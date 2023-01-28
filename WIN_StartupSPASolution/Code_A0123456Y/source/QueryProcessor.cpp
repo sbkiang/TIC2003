@@ -1,5 +1,6 @@
 #include "QueryProcessor.h"
 #include "Tokenizer.h"
+#include <iostream>
 
 // constructor
 QueryProcessor::QueryProcessor() {}
@@ -32,6 +33,12 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	if (synonymType == "procedure") {
 		Database::getProcedures(databaseResults);
 	}
+
+	else if (synonymType == "variable") {
+		Database::getVariable(databaseResults);
+	}
+
+
 
 	// post process the results to fill in the output vector
 	for (string databaseResult : databaseResults) {
