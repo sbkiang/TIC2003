@@ -1,0 +1,14 @@
+*.tlog
+*.ilk
+*.pdb
+*.vsidx
+*.tlog
+*.ipch
+*.ilk
+*.log
+*.pdb
+*.db-shm
+*.db-wal
+*.db
+*.opendb
+*.lock

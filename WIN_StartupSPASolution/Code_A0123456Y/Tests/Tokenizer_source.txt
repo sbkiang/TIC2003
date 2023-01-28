@@ -1,0 +1,22 @@
+procedure echo1 { 
+    read num1;
+    index = num1;
+    
+    num1 = 5;
+    num2 = 6;
+    
+    print num1;
+    print index;
+    
+}
+
+procedure echo2 { 
+    read num1;
+    index = num1;
+    
+    num3 = 11;
+    numAny = 22;
+    
+    print num1;
+    print index;
+}
