@@ -63,8 +63,7 @@ void SourceProcessor::process(string program) {
 			stmtNum++;
 			Container* container = new Container();
 			container->_type = "while";
-			Statement* stmt = new Statement(elseFlag);
-			stmt->_stmtNum = stmtNum;
+			Statement* stmt = new Statement(stmtNum, elseFlag);
 			if (!parentStack.empty()) {
 				parentStack.top()->_childContainers.push_back(container);
 			}
@@ -90,8 +89,7 @@ void SourceProcessor::process(string program) {
 			stmtNum++;
 			Container* container = new Container();
 			container->_type = "if";
-			Statement* stmt = new Statement(elseFlag);
-			stmt->_stmtNum = stmtNum;
+			Statement* stmt = new Statement(stmtNum, elseFlag);
 			if (!parentStack.empty()) { // if there's parent container, add current container to parent's child
 				parentStack.top()->_childContainers.push_back(container);
 			}
@@ -108,9 +106,8 @@ void SourceProcessor::process(string program) {
 			elseFlag = true;
 		}
 		else if (word == "=") { // for assign
-			Statement* stmt = new Statement(elseFlag);
 			stmtNum++;
-			stmt->_stmtNum = stmtNum;
+			Statement* stmt = new Statement(stmtNum, elseFlag);
 			while (tokens.at(i) != ";") {
 				stmt->_stmt += tokens.at(i);
 				i++;
@@ -120,9 +117,8 @@ void SourceProcessor::process(string program) {
 			Database::insertVariable(tokens.at(i - 3), stmtNum);
 		}
 		else if (word == "read" || word == "print" || word == "call") {
-			Statement* stmt = new Statement(elseFlag);
 			stmtNum++;
-			stmt->_stmtNum = stmtNum;
+			Statement* stmt = new Statement(stmtNum, elseFlag);
 			while (tokens.at(i) != ";") {
 				stmt->_stmt += tokens.at(i);
 				i++;
