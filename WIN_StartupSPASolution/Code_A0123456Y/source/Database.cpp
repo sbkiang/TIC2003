@@ -1,4 +1,5 @@
 #include "Database.h"
+#include <iostream>
 
 sqlite3* Database::dbConnection;
 vector<vector<string>> Database::dbResults;
@@ -100,6 +101,29 @@ void Database::getVariable(vector<string>& results) {
 		results.push_back(result);
 	}
 }
+
+void Database::getStmt(string type, vector<string>& results) {
+	// clear the existing results
+	dbResults.clear();
+
+	// retrieve the variable name from the variable table
+	// The callback method is only used when there are results to be returned.
+	if (type == "stmt") {
+		string getStmtSQL = "SELECT line_num FROM statement;";
+		sqlite3_exec(dbConnection, getStmtSQL.c_str(), callback, 0, &errorMessage);
+	}
+	else {
+		string getStmtSQL = "SELECT line_num FROM statement WHERE stmtType = '" + type + "';";
+		sqlite3_exec(dbConnection, getStmtSQL.c_str(), callback, 0, &errorMessage);
+	}
+	// postprocess the results from the database so that the output is just a vector of procedure names
+	for (vector<string> dbRow : dbResults) {
+		string result;
+		result = dbRow.at(0);
+		results.push_back(result);
+	}
+}
+
 
 // method to get all the statement from the database
 void Database::getStatement(string type, vector<string>& results) {
