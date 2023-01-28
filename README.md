@@ -6,3 +6,11 @@ https://miro.com/welcomeonboard/N25hZ3VvMWY0bW42c0tUamRvem94UmpadHQ0ZmIxSEx0ZGFE
 
 # Tasking
 https://docs.google.com/document/d/1wz7z3CZqi4ypNXZK6oKxiFp_WPf2AE0r7FTidXWOGa4/edit?usp=sharing
+
+#lteration 1 Report
+https://docs.google.com/document/d/1CV7otxATjUSHi6X-XMz9IOpijloG6mo-uRkFm-vgz20/edit?usp=sharing
+
+#lteration 2 Report
+
+
+#lteration 3 Report
