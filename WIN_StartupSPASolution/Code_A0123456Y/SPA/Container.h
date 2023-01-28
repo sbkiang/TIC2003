@@ -9,7 +9,13 @@ struct Statement{
 	string _stmt;
 	int _stmtNum;
 	bool _altCondition;
-	Statement(bool inAlt);
+	Statement(int stmtNum, bool inAlt);
+};
+
+struct CFGNode {
+	Statement* _stmtPtr = NULL;
+	CFGNode* _sJump = NULL;
+	CFGNode* _fJump = NULL;
 };
 
 
@@ -20,6 +26,8 @@ public:
 
 	// Destructor
 	~Container();
+
+	CFGNode* linkStatements();
 
 	// method for processing the source program
 	//virtual vector<string> getVectorStatements();
