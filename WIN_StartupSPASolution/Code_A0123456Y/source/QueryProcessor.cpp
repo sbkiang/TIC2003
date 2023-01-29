@@ -48,7 +48,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		}
 		
 		else if (synonymType == "constant") {
-			Database::getConsant();
+			Database::getConstant(databaseResults);
 		}
 
 

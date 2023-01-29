@@ -51,25 +51,25 @@ void Database::close() {
 
 // method to insert a procedure into the database
 void Database::insertProcedure(string procedureName) {
-	string insertProcedureSQL = "INSERT INTO procedures ('name') VALUES ('" + procedureName + "');";
-	sqlite3_exec(dbConnection, insertProcedureSQL.c_str(), NULL, 0, &errorMessage);
+	string sql = "INSERT INTO procedures ('name') VALUES ('" + procedureName + "');";
+	sqlite3_exec(dbConnection, sql.c_str(), NULL, 0, &errorMessage);
 }
 
 // method to insert a statement into the database
 void Database::insertStatement(int statementNumber, string statementName, string statementType) {
-	string insertStatementSQL= "INSERT INTO statement ('line_num', 'procedure_name', 'stmtType') VALUES ('" + to_string(statementNumber) + "', '" + statementName + "', '" + statementType + "');";
-	sqlite3_exec(dbConnection, insertStatementSQL.c_str(), NULL, 0, &errorMessage);
+	string sql = "INSERT INTO statement ('line_num', 'procedure_name', 'stmtType') VALUES ('" + to_string(statementNumber) + "', '" + statementName + "', '" + statementType + "');";
+	sqlite3_exec(dbConnection, sql.c_str(), NULL, 0, &errorMessage);
 }
 
 // method to insert a statement into the database
 void Database::insertVariable(string statementName, int statementNumber) {
-	string insertVariable = "INSERT INTO variable ('name', 'line_num') VALUES ('" + statementName + "', '" + to_string(statementNumber) + "');";
-	sqlite3_exec(dbConnection, insertVariable.c_str(), NULL, 0, &errorMessage);
+	string sql = "INSERT INTO variable ('name', 'line_num') VALUES ('" + statementName + "', '" + to_string(statementNumber) + "');";
+	sqlite3_exec(dbConnection, sql.c_str(), NULL, 0, &errorMessage);
 }
 
 void Database::insertConstant(string value) {
-	string insertConstant = "INSERT INTO constant ('value') VALUES ('" + value + "');";
-	sqlite3_exec(dbConnection, insertConstant.c_str(), NULL, 0, &errorMessage);
+	string sql = "INSERT INTO constant ('value') VALUES ('" + value + "');";
+	sqlite3_exec(dbConnection, sql.c_str(), NULL, 0, &errorMessage);
 }
 
 // method to get all the procedures from the database
@@ -79,8 +79,8 @@ void Database::getProcedures(vector<string>& results) {
 
 	// retrieve the procedures from the procedure table
 	// The callback method is only used when there are results to be returned.
-	string getProceduresSQL = "SELECT * FROM procedures;";
-	sqlite3_exec(dbConnection, getProceduresSQL.c_str(), callback, 0, &errorMessage);
+	string sql = "SELECT * FROM procedures;";
+	sqlite3_exec(dbConnection, sql.c_str(), callback, 0, &errorMessage);
 
 	// postprocess the results from the database so that the output is just a vector of procedure names
 	for (vector<string> dbRow : dbResults) {
@@ -96,8 +96,8 @@ void Database::getVariable(vector<string>& results) {
 
 	// retrieve the variable name from the variable table
 	// The callback method is only used when there are results to be returned.
-	string getVariableSQL = "SELECT name FROM variable;";
-	sqlite3_exec(dbConnection, getVariableSQL.c_str(), callback, 0, &errorMessage);
+	string sql = "SELECT name FROM variable;";
+	sqlite3_exec(dbConnection, sql.c_str(), callback, 0, &errorMessage);
 
 	// postprocess the results from the database so that the output is just a vector of procedure names
 	for (vector<string> dbRow : dbResults) {
@@ -114,14 +114,25 @@ void Database::getStmt(string type, vector<string>& results) {
 	// retrieve the variable name from the variable table
 	// The callback method is only used when there are results to be returned.
 	if (type == "stmt") {
-		string getStmtSQL = "SELECT line_num FROM statement;";
-		sqlite3_exec(dbConnection, getStmtSQL.c_str(), callback, 0, &errorMessage);
+		string sql = "SELECT line_num FROM statement;";
+		sqlite3_exec(dbConnection, sql.c_str(), callback, 0, &errorMessage);
 	}
 	else {
-		string getStmtSQL = "SELECT line_num FROM statement WHERE stmtType = '" + type + "';";
-		sqlite3_exec(dbConnection, getStmtSQL.c_str(), callback, 0, &errorMessage);
+		string sql = "SELECT line_num FROM statement WHERE stmtType = '" + type + "';";
+		sqlite3_exec(dbConnection, sql.c_str(), callback, 0, &errorMessage);
 	}
 	// postprocess the results from the database so that the output is just a vector of procedure names
+	for (vector<string> dbRow : dbResults) {
+		string result;
+		result = dbRow.at(0);
+		results.push_back(result);
+	}
+}
+
+void Database::getConstant(vector<string>& results) {
+	dbResults.clear();
+	string sql = "SELECT * FROM constant;";
+	sqlite3_exec(dbConnection, sql.c_str(), callback, 0, &errorMessage);
 	for (vector<string> dbRow : dbResults) {
 		string result;
 		result = dbRow.at(0);
@@ -137,8 +148,8 @@ void Database::getStatement(string type, vector<string>& results) {
 
 	// retrieve the procedures from the procedure table
 	// The callback method is only used when there are results to be returned.
-	string getStatementSQL = "SELECT * FROM statement WHERE stmtType = '" + type + "';";
-	sqlite3_exec(dbConnection, getStatementSQL.c_str(), callback, 0, &errorMessage);
+	string sql = "SELECT * FROM statement WHERE stmtType = '" + type + "';";
+	sqlite3_exec(dbConnection, sql.c_str(), callback, 0, &errorMessage);
 
 	// postprocess the results from the database so that the output is just a vector of procedure names
 	for (vector<string> dbRow : dbResults) {

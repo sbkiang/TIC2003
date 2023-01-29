@@ -42,6 +42,9 @@ public:
 	// method to get statements from the database
 	static void getStmt(string type, vector<string>& results);
 
+	// method to get constant from the database
+	static void getConstant(vector<string>& results);
+
 private:
 	// the connection pointer to the database
 	static sqlite3* dbConnection; 
