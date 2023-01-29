@@ -83,7 +83,7 @@ void SourceProcessor::process(string program) {
 				i++;
 			} while (brackets != 0);
 			container->_statements.push_back(stmt);
-			Database::insertStatement(stmtNum, procedures.back()->_name, word);
+			Database::insertStatement(stmtNum, stmt->_stmt, word);
 		}
 		else if (word == "if") { // if(...) then {...} else {...}
 			stmtNum++;
@@ -97,10 +97,13 @@ void SourceProcessor::process(string program) {
 			while (tokens.at(i) != "then") { // from current index till "then", it's the condition. "if(...) then{"
 				container->_condition += tokens.at(i);
 				stmt->_stmt += tokens.at(i);
+				if (isdigit(tokens.at(i)[0])) { // if the first char is digit, then token is a number
+					Database::insertConstant(tokens.at(i));
+				}
 				i++;
 			}
 			container->_statements.push_back(stmt);
-			Database::insertStatement(stmtNum, procedures.back()->_name, word);
+			Database::insertStatement(stmtNum, stmt->_stmt, word);
 		}
 		else if (word == "else") { // set the flag for encountering "else"
 			elseFlag = true;
@@ -108,12 +111,13 @@ void SourceProcessor::process(string program) {
 		else if (word == "=") { // for assign
 			stmtNum++;
 			Statement* stmt = new Statement(stmtNum, elseFlag);
+			stmt->_stmt += tokens.at(i-1);
 			while (tokens.at(i) != ";") {
 				stmt->_stmt += tokens.at(i);
 				i++;
 			}
 			parentStack.top()->_statements.push_back(stmt);
-			Database::insertStatement(stmtNum, procedures.back()->_name, "assign");
+			Database::insertStatement(stmtNum, stmt->_stmt, "assign");
 			Database::insertVariable(tokens.at(i - 3), stmtNum);
 		}
 		else if (word == "read" || word == "print" || word == "call") {
@@ -124,7 +128,7 @@ void SourceProcessor::process(string program) {
 				i++;
 			}
 			parentStack.top()->_statements.push_back(stmt);
-			Database::insertStatement(stmtNum, procedures.back()->_name, word);
+			Database::insertStatement(stmtNum, stmt->_stmt, word);
 
 			if (word == "read") {
 				Database::insertVariable(tokens.at(i - 1), stmtNum);

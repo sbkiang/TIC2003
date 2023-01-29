@@ -1,0 +1,25 @@
+1 - Procedure
+procedure p;
+Select p
+echo 1
+5000
+2 - Variable
+variable v;
+Select v
+num1, num2, num3, num4, num5, num6, num7, num8, num9
+5000
+3 - Constant
+constant c;
+Select c
+5, 6, 10, 20, 30, 40, 50, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1000000
+5000
+4 - Assignment
+assign a;
+Select a
+1, 2, 3, 4, 5, 6, 8, 9, 11, 12, 14
+5000
+5 - Statement
+stmt s;
+Select s
+1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+5000
