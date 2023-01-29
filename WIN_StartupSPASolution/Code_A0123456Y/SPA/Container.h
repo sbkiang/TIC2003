@@ -9,14 +9,14 @@ using namespace std;
 struct Statement {
 	string _stmt;
 	int _stmtNum;
-	bool _failCondition;
-	Statement(int stmtNum, bool inAlt);
+	//bool _failCondition;
+	Statement(int stmtNum);
 };
 
 struct CFGNode {
 	Statement* _stmtPtr = NULL;
-	CFGNode* _sJump = NULL; // For non-condition statement, _sJump points to next statement. For condition statement, _sJump points to success condition block
-	CFGNode* _fJump = NULL; //For non-condition statement, _fJump points to NULL. For condition statement, _fJump points to fail condition block
+	CFGNode* _sJump = NULL; // For non-condition statement, _sJump points to next statement. For condition statement, _sJump points to first statement in the success condition block
+	CFGNode* _fJump = NULL; //For non-condition statement, _fJump points to NULL. For condition statement, _fJump points to first statement in the fail condition block
 };
 
 /*

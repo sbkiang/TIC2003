@@ -45,11 +45,8 @@ void CFG::addFTailFJump(CFGNode* node) { // add node to fail jump of CFG's fail 
 }
 
 void CFG::addSTailSJump(CFGNode* node) { // add node to success jump of CFG's success condition's tail
-	if (!_sTail) { // we want to maintain _sTail as NULL if there's no statement for it
-		_head->_sJump = node;
-		return;
-	}
-	_sTail->_sJump = node;
+	if (!_sTail) { _head->_sJump = node; }
+	else { _sTail->_sJump = node; }
 	_sTail = node;
 }
 
@@ -78,14 +75,13 @@ CFG* Container::linkStatements() { // Create a CFGNode for each statement. Then,
 	for (int i = 1; i < _statements.size(); i++) {
 		CFGNode* node = new CFGNode;
 		node->_stmtPtr = _statements.at(i);
-		if (!(_statements.at(i)->_failCondition)) { // if statement resides in the success condition block
-			cfg->addSTailSJump(node);
-			continue;
-		}
+		cfg->addSTailSJump(node);
+		/*
 		if (_statements.at(i)->_failCondition) { // statement reside in the fail condition block. Only applicable for if-else
 			cfg->addFTailSJump(node);
 			continue;
 		}
+		*/
 		/*
 		if (!(_statements.at(i)->_altCondition)) { // if statement reside in the success condition block
 			while (traverse->_sJump) { traverse = traverse->_sJump; } // traverse node until the last node
@@ -110,9 +106,8 @@ IfElseLinker* Container::getIfElseLinker(Container* ptr) {
 	return nullptr;
 }
 
-Statement::Statement(int stmtNum, bool inAlt) {
+Statement::Statement(int stmtNum) {
 	_stmtNum = stmtNum;
-	_failCondition = inAlt;
 }
 
 /*

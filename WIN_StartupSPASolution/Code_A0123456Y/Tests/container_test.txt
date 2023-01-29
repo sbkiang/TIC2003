@@ -1,6 +1,11 @@
 procedure proc1 {
     if(x = 10) then{	
-		b = 2;
+		if(x = 2) then{
+            d = 2;
+        }
+        else{
+            c = 3;
+        }
 		read c;
 		while(c < 10){
 			c = c + 1;
@@ -12,6 +17,12 @@ procedure proc1 {
 		if(c = 3) then{
 			d = 2;
 		}
+        else{
+            test = 1;
+        }
+        while(x > 10){
+            x = 5;
+        }
 	}   
 }
 

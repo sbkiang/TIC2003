@@ -45,7 +45,7 @@ void TestWrapper::evaluate(std::string query, std::list<std::string>& results){
 	}
 }
 
-/*int main() {
+int main() {
 	TestWrapper* tp = new TestWrapper();
 	tp->parse("..\\Tests\\container_test.txt");
-}*/
+}

@@ -42,15 +42,7 @@ void SourceProcessor::process(string program) {
 		if (word == "{") { curlyBrackets++; }
 		else if (word == "}") {
 			curlyBrackets--;
-			if (!parentStack.empty()) {
-				if (parentStack.top()->_type != "if") {
-					parentStack.pop();
-				}
-				else if (parentStack.top()->_type == "if" && elseFlag) { // for "if" container, pop after encountered "else"
-					parentStack.pop();
-					elseFlag = false;
-				}
-			}
+			if (!parentStack.empty()) { parentStack.pop(); }
 		}
 		else if (word == "procedure") {
 			i++;
@@ -63,7 +55,7 @@ void SourceProcessor::process(string program) {
 			stmtNum++;
 			Container* container = new Container();
 			container->_type = "while";
-			Statement* stmt = new Statement(stmtNum, elseFlag);
+			Statement* stmt = new Statement(stmtNum);
 			if (!parentStack.empty()) {
 				parentStack.top()->_childContainers.push_back(container);
 			}
@@ -92,10 +84,10 @@ void SourceProcessor::process(string program) {
 			stmtNum++;
 			Container* container = new Container();
 			container->_type = "if";
-			IfElseLinker* linker = new IfElseLinker();
-			linker->_ifPtr = container;
-			ifElseLinkerStack.push(linker);
-			Statement* stmt = new Statement(stmtNum, elseFlag);
+			IfElseLinker* linker = new IfElseLinker(); // create a IfElseLinker
+			linker->_ifPtr = container; // set the IfElseLinker's ifPtr to this "if" container
+			ifElseLinkerStack.push(linker); // push it onto the stack for the corresponding "else" container
+			Statement* stmt = new Statement(stmtNum);
 			if (!parentStack.empty()) { // if there's parent container, add current container to parent's child
 				parentStack.top()->_childContainers.push_back(container);
 			}
@@ -118,12 +110,16 @@ void SourceProcessor::process(string program) {
 			ifElseLinkerStack.top()->_elsePtr = container; // the top stack will be the corresponding "if" container. We set this "else" container to the pointer
 			parentStack.top()->_ifElseLinker.push_back(ifElseLinkerStack.top()); // parentStack.top() is this if-else container's parent. We add the this linker to it
 			ifElseLinkerStack.pop(); // we pop the IfElseLinker as we've already processed the if-else
+			if (!parentStack.empty()) { // if there's parent container, add current container to parent's child
+				parentStack.top()->_childContainers.push_back(container);
+			}
 			parentStack.push(container); // we push the current "else" container to the parentStack for future statements			
 		}
 		else if (word == "=") { // for assign
 			stmtNum++;
-			Statement* stmt = new Statement(stmtNum, elseFlag);
- 			Database::insertVariable(tokens.at(i - 1), stmtNum); 
+			Statement* stmt = new Statement(stmtNum);
+ 			Database::insertVariable(tokens.at(i - 1), stmtNum);
+			stmt->_stmt += tokens.at(i - 1);
 			while (tokens.at(i) != ";") {
 				stmt->_stmt += tokens.at(i);
 				if (isdigit(tokens.at(i)[0])) { // if the first char is digit, then token is a number. Add it to "constant" table
@@ -136,7 +132,7 @@ void SourceProcessor::process(string program) {
 		}
 		else if (word == "read" || word == "print" || word == "call") {
 			stmtNum++;
-			Statement* stmt = new Statement(stmtNum, elseFlag);
+			Statement* stmt = new Statement(stmtNum);
 			if (word == "read") {
 				Database::insertVariable(tokens.at(i - 1), stmtNum);
 			}
@@ -161,8 +157,17 @@ CFG* createCFG(Container* container) {
 	CFG* childCFG = nullptr;
 	for (int i = 0; i < container->_childContainers.size(); i++) { // loop through current container's child containers
 		Container* childContainer = container->_childContainers.at(i);
-		childCFG = createCFG(childContainer); //DFS till end of tree
-
+		childCFG = createCFG(childContainer); //DFS till end of tree, and create CFG
+		if (container->_childContainers.at(i)->_type == "if") { // if the current child container is "if" container, the next one will be the "else" container
+			i++;
+			CFG* elseCFG = createCFG(container->_childContainers.at(i)); // create the CFG for the else 
+			childCFG->_head->_fJump = elseCFG->_head; // set if CFG.fJump to else CFG.head
+		}
+		CFGNode* prevNode = ownCFG->getNode(childCFG->_head->_stmtPtr->_stmtNum - 1);
+		CFGNode* temp = prevNode->_sJump;
+		prevNode->_sJump = childCFG->_head;
+		childCFG->_sTail->_sJump = temp;
+		childCFG->_fTail->_sJump = temp; // is the _fTail pointing to the correct CFGNode?
 		// Get the current container's CFGNode that needs to be linked with the Child's CFG
 		/*
 		*	if(...){	 --> stmt1
@@ -190,7 +195,7 @@ CFG* createCFG(Container* container) {
 		*	What if I put else as a container under if?
 
 		*/
-		CFGNode* prevNode = ownCFG->getNode(childCFG->_head->_stmtPtr->_stmtNum - 1);
+		//CFGNode* prevNode = ownCFG->getNode(childCFG->_head->_stmtPtr->_stmtNum - 1);
 		if (prevNode) { // if able to find the CFGNode
 			//prevNode->_sJump =
 		}
