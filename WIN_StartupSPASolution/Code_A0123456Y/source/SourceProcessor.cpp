@@ -31,10 +31,6 @@ void SourceProcessor::process(string program) {
 	int curlyBrackets = 0;
 	stack<Container*> parentStack;
 	stack<IfElseLinker*> ifElseLinkerStack;
-	vector<string> containerWords{ "procedure","if","while" };
-	vector<string> noncontainers{ "" };
-	vector<string> assign, read, print, variable, constant, procedure;
-
 	bool elseFlag = false;
 	int stmtNum = 0;
 	for (int i = 0; i < tokens.size(); i++) {
@@ -73,9 +69,14 @@ void SourceProcessor::process(string program) {
 				}
 				container->_condition += tokens.at(i);
 				stmt->_stmt += tokens.at(i);
+				if (regex_match(tokens.at(i), regex("^[0-9]+$"))) {
+					Database::insertConstant(tokens.at(i));
+				}
+				/*
 				if (isdigit(tokens.at(i)[0])) { // if the first char is digit, then token is a number. Add it to "constant" table
 					Database::insertConstant(tokens.at(i));
 				}
+				*/
 			} while (brackets != 0);
 			container->_statements.push_back(stmt);
 			Database::insertStatement(stmtNum, procedures.back()->_name, word);
@@ -95,7 +96,7 @@ void SourceProcessor::process(string program) {
 			while (tokens.at(i) != "then") { // from current index till "then", it's the condition. "if(...) then{"
 				container->_condition += tokens.at(i);
 				stmt->_stmt += tokens.at(i);
-				if (isdigit(tokens.at(i)[0])) { // if the first char is digit, then token is a number. Add it to "constant" table
+				if (regex_match(tokens.at(i), regex("^[0-9]+$"))) {
 					Database::insertConstant(tokens.at(i));
 				}
 				i++;
@@ -122,8 +123,11 @@ void SourceProcessor::process(string program) {
 			stmt->_stmt += tokens.at(i - 1);
 			while (tokens.at(i) != ";") {
 				stmt->_stmt += tokens.at(i);
-				if (isdigit(tokens.at(i)[0])) { // if the first char is digit, then token is a number. Add it to "constant" table
+				if (regex_match(tokens.at(i), regex("^[0-9]+$"))) {
 					Database::insertConstant(tokens.at(i));
+				}
+				else if (false) { // token a variable. How to match? Alphanum, and not keyword? also need apply to condition statements to look for variables in there
+
 				}
 				i++;
 			}
@@ -133,12 +137,12 @@ void SourceProcessor::process(string program) {
 		else if (word == "read" || word == "print" || word == "call") {
 			stmtNum++;
 			Statement* stmt = new Statement(stmtNum);
-			if (word == "read") {
+			if (word == "read" || word == "print") {
 				Database::insertVariable(tokens.at(i - 1), stmtNum);
 			}
 			while (tokens.at(i) != ";") {
 				stmt->_stmt += tokens.at(i);
-				if (isdigit(tokens.at(i)[0])) { // if the first char is digit, then token is a number. Add it to "constant" table
+				if (regex_match(tokens.at(i), regex("^[0-9]+$"))) {
 					Database::insertConstant(tokens.at(i));
 				}
 				i++;

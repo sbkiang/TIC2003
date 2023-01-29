@@ -1,23 +1,42 @@
-procedure echo1 {   
+procedure assign {   
     num1 = 5;
     num2 = 6;
     num3 = num1 + num2;
-    num4 = num1 * 1000 + num2 * 2000;
-    num5 = num1 * num1 + num2 * num2;
-    num6 = num1 * num2 + num2 * num1;
-    if(num1 < (100 + 200 + 300 + 400 * 500 / 600 - 700 ^ 800)) then {
-        num6 = 10;
+    if(x == 10){
+        b = 10;
+        if(b != 20){
+            c = 20;
+            while(aa < 20){
+                cc = 30;
+                bb = cc + 20;
+            }
+            d = 30;
+        }
+        else{
+            e = 30;
+            while(dd > 20){
+                ee = 0;
+            }
+            ff = 200;
+        }
     }
     else{
-        num7 = 20 + 30 + 40 + 50 + 1 + 2 + 3 + 4 * 5 * 6 * 7;
+        f = -1;
+        if(bbb < 20){
+            aaa = -100;
+            while(ab != 0){
+                aaa = aaa + 1;
+            }
+            aaa = aaa - ccc;
+        }
+        else{
+            xx = 20 * 10;
+            while(xx > 0){
+                xx = xx - 1;
+            }
+            jj = -1 * xx;
+        }
     }
-    if(num2 < (5+10)) then {
-        num7 = 20;
-    }
-    else{
-        num8 = 1 * 2 / 3 + 4 - 5;
-    }
-    while(num8 > (2 * 6 + 3 / 8 + (9 - 10))){
-        num9 = num9 + 1000000;
-    }
+    last1 = 1;
+    last2 = 2;
 }

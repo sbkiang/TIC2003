@@ -6,7 +6,7 @@ echo1
 2 - Variable
 variable v;
 Select v
-num1, num2, num3, num4, num5, num6, num7, num8, num9
+num1, num2, num3, b, c, cc, bb, d, e, ee, ff, f, aaa, AAA, xx, jj, last1, last2
 5000
 3 - Constant
 constant c;

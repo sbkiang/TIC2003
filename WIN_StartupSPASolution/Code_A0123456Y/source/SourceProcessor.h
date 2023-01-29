@@ -5,6 +5,7 @@
 #include "Database.h"
 #include "Tokenizer.h"
 #include <stack>
+#include <regex>
 
 using namespace std;
 
