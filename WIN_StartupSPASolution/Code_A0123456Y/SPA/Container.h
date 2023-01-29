@@ -8,16 +8,32 @@ using namespace std;
 struct Statement{
 	string _stmt;
 	int _stmtNum;
-	bool _altCondition;
+	bool _failCondition;
 	Statement(int stmtNum, bool inAlt);
 };
 
 struct CFGNode {
 	Statement* _stmtPtr = NULL;
-	CFGNode* _sJump = NULL;
-	CFGNode* _fJump = NULL;
+	CFGNode* _sJump = NULL; // For non-condition statement, _sJump points to next statement. For condition statement, _sJump points to success condition block
+	CFGNode* _fJump = NULL; //For non-condition statement, _fJump points to NULL. For condition statement, _fJump points to fail condition block
 };
 
+class CFG {
+public:
+	CFGNode* _head;
+	CFGNode* _sTail;
+	CFGNode* _fTail;
+
+	CFG(CFGNode* head);
+	~CFG();
+
+	CFGNode* getNode(int stmtNum);
+	CFGNode* _getNode(int stmtNum, CFGNode* CFGNode);
+	void addSTailSJump(CFGNode* CFGNode);
+	void addSTailFJump(CFGNode* CFGNode);
+	void addFTailSJump(CFGNode* CFGNode);
+	void addFTailFJump(CFGNode* CFGNode);
+};
 
 class Container {
 public:
@@ -27,7 +43,7 @@ public:
 	// Destructor
 	~Container();
 
-	CFGNode* linkStatements();
+	CFG* linkStatements();
 
 	// method for processing the source program
 	//virtual vector<string> getVectorStatements();
