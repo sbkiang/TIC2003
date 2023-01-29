@@ -2,8 +2,8 @@
 
 CFG::CFG(CFGNode* head){
 	_head = head;
-	_sTail = NULL;
-	_fTail = NULL;
+	_sTail = nullptr;
+	_fTail = nullptr;
 }
 
 CFG::~CFG() {}
@@ -13,7 +13,7 @@ CFGNode* CFG::getNode(int stmtNum) {
 }
 
 CFGNode* CFG::_getNode(int stmtNum, CFGNode* node) {
-	CFGNode* found = NULL;
+	CFGNode* found = nullptr;
 	if (node) {
 		if (node->_stmtPtr->_stmtNum == stmtNum) {
 			return node;
@@ -71,7 +71,7 @@ Container::Container() {
 Container::~Container() {}
 
 CFG* Container::linkStatements() { // Create a CFGNode for each statement. Then, link them together in a CFG, and following the if-else and while CFG rule
-	if (_statements.size() == 0) { return NULL; }
+	if (_statements.size() == 0) { return nullptr; }
 	CFGNode* head = new CFGNode;
 	head->_stmtPtr = _statements.at(0);
 	CFG* cfg = new CFG(head);
@@ -102,7 +102,22 @@ CFG* Container::linkStatements() { // Create a CFGNode for each statement. Then,
 	return cfg;
 }
 
+IfElseLinker* Container::getIfElseLinker(Container* ptr) {
+	for (int i = 0; i < _ifElseLinker.size(); i++) {
+		if (_ifElseLinker.at(i)->_ifPtr == ptr) { return _ifElseLinker.at(i); }
+		if (_ifElseLinker.at(i)->_elsePtr == ptr) { return _ifElseLinker.at(i); }
+	}
+	return nullptr;
+}
+
 Statement::Statement(int stmtNum, bool inAlt) {
 	_stmtNum = stmtNum;
 	_failCondition = inAlt;
 }
+
+/*
+IfElseLinker::IfElseLinker(Container* ifPtr, Container* elsePtr) {
+	_ifPtr = ifPtr;
+	_elsePtr = elsePtr;
+}
+*/

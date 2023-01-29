@@ -2,10 +2,11 @@
 #include <sstream>
 #include <fstream>
 #include <vector>
+#include "IfElseLinker.h"
 
 using namespace std;
 
-struct Statement{
+struct Statement {
 	string _stmt;
 	int _stmtNum;
 	bool _failCondition;
@@ -17,6 +18,14 @@ struct CFGNode {
 	CFGNode* _sJump = NULL; // For non-condition statement, _sJump points to next statement. For condition statement, _sJump points to success condition block
 	CFGNode* _fJump = NULL; //For non-condition statement, _fJump points to NULL. For condition statement, _fJump points to fail condition block
 };
+
+/*
+struct IfElseLinker {
+	Container* _ifPtr;
+	Container* _elsePtr;
+	IfElseLinker(Container* ifPtr, Container* elsePtr);
+};
+*/
 
 class CFG {
 public:
@@ -53,4 +62,7 @@ public:
 	string _condition;
 	string _type;
 	int _statementCount;
+	vector<IfElseLinker*> _ifElseLinker;
+
+	IfElseLinker* getIfElseLinker(Container* ptr);
 };

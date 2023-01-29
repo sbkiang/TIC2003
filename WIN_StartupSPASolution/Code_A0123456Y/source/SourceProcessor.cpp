@@ -30,9 +30,11 @@ void SourceProcessor::process(string program) {
 	vector<Procedure*> procedures;
 	int curlyBrackets = 0;
 	stack<Container*> parentStack;
+	stack<IfElseLinker*> ifElseLinkerStack;
 	vector<string> containerWords{ "procedure","if","while" };
 	vector<string> noncontainers{ "" };
 	vector<string> assign, read, print, variable, constant, procedure;
+
 	bool elseFlag = false;
 	int stmtNum = 0;
 	for (int i = 0; i < tokens.size(); i++) {
@@ -51,12 +53,10 @@ void SourceProcessor::process(string program) {
 			}
 		}
 		else if (word == "procedure") {
-			Procedure* procedure = new Procedure();
 			i++;
-			procedure->_name = tokens.at(i);
+			Procedure* procedure = new Procedure(tokens.at(i));
 			procedures.push_back(procedure);
 			parentStack.push(procedure);
-
 			Database::insertProcedure(procedure->_name);
 		}
 		else if (word == "while") { // while(...){...}
@@ -92,6 +92,9 @@ void SourceProcessor::process(string program) {
 			stmtNum++;
 			Container* container = new Container();
 			container->_type = "if";
+			IfElseLinker* linker = new IfElseLinker();
+			linker->_ifPtr = container;
+			ifElseLinkerStack.push(linker);
 			Statement* stmt = new Statement(stmtNum, elseFlag);
 			if (!parentStack.empty()) { // if there's parent container, add current container to parent's child
 				parentStack.top()->_childContainers.push_back(container);
@@ -110,6 +113,12 @@ void SourceProcessor::process(string program) {
 		}
 		else if (word == "else") { // set the flag for encountering "else"
 			elseFlag = true;
+			Container* container = new Container();
+			container->_type = "else";
+			ifElseLinkerStack.top()->_elsePtr = container; // the top stack will be the corresponding "if" container. We set this "else" container to the pointer
+			parentStack.top()->_ifElseLinker.push_back(ifElseLinkerStack.top()); // parentStack.top() is this if-else container's parent. We add the this linker to it
+			ifElseLinkerStack.pop(); // we pop the IfElseLinker as we've already processed the if-else
+			parentStack.push(container); // we push the current "else" container to the parentStack for future statements			
 		}
 		else if (word == "=") { // for assign
 			stmtNum++;
@@ -140,6 +149,59 @@ void SourceProcessor::process(string program) {
 			}
 			parentStack.top()->_statements.push_back(stmt);
 			Database::insertStatement(stmtNum, procedures.back()->_name, word);
+		}
+	}
+}
+
+
+// call linkStatements for each container, then join them up 
+CFG* createCFG(Container* container) {
+	if (!container) { return nullptr; }
+	CFG* ownCFG = container->linkStatements();
+	CFG* childCFG = nullptr;
+	for (int i = 0; i < container->_childContainers.size(); i++) { // loop through current container's child containers
+		Container* childContainer = container->_childContainers.at(i);
+		childCFG = createCFG(childContainer); //DFS till end of tree
+
+		// Get the current container's CFGNode that needs to be linked with the Child's CFG
+		/*
+		*	if(...){	 --> stmt1
+		*		stmt2
+		*	}
+		*	else{
+		*		if(...){ --> stmt3
+		*			stmt4
+		*		}
+		*		else{
+		*			stmt5
+		*		}
+		*	}
+		*	stmt1.sJump = stmt2
+		*	stmt1.fJump = stmt3
+		*	stmt3.sJump = stmt4
+		*	stmt3.fJump = stmt5
+		*
+		*	childCFG = 3->4->5
+		*	prevNode = 3-1 = 2
+		*	But stmt2.sJump is not 3->4->5. Correct one is stmt1.fJump. But given my classes, I can't determine if stmt3 is under the if block or else block
+		*	Seems to be an issue only for if-else because I need to consider the else block. For while, this works
+		*   Maybe use a successJump stmtNum and failJump stmtNum to denote the first successJump statement and failJump statement?
+		* 
+		*	What if I put else as a container under if?
+
+		*/
+		CFGNode* prevNode = ownCFG->getNode(childCFG->_head->_stmtPtr->_stmtNum - 1);
+		if (prevNode) { // if able to find the CFGNode
+			//prevNode->_sJump =
+		}
+
+		if (container->_type == "if") { // if current container is "if" container
+
+		}
+		if (childCFG) { // if there's a CFG from the child container
+			if (childContainer->_type == "while") {
+
+			}
 		}
 	}
 }

@@ -30,16 +30,13 @@
     <ClCompile Include="Container.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="If_Then_Else.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Procedure.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="While.cpp">
+    <ClCompile Include="..\source\SourceProcessor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\SourceProcessor.cpp">
+    <ClCompile Include="IfElseLinker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -62,13 +59,10 @@
     <ClInclude Include="Container.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="If_Then_Else.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Procedure.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="While.h">
+    <ClInclude Include="IfElseLinker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

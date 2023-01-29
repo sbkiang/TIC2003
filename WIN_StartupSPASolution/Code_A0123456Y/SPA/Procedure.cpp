@@ -1,9 +1,8 @@
 #include "Procedure.h"
 
 // constructor
-Procedure::Procedure() {
-	_statementCount = 0;
-	_name = "";
+Procedure::Procedure(string name) {
+	_name = name;
 }
 
 // destructor
@@ -17,5 +16,4 @@ void Procedure::print() {
 	}
 }
 
-void Procedure::_print() {
-}
+void Procedure::_print() {}
