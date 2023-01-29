@@ -2,10 +2,10 @@ procedure echo1 {
     num1 = 5;
     num2 = 6;
     num3 = num1 + num2;
-    num4 = num1 * 6 + num2 * 5;
+    num4 = num1 * 1000 + num2 * 2000;
     num5 = num1 * num1 + num2 * num2;
     num6 = num1 * num2 + num2 * num1;
-    if(num1 < 5) then {
+    if(num1 < (100 + 200 + 300 + 400 * 500 / 600 - 700 ^ 800)) then {
         num6 = 10;
     }
     else{

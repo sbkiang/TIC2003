@@ -1,0 +1,5 @@
+1) Centralize the code for 
+		if (isdigit(tokens.at(i)[0])) { // if the first char is digit, then token is a number. Add it to "constant" table
+			Database::insertConstant(tokens.at(i));
+		}
+   Current it's being copy and pasted to 3 different places

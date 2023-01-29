@@ -70,6 +70,7 @@ void SourceProcessor::process(string program) {
 			parentStack.push(container);
 			int brackets = 0;
 			do { // Anything enclosed between the brackets is the if condition
+				i++;
 				if (tokens.at(i) == "(") {
 					brackets++;
 					continue;
@@ -80,10 +81,12 @@ void SourceProcessor::process(string program) {
 				}
 				container->_condition += tokens.at(i);
 				stmt->_stmt += tokens.at(i);
-				i++;
+				if (isdigit(tokens.at(i)[0])) { // if the first char is digit, then token is a number. Add it to "constant" table
+					Database::insertConstant(tokens.at(i));
+				}
 			} while (brackets != 0);
 			container->_statements.push_back(stmt);
-			Database::insertStatement(stmtNum, stmt->_stmt, word);
+			Database::insertStatement(stmtNum, procedures.back()->_name, word);
 		}
 		else if (word == "if") { // if(...) then {...} else {...}
 			stmtNum++;
@@ -97,13 +100,13 @@ void SourceProcessor::process(string program) {
 			while (tokens.at(i) != "then") { // from current index till "then", it's the condition. "if(...) then{"
 				container->_condition += tokens.at(i);
 				stmt->_stmt += tokens.at(i);
-				if (isdigit(tokens.at(i)[0])) { // if the first char is digit, then token is a number
+				if (isdigit(tokens.at(i)[0])) { // if the first char is digit, then token is a number. Add it to "constant" table
 					Database::insertConstant(tokens.at(i));
 				}
 				i++;
 			}
 			container->_statements.push_back(stmt);
-			Database::insertStatement(stmtNum, stmt->_stmt, word);
+			Database::insertStatement(stmtNum, procedures.back()->_name, word);
 		}
 		else if (word == "else") { // set the flag for encountering "else"
 			elseFlag = true;
@@ -111,43 +114,32 @@ void SourceProcessor::process(string program) {
 		else if (word == "=") { // for assign
 			stmtNum++;
 			Statement* stmt = new Statement(stmtNum, elseFlag);
-			stmt->_stmt += tokens.at(i-1);
+ 			Database::insertVariable(tokens.at(i - 1), stmtNum); 
 			while (tokens.at(i) != ";") {
 				stmt->_stmt += tokens.at(i);
+				if (isdigit(tokens.at(i)[0])) { // if the first char is digit, then token is a number. Add it to "constant" table
+					Database::insertConstant(tokens.at(i));
+				}
 				i++;
 			}
 			parentStack.top()->_statements.push_back(stmt);
-			Database::insertStatement(stmtNum, stmt->_stmt, "assign");
-			Database::insertVariable(tokens.at(i - 3), stmtNum);
+			Database::insertStatement(stmtNum, procedures.back()->_name, "assign");
 		}
 		else if (word == "read" || word == "print" || word == "call") {
 			stmtNum++;
 			Statement* stmt = new Statement(stmtNum, elseFlag);
-			while (tokens.at(i) != ";") {
-				stmt->_stmt += tokens.at(i);
-				i++;
-			}
-			parentStack.top()->_statements.push_back(stmt);
-			Database::insertStatement(stmtNum, stmt->_stmt, word);
-
 			if (word == "read") {
 				Database::insertVariable(tokens.at(i - 1), stmtNum);
 			}
-		}
-	}
-}
-
-void formStatement(int index, vector<string> tokens, int& retIndex) {
-	string ret = "";
-	vector<string> r_p_c{ "read","print","call" };
-	vector<string> i_w{ "if","while" };
-	// join tokens together, delimited by ";" = end of statement
-
-	// if current token is a (read, print, call), find the terminating ";" to form a statement
-	if (find(r_p_c.begin(), r_p_c.end(), tokens.at(index)) == r_p_c.end()) {
-		while (tokens.at(index) != ";") {
-			ret += tokens.at(index);
-			index++;
+			while (tokens.at(i) != ";") {
+				stmt->_stmt += tokens.at(i);
+				if (isdigit(tokens.at(i)[0])) { // if the first char is digit, then token is a number. Add it to "constant" table
+					Database::insertConstant(tokens.at(i));
+				}
+				i++;
+			}
+			parentStack.top()->_statements.push_back(stmt);
+			Database::insertStatement(stmtNum, procedures.back()->_name, word);
 		}
 	}
 }
