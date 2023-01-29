@@ -46,6 +46,10 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		else if (synonymType == "assign" || synonymType == "print" || synonymType == "read" || synonymType == "stmt") {
 			Database::getStmt(synonymType ,databaseResults);
 		}
+		
+		else if (synonymType == "constant") {
+			Database::getConsant();
+		}
 
 
 	}

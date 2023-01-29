@@ -27,8 +27,8 @@ public:
 	// method to insert a statement into the database
 	static void insertVariable(string statementName, int statementNumber);
 
-
-
+	// method to insert a constant into the database
+	static void insertConstant(string value);
 
 	// method to get all the procedures from the database
 	static void getProcedures(vector<string>& results);
@@ -39,7 +39,7 @@ public:
 	// method to get all variable name from the database
 	static void getVariable(vector<string>& results);
 
-	// method to get all variable name from the database
+	// method to get statements from the database
 	static void getStmt(string type, vector<string>& results);
 
 private:

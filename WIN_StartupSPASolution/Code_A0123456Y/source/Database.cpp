@@ -37,7 +37,7 @@ void Database::initialize() {
 	string dropConstantTableSQL = "DROP TABLE IF EXISTS constant";
 	sqlite3_exec(dbConnection, dropConstantTableSQL.c_str(), NULL, 0, &errorMessage);
 	// create a constant table
-	string createConstantTableSQL = "CREATE TABLE constant ( name VARCHAR(255) REFERENCES procedures(procedure_name), value INT );";
+	string createConstantTableSQL = "CREATE TABLE constant ( value VARCHAR(20) PRIMARY KEY);";
 	sqlite3_exec(dbConnection, createConstantTableSQL.c_str(), NULL, 0, &errorMessage);
 
 	// initialize the result vector
@@ -65,6 +65,11 @@ void Database::insertStatement(int statementNumber, string statementName, string
 void Database::insertVariable(string statementName, int statementNumber) {
 	string insertVariable = "INSERT INTO variable ('name', 'line_num') VALUES ('" + statementName + "', '" + to_string(statementNumber) + "');";
 	sqlite3_exec(dbConnection, insertVariable.c_str(), NULL, 0, &errorMessage);
+}
+
+void Database::insertConstant(string value) {
+	string insertConstant = "INSERT INTO constant ('value') VALUES ('" + value + "');";
+	sqlite3_exec(dbConnection, insertConstant.c_str(), NULL, 0, &errorMessage);
 }
 
 // method to get all the procedures from the database
