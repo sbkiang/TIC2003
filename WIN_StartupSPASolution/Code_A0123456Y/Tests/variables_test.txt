@@ -1,4 +1,4 @@
-procedure assign {   
+procedure variables {   
     num1 = 5;
     num2 = 6;
     num3 = num1 + num2;
@@ -27,7 +27,7 @@ procedure assign {
             while(ab != 0){
                 aaa = aaa + 1;
             }
-            aaa = aaa - ccc;
+            AAA = aaa - ccc;
         }
         else{
             xx = 20 * 10;
