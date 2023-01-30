@@ -70,7 +70,7 @@ void SourceProcessor::process(string program) {
 				if (regex_match(tokens.at(i), regex("^[0-9]+$"))) {
 					Database::insertConstant(tokens.at(i));
 				}
-				else if (regex_match(tokens.at(i), regex("^((?!procedure)(?!while)(?!if)(?!then)(?!else)(?!call)(?!read)(?!print))[A-Za-z][A-Za-z0-9]*"))) { // token a variable. How to match? Alphanum, and not keyword? also need apply to condition statements to look for variables in there
+				else if (regex_match(tokens.at(i), regex("^((?!(procedure|while|if|then|else|call|read|print)+$).)*"))) { // token a variable. How to match? Alphanum, and not keyword? also need apply to condition statements to look for variables in there
 					Database::insertVariable(tokens.at(i), stmtNum);
 				}
 			} while (brackets != 0);
@@ -95,7 +95,7 @@ void SourceProcessor::process(string program) {
 				if (regex_match(tokens.at(i), regex("^[0-9]+$"))) {
 					Database::insertConstant(tokens.at(i));
 				}
-				else if (regex_match(tokens.at(i), regex("^((?!procedure)(?!while)(?!if)(?!then)(?!else)(?!call)(?!read)(?!print))[A-Za-z][A-Za-z0-9]*"))) { // token a variable. How to match? Alphanum, and not keyword? also need apply to condition statements to look for variables in there
+				else if (regex_match(tokens.at(i), regex("^((?!(procedure|while|if|then|else|call|read|print)+$).)*"))) { // token a variable. How to match? Alphanum, and not keyword? also need apply to condition statements to look for variables in there
 					Database::insertVariable(tokens.at(i), stmtNum);
 				}
 				i++;
@@ -125,7 +125,7 @@ void SourceProcessor::process(string program) {
 				if (regex_match(tokens.at(i), regex("^[0-9]+$"))) {
 					Database::insertConstant(tokens.at(i));
 				}
-				else if (regex_match(tokens.at(i), regex("^((?!procedure)(?!while)(?!if)(?!then)(?!else)(?!call)(?!read)(?!print))[A-Za-z][A-Za-z0-9]*"))) { // token a variable. How to match? Alphanum, and not keyword? also need apply to condition statements to look for variables in there
+				else if (regex_match(tokens.at(i), regex("^((?!(procedure|while|if|then|else|call|read|print)+$).)*"))) {
 					Database::insertVariable(tokens.at(i), stmtNum);
 				}
 				i++;
