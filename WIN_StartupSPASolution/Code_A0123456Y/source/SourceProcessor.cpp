@@ -1,7 +1,5 @@
 #include "SourceProcessor.h"
-#include "..\SPA\If_Then_Else.h"
 #include "..\SPA\Procedure.h"
-#include "..\SPA\While.h"
 #include "..\SPA\Container.h"
 
 // method for processing the source program
@@ -72,11 +70,9 @@ void SourceProcessor::process(string program) {
 				if (regex_match(tokens.at(i), regex("^[0-9]+$"))) {
 					Database::insertConstant(tokens.at(i));
 				}
-				/*
-				if (isdigit(tokens.at(i)[0])) { // if the first char is digit, then token is a number. Add it to "constant" table
-					Database::insertConstant(tokens.at(i));
+				else if (regex_match(tokens.at(i), regex("^((?!procedure)(?!while)(?!if)(?!then)(?!else)(?!call)(?!read)(?!print))[A-Za-z][A-Za-z0-9]*"))) { // token a variable. How to match? Alphanum, and not keyword? also need apply to condition statements to look for variables in there
+					Database::insertVariable(tokens.at(i), stmtNum);
 				}
-				*/
 			} while (brackets != 0);
 			container->_statements.push_back(stmt);
 			Database::insertStatement(stmtNum, procedures.back()->_name, word);
@@ -98,6 +94,9 @@ void SourceProcessor::process(string program) {
 				stmt->_stmt += tokens.at(i);
 				if (regex_match(tokens.at(i), regex("^[0-9]+$"))) {
 					Database::insertConstant(tokens.at(i));
+				}
+				else if (regex_match(tokens.at(i), regex("^((?!procedure)(?!while)(?!if)(?!then)(?!else)(?!call)(?!read)(?!print))[A-Za-z][A-Za-z0-9]*"))) { // token a variable. How to match? Alphanum, and not keyword? also need apply to condition statements to look for variables in there
+					Database::insertVariable(tokens.at(i), stmtNum);
 				}
 				i++;
 			}
@@ -126,8 +125,8 @@ void SourceProcessor::process(string program) {
 				if (regex_match(tokens.at(i), regex("^[0-9]+$"))) {
 					Database::insertConstant(tokens.at(i));
 				}
-				else if (false) { // token a variable. How to match? Alphanum, and not keyword? also need apply to condition statements to look for variables in there
-
+				else if (regex_match(tokens.at(i), regex("^((?!procedure)(?!while)(?!if)(?!then)(?!else)(?!call)(?!read)(?!print))[A-Za-z][A-Za-z0-9]*"))) { // token a variable. How to match? Alphanum, and not keyword? also need apply to condition statements to look for variables in there
+					Database::insertVariable(tokens.at(i), stmtNum);
 				}
 				i++;
 			}
@@ -138,14 +137,7 @@ void SourceProcessor::process(string program) {
 			stmtNum++;
 			Statement* stmt = new Statement(stmtNum);
 			if (word == "read" || word == "print") {
-				Database::insertVariable(tokens.at(i - 1), stmtNum);
-			}
-			while (tokens.at(i) != ";") {
-				stmt->_stmt += tokens.at(i);
-				if (regex_match(tokens.at(i), regex("^[0-9]+$"))) {
-					Database::insertConstant(tokens.at(i));
-				}
-				i++;
+				Database::insertVariable(tokens.at(i + 1), stmtNum);
 			}
 			parentStack.top()->_statements.push_back(stmt);
 			Database::insertStatement(stmtNum, procedures.back()->_name, word);

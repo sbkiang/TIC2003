@@ -2,13 +2,13 @@ procedure variables {
     num1 = 5;
     num2 = 6;
     num3 = num1 + num2;
-    if(x == 10){
+    if(x == 10) then{
         b = 10;
-        if(b != 20){
+        if(b != 20) then{
             c = 20;
             while(aa < 20){
                 cc = 30;
-                bb = cc + 20;
+                bb = cc + 20 * xyz - ZzZ - Zzz;
             }
             d = 30;
         }
@@ -22,8 +22,8 @@ procedure variables {
     }
     else{
         f = -1;
-        if(bbb < 20){
-            aaa = -100;
+        if(bbb < 20) then{
+            aaa = 100;
             while(ab != 0){
                 aaa = aaa + 1;
             }
@@ -40,3 +40,5 @@ procedure variables {
     last1 = 1;
     last2 = 2;
 }
+
+5 6 10 20 30 0 200 1 100 2
