@@ -1,4 +1,4 @@
-procedure variables {   
+procedure variables {
     procedurexx = procedure + if + else + whilex;
     num1 = 5;
     num2 = 6;
@@ -32,7 +32,7 @@ procedure variables {
         }
         else{
             xx = 20 * 10;
-            while(xx > 0){
+            while(xx > (x1 * x2 + x3 - x4 / x5)){
                 xx = xx - 1;
             }
             jj = -1 * xx;
@@ -41,5 +41,3 @@ procedure variables {
     last1 = 1;
     last2 = 2;
 }
-
-5 6 10 20 30 0 200 1 100 2

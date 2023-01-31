@@ -16,6 +16,8 @@ void SourceProcessor::process(string program) {
 	vector<string> tokens;
 	tk.tokenize(program, tokens);
 
+	string var_regex = "^((?!(procedure|while|if|then|else|call|read|print)+$)[A-Za-z][A-Za-z0-9]*)";
+
 	// This logic is highly simplified based on iteration 1 requirements and 
 	// the assumption that the programs are valid.
 
@@ -54,28 +56,31 @@ void SourceProcessor::process(string program) {
 				parentStack.top()->_childContainers.push_back(container);
 			}
 			parentStack.push(container);
+			vector<Statement> variableStore;
 			int brackets = 0;
 			do { // Anything enclosed between the brackets is the if condition
-				i++;
+				i++; // skip the "while" keyword
 				if (tokens.at(i) == "(") {
 					brackets++;
-					continue;
 				}
-				if (tokens.at(i) == ")") {
+				else if (tokens.at(i) == ")") {
 					brackets--;
-					continue;
 				}
 				container->_condition += tokens.at(i);
 				stmt->_stmt += tokens.at(i);
 				if (regex_match(tokens.at(i), regex("^[0-9]+$"))) {
 					Database::insertConstant(tokens.at(i));
 				}
-				else if (regex_match(tokens.at(i), regex("^((?!(procedure|while|if|then|else|call|read|print)+$).)*"))) { // token a variable. How to match? Alphanum, and not keyword? also need apply to condition statements to look for variables in there
-					Database::insertVariable(tokens.at(i), stmtNum);
+				else if (regex_match(tokens.at(i), regex(var_regex))) {
+					variableStore.push_back(Statement(stmtNum, tokens.at(i)));
 				}
 			} while (brackets != 0);
 			container->_statements.push_back(stmt);
-			Database::insertStatement(stmtNum, procedures.back()->_name, word);
+			Database::insertStatement(stmtNum, procedures.back()->_name, word, stmt->_stmt);
+			for (int i = 0; i < variableStore.size(); i++) { // insert the variable after inserting the statement due to FK
+				Database::insertVariable(variableStore.at(i)._stmt, variableStore.at(i)._stmtNum);
+			}
+
 		}
 		else if (word == "if") { // if(...) then {...} else {...}
 			stmtNum++;
@@ -89,19 +94,24 @@ void SourceProcessor::process(string program) {
 				parentStack.top()->_childContainers.push_back(container);
 			}
 			parentStack.push(container); //set itself as the latest parent container
+			vector<Statement> variableStore; // we need to insert statement first before inserting variable due to FK
+			i++ ; // skip the "if" keyword for the while loop below
 			while (tokens.at(i) != "then") { // from current index till "then", it's the condition. "if(...) then{"
 				container->_condition += tokens.at(i);
 				stmt->_stmt += tokens.at(i);
 				if (regex_match(tokens.at(i), regex("^[0-9]+$"))) {
 					Database::insertConstant(tokens.at(i));
 				}
-				else if (regex_match(tokens.at(i), regex("^((?!(procedure|while|if|then|else|call|read|print)+$).)*"))) { // token a variable. How to match? Alphanum, and not keyword? also need apply to condition statements to look for variables in there
-					Database::insertVariable(tokens.at(i), stmtNum);
+				else if (regex_match(tokens.at(i), regex(var_regex))) {
+					variableStore.push_back(Statement(stmtNum, tokens.at(i)));
 				}
 				i++;
 			}
 			container->_statements.push_back(stmt);
-			Database::insertStatement(stmtNum, procedures.back()->_name, word);
+			Database::insertStatement(stmtNum, procedures.back()->_name, word, stmt->_stmt);
+			for (int i = 0; i < variableStore.size(); i++) {
+				Database::insertVariable(variableStore.at(i)._stmt, variableStore.at(i)._stmtNum);
+			}
 		}
 		else if (word == "else") { // set the flag for encountering "else"
 			elseFlag = true;
@@ -118,29 +128,36 @@ void SourceProcessor::process(string program) {
 		else if (word == "=") { // for assign
 			stmtNum++;
 			Statement* stmt = new Statement(stmtNum);
- 			Database::insertVariable(tokens.at(i - 1), stmtNum);
 			stmt->_stmt += tokens.at(i - 1);
+			vector<Statement> variableStore; // we need to insert statement first before inserting variable due to FK. So, we store the variables here
+			variableStore.push_back(Statement(stmtNum, tokens.at(i - 1)));
+			string LHS = tokens.at(i - 1);
 			while (tokens.at(i) != ";") {
 				stmt->_stmt += tokens.at(i);
 				if (regex_match(tokens.at(i), regex("^[0-9]+$"))) {
 					Database::insertConstant(tokens.at(i));
 				}
-				else if (regex_match(tokens.at(i), regex("^((?!(procedure|while|if|then|else|call|read|print)+$).)*"))) {
-					Database::insertVariable(tokens.at(i), stmtNum);
+				else if (regex_match(tokens.at(i), regex(var_regex))) {
+					variableStore.push_back(Statement(stmtNum, tokens.at(i)));
 				}
 				i++;
 			}
 			parentStack.top()->_statements.push_back(stmt);
-			Database::insertStatement(stmtNum, procedures.back()->_name, "assign");
+			Database::insertStatement(stmtNum, procedures.back()->_name, "assign", stmt->_stmt);
+			for (int i = 0; i < variableStore.size(); i++) {
+				Database::insertVariable(variableStore.at(i)._stmt, variableStore.at(i)._stmtNum);
+			}
 		}
 		else if (word == "read" || word == "print" || word == "call") {
 			stmtNum++;
 			Statement* stmt = new Statement(stmtNum);
+			stmt->_stmt += tokens.at(i);
+			stmt->_stmt += tokens.at(i + 1);
+			Database::insertStatement(stmtNum, procedures.back()->_name, word, stmt->_stmt);
 			if (word == "read" || word == "print") {
 				Database::insertVariable(tokens.at(i + 1), stmtNum);
 			}
 			parentStack.top()->_statements.push_back(stmt);
-			Database::insertStatement(stmtNum, procedures.back()->_name, word);
 		}
 	}
 }

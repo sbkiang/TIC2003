@@ -22,7 +22,7 @@ public:
 	static void insertProcedure(string procedureName);
 
 	// method to insert a statement into the database
-	static void insertStatement(int statementNumber, string statementName, string statementType);
+	static void insertStatement(int statementNumber, string statementName, string statementType, string text);
 
 	// method to insert a statement into the database
 	static void insertVariable(string statementName, int statementNumber);

@@ -19,6 +19,7 @@
     <ClCompile Include="Container.cpp" />
     <ClCompile Include="IfElseLinker.cpp" />
     <ClCompile Include="Procedure.cpp" />
+    <ClCompile Include="Struct.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\Database.h" />
@@ -29,6 +30,7 @@
     <ClInclude Include="Container.h" />
     <ClInclude Include="IfElseLinker.h" />
     <ClInclude Include="Procedure.h" />
+    <ClInclude Include="Struct.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{DC21A1EA-D2C6-4D14-A2B4-E025B64BDE81}</ProjectGuid>

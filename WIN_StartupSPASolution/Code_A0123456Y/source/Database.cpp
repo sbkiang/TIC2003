@@ -23,7 +23,7 @@ void Database::initialize() {
 	sqlite3_exec(dbConnection, dropStatementTableSQL.c_str(), NULL, 0, &errorMessage);
 
 	// create a statement table
-	string createStatementTableSQL = "CREATE TABLE statement ( line_num INT PRIMARY KEY, procedure_name VARCHAR(255) REFERENCES procedures(name), stmtType VARCHAR(255) );";
+	string createStatementTableSQL = "CREATE TABLE statement ( line_num INT PRIMARY KEY, procedure_name VARCHAR(255) REFERENCES procedures(name), entity VARCHAR(255), text VARCHAR(255));";
 	sqlite3_exec(dbConnection, createStatementTableSQL.c_str(), NULL, 0, &errorMessage);
 
 	// drop the existing variable table (if any)
@@ -56,8 +56,8 @@ void Database::insertProcedure(string procedureName) {
 }
 
 // method to insert a statement into the database
-void Database::insertStatement(int statementNumber, string statementName, string statementType) {
-	string sql = "INSERT INTO statement ('line_num', 'procedure_name', 'stmtType') VALUES ('" + to_string(statementNumber) + "', '" + statementName + "', '" + statementType + "');";
+void Database::insertStatement(int statementNumber, string statementName, string entity, string text) {
+	string sql = "INSERT INTO statement ('line_num', 'procedure_name', 'entity', 'text') VALUES ('" + to_string(statementNumber) + "', '" + statementName + "', '" + entity + "', '" + text + "');";
 	sqlite3_exec(dbConnection, sql.c_str(), NULL, 0, &errorMessage);
 }
 
@@ -118,7 +118,7 @@ void Database::getStmt(string type, vector<string>& results) {
 		sqlite3_exec(dbConnection, sql.c_str(), callback, 0, &errorMessage);
 	}
 	else {
-		string sql = "SELECT line_num FROM statement WHERE stmtType = '" + type + "';";
+		string sql = "SELECT line_num FROM statement WHERE entity = '" + type + "';";
 		sqlite3_exec(dbConnection, sql.c_str(), callback, 0, &errorMessage);
 	}
 	// postprocess the results from the database so that the output is just a vector of procedure names

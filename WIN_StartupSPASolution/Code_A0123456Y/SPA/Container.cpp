@@ -105,14 +105,3 @@ IfElseLinker* Container::getIfElseLinker(Container* ptr) {
 	}
 	return nullptr;
 }
-
-Statement::Statement(int stmtNum) {
-	_stmtNum = stmtNum;
-}
-
-/*
-IfElseLinker::IfElseLinker(Container* ifPtr, Container* elsePtr) {
-	_ifPtr = ifPtr;
-	_elsePtr = elsePtr;
-}
-*/
