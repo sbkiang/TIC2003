@@ -43,7 +43,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			Database::getVariable(databaseResults);
 		}
 
-		else if (synonymType == "assign" || synonymType == "print" || synonymType == "read" || synonymType == "stmt") {
+		else if (synonymType == "assign" || synonymType == "print" || synonymType == "read" || synonymType == "stmt" || synonymType == "call") {
 			Database::getStmt(synonymType ,databaseResults);
 		}
 		

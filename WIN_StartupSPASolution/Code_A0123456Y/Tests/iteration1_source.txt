@@ -1,0 +1,23 @@
+procedure main{
+	call sum;
+}
+procedure sum {
+	read num1;
+	read num2;
+	result = num1 + num2;
+	call counts;
+}
+procedure counts{
+	number = 0;
+	total = 0;
+	while(number != 10){
+		print number;
+		number = number + 1;
+	}
+}
+procedure variable{
+	var1 = 100;
+	var2 = 200;
+	totalvar = var1 + var2;
+	print totalvar;
+}
