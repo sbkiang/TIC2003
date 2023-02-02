@@ -16,8 +16,8 @@ void SourceProcessor::process(string program) {
 	vector<string> tokens;
 	tk.tokenize(program, tokens);
 
-	string var_regex = "^((?!(procedure|while|if|then|else|call|read|print)+$)[A-Za-z][A-Za-z0-9]*)";
-
+	string var_regex = "^((?!(procedure|while|if|then|else|call|read|print)$)[A-Za-z][A-Za-z0-9]*)";
+	string var_constants = "^[0-9]+$";
 	// This logic is highly simplified based on iteration 1 requirements and 
 	// the assumption that the programs are valid.
 
@@ -28,16 +28,13 @@ void SourceProcessor::process(string program) {
 	if (true) { {} {string test = "true"; } }
 
 	vector<Procedure*> procedures;
-	int curlyBrackets = 0;
 	stack<Container*> parentStack;
 	stack<IfElseLinker*> ifElseLinkerStack;
 	bool elseFlag = false;
 	int stmtNum = 0;
 	for (int i = 0; i < tokens.size(); i++) {
 		string word = tokens.at(i);
-		if (word == "{") { curlyBrackets++; }
-		else if (word == "}") {
-			curlyBrackets--;
+		if (word == "}") { // "}" indicates the end of a container
 			if (!parentStack.empty()) { parentStack.pop(); }
 		}
 		else if (word == "procedure") {
@@ -57,6 +54,7 @@ void SourceProcessor::process(string program) {
 			}
 			parentStack.push(container);
 			vector<Statement> variableStore;
+			/*
 			int brackets = 0;
 			do { // Anything enclosed between the brackets is the if condition
 				i++; // skip the "while" keyword
@@ -68,13 +66,25 @@ void SourceProcessor::process(string program) {
 				}
 				container->_condition += tokens.at(i);
 				stmt->_stmt += tokens.at(i);
-				if (regex_match(tokens.at(i), regex("^[0-9]+$"))) {
+				if (regex_match(tokens.at(i), regex(var_constants))) {
 					Database::insertConstant(tokens.at(i));
 				}
 				else if (regex_match(tokens.at(i), regex(var_regex))) {
 					variableStore.push_back(Statement(stmtNum, tokens.at(i)));
 				}
 			} while (brackets != 0);
+			*/
+			while (tokens.at(i) != "{") {
+				i++; // skip the "while" keyword
+				container->_condition += tokens.at(i);
+				stmt->_stmt += tokens.at(i);
+				if (regex_match(tokens.at(i), regex(var_constants))) {
+					Database::insertConstant(tokens.at(i));
+				}
+				else if (regex_match(tokens.at(i), regex(var_regex))) {
+					variableStore.push_back(Statement(stmtNum, tokens.at(i)));
+				}
+			}
 			container->_statements.push_back(stmt);
 			Database::insertStatement(stmtNum, procedures.back()->_name, word, stmt->_stmt);
 			for (int i = 0; i < variableStore.size(); i++) { // insert the variable after inserting the statement due to FK
@@ -99,7 +109,7 @@ void SourceProcessor::process(string program) {
 			while (tokens.at(i) != "then") { // from current index till "then", it's the condition. "if(...) then{"
 				container->_condition += tokens.at(i);
 				stmt->_stmt += tokens.at(i);
-				if (regex_match(tokens.at(i), regex("^[0-9]+$"))) {
+				if (regex_match(tokens.at(i), regex(var_constants))) {
 					Database::insertConstant(tokens.at(i));
 				}
 				else if (regex_match(tokens.at(i), regex(var_regex))) {
@@ -134,7 +144,7 @@ void SourceProcessor::process(string program) {
 			string LHS = tokens.at(i - 1);
 			while (tokens.at(i) != ";") {
 				stmt->_stmt += tokens.at(i);
-				if (regex_match(tokens.at(i), regex("^[0-9]+$"))) {
+				if (regex_match(tokens.at(i), regex(var_constants))) {
 					Database::insertConstant(tokens.at(i));
 				}
 				else if (regex_match(tokens.at(i), regex(var_regex))) {

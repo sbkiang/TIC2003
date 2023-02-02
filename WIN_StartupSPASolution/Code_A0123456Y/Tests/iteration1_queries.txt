@@ -6,7 +6,7 @@ main, CALL, IF, procedurE
 2 - Variable
 variable v;
 Select v;
-AssiGn ,CaLLg ,Call ,If ,PRINT ,PRINTb ,PRinT ,Print ,ProCeduRE ,Procedure ,ReAd ,Read ,ReadA ,THen ,THen2 ,Then ,WHilE4 ,WHile ,WhilE ,cALL ,iF ,pRINT ,pRINT2 ,pRINTb ,prinT ,proceduRE ,rEAD ,theN ,wHILE ,wHILE2
+ififif, callcallcall, AssiGn ,CaLLg ,Call ,If ,PRINT ,PRINTb ,PRinT ,Print ,ProCeduRE ,Procedure ,ReAd ,Read ,ReadA ,THen ,THen2 ,Then ,WHilE4 ,WHile ,WhilE ,cALL ,iF ,pRINT ,pRINT2 ,pRINTb ,prinT ,proceduRE ,rEAD ,theN ,wHILE ,wHILE2
 5000
 3 - Constant
 constant c;
@@ -16,7 +16,7 @@ Select c;
 4 - Assignment
 assign a;
 Select a
-1, 2, 7, 10, 12, 13, 16, 19, 20, 24, 29, 33, 34, 35
+1, 2, 7, 10, 12, 13, 16, 19, 20, 24, 29, 33, 34, 35, 36, 37
 5000
 5 - Read
 read r;
@@ -31,7 +31,7 @@ Select p
 7 - Statement
 stmt s;
 Select s
-1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35
+1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37
 5000
 8 - Call
 call c;

@@ -56,4 +56,6 @@ procedure IF{
 
 procedure procedurE{
     Call = WhilE * Then;
+    ififif = 10;
+    callcallcall = ififif;
 }
