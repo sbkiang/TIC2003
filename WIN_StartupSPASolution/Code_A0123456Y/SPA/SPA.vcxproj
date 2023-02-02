@@ -16,6 +16,7 @@
     <ClCompile Include="..\source\SourceProcessor.cpp" />
     <ClCompile Include="..\source\sqlite3.c" />
     <ClCompile Include="..\source\Tokenizer.cpp" />
+    <ClCompile Include="CFG.cpp" />
     <ClCompile Include="Container.cpp" />
     <ClCompile Include="IfElseLinker.cpp" />
     <ClCompile Include="Procedure.cpp" />
@@ -27,6 +28,7 @@
     <ClInclude Include="..\source\SourceProcessor.h" />
     <ClInclude Include="..\source\sqlite3.h" />
     <ClInclude Include="..\source\Tokenizer.h" />
+    <ClInclude Include="CFG.h" />
     <ClInclude Include="Container.h" />
     <ClInclude Include="IfElseLinker.h" />
     <ClInclude Include="Procedure.h" />

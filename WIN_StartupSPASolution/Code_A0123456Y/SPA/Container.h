@@ -4,25 +4,9 @@
 #include <vector>
 #include "IfElseLinker.h"
 #include "Struct.h"
+#include "CFG.h"
 
 using namespace std;
-
-class CFG {
-public:
-	CFGNode* _head;
-	CFGNode* _sTail;
-	CFGNode* _fTail;
-
-	CFG(CFGNode* head);
-	~CFG();
-
-	CFGNode* getNode(int stmtNum);
-	CFGNode* _getNode(int stmtNum, CFGNode* CFGNode);
-	void addSTailSJump(CFGNode* CFGNode);
-	void addSTailFJump(CFGNode* CFGNode);
-	void addFTailSJump(CFGNode* CFGNode);
-	void addFTailFJump(CFGNode* CFGNode);
-};
 
 class Container {
 public:
