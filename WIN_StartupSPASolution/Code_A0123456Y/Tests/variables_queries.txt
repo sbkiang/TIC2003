@@ -1,5 +1,0 @@
-1 - Variable
-variable v;
-Select v
-AAA,ZzZ,Zzz,aa,aaa,ab,b,bb,bbb,c,cc,ccc,d,dd,e,ee,f,ff,jj,last1,last2,num1,num2,num3,procedurexx,whilex,x,x1,x2,x3,x4,x5,xx,xyz
-5000
