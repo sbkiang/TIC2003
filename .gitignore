@@ -12,3 +12,4 @@
 *.db
 *.opendb
 *.lock
+database.db
