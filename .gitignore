@@ -13,3 +13,8 @@
 *.opendb
 *.lock
 database.db
+WIN_StartupSPASolution/Code_18/.vs/
+WIN_StartupSPASolution/Code_18/Debug
+WIN_StartupSPASolution/Code_18/SPA/Debug
+WIN_StartupSPASolution/Code_18/SPA/Release
+
