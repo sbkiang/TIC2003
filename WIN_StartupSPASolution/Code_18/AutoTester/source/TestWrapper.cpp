@@ -45,9 +45,8 @@ void TestWrapper::evaluate(std::string query, std::list<std::string>& results){
 	}
 }
 
-/*
+
 int main() {
 	TestWrapper* tp = new TestWrapper();
-	tp->parse("..\\Tests\\container_test.txt");
+	tp->parse("../../Tests_18/iteration2_CFG_No_Nested_If_Else_Parent_Stmt_Start_Middle_End.txt");
 }
-*/

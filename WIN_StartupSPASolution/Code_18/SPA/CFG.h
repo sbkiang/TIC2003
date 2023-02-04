@@ -1,5 +1,7 @@
 #pragma once
 #include "Struct.h"
+#include <iostream>
+#include <vector>
 
 class CFG {
 public:
@@ -8,6 +10,7 @@ public:
 	CFGNode* _fTail;
 
 	CFG(CFGNode* head);
+	CFG();
 	~CFG();
 
 	CFGNode* getNode(int stmtNum);
@@ -16,4 +19,6 @@ public:
 	void addSTailFJump(CFGNode* CFGNode); // add node to fail jump of CFG's success condition's tail
 	void addFTailSJump(CFGNode* CFGNode); // add node to success jump of CFG's fail condition's tail
 	void addFTailFJump(CFGNode* CFGNode); // add node to fail jump of CFG's fail condition's tail
+	void printCFG();
+	void _printCFG(CFGNode* node, vector<CFGNode*> visited, int spaces);
 };

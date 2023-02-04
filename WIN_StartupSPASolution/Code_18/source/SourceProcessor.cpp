@@ -7,6 +7,8 @@
 // using some highly simplified logic.
 // You should modify this method to complete the logic for handling all the required syntax.
 
+CFG* createCFG(Container* container);
+
 void SourceProcessor::process(string program) {
 	// initialize the database
 	Database::initialize();
@@ -40,6 +42,7 @@ void SourceProcessor::process(string program) {
 		else if (word == "procedure") {
 			i++;
 			Procedure* procedure = new Procedure(tokens.at(i));
+			procedure->_type = "procedure";
 			procedures.push_back(procedure);
 			parentStack.push(procedure);
 			Database::insertProcedure(procedure->_name);
@@ -54,28 +57,8 @@ void SourceProcessor::process(string program) {
 			}
 			parentStack.push(container);
 			vector<Statement> variableStore;
-			/*
-			int brackets = 0;
-			do { // Anything enclosed between the brackets is the if condition
-				i++; // skip the "while" keyword
-				if (tokens.at(i) == "(") {
-					brackets++;
-				}
-				else if (tokens.at(i) == ")") {
-					brackets--;
-				}
-				container->_condition += tokens.at(i);
-				stmt->_stmt += tokens.at(i);
-				if (regex_match(tokens.at(i), regex(var_constants))) {
-					Database::insertConstant(tokens.at(i));
-				}
-				else if (regex_match(tokens.at(i), regex(var_regex))) {
-					variableStore.push_back(Statement(stmtNum, tokens.at(i)));
-				}
-			} while (brackets != 0);
-			*/
+			i++; // skip the "while" keyword
 			while (tokens.at(i) != "{") {
-				i++; // skip the "while" keyword
 				container->_condition += tokens.at(i);
 				stmt->_stmt += tokens.at(i);
 				if (regex_match(tokens.at(i), regex(var_constants))) {
@@ -84,13 +67,14 @@ void SourceProcessor::process(string program) {
 				else if (regex_match(tokens.at(i), regex(var_regex))) {
 					variableStore.push_back(Statement(stmtNum, tokens.at(i)));
 				}
+				i++;
 			}
 			container->_statements.push_back(stmt);
 			Database::insertStatement(stmtNum, procedures.back()->_name, word, stmt->_stmt);
 			for (int i = 0; i < variableStore.size(); i++) { // insert the variable after inserting the statement due to FK
 				Database::insertVariable(variableStore.at(i)._stmt, variableStore.at(i)._stmtNum);
 			}
-
+			cout << stmtNum << " : " << word << stmt->_stmt << endl;
 		}
 		else if (word == "if") { // if(...) then {...} else {...}
 			stmtNum++;
@@ -122,6 +106,7 @@ void SourceProcessor::process(string program) {
 			for (int i = 0; i < variableStore.size(); i++) {
 				Database::insertVariable(variableStore.at(i)._stmt, variableStore.at(i)._stmtNum);
 			}
+			cout << stmtNum << " : " << word << stmt->_stmt << endl;
 		}
 		else if (word == "else") { // set the flag for encountering "else"
 			elseFlag = true;
@@ -133,7 +118,8 @@ void SourceProcessor::process(string program) {
 			if (!parentStack.empty()) { // if there's parent container, add current container to parent's child
 				parentStack.top()->_childContainers.push_back(container);
 			}
-			parentStack.push(container); // we push the current "else" container to the parentStack for future statements			
+			parentStack.push(container); // we push the current "else" container to the parentStack for future statements		
+			cout << stmtNum+1 << " : " << word << " " << endl;
 		}
 		else if (word == "=") { // for assign
 			stmtNum++;
@@ -157,6 +143,7 @@ void SourceProcessor::process(string program) {
 			for (int i = 0; i < variableStore.size(); i++) {
 				Database::insertVariable(variableStore.at(i)._stmt, variableStore.at(i)._stmtNum);
 			}
+			cout << stmtNum << " : " << stmt->_stmt << endl;
 		}
 		else if (word == "read" || word == "print" || word == "call") {
 			stmtNum++;
@@ -168,15 +155,20 @@ void SourceProcessor::process(string program) {
 				Database::insertVariable(tokens.at(i + 1), stmtNum);
 			}
 			parentStack.top()->_statements.push_back(stmt);
+			cout << stmtNum << " : " << stmt->_stmt << endl;
 		}
 	}
+	//procedures.at(0)->printContainerTree(0);
+	CFG* p1CFG = createCFG(procedures.at(0));
+	p1CFG->printCFG();
 }
 
 
 // call linkStatements for each container, then join them up 
 CFG* createCFG(Container* container) {
 	if (!container) { return nullptr; }
-	CFG* ownCFG = container->linkStatements();
+	CFG* ownCFG = container->linkStatements(); // return nullptr if no statements for this container. Else, returns a new object. ** Probably have to delete it after use
+	ownCFG->printCFG();
 	CFG* childCFG = nullptr;
 	for (int i = 0; i < container->_childContainers.size(); i++) { // loop through current container's child containers
 		Container* childContainer = container->_childContainers.at(i);
@@ -189,66 +181,54 @@ CFG* createCFG(Container* container) {
 			childCFG->_head->_fJump = elseCFG->_head; // set if's CFG.fJump to else's CFG.head. So, fail condition next stmt points to else's stmt
 			childCFG->_fTail = elseCFG->_sTail; // set if's CFG.fTail to else's CFG.sTail to maintain the correct CFG fTail after joining the if's CFG and else's CFG
 		}
-
-		CFGNode* prevNode = ownCFG->getNode(childCFG->_head->_stmtPtr->_stmtNum - 1); // find the node to link parent CFG with child CFG
-		if (!prevNode) { // if prevNode is null, then the child CFG is the first statement
+		if (!(ownCFG->_head)) { // if ownCFG head is null, then the ownCFG is empty = no statement in this container. We replace it with child CFG, and free the allocated memory for ownCFG
+			delete(ownCFG);
+			ownCFG = childCFG;
+			continue;
+		}
+		CFGNode* prevNode = ownCFG->getNode(childCFG->_head->_stmtPtr->_stmtNum - 1); // find the node to link this container's CFG with child CFG
+		if (!prevNode) { // if prevNode is null, then the child CFG is the first statement. We append child CFG to this container's CFG
 			CFGNode* tempOwnCFGHead = ownCFG->_head;
 			ownCFG->_head = childCFG->_head;
-			if (childContainerType == "if") { // for "if" container, we need to link both sTail and fTail success jump to the parent CFG head node
-				childCFG->_fTail->_sJump = tempOwnCFGHead;
+			if (childContainerType == "if") { // for "if" container, we need to link both sTail and fTail success jump to the this container CFG head node
 				childCFG->_sTail->_sJump = tempOwnCFGHead;
+				childCFG->_fTail->_sJump = tempOwnCFGHead;
+				
 			}
-			if (childContainerType == "while") { // for "while" container, we needt o link the childCFG head success jump to the parent CFG head node
+			if (childContainerType == "while") { // for "while" container, we need to link the childCFG head success jump to the parent CFG head node
 				childCFG->_head->_fJump = tempOwnCFGHead;
 			}
 			// no need to set ownCFG _sTail and _fTail cos it's the same
 		}
-		if (prevNode) { // if prevNode is not null, then the child CFG is not the first statement
-			CFGNode* tempNode = prevNode->_sJump;
+		if (prevNode) { // if prevNode is not null, then the child CFG is not the first statement. It could be join in the middle, or join in the last
+			CFGNode* tempNode = prevNode->_sJump; 
+			// if prevNode is part of "if" container, set ownCFG _sTail and _fTail success jump to the childCFG _head = add childCFG to ownCFG
+			// this works as the previous childCFG would've set the correct ownCFG _sTail and _fTail. 
 			prevNode->_sJump = childCFG->_head;
+			if (prevNode->_container == "if" || prevNode->_container == "else") {
+				ownCFG->_sTail->_sJump = childCFG->_head; // set _sTail because prevNode would be _fTail as statements in else is always after statements in if
+			}
+
+			// if prevNode is part of "else" container, it'll be the last statement in the while loop. We need to set the while _head fJump to childCFG _head = add childCFG to ownCFG
+			else if (prevNode->_container == "while") {
+				prevNode->_sJump->_fJump = childCFG->_head;
+			}
 			if (childContainerType == "if") { // for "if" container, we need to link both sTail and fTail success jump to the next node
-				childCFG->_fTail->_sJump = tempNode;
 				childCFG->_sTail->_sJump = tempNode;
-				if (!tempNode) { // if the prevNode is the last node, then tempNode will be null. After appending the child CFG, we need to set the own CFG _sTail and _fTail to the correct node
+				childCFG->_fTail->_sJump = tempNode;
+				if (!tempNode) { // if the prevNode is the last node, then tempNode will be null. After appending the child CFG, we need to set the ownCFG _sTail and _fTail to the correct node
 					ownCFG->_fTail = childCFG->_fTail;
 					ownCFG->_sTail = childCFG->_sTail;
 				}
 			}
-			if (childContainerType == "while") { // for "while" container, we need to link the childCFG head fail jump to the next node
+			else if (childContainerType == "while") { // for "while" container, we need to link the childCFG head fail jump to the next node
 				childCFG->_head->_fJump = tempNode;
 				if (!tempNode) { // if the prevNode is the last node, then tempNode will be null. After appending the child CFG, we need to set the own CFG _sTail and _fTail to the correct node
 					ownCFG->_sTail = childCFG->_head;
 				}
 			}
-			
-		}		
 
-		// Get the current container's CFGNode that needs to be linked with the Child's CFG
-		/*
-		*	if(...){	 --> stmt1
-		*		stmt2
-		*	}
-		*	else{
-		*		if(...){ --> stmt3
-		*			stmt4
-		*		}
-		*		else{
-		*			stmt5
-		*		}
-		*	}
-		*	stmt1.sJump = stmt2
-		*	stmt1.fJump = stmt3
-		*	stmt3.sJump = stmt4
-		*	stmt3.fJump = stmt5
-		*
-		*	childCFG = 3->4->5
-		*	prevNode = 3-1 = 2
-		*	But stmt2.sJump is not 3->4->5. Correct one is stmt1.fJump. But given my classes, I can't determine if stmt3 is under the if block or else block
-		*	Seems to be an issue only for if-else because I need to consider the else block. For while, this works
-		*   Maybe use a successJump stmtNum and failJump stmtNum to denote the first successJump statement and failJump statement?
-		* 
-		*	What if I put else as a container under if?
-
-		*/
+		}
 	}
+	return ownCFG;
 }
