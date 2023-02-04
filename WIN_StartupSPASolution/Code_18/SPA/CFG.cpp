@@ -26,35 +26,26 @@ CFGNode* CFG::_getNode(int stmtNum, CFGNode* node) {
 	return found;
 }
 
-void CFG::addFTailSJump(CFGNode* node) { // add node to success jump of CFG's fail condition's tail
-	if (!_fTail) { // we want to maintain _fTail as NULL if there's no statement for it
-		_head->_sJump = node;
-		return;
-	}
-	_fTail->_sJump = node;
+void CFG::addFTailSJump(CFGNode* node) { 
+	if (!_fTail) { _head->_sJump = node; } // we want to maintain _fTail as NULL if there's no statement for it instead of setting _head as the tail
+	else { _fTail->_sJump = node; } // if _fTail is not NULL, add the new CFG node to it
 	_fTail = node;
 }
 
-void CFG::addFTailFJump(CFGNode* node) { // add node to fail jump of CFG's fail condition's tail
-	if (!_fTail) { // we want to maintain _fTail as NULL if there's no statement for it
-		_head->_fJump = node;
-		return;
-	}
-	_fTail->_fJump = node;
+void CFG::addFTailFJump(CFGNode* node) { 
+	if (!_fTail) { _head->_fJump = node; } // we want to maintain _fTail as NULL if there's no statement for it
+	else { _fTail->_fJump = node; }
 	_fTail = node;
 }
 
-void CFG::addSTailSJump(CFGNode* node) { // add node to success jump of CFG's success condition's tail
-	if (!_sTail) { _head->_sJump = node; }
-	else { _sTail->_sJump = node; }
+void CFG::addSTailSJump(CFGNode* node) { 
+	if (!_sTail) { _head->_sJump = node; } // we want to maintain _sTail as NULL if there's no statement for it
+	else { _sTail->_sJump = node; } // if _sTail is not NULL, add the new CFG node to it
 	_sTail = node;
 }
 
-void CFG::addSTailFJump(CFGNode* node) {  // add node to fail jump of CFG's success condition's tail
-	if (!_sTail) { // we want to maintain _sTail as NULL if there's no statement for it
-		_head->_fJump = node;
-		return;
-	}
-	_sTail->_fJump = node;
+void CFG::addSTailFJump(CFGNode* node) {  
+	if (!_sTail) { _head->_fJump = node; } // we want to maintain _sTail as NULL if there's no statement for it
+	else { _sTail->_fJump = node; } // if _sTail is not NULL, add the new CFG node to it
 	_sTail = node;
 }

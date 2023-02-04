@@ -6,6 +6,7 @@
 #include "Tokenizer.h"
 #include <stack>
 #include <regex>
+#include <assert.h>
 
 using namespace std;
 

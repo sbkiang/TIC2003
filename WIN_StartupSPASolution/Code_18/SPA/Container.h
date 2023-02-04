@@ -16,7 +16,7 @@ public:
 	// Destructor
 	~Container();
 
-	CFG* linkStatements();
+	CFG* linkStatements();  // Create a CFGNode for each statement. Then, link them together in a CFG, and following the if-else and while CFG rule
 
 	// method for processing the source program
 	//virtual vector<string> getVectorStatements();

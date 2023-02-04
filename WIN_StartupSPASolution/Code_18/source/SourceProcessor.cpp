@@ -180,17 +180,49 @@ CFG* createCFG(Container* container) {
 	CFG* childCFG = nullptr;
 	for (int i = 0; i < container->_childContainers.size(); i++) { // loop through current container's child containers
 		Container* childContainer = container->_childContainers.at(i);
-		childCFG = createCFG(childContainer); //DFS till end of tree, and create CFG
-		if (container->_childContainers.at(i)->_type == "if") { // if the current child container is "if" container, the next one will be the "else" container
-			i++;
+		childCFG = createCFG(childContainer); // DFS till end of tree, and create CFG
+		assert(childCFG != nullptr);
+		string childContainerType = container->_childContainers.at(i)->_type;
+		if (childContainerType == "if") { // if the current child container is "if" container, the next one will be the "else" container
+			i++; // go to next childContainer
 			CFG* elseCFG = createCFG(container->_childContainers.at(i)); // create the CFG for the else 
-			childCFG->_head->_fJump = elseCFG->_head; // set if CFG.fJump to else CFG.head
+			childCFG->_head->_fJump = elseCFG->_head; // set if's CFG.fJump to else's CFG.head. So, fail condition next stmt points to else's stmt
+			childCFG->_fTail = elseCFG->_sTail; // set if's CFG.fTail to else's CFG.sTail to maintain the correct CFG fTail after joining the if's CFG and else's CFG
 		}
-		CFGNode* prevNode = ownCFG->getNode(childCFG->_head->_stmtPtr->_stmtNum - 1);
-		CFGNode* temp = prevNode->_sJump;
-		prevNode->_sJump = childCFG->_head;
-		childCFG->_sTail->_sJump = temp;
-		childCFG->_fTail->_sJump = temp; // is the _fTail pointing to the correct CFGNode?
+
+		CFGNode* prevNode = ownCFG->getNode(childCFG->_head->_stmtPtr->_stmtNum - 1); // find the node to link parent CFG with child CFG
+		if (!prevNode) { // if prevNode is null, then the child CFG is the first statement
+			CFGNode* tempOwnCFGHead = ownCFG->_head;
+			ownCFG->_head = childCFG->_head;
+			if (childContainerType == "if") { // for "if" container, we need to link both sTail and fTail success jump to the parent CFG head node
+				childCFG->_fTail->_sJump = tempOwnCFGHead;
+				childCFG->_sTail->_sJump = tempOwnCFGHead;
+			}
+			if (childContainerType == "while") { // for "while" container, we needt o link the childCFG head success jump to the parent CFG head node
+				childCFG->_head->_fJump = tempOwnCFGHead;
+			}
+			// no need to set ownCFG _sTail and _fTail cos it's the same
+		}
+		if (prevNode) { // if prevNode is not null, then the child CFG is not the first statement
+			CFGNode* tempNode = prevNode->_sJump;
+			prevNode->_sJump = childCFG->_head;
+			if (childContainerType == "if") { // for "if" container, we need to link both sTail and fTail success jump to the next node
+				childCFG->_fTail->_sJump = tempNode;
+				childCFG->_sTail->_sJump = tempNode;
+				if (!tempNode) { // if the prevNode is the last node, then tempNode will be null. After appending the child CFG, we need to set the own CFG _sTail and _fTail to the correct node
+					ownCFG->_fTail = childCFG->_fTail;
+					ownCFG->_sTail = childCFG->_sTail;
+				}
+			}
+			if (childContainerType == "while") { // for "while" container, we need to link the childCFG head fail jump to the next node
+				childCFG->_head->_fJump = tempNode;
+				if (!tempNode) { // if the prevNode is the last node, then tempNode will be null. After appending the child CFG, we need to set the own CFG _sTail and _fTail to the correct node
+					ownCFG->_sTail = childCFG->_head;
+				}
+			}
+			
+		}		
+
 		// Get the current container's CFGNode that needs to be linked with the Child's CFG
 		/*
 		*	if(...){	 --> stmt1
@@ -218,18 +250,5 @@ CFG* createCFG(Container* container) {
 		*	What if I put else as a container under if?
 
 		*/
-		//CFGNode* prevNode = ownCFG->getNode(childCFG->_head->_stmtPtr->_stmtNum - 1);
-		if (prevNode) { // if able to find the CFGNode
-			//prevNode->_sJump =
-		}
-
-		if (container->_type == "if") { // if current container is "if" container
-
-		}
-		if (childCFG) { // if there's a CFG from the child container
-			if (childContainer->_type == "while") {
-
-			}
-		}
 	}
 }

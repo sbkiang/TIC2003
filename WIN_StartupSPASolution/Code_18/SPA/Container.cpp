@@ -8,7 +8,7 @@ Container::Container() {
 // destructor
 Container::~Container() {}
 
-CFG* Container::linkStatements() { // Create a CFGNode for each statement. Then, link them together in a CFG, and following the if-else and while CFG rule
+CFG* Container::linkStatements() {
 	if (_statements.size() == 0) { return nullptr; }
 	CFGNode* head = new CFGNode;
 	head->_stmtPtr = _statements.at(0);
@@ -17,24 +17,9 @@ CFG* Container::linkStatements() { // Create a CFGNode for each statement. Then,
 		CFGNode* node = new CFGNode;
 		node->_stmtPtr = _statements.at(i);
 		cfg->addSTailSJump(node);
-		/*
-		if (_statements.at(i)->_failCondition) { // statement reside in the fail condition block. Only applicable for if-else
-			cfg->addFTailSJump(node);
-			continue;
-		}
-		*/
-		/*
-		if (!(_statements.at(i)->_altCondition)) { // if statement reside in the success condition block
-			while (traverse->_sJump) { traverse = traverse->_sJump; } // traverse node until the last node
-			traverse->_sJump = node; // add current statement's CFGNode to the 
-			continue;
-		}
-		if (_statements.at(i)->_altCondition) { // statement reside in the fail condition block. Only applicable for if-else
-			while (traverse->_fJump) { traverse = traverse->_fJump; } // traverse node until last node for "else" block
-			traverse->_fJump = node; // add current statement to the linked list
-			continue;
-		}
-		*/
+	}
+	if (_type == "while") { // if is a while container, the last node will need to link with the first node
+		cfg->_fTail->_sJump = cfg->_head;
 	}
 	return cfg;
 }
