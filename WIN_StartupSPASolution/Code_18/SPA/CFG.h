@@ -2,6 +2,7 @@
 #include "Struct.h"
 #include <iostream>
 #include <vector>
+#include <iomanip>
 
 class CFG {
 public:

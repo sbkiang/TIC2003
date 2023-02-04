@@ -24,11 +24,20 @@ public:
 	// method to insert a statement into the database
 	static void insertStatement(int statementNumber, string statementName, string statementType, string text);
 
-	// method to insert a statement into the database
-	static void insertVariable(string statementName, int statementNumber);
+	// method to insert a variable into the database
+	static void insertVariable(string variablename, int statementNumber);
 
 	// method to insert a constant into the database
 	static void insertConstant(string value);
+
+	// method to insert a parent into the database
+	static void insertParent(int parentNumber, int childNumber, bool direct);
+
+	// method to insert a modify into the database
+	static void insertModify(int statementNumber, string procedureName, string variablename);
+
+	// method to insert a use into the database
+	static void insertUse(int statementNumber, string procedureName, string variablename);
 
 	// method to get all the procedures from the database
 	static void getProcedures(vector<string>& results);

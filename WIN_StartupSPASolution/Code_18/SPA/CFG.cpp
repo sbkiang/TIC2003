@@ -74,12 +74,14 @@ void CFG::_printCFG(CFGNode* node, vector<CFGNode*> visited, int spaces) {
 		return;
 	}
 	visited.push_back(node);
-	cout << node->_stmtPtr->_stmtNum << "->";
+	cout << setfill('0') << setw(2) << node->_stmtPtr->_stmtNum << "->";
 	spaces += to_string(node->_stmtPtr->_stmtNum).length() + 2;
 	_printCFG(node->_sJump, visited, spaces);
 	if (node->_fJump) {
-		cout << string(" ", spaces);
-		cout << node->_stmtPtr->_stmtNum << "->";
+		for (int i = 0; i < spaces-1; i++) {
+			cout << " ";
+		}
+		cout << setfill('0') << setw(2) << node->_stmtPtr->_stmtNum << "->";
 		_printCFG(node->_fJump, visited, spaces);
 	}
 }

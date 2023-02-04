@@ -15,7 +15,7 @@ void Database::initialize() {
 	sqlite3_exec(dbConnection, dropProcedureTableSQL.c_str(), NULL, 0, &errorMessage);
 
 	// create a procedure table
-	string createProcedureTableSQL = "CREATE TABLE procedures ( name VARCHAR(255) PRIMARY KEY );";
+	string createProcedureTableSQL = "CREATE TABLE procedures ( name VARCHAR(50) PRIMARY KEY );";
 	sqlite3_exec(dbConnection, createProcedureTableSQL.c_str(), NULL, 0, &errorMessage);
 
 	// drop the existing stmt table (if any)
@@ -29,6 +29,7 @@ void Database::initialize() {
 	// drop the existing variable table (if any)
 	string dropVariableTableSQL = "DROP TABLE IF EXISTS variable";
 	sqlite3_exec(dbConnection, dropVariableTableSQL.c_str(), NULL, 0, &errorMessage);
+
 	// create a variable table
 	string createVariableTableSQL = "CREATE TABLE variable ( name VARCHAR(20) PRIMARY KEY, line_num INT REFERENCES statement(line_num) );";
 	sqlite3_exec(dbConnection, createVariableTableSQL.c_str(), NULL, 0, &errorMessage);
@@ -36,9 +37,34 @@ void Database::initialize() {
 	// drop the existing constant table (if any)
 	string dropConstantTableSQL = "DROP TABLE IF EXISTS constant";
 	sqlite3_exec(dbConnection, dropConstantTableSQL.c_str(), NULL, 0, &errorMessage);
+
 	// create a constant table
 	string createConstantTableSQL = "CREATE TABLE constant ( value VARCHAR(20) PRIMARY KEY);";
 	sqlite3_exec(dbConnection, createConstantTableSQL.c_str(), NULL, 0, &errorMessage);
+
+	// drop the existing parent table (if any)
+	string dropParentTableSQL = "DROP TABLE IF EXISTS parent";
+	sqlite3_exec(dbConnection, dropParentTableSQL.c_str(), NULL, 0, &errorMessage);
+
+	// create a parent table
+	string createParentTableSQL = "CREATE TABLE parent ( parent_line INT REFERENCES statement(line_num), child_line INT REFERENCES statement(line_num), direct_child CHAR(1));";
+	sqlite3_exec(dbConnection, createParentTableSQL.c_str(), NULL, 0, &errorMessage);
+
+	// drop the existing modify table (if any)
+	string dropModifyTableSQL = "DROP TABLE IF EXISTS modify";
+	sqlite3_exec(dbConnection, dropModifyTableSQL.c_str(), NULL, 0, &errorMessage);
+
+	// create a modify table
+	string createModifyTableSQL = "CREATE TABLE modify ( line_num INT REFERENCES statement(line_num), procedure_name VARCHAR(50) REFERENCES procedure(name), variable_name VARCHAR(50) REFERENCES variable(name));";
+	sqlite3_exec(dbConnection, createModifyTableSQL.c_str(), NULL, 0, &errorMessage);
+
+	// drop the existing use table (if any)
+	string dropUseTableSQL = "DROP TABLE IF EXISTS use";
+	sqlite3_exec(dbConnection, dropUseTableSQL.c_str(), NULL, 0, &errorMessage);
+
+	// create a use table
+	string createUseTableSQL = "CREATE TABLE use ( line_num INT REFERENCES statement(line_num), procedure_name VARCHAR(50) REFERENCES procedure(name), variable_name VARCHAR(50) REFERENCES variable(name));";
+	sqlite3_exec(dbConnection, createUseTableSQL.c_str(), NULL, 0, &errorMessage);
 
 	// initialize the result vector
 	dbResults = vector<vector<string>>();
