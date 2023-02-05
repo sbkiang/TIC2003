@@ -6,6 +6,7 @@
 #include "Struct.h"
 #include "CFG.h"
 #include <iostream>
+#include <assert.h>
 
 using namespace std;
 

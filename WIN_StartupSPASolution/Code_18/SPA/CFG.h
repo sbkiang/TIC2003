@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 #include <iomanip>
+#include <set>
 
 class CFG {
 public:
@@ -15,11 +16,11 @@ public:
 	~CFG();
 
 	CFGNode* getNode(int stmtNum);
-	CFGNode* _getNode(int stmtNum, CFGNode* CFGNode);
+	CFGNode* _getNode(int stmtNum, CFGNode* CFGNode, set<int> visitsed);
 	void addSTailSJump(CFGNode* CFGNode); // add node to success jump of CFG's success condition's tail
 	void addSTailFJump(CFGNode* CFGNode); // add node to fail jump of CFG's success condition's tail
 	void addFTailSJump(CFGNode* CFGNode); // add node to success jump of CFG's fail condition's tail
 	void addFTailFJump(CFGNode* CFGNode); // add node to fail jump of CFG's fail condition's tail
 	void printCFG();
-	void _printCFG(CFGNode* node, vector<CFGNode*> visited, int spaces);
+	void _printCFG(CFGNode* node, set<int> visited, int spaces);
 };

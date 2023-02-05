@@ -1,0 +1,33 @@
+procedure main {
+    pStmt1 = 10;
+    pStmt2 = abc + cde;
+    if(a == b)then{
+        while(c == d){
+            while1Stmt1 = cc;
+            while1Stmt2 = ff;
+        }
+        if1Stmt1 = c;
+        if1Stmt2 = c;
+    }
+    else{
+        else1Stmt1 = d;
+        while(x < 2){
+            x = x + 1;
+        }
+        else1Stmt1 = f;
+    }
+    pStmt3 = cde + efg;
+    pStmt4 = cde + efg;
+    while(aa > 2){
+        if(i == 1) then{
+            read if2Stmt1;
+        }
+        else{
+            read else2Stmt1;
+        }
+        while2Stmt1 = c;
+        while2Stmt2 = d;
+    }
+    call pStmt5
+    read pStmt6
+}
