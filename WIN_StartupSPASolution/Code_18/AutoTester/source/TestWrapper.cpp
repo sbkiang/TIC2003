@@ -48,14 +48,22 @@ void TestWrapper::evaluate(std::string query, std::list<std::string>& results){
 
 /*int main() {
 	TestWrapper* tp = new TestWrapper();
+<<<<<<< Updated upstream
 	
+=======
+	/*
+>>>>>>> Stashed changes
 	cout << "=========== iteration2_CFG_Nested_Condition_L1_While_If_Parent_Stmt_Start_End.txt ===========" << endl;
 	tp->parse("../../Tests_18/iteration2_CFG_Nested_Condition_L1_While_If_Parent_Stmt_Start_End.txt");
 	cout << "=========== iteration2_CFG_Nested_Condition_L1_While_If_Parent_Stmt_None.txt ===========" << endl;
 	tp->parse("../../Tests_18/iteration2_CFG_Nested_Condition_L1_While_If_Parent_Stmt_None.txt"); 
 	cout << "=========== iteration2_CFG_Nested_Condition_L1_While_If_Parent_Stmt_End_correct.txt ===========" << endl;
 	tp->parse("../../Tests_18/iteration2_CFG_Nested_Condition_L1_While_If_Parent_Stmt_End_correct.txt");
+<<<<<<< Updated upstream
 	
+=======
+	*/
+>>>>>>> Stashed changes
 
 	cout << "=========== iteration2_CFG_Nested_Condition_L1_If_While_Parent_Stmt_Start_Start.txt ===========" << endl;
 	tp->parse("../../Tests_18/iteration2_CFG_Nested_Condition_L1_If_While_Parent_Stmt_Start.txt");
@@ -63,4 +71,10 @@ void TestWrapper::evaluate(std::string query, std::list<std::string>& results){
 	tp->parse("../../Tests_18/iteration2_CFG_Nested_Condition_L1_If_While_Parent_Stmt_End.txt");
 	cout << "=========== iteration2_CFG_Nested_Condition_L1_If_While_Parent_Stmt_Start_End.txt ===========" << endl;
 	tp->parse("../../Tests_18/iteration2_CFG_Nested_Condition_L1_If_While_Parent_Stmt_Start_End.txt");
+<<<<<<< Updated upstream
 }*/
+=======
+	
+	
+}
+>>>>>>> Stashed changes
