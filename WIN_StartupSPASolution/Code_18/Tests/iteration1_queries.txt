@@ -38,3 +38,8 @@ call c;
 Select c;
 5, 8, 27, 28, 32
 5000
+9 - Parent
+stmt s;
+Select s such that Parent (s, 7)
+6
+5000
