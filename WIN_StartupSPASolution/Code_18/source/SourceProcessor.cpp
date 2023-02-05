@@ -49,12 +49,13 @@ void SourceProcessor::process(string program) {
 			procedures.push_back(procedure);
 			parentStack.push(procedure);
 			Database::insertProcedure(procedure->_name);
+			indent++;
 		}
 		else if (word == "while") { // while(...){...}
 			stmtNum++;
 			Container* container = new Container();
 			container->_type = "while";
-			Statement* stmt = new Statement(stmtNum);
+			Statement* stmt = new Statement(stmtNum, indent+1);
 			if (!parentStack.empty()) {
 				parentStack.top()->_childContainers.push_back(container);
 			}
@@ -68,7 +69,7 @@ void SourceProcessor::process(string program) {
 					Database::insertConstant(tokens.at(i));
 				}
 				else if (regex_match(tokens.at(i), regex(var_regex))) {
-					variableStore.push_back(Statement(stmtNum, tokens.at(i)));
+					variableStore.push_back(Statement(stmtNum, tokens.at(i), indent));
 				}
 				i++;
 			}
@@ -77,8 +78,9 @@ void SourceProcessor::process(string program) {
 			for (int i = 0; i < variableStore.size(); i++) { // insert the variable after inserting the statement due to FK
 				Database::insertVariable(variableStore.at(i)._stmt, variableStore.at(i)._stmtNum);
 			}
+			cout << setfill('0') << setw(2) << stmtNum << " | ";
 			for (int i = 0; i < indent; i++) { cout << "    "; }
-			cout << stmtNum << " : " << word << stmt->_stmt << endl;
+			cout << word << stmt->_stmt << endl;
 			indent++;
 		}
 		else if (word == "if") { // if(...) then {...} else {...}
@@ -88,7 +90,7 @@ void SourceProcessor::process(string program) {
 			IfElseLinker* linker = new IfElseLinker(); // create a IfElseLinker
 			linker->_ifPtr = container; // set the IfElseLinker's ifPtr to this "if" container
 			ifElseLinkerStack.push(linker); // push it onto the stack for the corresponding "else" container
-			Statement* stmt = new Statement(stmtNum);
+			Statement* stmt = new Statement(stmtNum, indent+1);
 			if (!parentStack.empty()) { // if there's parent container, add current container to parent's child
 				parentStack.top()->_childContainers.push_back(container);
 			}
@@ -102,7 +104,7 @@ void SourceProcessor::process(string program) {
 					Database::insertConstant(tokens.at(i));
 				}
 				else if (regex_match(tokens.at(i), regex(var_regex))) {
-					variableStore.push_back(Statement(stmtNum, tokens.at(i)));
+					variableStore.push_back(Statement(stmtNum, tokens.at(i), indent));
 				}
 				i++;
 			}
@@ -111,8 +113,9 @@ void SourceProcessor::process(string program) {
 			for (int i = 0; i < variableStore.size(); i++) {
 				Database::insertVariable(variableStore.at(i)._stmt, variableStore.at(i)._stmtNum);
 			}
+			cout << setfill('0') << setw(2) << stmtNum << " | ";
 			for (int i = 0; i < indent; i++) { cout << "    "; }
-			cout << stmtNum << " : " << word << stmt->_stmt << endl;
+			cout << word << stmt->_stmt << endl;
 			indent++;
 		}
 		else if (word == "else") { // for else container
@@ -125,8 +128,9 @@ void SourceProcessor::process(string program) {
 				parentStack.top()->_childContainers.push_back(container);
 			}
 			parentStack.push(container); // we push the current "else" container to the parentStack for future statements
+			cout << setfill('0') << setw(2) << stmtNum+1 << " | ";
 			for (int i = 0; i < indent; i++) { cout << "    "; }
-			cout << stmtNum+1 << " : " << word << " " << endl;
+			cout << word << " " << endl;
 			indent++;
 		}
 		else if (word == "=") { // for assign
@@ -134,7 +138,7 @@ void SourceProcessor::process(string program) {
 			Statement* stmt = new Statement(stmtNum);
 			stmt->_stmt += tokens.at(i - 1);
 			vector<Statement> variableStore; // we need to insert statement first before inserting variable due to FK. So, we store the variables here
-			variableStore.push_back(Statement(stmtNum, tokens.at(i - 1)));
+			variableStore.push_back(Statement(stmtNum, tokens.at(i - 1), indent));
 			string LHS = tokens.at(i - 1);
 			while (tokens.at(i) != ";") {
 				stmt->_stmt += tokens.at(i);
@@ -142,7 +146,7 @@ void SourceProcessor::process(string program) {
 					Database::insertConstant(tokens.at(i));
 				}
 				else if (regex_match(tokens.at(i), regex(var_regex))) {
-					variableStore.push_back(Statement(stmtNum, tokens.at(i)));
+					variableStore.push_back(Statement(stmtNum, tokens.at(i), indent));
 				}
 				i++;
 			}
@@ -151,8 +155,9 @@ void SourceProcessor::process(string program) {
 			for (int i = 0; i < variableStore.size(); i++) {
 				Database::insertVariable(variableStore.at(i)._stmt, variableStore.at(i)._stmtNum);
 			}
+			cout << setfill('0') << setw(2) << stmtNum << " | ";
 			for (int i = 0; i < indent; i++) { cout << "    "; }
-			cout << stmtNum << " : " << stmt->_stmt << endl;
+			cout << stmt->_stmt << endl;
 		}
 		else if (word == "read" || word == "print" || word == "call") {
 			stmtNum++;
@@ -164,8 +169,9 @@ void SourceProcessor::process(string program) {
 				Database::insertVariable(tokens.at(i + 1), stmtNum);
 			}
 			parentStack.top()->_statements.push_back(stmt);
+			cout << setfill('0') << setw(2) << stmtNum << " | ";
 			for (int i = 0; i < indent; i++) { cout << "    "; }
-			cout << stmtNum << " : " << stmt->_stmt << endl;
+			cout << stmt->_stmt << endl;
 		}
 	}
 	//procedures.at(0)->printContainerTree(0);
@@ -176,20 +182,31 @@ void SourceProcessor::process(string program) {
 
 // call linkStatements for each container, then join them up 
 CFG* createCFG(Container* container) {
+	unordered_map<int, CFG*> hashMapCFG;
 	if (!container) { return nullptr; }
 	CFG* ownCFG = container->linkStatements(); // returns a CFG* object even if there's no statements.
 	CFG* childCFG = nullptr;
 	for (int i = 0; i < container->_childContainers.size(); i++) { // loop through current container's child containers
+		cout << "ownCFG: ";
 		ownCFG->printCFG();
+		cout << endl;
 		Container* childContainer = container->_childContainers.at(i);
 		childCFG = createCFG(childContainer); // DFS till end of tree, and create CFG
+		cout << "childCFG: ";
+		childCFG->printCFG();
+		cout << endl;
 		assert(childCFG != nullptr);
+		hashMapCFG.insert(pair<int, CFG*> (childCFG->_head->_stmtPtr->_stmtNum, childCFG));
 		string childContainerType = container->_childContainers.at(i)->_type;
 		if (childContainerType == "if") { // if the current child container is "if" container, the next one will be the "else" container
 			i++; // go to next childContainer = go to the corresponding "else" container
 			CFG* elseCFG = createCFG(container->_childContainers.at(i)); // create the CFG for the else container
 			childCFG->_head->_fJump = elseCFG->_head; // set "if" CFG.fJump to "else" CFG.head = "if" CFG fail condition next stmt points to else's stmt
-			childCFG->_fTail = elseCFG->_sTail; // set "if" CFG.fTail to "else" CFG.sTail to maintain the correct CFG fTail after joining the "if" CFG and "else" CFG
+			//childCFG->_fTail = elseCFG->_sTail; // set "if" CFG.fTail to "else" CFG.sTail to maintain the correct CFG fTail after joining the "if" CFG and "else" CFG
+			childCFG->_fTail = elseCFG->_sTail;
+			cout << "childCFG else: ";
+			childCFG->printCFG();
+			cout << endl;
 		}
 		if (!(ownCFG->_head)) { // if ownCFG head is null, then the ownCFG is empty = no statement in this container. We replace it with child CFG, and free the allocated memory for ownCFG
 			delete(ownCFG);
@@ -209,21 +226,58 @@ CFG* createCFG(Container* container) {
 				childCFG->_head->_fJump = tempOwnCFGHead;
 			}
 		}
+
+		// here, we are slotting in the childCFG to ownCFG
 		if (prevNode) { // if prevNode is not null, then childCFG is not the first statement. It could be joined to ownCFG in the middle or end
 			CFGNode* tempNode = prevNode->_sJump;
 
 			// if prevNode is part of "if" container, set ownCFG sTail and fTail success jump to the childCFG head = add childCFG to ownCFG
+				// wrong. this is only if adding childCFG to the end. If add to middle, is prevNode->_sJump to childCFG->_head, and childCFG->_tail to tempNode
+				// and if child is while container, the _tail is the _head.  ** here
 			// this works as the previous childCFG would've set the correct ownCFG sTail and fTail
-			prevNode->_sJump = childCFG->_head;
+			// issue: iteration2_CFG_Nested_Condition_L1_If_While_Parent_Stmt_Start_End_correct.txt
+				// line 6 while container is between ownCFG stmts
+				// so, ownCFG sTail and fTail points to the while container head, which by right, shouldn't
+			// logic works if prevNode is part of another else container. So need indent level?
+				// E.g., if prevNode is part of another sibling container
+				//			if sibling container is while, need to find the _head
+				//			if sibling container is if, need to find the _sTail and _fTail
+				//		 if prevNode is part of parent container, no need do anything
 			if (prevNode->_container == "if" || prevNode->_container == "else") {
-				ownCFG->_sTail->_sJump = childCFG->_head; // set sTail success jump to childCFG head because prevNode would be fTail since statements in else is always after statements in if
+				if (prevNode->_stmtPtr->_level == childCFG->_head->_stmtPtr->_level) { // prevNode is same nested level as childCFG
+					CFG* prevNodeCFG = hashMapCFG.at(prevNode->_stmtPtr->_level);
+					prevNodeCFG->_sTail->_sJump = childCFG->_head;
+					prevNodeCFG->_fTail->_sJump = childCFG->_head;
+				}
+				else { // prevNode different nested level as childCFG
+					prevNode->_sJump = childCFG->_head; 
+				}
+			}
+			else if (prevNode->_container == "while") {
+				if (prevNode->_stmtPtr->_level == childCFG->_head->_stmtPtr->_level) { // prevNode is same nested level as childCFG
+					CFG* prevNodeCFG = hashMapCFG.at(prevNode->_stmtPtr->_level);
+					prevNodeCFG->_head->_fJump = childCFG->_head;
+				}
+				else { // prevNode is different nested level as childCFG
+					prevNode->_sJump = childCFG->_head;
+				}
+			}
+			else {
+				prevNode->_sJump = childCFG->_head;
 			}
 
 			// if prevNode is part of "while" container, we need to set the while head fail jump to childCFG head = add childCFG to ownCFG
-			else if (prevNode->_container == "while") {
-				prevNode->_sJump->_fJump = childCFG->_head;
-			}
-			if (childContainerType == "if") { // if child is "if" container, we need to link both sTail and fTail success jump to the next node
+			// the above logic is wrong?
+				// if we're joining childCFG at the middle, then it's prevNode as usual
+				// if we're joining childCFG at the end, then it's prevNode as usual. Then, the childCFG sTail's and fTail's sJump will be the while head
+			// under what case is this logic correct? So ownCFG will be this container's CFG + previous child CFG
+				// So, childCFG will always be at the same level as whatever CFG. If same level, then there's no need to touch the while head fJump cos fJump will be for the previous nested level
+			// logic error. What if we have a "while with nested if". the while head fjump should not be the if child container head
+			// counter: what if two while containers. prevNode will be while1 last node. If while1 last node sJump is while2 head, wrong
+			
+
+			// this part sets the childCFG sTail and/or fTail to the correct node in ownCFG. Then, checks if childCFG is the end CFG, and set the ownCFG sTail and/or fTail to the childCFG nodes
+			if (childContainerType == "if" || childContainerType == "else") { // if child is "if" container, we need to link both sTail and fTail success jump to the next node
 				childCFG->_sTail->_sJump = tempNode;
 				childCFG->_fTail->_sJump = tempNode;
 				if (!tempNode) { // if the prevNode is the last node, then tempNode will be null. After appending childCFG, we need to set ownCFG sTail and fTail to the chidCFG fTail and sTail

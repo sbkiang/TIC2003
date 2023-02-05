@@ -63,11 +63,33 @@ void CFG::addSTailFJump(CFGNode* node) {
 	_sTail = node;
 }
 
+CFGNode* CFG::getSTail() {
+	set<int> visited;
+	return _getSTail(_head, visited);
+}
+
+CFGNode* CFG::_getSTail(CFGNode* node, set<int> visited) {
+	if (!(node->_sJump)) { return node; } // if next node is null, this node is last node. return
+	if (visited.find(node->_sJump->_stmtPtr->_stmtNum) != visited.end()) { return node; } // if next node is a visited node, then this node is also last node. For while CFG only
+	visited.insert(node->_stmtPtr->_stmtNum);
+	return _getSTail(node->_sJump, visited);
+}
+
+CFGNode* CFG::getFTail() {
+	set<int> visited;
+	return _getFTail(_head, visited);
+}
+
+CFGNode* CFG::_getFTail(CFGNode* node, set<int> visited) {
+	if (!(node->_fJump)) { return node; }
+	if (visited.find(node->_fJump->_stmtPtr->_stmtNum) != visited.end()) { return node; } // if next node is a visited node, then this node is also last node. For while CFG only
+	visited.insert(node->_stmtPtr->_stmtNum);
+	return _getFTail(node->_sJump, visited);
+}
+
 void CFG::printCFG() {
 	set<int> visited;
-	if (_head) { 
-		_printCFG(_head, visited, 0); 
-	}
+	_printCFG(_head, visited, 0); 
 }
 
 void CFG::_printCFG(CFGNode* node, set<int> visited, int spaces) {

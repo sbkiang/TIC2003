@@ -6,8 +6,10 @@ using namespace std;
 struct Statement {
 	string _stmt;
 	int _stmtNum;
+	int _level;
 	Statement(int stmtNum);
-	Statement(int stmtNum, string stmt);
+	Statement(int stmtNum, int level);
+	Statement(int stmtNum, string stmt, int level);
 };
 
 struct CFGNode {
