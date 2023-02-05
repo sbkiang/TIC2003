@@ -40,6 +40,16 @@ Select c;
 5000
 9 - Parent
 stmt s;
-Select s such that Parent (s, 7)
+Select s such that Parent ("s", 7)
+6
+5000
+10 - Parentss
+stmt s;
+Select s such that Parent (4, "s")
+6
+5000
+11 - Parentsss
+stmt s;
+Select s such that Parent (4, "count")
 6
 5000

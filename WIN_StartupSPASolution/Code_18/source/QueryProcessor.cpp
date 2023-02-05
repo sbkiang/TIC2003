@@ -25,16 +25,12 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	tk.tokenize(query, tokens);
 
 	// check what type of synonym is being declared
-	vector<string> synonymType;
+	vector<string> synonymType, index;
 
 	int selectIndex = 0, suchThatIndex = 0, patternIndex = 0;
 
 	// check for Next, Parent, Uses, Modifies, Call
 	string designAbstraction = "";
-
-	string firstStrIdx = "", secondStrIdx = "";
-	int firstIntIdx = 0, secondIntIdx = 0;
-	bool bracket = false, isNumber = true;
 
 	for (int i = 0; i < tokens.size(); i++) {
 
@@ -68,50 +64,19 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 				}
 			}
 
-			while (tokens[i] != ")") {
-				if(tokens[i] == "(" || bracket) {			
-					if (tokens[i] == ",") {
-						cout << "11";
-						for (char c : tokens[i+1]) {
-							if (!isdigit(c)) {
-								cout << "55";
-								isNumber = false;
-								break;
-							}
-						}
-
-						if (isNumber) {
-							cout << "22";
-							secondIntIdx = stoi(tokens[i+1]); //convert string to int
-						}
-						else 
-							cout << "33";
-							secondStrIdx = tokens[i+1];
+			if (designAbstraction != "") {
+				i = i + 3;
+				while (tokens[i] != ")") {
+					if (tokens[i] != "(" && tokens[i] != "\"" && tokens[i] != ",") {
+						index.push_back(tokens[i]);
 					}
-					else {
-						for (char c : tokens[i]) {
-							if (!isdigit(c)) {
-								isNumber = false;
-								break;
-							}
-						}
-						if (isNumber)
-							firstIntIdx = stoi(tokens[i]); //convert string to int
-						else
-							firstStrIdx = tokens[i];
-					}
-					bracket = true;
+					i++;
 				}
-				i++;
 			}
-
 		}
 		else if (tokens[i] == "pattern") {
 			patternIndex = i;
 		}
-
-	 
-		
 
 	}
 
@@ -146,8 +111,11 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			//Relationship between statement
 			if(synonymType[0] == "assign" || synonymType[0] == "print" || synonymType[0] == "read" || synonymType[0] == "stmt" || synonymType[0] == "call") {
 				Database::getStmt(synonymType[0], synonymResults);
-				cout << firstStrIdx << " @@ " << secondIntIdx;
-;
+
+				
+
+
+			
 			}
 		}
 		else if (designAbstraction == "parentT") { //parentT = parent*
