@@ -1,9 +1,7 @@
 #include "QueryProcessor.h"
 #include "Tokenizer.h"
 #include <iostream>
-#include <string>
 #include <algorithm>
-#include <cctype>
 
 // constructor
 QueryProcessor::QueryProcessor() {}
@@ -25,71 +23,33 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	tk.tokenize(query, tokens);
 
 	// check what type of synonym is being declared
-	vector<string> synonymType, index;
-
-	int selectIndex = 0, suchThatIndex = 0, patternIndex = 0;
-
-	// check for Next, Parent, Uses, Modifies, Call
-	string designAbstraction = "";
-
-	for (int i = 0; i < tokens.size(); i++) {
-
-		//check what type of synonym is
-		if (tokens[i] == "procedure" || tokens[i] == "variable" || tokens[i] == "constant" || tokens[i] == "call" || tokens[i] == "assign" || tokens[i] == "stmt" || tokens[i] == "read" || tokens[i] == "print" || tokens[i] == "while" || tokens[i] == "if") {
-			//uppercase to lowercase
-			transform(tokens[i].begin(), tokens[i].end(), tokens[i].begin(), [](unsigned char c) { return std::tolower(c); });
-			
-			synonymType.push_back(tokens[i]);
-		}
-
-		if (tokens[i] == "Select") {
-			selectIndex = i;
-		}
-		else if (tokens[i] == "such" && tokens[i + 1] == "that") {
-			suchThatIndex = i;
-			designAbstraction = tokens[i + 2];
-
-			//uppercase to lowercase
-			transform(designAbstraction.begin(), designAbstraction.end(), designAbstraction.begin(), [](unsigned char c) { return std::tolower(c); });
-
-			if (tokens[i + 3] == "*") {
-				if (designAbstraction == "parent") {
-					designAbstraction = designAbstraction + "T";
-				}
-				else if (designAbstraction == "calls") {
-					designAbstraction = designAbstraction + "T";
-				}
-				else if (designAbstraction == "next") {
-					designAbstraction = designAbstraction + "T";
-				}
-			}
-
-			if (designAbstraction != "") {
-				i = i + 3;
-				while (tokens[i] != ")") {
-					if (tokens[i] != "(" && tokens[i] != "\"" && tokens[i] != ",") {
-						index.push_back(tokens[i]);
-					}
-					i++;
-				}
-			}
-		}
-		else if (tokens[i] == "pattern") {
-			patternIndex = i;
-		}
-
-	}
+	vector<string> synonymType;
+	// check for such that or pattern is being declared
+	vector<int> suchThatIdx, patternIdx;
 
 	// create a vector for storing the results from database
-	vector<string> databaseResults, synonymResults;
+	vector<string> databaseResults;
 
-	
+	string designAbstract = "", first = "", second = "";
+	int idx;
+	bool comma = false;
 
-	// call the method in database to retrieve the results
-	// This logic is highly simplified based on iteration 1 requirements and 
-	// the assumption that the queries are valid.
+	for (int i = 0; i < tokens.size(); i++) {
+		//change any uppercase char to lowercase
+		transform(tokens[i].begin(), tokens[i].end(), tokens[i].begin(), [](unsigned char c) { return std::tolower(c); });
 
-	if (!suchThatIndex && !patternIndex) {
+		if (tokens[i] == "procedure" || tokens[i] == "variable" || tokens[i] == "constant" || tokens[i] == "call" || tokens[i] == "assign" || tokens[i] == "stmt" || tokens[i] == "read" || tokens[i] == "print" || tokens[i] == "while" || tokens[i] == "if") {
+			synonymType.push_back(tokens[i]);
+		}
+		else if (tokens[i] == "such" && tokens[i + 1] == "that") {
+			suchThatIdx.push_back(i);
+		}
+		else if (tokens[i] == "pattern") {
+			patternIdx.push_back(i);
+		}
+	}
+
+	if (suchThatIdx.empty() && patternIdx.empty()) { //Select Cause (Single)
 		if (synonymType[0] == "procedure") {
 			Database::getProcedures(databaseResults);
 		}
@@ -106,43 +66,40 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			Database::getConstant(databaseResults);
 		}
 	}
-	else if (suchThatIndex) {
-		if (designAbstraction == "parent") {
-			//Relationship between statement
-			if(synonymType[0] == "assign" || synonymType[0] == "print" || synonymType[0] == "read" || synonymType[0] == "stmt" || synonymType[0] == "call") {
-				Database::getStmt(synonymType[0], synonymResults);
+	else { //Select Cause (Multiple)
+		if (suchThatIdx.size() > 0) {
 
-				
-
+			for (int i = 0; i < suchThatIdx.size(); i++) {
+				idx = suchThatIdx[i];
+				designAbstract = tokens[idx + 2];
+				idx = idx + 3;
+				while (tokens[idx] != ")") {
+					if (tokens[idx] == ",") {
+						comma = true;
+					}
+					else if (tokens[idx] != "(" && tokens[idx] != "\"" && comma == false) {
+						first = tokens[idx];
+					}
+					else if (tokens[idx] != "\"" && comma == true) {
+						second = tokens[idx];
+					}
+					idx++;
+				}
+			}
 
 			
-			}
-		}
-		else if (designAbstraction == "parentT") { //parentT = parent*
-			//Relationship between statement
-		}
-		else if (designAbstraction == "next") {
-			//Relationship between statement
-		}
-		else if (designAbstraction == "nextT") { //nextT = next* 
-			//Relationship between statement
-		}
-		else if (designAbstraction == "calls") {
-			//Relationship between procedure
-		}
-		else if (designAbstraction == "callsT") { //callT = call* 
-			//Relationship between procedure
-		}
-		else if (designAbstraction == "use") {
-			//Relationship between statement/procedure and variable
-		}
-		else if (designAbstraction == "modifies") {
-			//Relationship between statement/procedure and variable
-		}
-	}
-	else if (patternIndex) {
 
+		}
 	}
+
+
+
+	// call the method in database to retrieve the results
+	// This logic is highly simplified based on iteration 1 requirements and 
+	// the assumption that the queries are valid.
+	/*if (synonymType == "procedure") {
+		Database::getProcedures(databaseResults);
+	}*/
 
 	// post process the results to fill in the output vector
 	for (string databaseResult : databaseResults) {
