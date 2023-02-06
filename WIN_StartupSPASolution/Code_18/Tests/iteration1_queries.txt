@@ -43,4 +43,9 @@ stmt s;
 Select s such that Parent ("s", 7)
 6
 5000
+9 - stmt such that Parent
+stmt x;
+Select s such that Parent* (4, "x")
+6
+5000
 

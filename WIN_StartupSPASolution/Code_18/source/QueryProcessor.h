@@ -16,4 +16,16 @@ public:
 
 	// method for evaluating a query
 	void evaluate(string query, vector<string>& results);
+
+	//Check for number or string
+	bool isNumber(string text) {
+		bool isNum = true;
+		for (char c : text) {
+			if (!isdigit(c)) {
+				isNum = false;
+				break;
+			}
+		}
+		return isNum;
+	}
 };

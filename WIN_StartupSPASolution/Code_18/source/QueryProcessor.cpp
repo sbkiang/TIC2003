@@ -30,7 +30,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	// create a vector for storing the results from database
 	vector<string> databaseResults;
 
-	string designAbstract = "", first = "", second = "";
+	string designAbstract = "", firstValue = "", secondValue = "";
 	int idx;
 	bool comma = false;
 
@@ -67,32 +67,72 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		}
 	}
 	else { //Select Cause (Multiple)
-		if (suchThatIdx.size() > 0) {
+		if (suchThatIdx.size() > 0) { //More than 1 of "Such That" cause
 
 			for (int i = 0; i < suchThatIdx.size(); i++) {
 				idx = suchThatIdx[i];
+
+				//change any uppercase char to lowercase
+				transform(tokens[idx + 2].begin(), tokens[idx + 2].end(), tokens[idx + 2].begin(), [](unsigned char c) { return std::tolower(c); });
+
 				designAbstract = tokens[idx + 2];
+
+				if (tokens[idx + 3] == "*") {
+					if (designAbstract == "parent") {
+						designAbstract = designAbstract + "t";
+						idx++;
+					}
+					else if (designAbstract == "calls") {
+						designAbstract = designAbstract + "t";
+						idx++;
+					}
+					else if (designAbstract == "next") {
+						designAbstract = designAbstract + "t";
+						idx++;
+					}
+				}
+
 				idx = idx + 3;
 				while (tokens[idx] != ")") {
 					if (tokens[idx] == ",") {
 						comma = true;
 					}
 					else if (tokens[idx] != "(" && tokens[idx] != "\"" && comma == false) {
-						first = tokens[idx];
+						firstValue = tokens[idx];
 					}
 					else if (tokens[idx] != "\"" && comma == true) {
-						second = tokens[idx];
+						secondValue = tokens[idx];
 					}
 					idx++;
 				}
 			}
 
-			
-
+			if (designAbstract == "parent") {
+				//Relationship between statement
+			}
+			else if (designAbstract == "parentt") { //parentt = parent*
+				//Relationship between statement
+			}
+			else if (designAbstract == "next") {
+				//Relationship between statement
+			}
+			else if (designAbstract == "nextT") { //nextt = next* 
+				//Relationship between statement
+			}
+			else if (designAbstract == "calls") {
+				//Relationship between procedure
+			}
+			else if (designAbstract == "callsT") { //callt = call* 
+				//Relationship between procedure
+			}
+			else if (designAbstract == "use") {
+				//Relationship between statement/procedure and variable
+			}
+			else if (designAbstract == "modifies") {
+				//Relationship between statement/procedure and variable
+			}
 		}
 	}
-
-
 
 	// call the method in database to retrieve the results
 	// This logic is highly simplified based on iteration 1 requirements and 
@@ -105,4 +145,6 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	for (string databaseResult : databaseResults) {
 		output.push_back(databaseResult);
 	}
+
 }
+
