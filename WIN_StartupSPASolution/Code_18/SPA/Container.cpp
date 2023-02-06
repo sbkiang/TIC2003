@@ -25,6 +25,7 @@ CFG* Container::linkStatements() {
 	}
 	if (_type == "while") { // if is a while container, the last node will need to link with the first node
 		if (cfg->_sTail) { cfg->_sTail->_sJump = cfg->_head; } // check if _sTail is null. This might happen if we get a while container without any statements in it
+		else { cfg->_sTail = cfg->_head; } // if no _sTail = no statements, the tail is the head
 	}
 	return cfg;
 }

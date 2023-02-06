@@ -1,0 +1,12 @@
+procedure main {
+    while(c == d){
+        while(d == f){
+            while(f == g){
+                while(g == h){
+                    stmt1 = 1;
+                }
+            }
+        }
+    }
+    c = d;
+}

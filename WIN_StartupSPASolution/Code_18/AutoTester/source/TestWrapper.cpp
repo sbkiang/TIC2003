@@ -47,27 +47,25 @@ void TestWrapper::evaluate(std::string query, std::list<std::string>& results){
 
 
 int main() {
-	if (1 == 1) {
-		if (2 == 2) {
-			int a = 1;
-			a = 1 + 1;
-		}
-		else {
-			int b = 1;
-			b = 1 + 1;
-		}
-	}
-	else {
-		int c = 1;
-		c++;
-	}
-	int d = 1;
-
+	
 	TestWrapper* tp = new TestWrapper();
+	/*
 	cout << "=========== iteration2_CFG_Nested_Condition_L1_While_If_Parent_Stmt_Start_End.txt ===========" << endl;
 	tp->parse("../../Tests_18/iteration2_CFG_Nested_Condition_L1_While_If_Parent_Stmt_Start_End.txt");
 	cout << "=========== iteration2_CFG_Nested_Condition_L1_While_If_Parent_Stmt_None.txt ===========" << endl;
 	tp->parse("../../Tests_18/iteration2_CFG_Nested_Condition_L1_While_If_Parent_Stmt_None.txt"); 
 	cout << "=========== iteration2_CFG_Nested_Condition_L1_While_If_Parent_Stmt_End_correct.txt ===========" << endl;
 	tp->parse("../../Tests_18/iteration2_CFG_Nested_Condition_L1_While_If_Parent_Stmt_End_correct.txt");
+	*/
+	/*
+	int a = 3;
+	int b = 3;
+	while (a > 0) {
+		a--;
+		while (b > 0) {
+			b--;			
+		}
+	}
+	*/
+	tp->parse("../../Tests_18/iteration2_CFG_Nested_Condition_L4_While.txt");
 }

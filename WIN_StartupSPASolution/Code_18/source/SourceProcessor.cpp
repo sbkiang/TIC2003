@@ -196,7 +196,7 @@ CFG* createCFG(Container* container) {
 		childCFG->printCFG();
 		cout << endl;
 		assert(childCFG != nullptr);
-		hashMapCFG.insert(pair<int, CFG*> (childCFG->_head->_stmtPtr->_stmtNum, childCFG));
+		hashMapCFG.insert(pair<int, CFG*> (childCFG->_head->_stmtPtr->_level, childCFG));
 		string childContainerType = container->_childContainers.at(i)->_type;
 		if (childContainerType == "if") { // if the current child container is "if" container, the next one will be the "else" container
 			i++; // go to next childContainer = go to the corresponding "else" container
