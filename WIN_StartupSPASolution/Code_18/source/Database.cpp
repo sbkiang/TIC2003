@@ -98,6 +98,11 @@ void Database::insertConstant(string value) {
 	sqlite3_exec(dbConnection, sql.c_str(), NULL, 0, &errorMessage);
 }
 
+void Database::insertParent(int parent, int child, bool direct) {
+	string sql = "INSERT INTO parent ('parent_line', 'child_line', 'direct_child' ) VALUES ('" + to_string(parent) + "', '" + to_string(child) + "', '" + to_string(direct) + "');";
+	sqlite3_exec(dbConnection, sql.c_str(), NULL, 0, &errorMessage);
+}
+
 // method to get all the procedures from the database
 void Database::getProcedures(vector<string>& results) {
 	// clear the existing results

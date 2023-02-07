@@ -31,6 +31,8 @@ void SourceProcessor::process(string program) {
 
 	vector<Procedure*> procedures;
 	stack<Container*> parentStack;
+	stack<int> parentStmtNum;
+	stack<string> parentRegex;
 	stack<IfElseLinker*> ifElseLinkerStack;
 	int stmtNum = 0;
 	int indent = 0;
@@ -40,6 +42,11 @@ void SourceProcessor::process(string program) {
 			if (!parentStack.empty()) {
 				indent--;
 				parentStack.pop(); 
+				
+			}
+			if (!parentStmtNum.empty()) {
+				parentStmtNum.pop();
+				parentRegex.pop();
 			}
 		}
 		else if (word == "procedure") {
@@ -78,6 +85,20 @@ void SourceProcessor::process(string program) {
 			for (int i = 0; i < variableStore.size(); i++) { // insert the variable after inserting the statement due to FK
 				Database::insertVariable(variableStore.at(i)._stmt, variableStore.at(i)._stmtNum);
 			}
+
+			if (parentStmtNum.empty() && word == "while") {
+				parentStmtNum.push(stmtNum);
+				parentRegex.push(word);
+			}
+			else if (!parentStmtNum.empty() && word == "while") {
+				parentStmtNum.push(stmtNum);
+				parentRegex.push(word);
+			}
+
+			if (!parentStmtNum.empty() && parentRegex.top() != "while") {
+				Database::insertParent(parentStmtNum.top(), stmtNum, 1);
+			}
+
 			cout << setfill('0') << setw(2) << stmtNum << " | ";
 			for (int i = 0; i < indent; i++) { cout << "    "; }
 			cout << word << stmt->_stmt << endl;
@@ -113,6 +134,20 @@ void SourceProcessor::process(string program) {
 			for (int i = 0; i < variableStore.size(); i++) {
 				Database::insertVariable(variableStore.at(i)._stmt, variableStore.at(i)._stmtNum);
 			}
+
+			if (parentStmtNum.empty() && word == "if") {
+				parentStmtNum.push(stmtNum);
+				parentRegex.push(word);
+			}
+			else if (!parentStmtNum.empty() && word == "if") {
+				parentStmtNum.push(stmtNum);
+				parentRegex.push(word);
+			}
+
+			if (!parentStmtNum.empty() && parentRegex.top() != "if") {
+				Database::insertParent(parentStmtNum.top(), stmtNum, 1);
+			}
+
 			cout << setfill('0') << setw(2) << stmtNum << " | ";
 			for (int i = 0; i < indent; i++) { cout << "    "; }
 			cout << word << stmt->_stmt << endl;
