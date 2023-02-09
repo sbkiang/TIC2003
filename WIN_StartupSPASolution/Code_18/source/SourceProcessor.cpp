@@ -41,11 +41,7 @@ void SourceProcessor::process(string program) {
 		if (word == "}") { // "}" indicates the end of a container
 			if (!parentStack.empty()) {
 				indent--;
-<<<<<<< Updated upstream
 				parentStack.pop(); 
-=======
-				parentStack.pop(); 	
->>>>>>> Stashed changes
 			}
 		}
 		else if (word == "procedure") {
@@ -91,14 +87,11 @@ void SourceProcessor::process(string program) {
 			for (int i = 0; i < variableStore.size(); i++) { // insert the variable after inserting the statement due to FK
 				Database::insertVariable(variableStore.at(i)._stmt, variableStore.at(i)._stmtNum);
 			}
-<<<<<<< Updated upstream
-=======
 
 			for (int i = 0; i < useStore.size(); i++) {
 				Database::insertUse(useStore.at(i)._stmtNum, procedures.back()->_name, useStore.at(i)._stmt);
 			}
 
->>>>>>> Stashed changes
 			cout << setfill('0') << setw(2) << stmtNum << " | ";
 			for (int i = 0; i < indent; i++) { cout << "    "; }
 			cout << word << stmt->_stmt << endl;
@@ -134,10 +127,7 @@ void SourceProcessor::process(string program) {
 			for (int i = 0; i < variableStore.size(); i++) {
 				Database::insertVariable(variableStore.at(i)._stmt, variableStore.at(i)._stmtNum);
 			}
-<<<<<<< Updated upstream
-=======
 
->>>>>>> Stashed changes
 			cout << setfill('0') << setw(2) << stmtNum << " | ";
 			for (int i = 0; i < indent; i++) { cout << "    "; }
 			cout << word << stmt->_stmt << endl;
