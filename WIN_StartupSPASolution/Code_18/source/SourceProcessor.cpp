@@ -110,6 +110,7 @@ void SourceProcessor::process(string program) {
 			}
 			parentStack.push(container); //set itself as the latest parent container
 			vector<Statement> variableStore; // we need to insert statement first before inserting variable due to FK
+			vector<Statement> useStore;
 			i++ ; // skip the "if" keyword for the while loop below
 			while (tokens.at(i) != "then") { // from current index till "then", it's the condition. "if(...) then{"
 				container->_condition += tokens.at(i);
@@ -120,12 +121,21 @@ void SourceProcessor::process(string program) {
 				else if (regex_match(tokens.at(i), regex(var_regex))) {
 					variableStore.push_back(Statement(stmtNum, tokens.at(i), indent));
 				}
+
+				if (!regex_match(tokens.at(i), regex(var_use))) {
+					useStore.push_back(Statement(stmtNum, tokens.at(i), indent));
+				}
+
 				i++;
 			}
 			container->_statements.push_back(stmt);
 			Database::insertStatement(stmtNum, procedures.back()->_name, word, stmt->_stmt);
 			for (int i = 0; i < variableStore.size(); i++) {
 				Database::insertVariable(variableStore.at(i)._stmt, variableStore.at(i)._stmtNum);
+			}
+
+			for (int i = 0; i < useStore.size(); i++) {
+				Database::insertUse(useStore.at(i)._stmtNum, procedures.back()->_name, useStore.at(i)._stmt);
 			}
 
 			cout << setfill('0') << setw(2) << stmtNum << " | ";
@@ -173,8 +183,6 @@ void SourceProcessor::process(string program) {
 				i++;
 			}
 
-			
-
 			parentStack.top()->_statements.push_back(stmt);
 			Database::insertStatement(stmtNum, procedures.back()->_name, "assign", stmt->_stmt);
 			for (int i = 0; i < variableStore.size(); i++) {
@@ -203,6 +211,24 @@ void SourceProcessor::process(string program) {
 			cout << setfill('0') << setw(2) << stmtNum << " | ";
 			for (int i = 0; i < indent; i++) { cout << "    "; }
 			cout << stmt->_stmt << endl;
+
+			if (word == "print") {
+				vector<Statement> useStore;
+				i++; // skip the "print" keyword for the while loop below
+				while (tokens.at(i) != ";") {
+					stmt->_stmt += tokens.at(i);
+					if (!regex_match(tokens.at(i), regex(var_use)) ) {
+						useStore.push_back(Statement(stmtNum, tokens.at(i), indent));
+					}
+					i++;
+				}
+
+				for (int i = 0; i < useStore.size(); i++) {
+					Database::insertUse(useStore.at(i)._stmtNum, procedures.back()->_name, useStore.at(i)._stmt);
+				}
+
+			}
+
 		}
 	}
 	//procedures.at(0)->printContainerTree(0);
