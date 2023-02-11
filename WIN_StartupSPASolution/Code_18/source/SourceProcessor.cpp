@@ -164,6 +164,7 @@ void SourceProcessor::process(string program) {
 			stmt->_stmt += tokens.at(i - 1);
 			vector<Statement> variableStore; // we need to insert statement first before inserting variable due to FK. So, we store the variables here
 			vector<Statement> useStore;
+			vector<Statement> modifiesStore;
 			variableStore.push_back(Statement(stmtNum, tokens.at(i - 1), indent));
 			//useStore.push_back(Statement(stmtNum, tokens.at(i + 1), indent));
 			string LHS = tokens.at(i - 1);
@@ -175,13 +176,15 @@ void SourceProcessor::process(string program) {
 				else if (regex_match(tokens.at(i), regex(var_regex))) {
 					variableStore.push_back(Statement(stmtNum, tokens.at(i), indent));
 				}
-
+				
 				if (!regex_match(tokens.at(i), regex(var_use))) {
 					useStore.push_back(Statement(stmtNum, tokens.at(i), indent));
 				}
 				
 				i++;
 			}
+
+			modifiesStore.push_back(Statement(stmtNum, LHS, indent)); //Store LHS variable
 
 			parentStack.top()->_statements.push_back(stmt);
 			Database::insertStatement(stmtNum, procedures.back()->_name, "assign", stmt->_stmt);
@@ -191,6 +194,10 @@ void SourceProcessor::process(string program) {
 
 			for (int i = 0; i < useStore.size(); i++) {
 				Database::insertUse(useStore.at(i)._stmtNum, procedures.back()->_name, useStore.at(i)._stmt);
+			}
+
+			for (int i = 0; i < modifiesStore.size(); i++) {
+				Database::insertModifies(modifiesStore.at(i)._stmtNum, procedures.back()->_name, modifiesStore.at(i)._stmt);
 			}
 
 
@@ -204,20 +211,17 @@ void SourceProcessor::process(string program) {
 			stmt->_stmt += tokens.at(i);
 			stmt->_stmt += tokens.at(i + 1);
 			Database::insertStatement(stmtNum, procedures.back()->_name, word, stmt->_stmt);
+			
 			if (word == "read" || word == "print") {
 				Database::insertVariable(tokens.at(i + 1), stmtNum);
 			}
-			parentStack.top()->_statements.push_back(stmt);
-			cout << setfill('0') << setw(2) << stmtNum << " | ";
-			for (int i = 0; i < indent; i++) { cout << "    "; }
-			cout << stmt->_stmt << endl;
-
+			
 			if (word == "print") {
 				vector<Statement> useStore;
 				i++; // skip the "print" keyword for the while loop below
 				while (tokens.at(i) != ";") {
 					stmt->_stmt += tokens.at(i);
-					if (!regex_match(tokens.at(i), regex(var_use)) ) {
+					if (!regex_match(tokens.at(i), regex(var_use))) {
 						useStore.push_back(Statement(stmtNum, tokens.at(i), indent));
 					}
 					i++;
@@ -228,6 +232,21 @@ void SourceProcessor::process(string program) {
 				}
 
 			}
+
+			if (word == "read") {
+				vector<Statement> modifiesStore;
+
+				modifiesStore.push_back(Statement(stmtNum, tokens.at(i + 1), indent));
+
+				for (int i = 0; i < modifiesStore.size(); i++) {
+					Database::insertModifies(modifiesStore.at(i)._stmtNum, procedures.back()->_name, modifiesStore.at(i)._stmt);
+				}
+			}
+			
+			parentStack.top()->_statements.push_back(stmt);
+			cout << setfill('0') << setw(2) << stmtNum << " | ";
+			for (int i = 0; i < indent; i++) { cout << "    "; }
+			cout << stmt->_stmt << endl;
 
 		}
 	}

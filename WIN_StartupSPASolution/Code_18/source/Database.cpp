@@ -108,6 +108,11 @@ void Database::insertUse(int statementNumber, string procedureName, string varia
 	sqlite3_exec(dbConnection, sql.c_str(), NULL, 0, &errorMessage);
 }
 
+void Database::insertModifies(int statementNumber, string procedureName, string variablename) {
+	string sql = "INSERT INTO modify ('line_num', 'procedure_name', 'variable_name' ) VALUES ('" + to_string(statementNumber) + "', '" + procedureName + "', '" + variablename + "');";
+	sqlite3_exec(dbConnection, sql.c_str(), NULL, 0, &errorMessage);
+}
+
 // method to get all the procedures from the database
 void Database::getProcedures(vector<string>& results) {
 	// clear the existing results
