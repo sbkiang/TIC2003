@@ -1,33 +1,32 @@
 #include "Container.h"
 
 // constructor
-Container::Container() {
-}
+Container::Container() {}
 
 // destructor
 Container::~Container() {}
-
-CFG* Container::linkStatements() {
-	CFG* cfg = new CFG();
-	CFGNode* head = new CFGNode;
-	if (_statements.size() == 0) {
-		return cfg;
-	}
-	head->_stmtPtr = _statements.at(0);
-	head->_container = _type;
-	cfg->_head = head;
-	for (int i = 1; i < _statements.size(); i++) {
-		CFGNode* node = new CFGNode;
-		node->_stmtPtr = _statements.at(i);
-		node->_container = _type;
-		cfg->addSTailSJump(node);
-	}
-	if (_type == "while") { // if is a while container, the last node will need to link with the first node
-		if (cfg->_sTail) { cfg->_sTail->_sJump = cfg->_head; } // check if _sTail is null. This might happen if we get a while container without any statements in it
-		//else { cfg->_sTail = cfg->_head; } // if no _sTail = no statements, the tail is the head
-	}
-	return cfg;
-}
+//
+//CFG* Container::linkStatements() {
+//	CFG* cfg = new CFG();
+//	CFGNode* head = new CFGNode;
+//	if (_statements.size() == 0) {
+//		return cfg;
+//	}
+//	head->_stmtPtr = _statements.at(0);
+//	head->_container = _type;
+//	cfg->_head = head;
+//	for (int i = 1; i < _statements.size(); i++) {
+//		CFGNode* node = new CFGNode;
+//		node->_stmtPtr = _statements.at(i);
+//		node->_container = _type;
+//		cfg->addSTailSJump(node);
+//	}
+//	if (_type == "while") { // if is a while container, the last node will need to link with the first node
+//		if (cfg->_sTail) { cfg->_sTail->_sJump = cfg->_head; } // check if _sTail is null. This might happen if we get a while container without any statements in it
+//		//else { cfg->_sTail = cfg->_head; } // if no _sTail = no statements, the tail is the head
+//	}
+//	return cfg;
+//}
 
 IfElseLinker* Container::getIfElseLinker(Container* ptr) {
 	for (int i = 0; i < _ifElseLinker.size(); i++) {
@@ -37,11 +36,11 @@ IfElseLinker* Container::getIfElseLinker(Container* ptr) {
 	return nullptr;
 }
 
-void Container::printContainerTree(int tabs) {
+void Container::printContainerTree(int indent) {
 	for (int i = 0; i < _childContainers.size(); i++) {
 		Container* container = _childContainers.at(i);
-		for (int i = 0; i < tabs; i++) {
-			cout << "\t"; // tab for formatting
+		for (int i = 0; i < indent; i++) {
+			cout << " "; // tab for formatting
 		}
 		if (container->_type == "else") {
 			cout << "else container for : " << getIfElseLinker(container)->_ifPtr->_statements.at(0)->_stmt;
@@ -49,8 +48,9 @@ void Container::printContainerTree(int tabs) {
 		else {
 			cout << container->_type << " container : " << container->_statements.at(0)->_stmt;
 		}
+		cout << "\tStmt start : " << container->_startStmtNum << "\tStmt end: " << container->_endStmtNum;
 		cout << endl;
-		_childContainers.at(i)->printContainerTree(tabs + 1);
+		_childContainers.at(i)->printContainerTree(indent + 1);
 	}
 }
 

@@ -22,11 +22,12 @@ public:
 	vector<Container*> _childContainers;
 	string _condition;
 	string _type;
+	int _level;
 	int _startStmtNum;
 	int _endStmtNum;
 	vector<IfElseLinker*> _ifElseLinker;
 
-	CFG* linkStatements();  // Create a CFGNode for each statement. Then, link them together in a CFG, and following the if-else and while CFG rule
+	//CFG* linkStatements();  // Create a CFGNode for each statement. Then, link them together in a CFG, and following the if-else and while CFG rule
 	IfElseLinker* getIfElseLinker(Container* ptr);
 	void printContainerTree(int tab);
 	void printStmt();

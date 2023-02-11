@@ -36,3 +36,7 @@ Statement::Statement(int stmtNum, string stmt, int level, Container* container) 
 	_containerHead = false;
 	_container = container;
 }
+
+int Statement::getFinalStmtNum() {
+	return _stmtNum - _ifOffset;
+}

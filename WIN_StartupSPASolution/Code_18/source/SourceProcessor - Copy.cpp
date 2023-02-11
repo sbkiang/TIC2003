@@ -7,8 +7,7 @@
 
 //CFG* createCFG(Container* container);
 map<int, CFGNode*> _buildStatements(Container* container);
-CFG* buildStatements(Container* container);
-CFGNode* findNextStmt(stack<Container*> parentStack, int startStmtNum, map<int, CFGNode*> stmts);
+void buildStatements(Container* container);
 
 void SourceProcessor::process(string program) {
 	// initialize the database
@@ -43,7 +42,6 @@ void SourceProcessor::process(string program) {
 			Procedure* procedure = new Procedure(tokens.at(i));
 			procedure->_type = "procedure";
 			procedure->_startStmtNum = stmtNum + 1;
-			procedure->_level = indent;
 			procedures.push_back(procedure);
 			parentStack.push(procedure);
 			Database::insertProcedure(procedure->_name);
@@ -54,7 +52,6 @@ void SourceProcessor::process(string program) {
 			Container* container = new Container();
 			container->_type = "while";
 			container->_startStmtNum = stmtNum;
-			container->_level = indent;
 			Statement* stmt = new Statement(stmtNum, indent + 1, true, container);
 			if (!parentStack.empty()) {
 				parentStack.top()->_childContainers.push_back(container);
@@ -88,7 +85,6 @@ void SourceProcessor::process(string program) {
 			Container* container = new Container();
 			container->_type = "if";
 			container->_startStmtNum = stmtNum;
-			container->_level = indent;
 			IfElseLinker* linker = new IfElseLinker(); // create a IfElseLinker
 			linker->_ifPtr = container; // set the IfElseLinker's ifPtr to this "if" container
 			ifElseLinkerStack.push(linker); // push it onto the stack for the corresponding "else" container
@@ -121,16 +117,9 @@ void SourceProcessor::process(string program) {
 			indent++;
 		}
 		else if (word == "else") { // for else container
-			
 			Container* container = new Container();
-			/*
 			container->_type = "else";
-			Statement* stmt = new Statement(stmtNum + 1, indent + 1, true, container);
-			stmt->_stmt = "else";
-			container->_statements.push_back(stmt);
-			*/
 			container->_startStmtNum = stmtNum + 1;
-			container->_level = indent;
 			ifElseLinkerStack.top()->_elsePtr = container; // the top stack will be the corresponding "if" container. We set this "else" container to the pointer
 			parentStack.top()->_ifElseLinker.push_back(ifElseLinkerStack.top()); // parentStack.top() is this if-else container's parent. We add the this linker to it
 			ifElseLinkerStack.pop(); // we pop the IfElseLinker as we've already processed the if-else
@@ -185,81 +174,80 @@ void SourceProcessor::process(string program) {
 		}
 	}
 	procedures.at(0)->printContainerTree(0);
-	CFG* cfg = buildStatements(procedures.at(0));
-	cfg->printCFG();
+	buildStatements(procedures.at(0));
 }
 
 
-CFG* buildStatements(Container* container) {
+void buildStatements(Container* container) {
 	stack<CFGNode*> whileHeads;
 	stack<CFGNode*> ifHeads;
 	stack<Container*> parentStack;
 	stack<Container*> tempParentStack;
-	Container* tempContainer = container;
+	Container* parent = container;
 	map<int, CFGNode*> stmts = _buildStatements(container);
-	CFG* cfg = new CFG(stmts.at(1));
+	//parentStack.push(container); // procedure container is always the first container
+	bool pushBack = false;
 	int loopStart = 0, loopEnd = 0;
 	for (int i = 1; i < stmts.size() + 1; i++) {
 		CFGNode* node = stmts.at(i);
-		if (i == node->_stmtPtr->_container->_startStmtNum) {  // if current stmt is the container head, save to a tempContainer as it's the start of a new container
-			if (tempContainer->_level < node->_stmtPtr->_container->_level) { // if parent container indent is lower than current node, then tempContainer is a parent container
-				parentStack.push(tempContainer);
-				tempContainer = node->_stmtPtr->_container;
-			}
+		if (tempParentStack.empty()) { // if we use the i-- method, this if statement will run, and push the same container again. We don't want that to happen
+			if (i == node->_stmtPtr->_container->_startStmtNum) { parentStack.push(node->_stmtPtr->_container); } // if current stmt is the start of a container, push to parentStack
 		}
 		if (!(node->_stmtPtr->_containerHead || node->_stmtPtr->_containerTail)) {
 			node->_sJump = stmts.at(i + 1);
-			cout << "node " << node->_stmtPtr->_stmtNum << " sJump : " << node->_sJump->_stmtPtr->_stmtNum << endl;
 			continue;
 		}
- 		if (node->_stmtPtr->_container->_type == "procedure") {
+		if (node->_stmtPtr->_container->_type == "procedure") {
 			if (stmts.find(i + 1) != stmts.end()) {
 				node->_sJump = stmts.at(i + 1);
 			}
 		}
 		else if (node->_stmtPtr->_container->_type == "while") {
-			if (!node->_stmtPtr->_containerHead && node->_stmtPtr->_containerTail) { // if stmt is while container tail only, sJump back to head
+			if (node->_stmtPtr->_containerHead && node->_stmtPtr->_containerTail) { // if stmt is both while container head and tail, set sJump and sTail
+				node->_sJump = stmts.at(i + 1);
+				if (parentStack.top()->_type == "while") { // if parent container is while, then fJump will be parent container head
+					node->_fJump = stmts.at(parentStack.top()->_startStmtNum);
+				}
+				else { // for all other parent containers, find sibling stmt or parent stmt, and skip all else stmt
+					loopStart = node->_stmtPtr->_container->_endStmtNum; // skip self stmt
+					loopEnd = parentStack.top()->_endStmtNum;
+					for (int j = loopStart; j < loopEnd; j++) {
+						if (stmts.at(j)->_stmtPtr->_container->_type == "else") {
+							continue;
+						}
+						if (node->_stmtPtr->_level >= stmts.at(j)->_stmtPtr->_level) { // siblings container = same indent level. parent container = lower indent level. So, >=
+							node->_fJump = stmts.at(j); // after finding the _fJump, we push whatever parent container that we popped
+							while (!tempParentStack.empty()) {
+								parentStack.push(tempParentStack.top());
+								tempParentStack.pop();
+							}
+							break; //exit if found fJump
+						}
+					}
+					if (!node->_fJump) { // if from current container end stmt to parent end stmt, unable to find sibling container or parent stmt, go one level higher
+						tempParentStack.push(parentStack.top());
+						parentStack.pop();
+						loopStart = tempParentStack.top()->_endStmtNum;
+						i--;
+						continue;
+					}
+				}
+				parentStack.push(container); // to ensure that the parentStack is always the current node's parent container, we push the current container to the stack after processing each head
+				container = node->_stmtPtr->_container;
+			}
+			else if (node->_stmtPtr->_containerHead && !node->_stmtPtr->_containerTail) { // if stmt is while container head only, sJump is next stmt
+				node->_sJump = stmts.at(i + 1);
+			}
+			else if (!node->_stmtPtr->_containerHead && node->_stmtPtr->_containerTail) { // if stmt is while container tail only, sJump back to head
 				node->_sJump = stmts.at(node->_stmtPtr->_container->_startStmtNum);
 			}
-			else { // if stmt is while container head and tail, or only head, set sJump and sTail
-				node->_sJump = stmts.at(i + 1);
-				/*
-				if (parentStack.top()->_type == "while") { // if parent container is while
-					stack<Container*> tempStack;
-					tempStack.push(parentStack.top());
-					node->_fJump = findNextStmt(tempStack, node->_stmtPtr->_container->_endStmtNum + 1, stmts); // find the next sibling or parent stmt in this while parent container
-					if (!node->_fJump) { // if can't find, then there's no more further in this while parent container. sJump will go back to while head
-						node->_fJump = stmts.at(parentStack.top()->_startStmtNum);
-					}
-				}
-				else { // for all other parent containers, find sibling stmt or parent stmt, and skip all else stmt
-					node->_fJump = findNextStmt(parentStack, node->_stmtPtr->_container->_endStmtNum + 1, stmts);
-				}*/
-				node->_fJump = findNextStmt(parentStack, node->_stmtPtr->_container->_endStmtNum + 1, stmts);
-			} 
 		}
 		else if (node->_stmtPtr->_container->_type == "if") {
-			if (!node->_stmtPtr->_containerHead && node->_stmtPtr->_containerTail) { // if stmt is if container tail only
-				/*
-				if (parentStack.top()->_type == "while") { // if parent container is while
-					stack<Container*> tempStack;
-					tempStack.push(parentStack.top());
-					node->_sJump = findNextStmt(tempStack, node->_stmtPtr->_container->_endStmtNum + 1, stmts); // find the next sibling or parent stmt in this while parent container
-					if (!node->_sJump) { // if can't find, then there's no more further in this while parent container. sJump will go back to while head
-						node->_sJump = stmts.at(parentStack.top()->_startStmtNum);
-					}
-				}
-				else { // for all other parent containers, find sibling stmt or parent stmt, and skip all else stmt
-					node->_sJump = findNextStmt(parentStack, node->_stmtPtr->_stmtNum + 1, stmts);
-				}
-				*/
-				node->_sJump = findNextStmt(parentStack, node->_stmtPtr->_stmtNum + 1, stmts);
-			}
-			else { // if stmt is both if container head and tail, or head only, sJump = next stmt, fJump = else stmt
+			if (node->_stmtPtr->_containerHead && node->_stmtPtr->_containerTail) { // if stmt is both if container head and tail, sJump = next stmt, fJump = else stmt
 				node->_sJump = stmts.at(i + 1);
 				loopStart = node->_stmtPtr->_container->_endStmtNum + 1; // skip self stmt
 				loopEnd = parentStack.top()->_endStmtNum;
-				for (int j = loopStart; j < loopEnd; j++) { // fJump is the first stmt in else container of same indent
+				for (int j = loopStart; j < loopEnd; j++) { // fJump is next else container of same indent
 					if (stmts.at(j)->_stmtPtr->_level != node->_stmtPtr->_level) {
 						continue;
 					}
@@ -267,104 +255,133 @@ CFG* buildStatements(Container* container) {
 						continue;
 					}
 					node->_fJump = stmts.at(j);
-					break;
 				}
-			} 
- 		}
-		else if (node->_stmtPtr->_container->_type == "else") {
-			if (node->_stmtPtr->_containerHead && !node->_stmtPtr->_containerTail) { // if stmt is else container head only, sJump is next stmt
+			}
+			else if (node->_stmtPtr->_containerHead && !node->_stmtPtr->_containerTail) { // if stmt is if container head only, sJump is next stmt
 				node->_sJump = stmts.at(i + 1);
 			}
-			else{ // if stmt is else container tail only, or head and tail
-				/*
-				if (parentStack.top()->_type == "while") { // if parent container is while
-					stack<Container*> tempStack;
-					tempStack.push(parentStack.top());
-					node->_sJump = findNextStmt(tempStack, node->_stmtPtr->_container->_endStmtNum + 1, stmts); // find the next sibling or parent stmt in this while parent container
-					if (!node->_sJump) { // if can't find, then there's no more further in this while parent container. sJump will go back to while head
-						node->_sJump = stmts.at(parentStack.top()->_startStmtNum);
-					}
+			else if (!node->_stmtPtr->_containerHead && node->_stmtPtr->_containerTail) { // if stmt is if container tail only
+				if (parentStack.top()->_type == "while") { // if parent container is while, then fJump will be parent container head
+					node->_fJump = stmts.at(parentStack.top()->_startStmtNum);
 				}
 				else { // for all other parent containers, find sibling stmt or parent stmt, and skip all else stmt
-					node->_sJump = findNextStmt(parentStack, node->_stmtPtr->_stmtNum + 1, stmts);
+					loopStart = node->_stmtPtr->_container->_endStmtNum;
+					loopEnd = parentStack.top()->_endStmtNum;
+					for (int j = loopStart; j < loopEnd; j++) {
+						if (stmts.at(j)->_stmtPtr->_container->_type == "else") {
+							continue;
+						}
+						if (node->_stmtPtr->_level >= stmts.at(j)->_stmtPtr->_level) { // siblings container = same indent level. parent container = lower indent level. So, >=
+							node->_sJump = stmts.at(j); // after finding the _fJump, we push whatever parent container that we popped
+							while (!tempParentStack.empty()) {
+								parentStack.push(tempParentStack.top());
+								tempParentStack.pop();
+							}
+						}
+					}
+					if (!node->_sJump) { // if from current container end stmt to parent end stmt, unable to find sibling container or parent stmt, go one level higher
+						tempParentStack.push(parentStack.top());
+						parentStack.pop();
+						loopStart = tempParentStack.top()->_endStmtNum;
+						i--;
+						continue;
+					}
 				}
-				*/
-				node->_sJump = findNextStmt(parentStack, node->_stmtPtr->_stmtNum + 1, stmts);
 			}
-		}
-		while(!parentStack.empty()) {
-			if (i == parentStack.top()->_endStmtNum) { // if current stmt is a container end, pop from parentStack. Place it at the end so that the pop occurs after everything have been processed
-				parentStack.pop();
-			}
-			else {
-				break;
-			}
+ 		}
+		else if (node->_stmtPtr->_container->_type == "else") {
+			if (node->_stmtPtr->_containerHead && node->_stmtPtr->_containerTail) { // if stmt is both else container head and tail
 
+				loopStart = node->_stmtPtr->_container->_endStmtNum;
+				loopEnd = parentStack.top()->_endStmtNum;
+				for (int j = loopStart; j < loopEnd; j++) {
+					if (stmts.at(j)->_stmtPtr->_container->_type == "else") {
+						continue;
+					}
+					if (node->_stmtPtr->_level >= stmts.at(j)->_stmtPtr->_level) { // siblings container = same indent level. parent container = lower indent level. So, >=
+						node->_fJump = stmts.at(j); // after finding the _fJump, we push whatever parent container that we popped
+						while (!tempParentStack.empty()) {
+							parentStack.push(tempParentStack.top());
+							tempParentStack.pop();
+						}
+					}
+				}
+				if (!node->_fJump) { // if from current container end stmt to parent end stmt, unable to find sibling container or parent stmt, go one level higher
+					tempParentStack.push(parentStack.top());
+					parentStack.pop();
+					loopStart = tempParentStack.top()->_endStmtNum;
+					i--;
+					continue;
+				}
+			}
+			else if (node->_stmtPtr->_containerHead && !node->_stmtPtr->_containerTail) { // if stmt is else container head only, sJump is next stmt
+				node->_sJump = stmts.at(i + 1);
+			}
+			else if (!node->_stmtPtr->_containerHead && node->_stmtPtr->_containerTail) { // if stmt is else container tail only
+				if (parentStack.top()->_type == "while") { // if parent container is while, then fJump will be parent container head
+					node->_fJump = stmts.at(parentStack.top()->_startStmtNum);
+				}
+				else { // for all other parent containers, find sibling stmt or parent stmt, and skip all else stmt
+					loopStart = node->_stmtPtr->_container->_endStmtNum + 1; // skip self stmt
+					loopEnd = parentStack.top()->_endStmtNum;
+					for (int j = loopStart; j < loopEnd; j++) {
+						if (stmts.at(j)->_stmtPtr->_container->_type == "else") {
+							continue;
+						}
+						if (node->_stmtPtr->_level >= stmts.at(j)->_stmtPtr->_level) { // siblings container = same indent level. parent container = lower indent level. So, >=
+							node->_fJump = stmts.at(j); // after finding the _fJump, we push whatever parent container that we popped
+							while (!tempParentStack.empty()) {
+								parentStack.push(tempParentStack.top());
+								tempParentStack.pop();
+							}
+						}
+					}
+					if (!node->_fJump) { // if from current container end stmt to parent end stmt, unable to find sibling container or parent stmt, go one level higher
+						tempParentStack.push(parentStack.top());
+						parentStack.pop();
+						loopStart = tempParentStack.top()->_endStmtNum;
+						i--;
+						continue;
+					}
+				}
+			}
 		}
-		if(node->_sJump){ cout << "node " << node->_stmtPtr->_stmtNum << " sJump : " << node->_sJump->_stmtPtr->_stmtNum << endl; }
-		if (node->_fJump) { cout << "node " << node->_stmtPtr->_stmtNum << " fJump : " << node->_fJump->_stmtPtr->_stmtNum << endl; }
-	}
-	return cfg;	
-}
-
-CFGNode* findNextStmt(stack<Container*> parentStack, int startStmtNum, map<int, CFGNode*> stmts) {
-	Container* currContainer = nullptr;
-	CFGNode* nextStmt = nullptr;
-	if (parentStack.empty()) { return nullptr; } // ** ISSUE HERE **. 
-	int endStmtNum = parentStack.top()->_endStmtNum;
-	for (int j = startStmtNum; j < endStmtNum + 1; j++) { // frind the next stmt that is a sibling or parent stmt
-		if (stmts.at(j)->_stmtPtr->_container->_type == "else") {
-			continue;
-		}
-		if (stmts.at(startStmtNum)->_stmtPtr->_level >= stmts.at(j)->_stmtPtr->_level) { // siblings container = same indent level. parent container = lower indent level. So, >=
-			nextStmt = stmts.at(j);
-			break;
-		}
-	}
-	if (!nextStmt) { // if can't find
-		if (parentStack.top()->_type == "while") { // if parent container is a while, then next stmt will be the while parent head
-			return stmts.at(parentStack.top()->_startStmtNum);
-		}
-		else { // if not, we continue to the higher parent
-			currContainer = parentStack.top();
+		while (i == parentStack.top()->_endStmtNum) { // if current stmt is a container end, pop from parentStack. Place it at the end so that the pop occurs after everything have been processed
 			parentStack.pop();
-			nextStmt = findNextStmt(parentStack, currContainer->_endStmtNum, stmts);
-			parentStack.push(currContainer);
 		}
 	}
-	return nextStmt;
 }
 
-/*
-CFGNode* findNextStmt(stack<Container*> parentStack, int startStmtNum, map<int, CFGNode*> stmts) {
-	Container* currContainer = nullptr;
+CFGNode* findNextStmt(stack<Container*> parentStack, CFGNode* node, map<int, CFGNode*> stmts) {
+	Container* currContainer;
+	currContainer = parentStack.top();
+	parentStack.pop();
+	int loopStart = 0;
+	int loopEnd = 0;
 	CFGNode* nextStmt = nullptr;
 	if (parentStack.empty()) { return nullptr; }
 	if (parentStack.top()->_type == "while") { // if parent container is while, then fJump will be parent container head
-		// find the next stmt in while. If can't find, then sJump to while head
-		return stmts.at(parentStack.top()->_startStmtNum);
+		node->_fJump = stmts.at(parentStack.top()->_startStmtNum);
 	}
 	else { // for all other parent containers, find sibling stmt or parent stmt, and skip all else stmt
-		int endStmtNum = parentStack.top()->_endStmtNum; // for the first iter, parentStack will be itself. But loop wont run
-		for (int j = startStmtNum; j < endStmtNum + 1; j++) {
+		loopStart = currContainer->_endStmtNum;
+		loopEnd = parentStack.top()->_endStmtNum; // for the first iter, parentStack will be itself. But loop wont run
+		for (int j = loopStart; j < loopEnd; j++) {
 			if (stmts.at(j)->_stmtPtr->_container->_type == "else") {
 				continue;
 			}
-			if (stmts.at(startStmtNum)->_stmtPtr->_level >= stmts.at(j)->_stmtPtr->_level) { // siblings container = same indent level. parent container = lower indent level. So, >=
+			if (node->_stmtPtr->_level >= stmts.at(j)->_stmtPtr->_level) { // siblings container = same indent level. parent container = lower indent level. So, >=
 				nextStmt = stmts.at(j);
-				break;
 			}
 		}
 	}
 	if (!nextStmt) { // if from current container end stmt to parent end stmt, unable to find sibling container or parent stmt, go one level higher
-		currContainer = parentStack.top();
-		parentStack.pop();
-		nextStmt = findNextStmt(parentStack, currContainer->_endStmtNum, stmts);
-		parentStack.push(currContainer);
+		nextStmt = findNextStmt(parentStack, node, stmts);
 	}
+	parentStack.push(currContainer);
 	return nextStmt;
 }
-*/
+
 map<int, CFGNode*> _buildStatements(Container* container) {
 	map<int, CFGNode*> myMap;
 	for (int i = 0; i < container->_statements.size(); i++) {
