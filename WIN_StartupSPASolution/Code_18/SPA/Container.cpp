@@ -36,10 +36,10 @@ IfElseLinker* Container::getIfElseLinker(Container* ptr) {
 	return nullptr;
 }
 
-void Container::printContainerTree(int indent) {
+void Container::printContainerTree(int nestedLevel) {
 	for (int i = 0; i < _childContainers.size(); i++) {
 		Container* container = _childContainers.at(i);
-		for (int i = 0; i < indent; i++) {
+		for (int i = 0; i < nestedLevel; i++) {
 			cout << " "; // tab for formatting
 		}
 		if (container->_type == "else") {
@@ -50,7 +50,7 @@ void Container::printContainerTree(int indent) {
 		}
 		cout << "\tStmt start : " << container->_startStmtNum << "\tStmt end: " << container->_endStmtNum;
 		cout << endl;
-		_childContainers.at(i)->printContainerTree(indent + 1);
+		_childContainers.at(i)->printContainerTree(nestedLevel + 1);
 	}
 }
 

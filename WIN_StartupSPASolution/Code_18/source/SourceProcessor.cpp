@@ -28,12 +28,12 @@ void SourceProcessor::process(string program) {
 	stack<Container*> parentStack;
 	stack<IfElseLinker*> ifElseLinkerStack;
 	int stmtNum = 0;
-	int indent = 0;
+	int nestedLevel = 0;
 	for (int i = 0; i < tokens.size(); i++) {
 		string word = tokens.at(i);
 		if (word == "}") { // "}" indicates the end of a container
 			if (!parentStack.empty()) {
-				indent--;
+				nestedLevel--;
 				parentStack.top()->_endStmtNum = stmtNum;
 				parentStack.pop();
 			}
@@ -43,19 +43,20 @@ void SourceProcessor::process(string program) {
 			Procedure* procedure = new Procedure(tokens.at(i));
 			procedure->_type = "procedure";
 			procedure->_startStmtNum = stmtNum + 1;
-			procedure->_level = indent;
+			procedure->_level = nestedLevel;
 			procedures.push_back(procedure);
 			parentStack.push(procedure);
 			Database::insertProcedure(procedure->_name);
-			indent++;
+			nestedLevel++;
 		}
 		else if (word == "while") { // while(...){...}
 			stmtNum++;
+			nestedLevel++;
 			Container* container = new Container();
 			container->_type = "while";
 			container->_startStmtNum = stmtNum;
-			container->_level = indent;
-			Statement* stmt = new Statement(stmtNum, indent + 1, true, container);
+			container->_level = nestedLevel;
+			Statement* stmt = new Statement(stmtNum, nestedLevel, true, container);
 			if (!parentStack.empty()) {
 				parentStack.top()->_childContainers.push_back(container);
 			}
@@ -79,20 +80,20 @@ void SourceProcessor::process(string program) {
 				Database::insertVariable(variableStore.at(i)._stmt, variableStore.at(i)._stmtNum);
 			}
 			cout << setfill('0') << setw(2) << stmtNum << " | ";
-			for (int i = 0; i < indent; i++) { cout << "    "; }
+			for (int i = 0; i < nestedLevel - 1; i++) { cout << "    "; }
 			cout << word << stmt->_stmt << endl;
-			indent++;
 		}
 		else if (word == "if") { // if(...) then {...} else {...}
 			stmtNum++;
+			nestedLevel++;
 			Container* container = new Container();
 			container->_type = "if";
 			container->_startStmtNum = stmtNum;
-			container->_level = indent;
+			container->_level = nestedLevel;
 			IfElseLinker* linker = new IfElseLinker(); // create a IfElseLinker
 			linker->_ifPtr = container; // set the IfElseLinker's ifPtr to this "if" container
 			ifElseLinkerStack.push(linker); // push it onto the stack for the corresponding "else" container
-			Statement* stmt = new Statement(stmtNum, indent + 1, true, container);
+			Statement* stmt = new Statement(stmtNum, nestedLevel, true, container);
 			if (!parentStack.empty()) { // if there's parent container, add current container to parent's child
 				parentStack.top()->_childContainers.push_back(container);
 			}
@@ -116,21 +117,20 @@ void SourceProcessor::process(string program) {
 				Database::insertVariable(variableStore.at(i)._stmt, variableStore.at(i)._stmtNum);
 			}
 			cout << setfill('0') << setw(2) << stmtNum << " | ";
-			for (int i = 0; i < indent; i++) { cout << "    "; }
+			for (int i = 0; i < nestedLevel - 1; i++) { cout << "    "; }
 			cout << word << stmt->_stmt << endl;
-			indent++;
 		}
 		else if (word == "else") { // for else container
-			
+			nestedLevel++;
 			Container* container = new Container();
-			/*
 			container->_type = "else";
-			Statement* stmt = new Statement(stmtNum + 1, indent + 1, true, container);
+			/*
+			Statement* stmt = new Statement(stmtNum + 1, nestedLevel + 1, true, container);
 			stmt->_stmt = "else";
 			container->_statements.push_back(stmt);
 			*/
 			container->_startStmtNum = stmtNum + 1;
-			container->_level = indent;
+			container->_level = nestedLevel;
 			ifElseLinkerStack.top()->_elsePtr = container; // the top stack will be the corresponding "if" container. We set this "else" container to the pointer
 			parentStack.top()->_ifElseLinker.push_back(ifElseLinkerStack.top()); // parentStack.top() is this if-else container's parent. We add the this linker to it
 			ifElseLinkerStack.pop(); // we pop the IfElseLinker as we've already processed the if-else
@@ -139,13 +139,12 @@ void SourceProcessor::process(string program) {
 			}
 			parentStack.push(container); // we push the current "else" container to the parentStack for future statements
 			cout << setfill('0') << setw(2) << stmtNum + 1 << " | ";
-			for (int i = 0; i < indent; i++) { cout << "    "; }
+			for (int i = 0; i < nestedLevel - 1; i++) { cout << "    "; }
 			cout << word << " " << endl;
-			indent++;
 		}
 		else if (word == "=") { // for assign
 			stmtNum++;
-			Statement* stmt = new Statement(stmtNum, indent, false, parentStack.top());
+			Statement* stmt = new Statement(stmtNum, nestedLevel, false, parentStack.top());
 			stmt->_stmt += tokens.at(i - 1);
 			vector<Statement> variableStore; // we need to insert statement first before inserting variable due to FK. So, we store the variables here
 			variableStore.push_back(Statement(stmtNum, tokens.at(i - 1)));
@@ -156,7 +155,7 @@ void SourceProcessor::process(string program) {
 					Database::insertConstant(tokens.at(i));
 				}
 				else if (regex_match(tokens.at(i), regex(var_regex))) {
-					variableStore.push_back(Statement(stmtNum, tokens.at(i), indent, parentStack.top()));
+					variableStore.push_back(Statement(stmtNum, tokens.at(i), nestedLevel, parentStack.top()));
 				}
 				i++;
 			}
@@ -166,12 +165,12 @@ void SourceProcessor::process(string program) {
 				Database::insertVariable(variableStore.at(i)._stmt, variableStore.at(i)._stmtNum);
 			}
 			cout << setfill('0') << setw(2) << stmtNum << " | ";
-			for (int i = 0; i < indent; i++) { cout << "    "; }
+			for (int i = 0; i < nestedLevel; i++) { cout << "    "; }
 			cout << stmt->_stmt << endl;
 		}
 		else if (word == "read" || word == "print" || word == "call") {
 			stmtNum++;
-			Statement* stmt = new Statement(stmtNum, indent, false, parentStack.top());
+			Statement* stmt = new Statement(stmtNum, nestedLevel, false, parentStack.top());
 			stmt->_stmt += tokens.at(i);
 			stmt->_stmt += tokens.at(i + 1);
 			Database::insertStatement(stmtNum, procedures.back()->_name, word, stmt->_stmt);
@@ -180,7 +179,7 @@ void SourceProcessor::process(string program) {
 			}
 			parentStack.top()->_statements.push_back(stmt);
 			cout << setfill('0') << setw(2) << stmtNum << " | ";
-			for (int i = 0; i < indent; i++) { cout << "    "; }
+			for (int i = 0; i < nestedLevel; i++) { cout << "    "; }
 			cout << stmt->_stmt << endl;
 		}
 	}
@@ -202,7 +201,7 @@ CFG* buildStatements(Container* container) {
 	for (int i = 1; i < stmts.size() + 1; i++) {
 		CFGNode* node = stmts.at(i);
 		if (i == node->_stmtPtr->_container->_startStmtNum) {  // if current stmt is the container head, save to a tempContainer as it's the start of a new container
-			if (tempContainer->_level < node->_stmtPtr->_container->_level) { // if parent container indent is lower than current node, then tempContainer is a parent container
+			if (tempContainer->_level < node->_stmtPtr->_container->_level) { // if parent container nestedLevel is lower than current node, then tempContainer is a parent container
 				parentStack.push(tempContainer);
 				tempContainer = node->_stmtPtr->_container;
 			}
@@ -259,7 +258,7 @@ CFG* buildStatements(Container* container) {
 				node->_sJump = stmts.at(i + 1);
 				loopStart = node->_stmtPtr->_container->_endStmtNum + 1; // skip self stmt
 				loopEnd = parentStack.top()->_endStmtNum;
-				for (int j = loopStart; j < loopEnd; j++) { // fJump is the first stmt in else container of same indent
+				for (int j = loopStart; j < loopEnd; j++) { // fJump is the first stmt in else container of same nestedLevel
 					if (stmts.at(j)->_stmtPtr->_level != node->_stmtPtr->_level) {
 						continue;
 					}
@@ -316,7 +315,7 @@ CFGNode* findNextStmt(stack<Container*> parentStack, int startStmtNum, map<int, 
 		if (stmts.at(j)->_stmtPtr->_container->_type == "else") {
 			continue;
 		}
-		if (stmts.at(startStmtNum)->_stmtPtr->_level >= stmts.at(j)->_stmtPtr->_level) { // siblings container = same indent level. parent container = lower indent level. So, >=
+		if (stmts.at(startStmtNum)->_stmtPtr->_level >= stmts.at(j)->_stmtPtr->_level) { // siblings container = same nestedLevel level. parent container = lower nestedLevel level. So, >=
 			nextStmt = stmts.at(j);
 			break;
 		}
@@ -350,7 +349,7 @@ CFGNode* findNextStmt(stack<Container*> parentStack, int startStmtNum, map<int, 
 			if (stmts.at(j)->_stmtPtr->_container->_type == "else") {
 				continue;
 			}
-			if (stmts.at(startStmtNum)->_stmtPtr->_level >= stmts.at(j)->_stmtPtr->_level) { // siblings container = same indent level. parent container = lower indent level. So, >=
+			if (stmts.at(startStmtNum)->_stmtPtr->_level >= stmts.at(j)->_stmtPtr->_level) { // siblings container = same nestedLevel level. parent container = lower nestedLevel level. So, >=
 				nextStmt = stmts.at(j);
 				break;
 			}
@@ -448,7 +447,7 @@ CFG* createCFG(Container* container) {
 			// issue: iteration2_CFG_Nested_Condition_L1_If_While_Parent_Stmt_Start_End_correct.txt
 				// line 6 while container is between ownCFG stmts
 				// so, ownCFG sTail and fTail points to the while container head, which by right, shouldn't
-			// logic works if prevNode is part of another else container. So need indent level?
+			// logic works if prevNode is part of another else container. So need nestedLevel level?
 				// E.g., if prevNode is part of another sibling container
 				//			if sibling container is while, need to find the _head
 				//			if sibling container is if, need to find the _sTail and _fTail
