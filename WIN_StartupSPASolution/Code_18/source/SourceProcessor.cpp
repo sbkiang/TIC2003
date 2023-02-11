@@ -27,6 +27,7 @@ void SourceProcessor::process(string program) {
 	vector<Procedure*> procedures;
 	stack<Container*> parentStack;
 	stack<IfElseLinker*> ifElseLinkerStack;
+	int elseStmtNumOffset = 0;
 	int stmtNum = 0;
 	int nestedLevel = 0;
 	for (int i = 0; i < tokens.size(); i++) {
@@ -35,6 +36,7 @@ void SourceProcessor::process(string program) {
 			if (!parentStack.empty()) {
 				nestedLevel--;
 				parentStack.top()->_endStmtNum = stmtNum;
+				if (parentStack.top()->_type == "else") { elseStmtNumOffset--; }
 				parentStack.pop();
 			}
 		}
@@ -122,14 +124,14 @@ void SourceProcessor::process(string program) {
 		}
 		else if (word == "else") { // for else container
 			nestedLevel++;
+			elseStmtNumOffset++;
+			stmtNum++;
 			Container* container = new Container();
 			container->_type = "else";
-			/*
-			Statement* stmt = new Statement(stmtNum + 1, nestedLevel + 1, true, container);
+			Statement* stmt = new Statement(stmtNum, nestedLevel, true, container);
 			stmt->_stmt = "else";
 			container->_statements.push_back(stmt);
-			*/
-			container->_startStmtNum = stmtNum + 1;
+			container->_startStmtNum = stmtNum;
 			container->_level = nestedLevel;
 			ifElseLinkerStack.top()->_elsePtr = container; // the top stack will be the corresponding "if" container. We set this "else" container to the pointer
 			parentStack.top()->_ifElseLinker.push_back(ifElseLinkerStack.top()); // parentStack.top() is this if-else container's parent. We add the this linker to it
@@ -138,7 +140,7 @@ void SourceProcessor::process(string program) {
 				parentStack.top()->_childContainers.push_back(container);
 			}
 			parentStack.push(container); // we push the current "else" container to the parentStack for future statements
-			cout << setfill('0') << setw(2) << stmtNum + 1 << " | ";
+			cout << setfill('0') << setw(2) << stmtNum << " | ";
 			for (int i = 0; i < nestedLevel - 1; i++) { cout << "    "; }
 			cout << word << " " << endl;
 		}
@@ -306,14 +308,22 @@ CFG* buildStatements(Container* container) {
 	return cfg;	
 }
 
+// this function finds the next statement from startStmtNum to endStmtNum. StartStmtNum is normally the end of the current block, endStmtNum is normally the endStmtNum of parent block
+//	1) if encounter else stmt, skip the block
+//	2) if can't find the stmt, i
+//		2a) if parent container is while, loop back
+//		2b) if parent container is not while, search from current block endStmtNum + 1 to parentBlock endStmtNum
 CFGNode* findNextStmt(stack<Container*> parentStack, int startStmtNum, map<int, CFGNode*> stmts) {
 	Container* currContainer = nullptr;
 	CFGNode* nextStmt = nullptr;
-	if (parentStack.empty()) { return nullptr; } // ** ISSUE HERE **. 
-	int endStmtNum = parentStack.top()->_endStmtNum;
+	if (parentStack.empty()) { return nullptr; }
+	int endStmtNum = parentStack.top()->_endStmtNum; // ** run createCFG 5 times to get to the 6th test
 	for (int j = startStmtNum; j < endStmtNum + 1; j++) { // frind the next stmt that is a sibling or parent stmt
-		if (stmts.at(j)->_stmtPtr->_container->_type == "else") {
-			continue;
+		if (stmts.at(j)->_stmtPtr->_container->_type == "else") { // if encounter and else stmt, it's going to be the else head. Skip the entire block
+			if (j == stmts.at(j)->_stmtPtr->_container->_startStmtNum) {
+				j = stmts.at(j)->_stmtPtr->_container->_endStmtNum;
+				continue;
+			}
 		}
 		if (stmts.at(startStmtNum)->_stmtPtr->_level >= stmts.at(j)->_stmtPtr->_level) { // siblings container = same nestedLevel level. parent container = lower nestedLevel level. So, >=
 			nextStmt = stmts.at(j);
@@ -327,7 +337,7 @@ CFGNode* findNextStmt(stack<Container*> parentStack, int startStmtNum, map<int, 
 		else { // if not, we continue to the higher parent
 			currContainer = parentStack.top();
 			parentStack.pop();
-			nextStmt = findNextStmt(parentStack, currContainer->_endStmtNum, stmts);
+			nextStmt = findNextStmt(parentStack, currContainer->_endStmtNum + 1, stmts);
 			parentStack.push(currContainer);
 		}
 	}

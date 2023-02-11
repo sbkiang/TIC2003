@@ -10,7 +10,7 @@ struct Statement {
 	string _stmt;
 	int _stmtNum;
 	int _level;
-	int _ifOffset;
+	int _elseOffset;
 	bool _containerHead = false;
 	bool _containerTail = false;
 	Container* _container;
