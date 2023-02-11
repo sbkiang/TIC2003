@@ -1,5 +1,4 @@
 #include "QueryProcessor.h"
-#include "Tokenizer.h"
 #include <iostream>
 #include <algorithm>
 

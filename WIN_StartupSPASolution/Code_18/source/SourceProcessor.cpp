@@ -1,13 +1,13 @@
 #include "SourceProcessor.h"
-#include "..\SPA\Procedure.h"
-#include "..\SPA\Container.h"
 
 // method for processing the source program
 // This method currently only inserts the procedure name into the database
 // using some highly simplified logic.
 // You should modify this method to complete the logic for handling all the required syntax.
 
-CFG* createCFG(Container* container);
+//CFG* createCFG(Container* container);
+map<int, CFGNode*> _buildStatements(Container* container);
+void buildStatements(Container* container);
 
 void SourceProcessor::process(string program) {
 	// initialize the database
@@ -39,13 +39,15 @@ void SourceProcessor::process(string program) {
 		if (word == "}") { // "}" indicates the end of a container
 			if (!parentStack.empty()) {
 				indent--;
-				parentStack.pop(); 
+				parentStack.top()->_endStmtNum = stmtNum;
+				parentStack.pop();
 			}
 		}
 		else if (word == "procedure") {
 			i++;
 			Procedure* procedure = new Procedure(tokens.at(i));
 			procedure->_type = "procedure";
+			procedure->_startStmtNum = stmtNum + 1;
 			procedures.push_back(procedure);
 			parentStack.push(procedure);
 			Database::insertProcedure(procedure->_name);
@@ -55,7 +57,8 @@ void SourceProcessor::process(string program) {
 			stmtNum++;
 			Container* container = new Container();
 			container->_type = "while";
-			Statement* stmt = new Statement(stmtNum, indent+1);
+			container->_startStmtNum = stmtNum;
+			Statement* stmt = new Statement(stmtNum, indent + 1, true, container);
 			if (!parentStack.empty()) {
 				parentStack.top()->_childContainers.push_back(container);
 			}
@@ -69,7 +72,7 @@ void SourceProcessor::process(string program) {
 					Database::insertConstant(tokens.at(i));
 				}
 				else if (regex_match(tokens.at(i), regex(var_regex))) {
-					variableStore.push_back(Statement(stmtNum, tokens.at(i), indent));
+					variableStore.push_back(Statement(stmtNum, tokens.at(i)));
 				}
 				i++;
 			}
@@ -87,16 +90,17 @@ void SourceProcessor::process(string program) {
 			stmtNum++;
 			Container* container = new Container();
 			container->_type = "if";
+			container->_startStmtNum = stmtNum;
 			IfElseLinker* linker = new IfElseLinker(); // create a IfElseLinker
 			linker->_ifPtr = container; // set the IfElseLinker's ifPtr to this "if" container
 			ifElseLinkerStack.push(linker); // push it onto the stack for the corresponding "else" container
-			Statement* stmt = new Statement(stmtNum, indent+1);
+			Statement* stmt = new Statement(stmtNum, indent + 1, true, container);
 			if (!parentStack.empty()) { // if there's parent container, add current container to parent's child
 				parentStack.top()->_childContainers.push_back(container);
 			}
 			parentStack.push(container); //set itself as the latest parent container
 			vector<Statement> variableStore; // we need to insert statement first before inserting variable due to FK
-			i++ ; // skip the "if" keyword for the while loop below
+			i++; // skip the "if" keyword for the while loop below
 			while (tokens.at(i) != "then") { // from current index till "then", it's the condition. "if(...) then{"
 				container->_condition += tokens.at(i);
 				stmt->_stmt += tokens.at(i);
@@ -104,7 +108,7 @@ void SourceProcessor::process(string program) {
 					Database::insertConstant(tokens.at(i));
 				}
 				else if (regex_match(tokens.at(i), regex(var_regex))) {
-					variableStore.push_back(Statement(stmtNum, tokens.at(i), indent));
+					variableStore.push_back(Statement(stmtNum, tokens.at(i)));
 				}
 				i++;
 			}
@@ -121,6 +125,7 @@ void SourceProcessor::process(string program) {
 		else if (word == "else") { // for else container
 			Container* container = new Container();
 			container->_type = "else";
+			container->_startStmtNum = stmtNum;
 			ifElseLinkerStack.top()->_elsePtr = container; // the top stack will be the corresponding "if" container. We set this "else" container to the pointer
 			parentStack.top()->_ifElseLinker.push_back(ifElseLinkerStack.top()); // parentStack.top() is this if-else container's parent. We add the this linker to it
 			ifElseLinkerStack.pop(); // we pop the IfElseLinker as we've already processed the if-else
@@ -128,17 +133,17 @@ void SourceProcessor::process(string program) {
 				parentStack.top()->_childContainers.push_back(container);
 			}
 			parentStack.push(container); // we push the current "else" container to the parentStack for future statements
-			cout << setfill('0') << setw(2) << stmtNum+1 << " | ";
+			cout << setfill('0') << setw(2) << stmtNum + 1 << " | ";
 			for (int i = 0; i < indent; i++) { cout << "    "; }
 			cout << word << " " << endl;
 			indent++;
 		}
 		else if (word == "=") { // for assign
 			stmtNum++;
-			Statement* stmt = new Statement(stmtNum);
+			Statement* stmt = new Statement(stmtNum, indent, false, parentStack.top());
 			stmt->_stmt += tokens.at(i - 1);
 			vector<Statement> variableStore; // we need to insert statement first before inserting variable due to FK. So, we store the variables here
-			variableStore.push_back(Statement(stmtNum, tokens.at(i - 1), indent));
+			variableStore.push_back(Statement(stmtNum, tokens.at(i - 1)));
 			string LHS = tokens.at(i - 1);
 			while (tokens.at(i) != ";") {
 				stmt->_stmt += tokens.at(i);
@@ -146,7 +151,7 @@ void SourceProcessor::process(string program) {
 					Database::insertConstant(tokens.at(i));
 				}
 				else if (regex_match(tokens.at(i), regex(var_regex))) {
-					variableStore.push_back(Statement(stmtNum, tokens.at(i), indent));
+					variableStore.push_back(Statement(stmtNum, tokens.at(i), indent, parentStack.top()));
 				}
 				i++;
 			}
@@ -161,7 +166,7 @@ void SourceProcessor::process(string program) {
 		}
 		else if (word == "read" || word == "print" || word == "call") {
 			stmtNum++;
-			Statement* stmt = new Statement(stmtNum);
+			Statement* stmt = new Statement(stmtNum, indent, false, parentStack.top());
 			stmt->_stmt += tokens.at(i);
 			stmt->_stmt += tokens.at(i + 1);
 			Database::insertStatement(stmtNum, procedures.back()->_name, word, stmt->_stmt);
@@ -175,12 +180,197 @@ void SourceProcessor::process(string program) {
 		}
 	}
 	//procedures.at(0)->printContainerTree(0);
-	CFG* p1CFG = createCFG(procedures.at(0));
-	p1CFG->printCFG();
+	buildStatements(procedures.at(0));
+}
+
+
+void buildStatements(Container* container) {
+	stack<CFGNode*> whileHeads;
+	stack<CFGNode*> ifHeads;
+	stack<Container*> parentStack;
+	stack<Container*> tempParentStack;
+	map<int, CFGNode*> stmts = _buildStatements(container);
+	parentStack.push(container); // the procedure will always be the top parent
+	stmts.at(container->_startStmtNum)->_stmtPtr->_containerHead = true;
+	stmts.at(container->_endStmtNum)->_stmtPtr->_containerTail = true;
+	bool pushBack = false;
+	int loopStart = 0, loopEnd = 0;
+	for (int i = 1; i < stmts.size() + 1; i++) {
+		CFGNode* node = stmts.at(i);
+		if (!(node->_stmtPtr->_containerHead || node->_stmtPtr->_containerTail)) {
+			node->_sJump = stmts.at(i + 1);
+			continue;
+		}
+		if (node->_stmtPtr->_container->_type == "procedure") {
+			if (stmts.find(i + 1) != stmts.end()) {
+				node->_sJump = stmts.at(i + 1);
+			}
+		}
+		if (node->_stmtPtr->_container->_type == "while") {
+			if (node->_stmtPtr->_containerHead && node->_stmtPtr->_containerTail) { // if stmt is both while container head and tail, set sJump and sTail
+				node->_sJump = stmts.at(i + 1);
+				if (parentStack.top()->_type == "while") { // if parent container is while, then fJump will be parent container head
+					node->_fJump = stmts.at(parentStack.top()->_startStmtNum);
+				}
+				else { // for all other parent containers, find sibling stmt or parent stmt, and skip all else stmt
+					loopStart = node->_stmtPtr->_container->_endStmtNum + 1; // skip self stmt
+					loopEnd = parentStack.top()->_endStmtNum;
+					for (int j = loopStart; j < loopEnd; j++) {
+						if (stmts.at(j)->_stmtPtr->_container->_type == "else") {
+							continue;
+						}
+						if (node->_stmtPtr->_level >= stmts.at(j)->_stmtPtr->_level) { // siblings container = same indent level. parent container = lower indent level. So, >=
+							node->_fJump = stmts.at(j); // after finding the _fJump, we push whatever parent container that we popped
+							while (!tempParentStack.empty()) {
+								parentStack.push(tempParentStack.top());
+								tempParentStack.pop();
+							}
+						}
+					}
+					if (!node->_fJump) { // if from current container end stmt to parent end stmt, unable to find sibling container or parent stmt, go one level higher
+						tempParentStack.push(parentStack.top());
+						parentStack.pop();
+						loopStart = tempParentStack.top()->_endStmtNum;
+						i--;
+						continue;
+					}
+				}
+			}
+			else if (node->_stmtPtr->_containerHead && !node->_stmtPtr->_containerTail) { // if stmt is while container head only, sJump is next stmt
+				node->_sJump = stmts.at(i + 1);
+			}
+			else if (!node->_stmtPtr->_containerHead && node->_stmtPtr->_containerTail) { // if stmt is while container tail only, sJump back to head
+				node->_sJump = stmts.at(node->_stmtPtr->_container->_startStmtNum);
+			}
+		}
+		else if (node->_stmtPtr->_container->_type == "if") {
+			if (node->_stmtPtr->_containerHead && node->_stmtPtr->_containerTail) { // if stmt is both if container head and tail, sJump = next stmt, fJump = else stmt
+				node->_sJump = stmts.at(i + 1);
+				loopStart = node->_stmtPtr->_container->_endStmtNum + 1; // skip self stmt
+				loopEnd = parentStack.top()->_endStmtNum;
+				for (int j = loopStart; j < loopEnd; j++) { // fJump is next else container of same indent
+					if (stmts.at(j)->_stmtPtr->_level != node->_stmtPtr->_level) {
+						continue;
+					}
+					if (stmts.at(j)->_stmtPtr->_container->_type != "else") {
+						continue;
+					}
+					node->_fJump = stmts.at(j);
+				}
+			}
+			else if (node->_stmtPtr->_containerHead && !node->_stmtPtr->_containerTail) { // if stmt is if container head only, sJump is next stmt
+				node->_sJump = stmts.at(i + 1);
+			}
+			else if (!node->_stmtPtr->_containerHead && node->_stmtPtr->_containerTail) { // if stmt is if container tail only
+				if (parentStack.top()->_type == "while") { // if parent container is while, then fJump will be parent container head
+					node->_fJump = stmts.at(parentStack.top()->_startStmtNum);
+				}
+				else { // for all other parent containers, find sibling stmt or parent stmt, and skip all else stmt
+					loopStart = node->_stmtPtr->_container->_endStmtNum;
+					loopEnd = parentStack.top()->_endStmtNum;
+					for (int j = loopStart; j < loopEnd; j++) {
+						if (stmts.at(j)->_stmtPtr->_container->_type == "else") {
+							continue;
+						}
+						if (node->_stmtPtr->_level >= stmts.at(j)->_stmtPtr->_level) { // siblings container = same indent level. parent container = lower indent level. So, >=
+							node->_fJump = stmts.at(j); // after finding the _fJump, we push whatever parent container that we popped
+							while (!tempParentStack.empty()) {
+								parentStack.push(tempParentStack.top());
+								tempParentStack.pop();
+							}
+						}
+					}
+					if (!node->_fJump) { // if from current container end stmt to parent end stmt, unable to find sibling container or parent stmt, go one level higher
+						tempParentStack.push(parentStack.top());
+						parentStack.pop();
+						loopStart = tempParentStack.top()->_endStmtNum;
+						i--;
+						continue;
+					}
+				}
+			}
+		}
+		else if (node->_stmtPtr->_container->_type == "else") {
+			if (node->_stmtPtr->_containerHead && node->_stmtPtr->_containerTail) { // if stmt is both else container head and tail
+
+				loopStart = node->_stmtPtr->_container->_endStmtNum;
+				loopEnd = parentStack.top()->_endStmtNum;
+				for (int j = loopStart; j < loopEnd; j++) {
+					if (stmts.at(j)->_stmtPtr->_container->_type == "else") {
+						continue;
+					}
+					if (node->_stmtPtr->_level >= stmts.at(j)->_stmtPtr->_level) { // siblings container = same indent level. parent container = lower indent level. So, >=
+						node->_fJump = stmts.at(j); // after finding the _fJump, we push whatever parent container that we popped
+						while (!tempParentStack.empty()) {
+							parentStack.push(tempParentStack.top());
+							tempParentStack.pop();
+						}
+					}
+				}
+				if (!node->_fJump) { // if from current container end stmt to parent end stmt, unable to find sibling container or parent stmt, go one level higher
+					tempParentStack.push(parentStack.top());
+					parentStack.pop();
+					loopStart = tempParentStack.top()->_endStmtNum;
+					i--;
+					continue;
+				}
+			}
+			else if (node->_stmtPtr->_containerHead && !node->_stmtPtr->_containerTail) { // if stmt is else container head only, sJump is next stmt
+				node->_sJump = stmts.at(i + 1);
+			}
+			else if (!node->_stmtPtr->_containerHead && node->_stmtPtr->_containerTail) { // if stmt is else container tail only
+				if (parentStack.top()->_type == "while") { // if parent container is while, then fJump will be parent container head
+					node->_fJump = stmts.at(parentStack.top()->_startStmtNum);
+				}
+				else { // for all other parent containers, find sibling stmt or parent stmt, and skip all else stmt
+					loopStart = node->_stmtPtr->_container->_endStmtNum + 1; // skip self stmt
+					loopEnd = parentStack.top()->_endStmtNum;
+					for (int j = loopStart; j < loopEnd; j++) {
+						if (stmts.at(j)->_stmtPtr->_container->_type == "else") {
+							continue;
+						}
+						if (node->_stmtPtr->_level >= stmts.at(j)->_stmtPtr->_level) { // siblings container = same indent level. parent container = lower indent level. So, >=
+							node->_fJump = stmts.at(j); // after finding the _fJump, we push whatever parent container that we popped
+							while (!tempParentStack.empty()) {
+								parentStack.push(tempParentStack.top());
+								tempParentStack.pop();
+							}
+						}
+					}
+					if (!node->_fJump) { // if from current container end stmt to parent end stmt, unable to find sibling container or parent stmt, go one level higher
+						tempParentStack.push(parentStack.top());
+						parentStack.pop();
+						loopStart = tempParentStack.top()->_endStmtNum;
+						i--;
+						continue;
+					}
+				}
+			}
+		}
+	}
+}
+
+
+map<int, CFGNode*> _buildStatements(Container* container) {
+	map<int, CFGNode*> myMap;
+	for (int i = 0; i < container->_statements.size(); i++) {
+		Statement* stmt = container->_statements.at(i);
+		CFGNode* node = new CFGNode();
+		node->_stmtPtr = stmt;
+		myMap.insert(pair<int, CFGNode*>(stmt->_stmtNum, node));
+	}
+	//myMap.at(container->_statements.at(container->_statements.size()-1)->
+	for (int i = 0; i < container->_childContainers.size(); i++) {
+		Container* childContainer = container->_childContainers.at(i);
+		map<int, CFGNode*> childMap = _buildStatements(childContainer);
+		myMap.insert(childMap.begin(), childMap.end());
+	}
+	return myMap;
 }
 
 
 // call linkStatements for each container, then join them up 
+/*
 CFG* createCFG(Container* container) {
 	unordered_map<int, CFG*> hashMapCFG;
 	if (!container) { return nullptr; }
@@ -296,3 +486,4 @@ CFG* createCFG(Container* container) {
 	}
 	return ownCFG;
 }
+*/

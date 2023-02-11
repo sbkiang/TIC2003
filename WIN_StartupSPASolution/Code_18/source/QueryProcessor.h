@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include "Database.h"
+#include "Tokenizer.h"
 
 using namespace std;
 

@@ -9,6 +9,9 @@
 #include <assert.h>
 #include <iomanip>
 #include <unordered_map>
+#include <map>
+#include "..\SPA\Procedure.h"
+#include "..\SPA\Container.h"
 
 using namespace std;
 
