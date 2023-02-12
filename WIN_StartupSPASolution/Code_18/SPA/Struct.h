@@ -18,7 +18,6 @@ struct Statement {
 	Statement(int stmtNum, string stmt, Container* container);
 	Statement(int stmtNum, int level, Container* container);
 	Statement(int stmtNum, string stmt, int level, Container* container);
-	Statement(int stmtNum, int level, bool conditionHead, Container* container);
 	int getFinalStmtNum();
 };
 
