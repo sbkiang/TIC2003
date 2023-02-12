@@ -1,24 +1,22 @@
 #pragma once
 #include <string>
-//#include "Container.h"
+#include "Container.h"
 
 using namespace std;
-
-class Container;
 
 struct Statement {
 	string _stmt;
 	int _stmtNum;
 	int _level;
-	int _elseOffset;
+	int _stmtNumSubtract;
 	bool _containerHead = false;
 	bool _containerTail = false;
 	Container* _container;
-	Statement(int stmtNum, string stmt);
-	Statement(int stmtNum, string stmt, Container* container);
-	Statement(int stmtNum, int level, Container* container);
-	Statement(int stmtNum, string stmt, int level, Container* container);
-	int getFinalStmtNum();
+	//Statement(int stmtNum, string stmt);
+	Statement(int stmtNum, string stmt, Container* container, int _stmtNumSubtract);
+	Statement(int stmtNum, int level, Container* container, int _stmtNumSubtract);
+	Statement(int stmtNum, string stmt, int level, Container* container, int _stmtNumSubtract);
+	int getAdjustedStmtNum();
 };
 
 struct CFGNode {

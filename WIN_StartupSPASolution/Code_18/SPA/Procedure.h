@@ -14,6 +14,4 @@ public:
 	// Default Destructor
 	~Procedure();
 	string _name;
-	void print();
-	void _print();
 };

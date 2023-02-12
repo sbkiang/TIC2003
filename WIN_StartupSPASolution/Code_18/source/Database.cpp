@@ -66,6 +66,14 @@ void Database::initialize() {
 	string createUseTableSQL = "CREATE TABLE use ( line_num INT REFERENCES statement(line_num), procedure_name VARCHAR(50) REFERENCES procedure(name), variable_name VARCHAR(50) REFERENCES variable(name), PRIMARY KEY(line_num, procedure_name, variable_name));";
 	sqlite3_exec(dbConnection, createUseTableSQL.c_str(), NULL, 0, &errorMessage);
 
+	string dropNextTableSQL = "DROP TABLE IF EXISTS next";
+	sqlite3_exec(dbConnection, dropNextTableSQL.c_str(), NULL, 0, &errorMessage);
+	string createNextTableSQL = "CREATE TABLE next (line_num_1 INT REFERENCES statement(line_num), line_num_2 INT REFERENCES statement(line_num), loopWhile CHAR(1), CONSTRAINT line_num_not_equal check(line_num_1 <> line_num_2));";
+	sqlite3_exec(dbConnection, createNextTableSQL.c_str(), NULL, 0, &errorMessage);
+	if (errorMessage) {
+		cout << errorMessage << endl;
+	}
+
 	// initialize the result vector
 	dbResults = vector<vector<string>>();
 }
@@ -113,8 +121,8 @@ void Database::insertModifies(int statementNumber, string procedureName, string 
 	sqlite3_exec(dbConnection, sql.c_str(), NULL, 0, &errorMessage);
 }
 
-void Database::insertNext(int stmtNum1, int stmtNum2) {
-	string sql = ("INSERT INTO next ('line_num_1', 'line_num_2' ) VALUES ('{}', '{}');", to_string(stmtNum1), to_string(stmtNum2));
+void Database::insertNext(int stmtNum1, int stmtNum2, string loopWhile) {
+	string sql = "INSERT INTO next ('line_num_1', 'line_num_2' , loopWhile) VALUES ('" + to_string(stmtNum1) + "', '" + to_string(stmtNum2) + "', '" + loopWhile + "');";
 	sqlite3_exec(dbConnection, sql.c_str(), NULL, 0, &errorMessage);
 	if (errorMessage) {
 		cout << "SQL Error: " << errorMessage;
@@ -195,7 +203,6 @@ void Database::getConstant(vector<string>& results) {
 		results.push_back(result);
 	}
 }
-
 
 // method to get all the statement from the database
 void Database::getStatement(string type, vector<string>& results) {

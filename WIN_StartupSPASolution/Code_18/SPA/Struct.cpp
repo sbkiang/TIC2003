@@ -2,30 +2,29 @@
 
 using namespace std;
 
-Statement::Statement(int stmtNum, int level, Container* container) {
+Statement::Statement(int stmtNum, int level, Container* container, int stmtNumSubtract) {
 	_stmtNum = stmtNum;
 	_level = level;
 	_container = container;
+	_stmtNumSubtract = stmtNumSubtract;
+
 }
 
-Statement::Statement(int stmtNum, string token) {
-	_stmtNum = stmtNum;
-	_level = 0;
-}
-
-Statement::Statement(int stmtNum, string token, Container* container) {
+Statement::Statement(int stmtNum, string token, Container* container, int stmtNumSubtract) {
 	_stmtNum = stmtNum;
 	_level = 0;
 	_container = container;
+	_stmtNumSubtract = stmtNumSubtract;
 }
 
-Statement::Statement(int stmtNum, string stmt, int level, Container* container) {
+Statement::Statement(int stmtNum, string stmt, int level, Container* container, int stmtNumSubtract) {
 	_stmtNum = stmtNum;
 	_stmt = stmt;
 	_level = level;
 	_container = container;
+	_stmtNumSubtract = stmtNumSubtract;
 }
 
-int Statement::getFinalStmtNum() {
-	return _stmtNum - _elseOffset;
+int Statement::getAdjustedStmtNum() {
+	return _stmtNum - _stmtNumSubtract;
 }

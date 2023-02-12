@@ -39,8 +39,7 @@ public:
 
 	// method to insert a use into the database
 	static void insertUse(int statementNumber, string procedureName, string variablename);
-
-	static void insertNext(int stmtNum1, int stmtNum2);
+	static void insertNext(int stmtNum1, int stmtNum2, string whileLoop);
 	static void getNext_direct(int stmtNum1, int stmtNum2);
 	static void getNext_indirect(int stmtNum1, int stmtNum2);
 

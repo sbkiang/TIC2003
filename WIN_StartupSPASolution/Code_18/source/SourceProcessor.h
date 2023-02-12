@@ -15,6 +15,8 @@
 
 using namespace std;
 
+struct CFGNode;
+
 class SourceProcessor {
 public:
 	// method for processing the source program

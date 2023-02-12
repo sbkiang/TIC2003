@@ -5,7 +5,7 @@
 #include <iomanip>
 #include <set>
 
-struct CFGNode;
+//struct CFGNode;
 
 class CFG {
 public:
@@ -16,7 +16,8 @@ public:
 	~CFG();
 
 	CFGNode* getNode(int stmtNum);
+	vector<CFGNode*> getAllCFGNodes();
 	CFGNode* _getNode(int stmtNum, CFGNode* CFGNode, set<int> visitsed);
-	void printCFG();
-	void _printCFG(CFGNode* node, set<int> visited, int spaces);
+	void _getAllCFGNodes(CFGNode* node, set<int> visited, int spaces, vector<CFGNode*> &nodes);
+	
 };

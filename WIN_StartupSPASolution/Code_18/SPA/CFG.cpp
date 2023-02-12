@@ -8,7 +8,6 @@ CFG::CFG() {
 	_head = nullptr;
 }
 
-
 CFG::~CFG() {}
 
 CFGNode* CFG::getNode(int stmtNum) {
@@ -35,28 +34,30 @@ CFGNode* CFG::_getNode(int stmtNum, CFGNode* node, set<int> visited) {
 	return found;
 }
 
-void CFG::printCFG() {
+vector<CFGNode*> CFG::getAllCFGNodes() {
 	set<int> visited;
-	_printCFG(_head, visited, 0); 
+	vector<CFGNode*> nodes;
+	_getAllCFGNodes(_head, visited, 0, nodes);
+	return nodes;
 }
 
-void CFG::_printCFG(CFGNode* node, set<int> visited, int spaces) {
+void CFG::_getAllCFGNodes(CFGNode* node, set<int> visited, int spaces, vector<CFGNode*> &nodes) {
 	if (!node) {
 		cout << endl;
 		return;
 	} // if node is null, return as we're at the end
 	if(visited.find(node->_stmtPtr->_stmtNum) != visited.end()){ // if node is already visited, skip. This is to avoid the While CFG cycle
-		cout << setfill('0') << setw(2) << node->_stmtPtr->_stmtNum << endl;
+		cout << setfill('0') << setw(2) << node->_stmtPtr->_stmtNum << "(" << node->_stmtPtr->getAdjustedStmtNum() << ")" << "->";
 		return;
 	}
 	visited.insert(node->_stmtPtr->_stmtNum);
-	cout << setfill('0') << setw(2) << node->_stmtPtr->_stmtNum << "->";
+	cout << setfill('0') << setw(2) << node->_stmtPtr->_stmtNum << "(" << node->_stmtPtr->getAdjustedStmtNum() << ")" << "->";
 	spaces += to_string(node->_stmtPtr->_stmtNum).length() + 2;
-	_printCFG(node->_sJump, visited, spaces);
+	nodes.push_back(node);
+	_getAllCFGNodes(node->_sJump, visited, spaces, nodes);
 	if (node->_fJump) {
 		cout << setfill(' ') << setw(spaces) << " ";
-		cout << setfill('0') << setw(2) << node->_stmtPtr->_stmtNum << "->";
-		_printCFG(node->_fJump, visited, spaces);
+		cout << setfill('0') << setw(2) << node->_stmtPtr->_stmtNum << "(" << node->_stmtPtr->getAdjustedStmtNum() << ")" << "->";
+		_getAllCFGNodes(node->_fJump, visited, spaces, nodes);
 	}
 }
-

@@ -1,12 +1,10 @@
 #include "CFGBuilder.h"
 
 CFG* CFGBuilder::buildCFG(Container* procedure) {
-	stack<CFGNode*> whileHeads;
-	stack<CFGNode*> ifHeads;
 	stack<Container*> parentStack;
-	stack<Container*> tempParentStack;
 	Container* tempContainer = procedure;
-	map<int, CFGNode*> stmts = _joinStmts(procedure);
+	map<int, CFGNode*> stmts;
+	_createStmtMap(procedure, stmts);
 	_printStmt(stmts);
 	int startIndex = stmts.begin()->first;
 	CFG* cfg = new CFG(stmts.at(startIndex));
@@ -82,8 +80,7 @@ CFG* CFGBuilder::buildCFG(Container* procedure) {
 	return cfg;
 }
 
-map<int, CFGNode*> CFGBuilder::_joinStmts(Container* container) {
-	map<int, CFGNode*> myMap;
+void CFGBuilder::_createStmtMap(Container* container, map<int, CFGNode*> &stmtMap) {
 	for (int i = 0; i < container->_statements.size(); i++) {
 		Statement* stmt = container->_statements.at(i);
 		if (stmt->_stmtNum == (container->_startStmtNum)) {
@@ -94,14 +91,13 @@ map<int, CFGNode*> CFGBuilder::_joinStmts(Container* container) {
 		}
 		CFGNode* node = new CFGNode();
 		node->_stmtPtr = stmt;
-		myMap.insert(pair<int, CFGNode*>(stmt->_stmtNum, node));
+		pair<int, CFGNode*> *mypair = new pair<int, CFGNode*>(stmt->_stmtNum, node);
+		stmtMap.insert(*mypair);
 	}
 	for (int i = 0; i < container->_childContainers.size(); i++) {
 		Container* childContainer = container->_childContainers.at(i);
-		map<int, CFGNode*> childMap = _joinStmts(childContainer);
-		myMap.insert(childMap.begin(), childMap.end());
+		_createStmtMap(childContainer, stmtMap);
 	}
-	return myMap;
 }
 
 // this function finds the next statement from startStmtNum to endStmtNum. StartStmtNum is normally the end of the current block, endStmtNum is normally the endStmtNum of parent block
