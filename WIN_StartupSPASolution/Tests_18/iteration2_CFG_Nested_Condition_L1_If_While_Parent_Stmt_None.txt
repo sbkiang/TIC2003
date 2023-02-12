@@ -1,0 +1,14 @@
+procedure main {
+    if(a == b)then{
+        while(c == d){
+            while1Stmt1 = cc;
+            while1Stmt2 = ff;
+        }
+    }
+    else{
+        while(d == f){
+            while2Stmt1 = a + b;
+            while2Stmt2 = c + d;
+        }
+    }
+}

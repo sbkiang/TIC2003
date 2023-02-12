@@ -2,7 +2,6 @@
 #include <sstream>
 #include <fstream>
 #include <vector>
-#include "IfElseLinker.h"
 #include "Struct.h"
 #include "CFG.h"
 #include <iostream>
@@ -22,11 +21,11 @@ public:
 	vector<Container*> _childContainers;
 	string _condition;
 	string _type;
-	int _statementCount;
-	vector<IfElseLinker*> _ifElseLinker;
+	int _level;
+	int _startStmtNum;
+	int _endStmtNum;
 
-	CFG* linkStatements();  // Create a CFGNode for each statement. Then, link them together in a CFG, and following the if-else and while CFG rule
-	IfElseLinker* getIfElseLinker(Container* ptr);
+	//CFG* linkStatements();  // Create a CFGNode for each statement. Then, link them together in a CFG, and following the if-else and while CFG rule
 	void printContainerTree(int tab);
 	void printStmt();
 };

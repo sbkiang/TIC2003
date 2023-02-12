@@ -1,0 +1,34 @@
+procedure main {
+    pStmt1 = a;
+    pStmt2 = b;
+    if(c == d) then{
+        if1Stmt1 = b;
+        if1Stmt2 = c;
+        if(d == f) then{
+            if2Stmt1 = c;
+            if2Stmt2 = d;
+        }
+        else{
+            else2Stmt1 = f;
+            else2Stmt2 = g;
+        }
+        if1Stmt3 = d;
+        if1Stmt4 = e;
+    }
+    else{
+        else1Stmt1 = g;
+        else1Stmt2 = c;
+        if(a == a) then{
+            if3Stmt1 = d;
+            if3Stmt2 = c;
+        }
+        else{
+            else3Stmt3 = d;
+            else3Stmt4 = c;
+        }
+        else1Stmt3 = c;
+        else1Stmt4 = e;
+    }
+    pStmt3 = b;
+    pStmt4 = f;
+}

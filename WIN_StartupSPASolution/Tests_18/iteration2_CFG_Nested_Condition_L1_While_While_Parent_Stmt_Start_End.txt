@@ -1,0 +1,16 @@
+procedure main {
+    pStmt1 = 10;
+    pStmt2 = abc + cde;
+    while(a == b) {
+        while1Stmt1 = c;
+        while1Stmt2 = c;
+        while(c == d){
+            while2Stmt1 = cc;
+            while2Stmt2 = ff;
+        }
+        while1Stmt3 = c;
+        while1Stmt4 = c;
+    }
+    pStmt3 = cde + efg;
+    pStmt4 = cde + efg;
+}

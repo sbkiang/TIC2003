@@ -18,7 +18,6 @@
     <ClCompile Include="..\source\Tokenizer.cpp" />
     <ClCompile Include="CFG.cpp" />
     <ClCompile Include="Container.cpp" />
-    <ClCompile Include="IfElseLinker.cpp" />
     <ClCompile Include="Procedure.cpp" />
     <ClCompile Include="Struct.cpp" />
   </ItemGroup>
@@ -30,7 +29,6 @@
     <ClInclude Include="..\source\Tokenizer.h" />
     <ClInclude Include="CFG.h" />
     <ClInclude Include="Container.h" />
-    <ClInclude Include="IfElseLinker.h" />
     <ClInclude Include="Procedure.h" />
     <ClInclude Include="Struct.h" />
   </ItemGroup>

@@ -5,6 +5,8 @@
 #include <iomanip>
 #include <set>
 
+struct CFGNode;
+
 class CFG {
 public:
 	CFGNode* _head;
