@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include "sqlite3.h"
+#include <format>
 
 using namespace std;
 
@@ -16,19 +17,19 @@ public:
 	// method to close the database connection
 	static void close();
 
-
-
-	// method to insert a procedure into the database
 	static void insertProcedure(string procedureName);
+	static void getProcedures(vector<string>& results);
 
-	// method to insert a statement into the database
 	static void insertStatement(int statementNumber, string statementName, string statementType, string text);
+	static void getStatement(string type, vector<string>& results);
+	static void getStmt(string type, vector<string>& results);
 
-	// method to insert a variable into the database
 	static void insertVariable(string variablename, int statementNumber);
+	static void getVariable(vector<string>& results);
 
 	// method to insert a constant into the database
 	static void insertConstant(string value);
+	static void getConstant(vector<string>& results);
 
 	// method to insert a parent into the database
 	static void insertParent(int parentNumber, int childNumber, bool direct);
@@ -39,20 +40,10 @@ public:
 	// method to insert a use into the database
 	static void insertUse(int statementNumber, string procedureName, string variablename);
 
-	// method to get all the procedures from the database
-	static void getProcedures(vector<string>& results);
+	static void insertNext(int stmtNum1, int stmtNum2);
+	static void getNext_direct(int stmtNum1, int stmtNum2);
+	static void getNext_indirect(int stmtNum1, int stmtNum2);
 
-	// method to get all the statement from the database
-	static void getStatement(string type, vector<string>& results);
-
-	// method to get all variable name from the database
-	static void getVariable(vector<string>& results);
-
-	// method to get statements from the database
-	static void getStmt(string type, vector<string>& results);
-
-	// method to get constant from the database
-	static void getConstant(vector<string>& results);
 
 private:
 	// the connection pointer to the database

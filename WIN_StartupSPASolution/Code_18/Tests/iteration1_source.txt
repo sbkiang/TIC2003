@@ -44,6 +44,7 @@ procedure main {
             call whilE;
         }
     }
+    linkAll = x;
 }
 
 procedure CALL{

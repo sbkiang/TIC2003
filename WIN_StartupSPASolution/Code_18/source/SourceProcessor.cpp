@@ -20,10 +20,10 @@ void SourceProcessor::process(string program) {
 	vector<string> tokens;
 	tk.tokenize(program, tokens);
 
-	string var_variables = "^((?!(procedure|while|if|then|else|call|read|print)$)[A-Za-z][A-Za-z0-9]*)";
-	string var_constants = "^[0-9]+$";
-	string var_use = "[+\\-*/\\(\\)\\=\\d+\\!]";
-	//string var_use_2 = "\\d+";
+	string regexVariables = "^((?!(procedure|while|if|then|else|call|read|print)$)[A-Za-z][A-Za-z0-9]*)";
+	string regexConstants = "^[0-9]+$";
+	string regexUse = "[+\\-*/\\(\\)\\=\\d+\\!]";
+	//string regexUse_2 = "\\d+";
 	// This logic is highly simplified based on iteration 1 requirements and 
 	// the assumption that the programs are valid.
 
@@ -71,14 +71,14 @@ void SourceProcessor::process(string program) {
 			while (tokens.at(i) != "{") {
 				container->_condition += tokens.at(i);
 				stmt->_stmt += tokens.at(i);
-				if (regex_match(tokens.at(i), regex(var_constants))) {
+				if (regex_match(tokens.at(i), regex(regexConstants))) {
 					Database::insertConstant(tokens.at(i));
 				}
-				else if (regex_match(tokens.at(i), regex(var_variables))) {
+				else if (regex_match(tokens.at(i), regex(regexVariables))) {
 					variableStore.push_back(Statement(stmtNum, tokens.at(i)));
 				}
 				
-				if (!regex_match(tokens.at(i), regex(var_use))) {
+				if (!regex_match(tokens.at(i), regex(regexUse))) {
 					useStore.push_back(Statement(stmtNum, tokens.at(i), container)); 
 				}
 
@@ -113,15 +113,15 @@ void SourceProcessor::process(string program) {
 			while (tokens.at(i) != "then") { // from current index till "then", it's the condition. "if(...) then{"
 				container->_condition += tokens.at(i);
 				stmt->_stmt += tokens.at(i);
-				if (regex_match(tokens.at(i), regex(var_constants))) {
+				if (regex_match(tokens.at(i), regex(regexConstants))) {
 					Database::insertConstant(tokens.at(i));
 				}
-				else if (regex_match(tokens.at(i), regex(var_variables))) {
+				else if (regex_match(tokens.at(i), regex(regexVariables))) {
 					variableStore.push_back(Statement(stmtNum, tokens.at(i)));
 				}
 
 				// ** !regex_match(..), yet push to useStore. Mistake?
-				if (!regex_match(tokens.at(i), regex(var_use))) {
+				if (!regex_match(tokens.at(i), regex(regexUse))) {
 					useStore.push_back(Statement(stmtNum, tokens.at(i), container));
 				}
 
@@ -166,14 +166,14 @@ void SourceProcessor::process(string program) {
 			string LHS = tokens.at(i - 1);
 			while (tokens.at(i) != ";") {
 				stmt->_stmt += tokens.at(i);
-				if (regex_match(tokens.at(i), regex(var_constants))) {
+				if (regex_match(tokens.at(i), regex(regexConstants))) {
 					Database::insertConstant(tokens.at(i));
 				}
-				else if (regex_match(tokens.at(i), regex(var_variables))) {
+				else if (regex_match(tokens.at(i), regex(regexVariables))) {
 					variableStore.push_back(Statement(stmtNum, tokens.at(i), nestedLevel, parentStack.top()));
 				}
 				
-				if (!regex_match(tokens.at(i), regex(var_use))) {
+				if (!regex_match(tokens.at(i), regex(regexUse))) {
 					useStore.push_back(Statement(stmtNum, tokens.at(i), parentStack.top()));
 				}
 				
@@ -199,34 +199,29 @@ void SourceProcessor::process(string program) {
 			Statement* stmt = new Statement(stmtNum, nestedLevel, parentStack.top());
 			stmt->_stmt += tokens.at(i);
 			stmt->_stmt += tokens.at(i + 1);
+			parentStack.top()->_statements.push_back(stmt);
 			Database::insertStatement(stmtNum, procedures.back()->_name, word, stmt->_stmt);
-			
 			if (word == "read" || word == "print") {
 				Database::insertVariable(tokens.at(i + 1), stmtNum);
 			}
-			
 			if (word == "print") {
 				vector<Statement> useStore;
 				i++; // skip the "print" keyword for the while loop below
 				while (tokens.at(i) != ";") {
 					stmt->_stmt += tokens.at(i);
-					if (!regex_match(tokens.at(i), regex(var_use))) {
+					if (!regex_match(tokens.at(i), regex(regexUse))) {
 						useStore.push_back(Statement(stmtNum, tokens.at(i), parentStack.top()));
 					}
 					i++;
 				}
-
 				for (int i = 0; i < useStore.size(); i++) {
 					Database::insertUse(useStore.at(i)._stmtNum, procedures.back()->_name, useStore.at(i)._stmt);
 				}
-
 			}
 
 			if (word == "read") {
 				vector<Statement> modifiesStore;
-
 				modifiesStore.push_back(Statement(stmtNum, tokens.at(i + 1), parentStack.top()));
-
 				for (int i = 0; i < modifiesStore.size(); i++) {
 					Database::insertModifies(modifiesStore.at(i)._stmtNum, procedures.back()->_name, modifiesStore.at(i)._stmt);
 				}
@@ -322,6 +317,29 @@ CFG* buildStatements(Container* container) {
 	return cfg;	
 }
 
+map<int, CFGNode*> _buildStatements(Container* container) {
+	map<int, CFGNode*> myMap;
+	for (int i = 0; i < container->_statements.size(); i++) {
+		Statement* stmt = container->_statements.at(i);
+		if (stmt->_stmtNum == (container->_startStmtNum)) {
+			stmt->_containerHead = true;
+		}
+		if (stmt->_stmtNum == (container->_endStmtNum)) {
+			stmt->_containerTail = true;
+		}
+		CFGNode* node = new CFGNode();
+		node->_stmtPtr = stmt;
+		myMap.insert(pair<int, CFGNode*>(stmt->_stmtNum, node));
+	}
+	//myMap.at(container->_statements.at(container->_statements.size()-1)->
+	for (int i = 0; i < container->_childContainers.size(); i++) {
+		Container* childContainer = container->_childContainers.at(i);
+		map<int, CFGNode*> childMap = _buildStatements(childContainer);
+		myMap.insert(childMap.begin(), childMap.end());
+	}
+	return myMap;
+}
+
 // this function finds the next statement from startStmtNum to endStmtNum. StartStmtNum is normally the end of the current block, endStmtNum is normally the endStmtNum of parent block
 //	1) if encounter else stmt, skip the block
 //	2) if can't find the stmt, i
@@ -356,29 +374,6 @@ CFGNode* findNextStmt(stack<Container*> parentStack, int startStmtNum, map<int, 
 		}
 	}
 	return nextStmt;
-}
-
-map<int, CFGNode*> _buildStatements(Container* container) {
-	map<int, CFGNode*> myMap;
-	for (int i = 0; i < container->_statements.size(); i++) {
-		Statement* stmt = container->_statements.at(i);
-		if (stmt->_stmtNum == (container->_startStmtNum)) {
-			stmt->_containerHead = true;
-		}
-		if (stmt->_stmtNum == (container->_endStmtNum)) {
-			stmt->_containerTail = true;
-		}
-		CFGNode* node = new CFGNode();
-		node->_stmtPtr = stmt;
-		myMap.insert(pair<int, CFGNode*>(stmt->_stmtNum, node));
-	}
-	//myMap.at(container->_statements.at(container->_statements.size()-1)->
-	for (int i = 0; i < container->_childContainers.size(); i++) {
-		Container* childContainer = container->_childContainers.at(i);
-		map<int, CFGNode*> childMap = _buildStatements(childContainer);
-		myMap.insert(childMap.begin(), childMap.end());
-	}
-	return myMap;
 }
 
 void printHeadTail(map<int, CFGNode*> stmts) {

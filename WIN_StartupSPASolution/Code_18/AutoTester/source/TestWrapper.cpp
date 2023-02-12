@@ -45,10 +45,10 @@ void TestWrapper::evaluate(std::string query, std::list<std::string>& results){
 	}
 }
 
-
+/*
 int main() {
 	TestWrapper* tp = new TestWrapper();
-	/*
+	
 	cout << "=========== iteration2_CFG_Nested_Condition_L1_While_If_Parent_Stmt_None.txt ===========" << endl;
 	tp->parse("../../Tests_18/iteration2_CFG_Nested_Condition_L1_While_If_Parent_Stmt_None.txt");
 
@@ -63,8 +63,8 @@ int main() {
 
 	cout << "=========== iteration2_CFG_Nested_Condition_L4_While.txt ===========" << endl;
 	tp->parse("../../Tests_18/iteration2_CFG_Nested_Condition_L4_While.txt");
-	*/
-	/*
+	
+	
 	cout << "=========== iteration2_CFG_Nested_Condition_L1_If_While_Parent_Stmt_End.txt ===========" << endl;
 	tp->parse("../../Tests_18/iteration2_CFG_Nested_Condition_L1_If_While_Parent_Stmt_End.txt");
 
@@ -76,8 +76,8 @@ int main() {
 
 	cout << "=========== iteration2_CFG_Nested_Condition_L1_If_While_Parent_Stmt_Start_End.txt ===========" << endl;
 	tp->parse("../../Tests_18/iteration2_CFG_Nested_Condition_L1_If_While_Parent_Stmt_Start_End.txt");
-	*/
-	/*
+	
+	
 	cout << "=========== iteration2_CFG_Nested_Condition_L1_If_If_Parent_Stmt_Start_End.txt ===========" << endl;
 	tp->parse("../../Tests_18/iteration2_CFG_Nested_Condition_L1_If_If_Parent_Stmt_Start_End.txt");
 
@@ -92,8 +92,8 @@ int main() {
 
 	cout << "=========== iteration2_CFG_Nested_Condition_L1_If_If_Parent_Stmt_None.txt ===========" << endl;
 	tp->parse("../../Tests_18/iteration2_CFG_Nested_Condition_L1_If_If_Parent_Stmt_None.txt");
-	*/
-	/*
+	
+	
 	cout << "=========== iteration2_CFG_Nested_Condition_L1_While_While_Parent_Stmt_Start_End.txt ===========" << endl;
 	tp->parse("../../Tests_18/iteration2_CFG_Nested_Condition_L1_While_While_Parent_Stmt_Start_End.txt");
 
@@ -105,7 +105,8 @@ int main() {
 
 	cout << "=========== iteration2_CFG_Nested_Condition_L1_While_While_Parent_Stmt_None.txt ===========" << endl;
 	tp->parse("../../Tests_18/iteration2_CFG_Nested_Condition_L1_While_While_Parent_Stmt_None.txt");
-	*/
+	
 	cout << "=========== iteration2_CFG_Nested_Condition_L3_If_Parent_Stmt_None.txt ===========" << endl;
 	tp->parse("../../Tests_18/iteration2_CFG_Nested_Condition_L3_If_Parent_Stmt_None.txt");
 }
+*/
