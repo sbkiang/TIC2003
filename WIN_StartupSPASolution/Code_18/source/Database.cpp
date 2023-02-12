@@ -63,7 +63,7 @@ void Database::initialize() {
 	sqlite3_exec(dbConnection, dropUseTableSQL.c_str(), NULL, 0, &errorMessage);
 
 	// create a use table
-	string createUseTableSQL = "CREATE TABLE use ( line_num INT REFERENCES statement(line_num), procedure_name VARCHAR(50) REFERENCES procedure(name), variable_name VARCHAR(50) REFERENCES variable(name));";
+	string createUseTableSQL = "CREATE TABLE use ( line_num INT REFERENCES statement(line_num), procedure_name VARCHAR(50) REFERENCES procedure(name), variable_name VARCHAR(50) REFERENCES variable(name), PRIMARY KEY(line_num, procedure_name, variable_name));";
 	sqlite3_exec(dbConnection, createUseTableSQL.c_str(), NULL, 0, &errorMessage);
 
 	// initialize the result vector
@@ -95,6 +95,21 @@ void Database::insertVariable(string statementName, int statementNumber) {
 
 void Database::insertConstant(string value) {
 	string sql = "INSERT INTO constant ('value') VALUES ('" + value + "');";
+	sqlite3_exec(dbConnection, sql.c_str(), NULL, 0, &errorMessage);
+}
+
+void Database::insertParent(int parent, int child, bool direct) {
+	string sql = "INSERT INTO parent ('parent_line', 'child_line', 'direct_child' ) VALUES ('" + to_string(parent) + "', '" + to_string(child) + "', '" + to_string(direct) + "');";
+	sqlite3_exec(dbConnection, sql.c_str(), NULL, 0, &errorMessage);
+}
+
+void Database::insertUse(int statementNumber, string procedureName, string variablename) {
+	string sql = "INSERT INTO use ('line_num', 'procedure_name', 'variable_name' ) VALUES ('" + to_string(statementNumber) + "', '" + procedureName + "', '" + variablename + "');";
+	sqlite3_exec(dbConnection, sql.c_str(), NULL, 0, &errorMessage);
+}
+
+void Database::insertModifies(int statementNumber, string procedureName, string variablename) {
+	string sql = "INSERT INTO modify ('line_num', 'procedure_name', 'variable_name' ) VALUES ('" + to_string(statementNumber) + "', '" + procedureName + "', '" + variablename + "');";
 	sqlite3_exec(dbConnection, sql.c_str(), NULL, 0, &errorMessage);
 }
 

@@ -34,7 +34,7 @@ public:
 	static void insertParent(int parentNumber, int childNumber, bool direct);
 
 	// method to insert a modify into the database
-	static void insertModify(int statementNumber, string procedureName, string variablename);
+	static void insertModifies(int statementNumber, string procedureName, string variablename);
 
 	// method to insert a use into the database
 	static void insertUse(int statementNumber, string procedureName, string variablename);
