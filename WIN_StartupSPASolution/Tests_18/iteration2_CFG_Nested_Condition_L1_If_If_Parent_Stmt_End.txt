@@ -1,9 +1,5 @@
 procedure main {
-    pStmt1 = a;
-    pStmt2 = b;
     if(c == d) then{
-        if1Stmt1 = b;
-        if1Stmt2 = c;
         if(d == f) then{
             if2Stmt1 = c;
             if2Stmt2 = d;
@@ -16,8 +12,6 @@ procedure main {
         if1Stmt4 = e;
     }
     else{
-        else1Stmt1 = g;
-        else1Stmt2 = c;
         if(a == a) then{
             if3Stmt1 = d;
             if3Stmt2 = c;

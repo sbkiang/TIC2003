@@ -174,6 +174,8 @@ void SourceProcessor::process(string program) {
 	procedures.at(0)->printContainerTree(0);
 	CFG* cfg = buildStatements(procedures.at(0));
 	cfg->printCFG();
+	CFG* cfg2 = buildStatements(procedures.at(1));
+	cfg2->printCFG();
 }
 
 CFG* buildStatements(Container* container) {
@@ -184,9 +186,10 @@ CFG* buildStatements(Container* container) {
 	Container* tempContainer = container;
 	map<int, CFGNode*> stmts = _buildStatements(container);
 	printHeadTail(stmts);
-	CFG* cfg = new CFG(stmts.at(1));
+	int startIndex = stmts.begin()->first;
+	CFG* cfg = new CFG(stmts.at(startIndex));
 	int loopStart = 0, loopEnd = 0;
-	for (int i = 1; i < stmts.size() + 1; i++) {
+	for (int i = startIndex; i < stmts.size() + startIndex; i++) {
 		CFGNode* node = stmts.at(i);
 		if (i == node->_stmtPtr->_container->_startStmtNum) {  // if current stmt is the container head, save to a tempContainer as it's the start of a new container
 			if (tempContainer->_level < node->_stmtPtr->_container->_level) { // if parent container nestedLevel is lower than current node, then tempContainer is a parent container
@@ -318,8 +321,9 @@ map<int, CFGNode*> _buildStatements(Container* container) {
 
 void printHeadTail(map<int, CFGNode*> stmts) {
 	cout << "   | H | T | " << endl;
-	for (int i = 1; i < stmts.size() + 1; i++) {
-		CFGNode* node = stmts.at(i);
+	int startIndex = stmts.begin()->first;
+	for (map<int, CFGNode*>::iterator it = stmts.begin(); it != stmts.end(); it++) {
+		CFGNode* node = it->second;
 		cout << setfill('0') << setw(2) << node->_stmtPtr->_stmtNum << " |";
 		if (node->_stmtPtr->_containerHead) {
 			cout << " Y |";

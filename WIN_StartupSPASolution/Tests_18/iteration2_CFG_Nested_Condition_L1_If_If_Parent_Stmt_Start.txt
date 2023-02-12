@@ -12,8 +12,6 @@ procedure main {
             else2Stmt1 = f;
             else2Stmt2 = g;
         }
-        if1Stmt3 = d;
-        if1Stmt4 = e;
     }
     else{
         else1Stmt1 = g;
@@ -26,9 +24,5 @@ procedure main {
             else3Stmt3 = d;
             else3Stmt4 = c;
         }
-        else1Stmt3 = c;
-        else1Stmt4 = e;
     }
-    pStmt3 = b;
-    pStmt4 = f;
 }

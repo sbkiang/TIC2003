@@ -1,0 +1,8 @@
+procedure main {
+    while(a == b) {
+        while(c == d){
+            while1Stmt1 = cc;
+            while1Stmt2 = ff;
+        }
+    }
+}
