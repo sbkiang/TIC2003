@@ -27,7 +27,6 @@ void SourceProcessor::process(string program) {
 
 	vector<Procedure*> procedures;
 	stack<Container*> parentStack;
-	stack<IfElseLinker*> ifElseLinkerStack;
 	int elseStmtNumOffset = 0;
 	int stmtNum = 0;
 	int nestedLevel = 0;
@@ -90,9 +89,6 @@ void SourceProcessor::process(string program) {
 			container->_type = "if";
 			container->_startStmtNum = stmtNum;
 			container->_level = nestedLevel;
-			IfElseLinker* linker = new IfElseLinker(); // create a IfElseLinker
-			linker->_ifPtr = container; // set the IfElseLinker's ifPtr to this "if" container
-			ifElseLinkerStack.push(linker); // push it onto the stack for the corresponding "else" container
 			Statement* stmt = new Statement(stmtNum, nestedLevel, true, container);
 			if (!parentStack.empty()) { // if there's parent container, add current container to parent's child
 				parentStack.top()->_childContainers.push_back(container);
@@ -128,9 +124,6 @@ void SourceProcessor::process(string program) {
 			container->_statements.push_back(stmt);
 			container->_startStmtNum = stmtNum;
 			container->_level = nestedLevel;
-			ifElseLinkerStack.top()->_elsePtr = container; // the top stack will be the corresponding "if" container. We set this "else" container to the pointer
-			parentStack.top()->_ifElseLinker.push_back(ifElseLinkerStack.top()); // parentStack.top() is this if-else container's parent. We add the this linker to it
-			ifElseLinkerStack.pop(); // we pop the IfElseLinker as we've already processed the if-else
 			if (!parentStack.empty()) { // if there's parent container, add current container to parent's child
 				parentStack.top()->_childContainers.push_back(container);
 			}

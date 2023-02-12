@@ -28,14 +28,6 @@ Container::~Container() {}
 //	return cfg;
 //}
 
-IfElseLinker* Container::getIfElseLinker(Container* ptr) {
-	for (int i = 0; i < _ifElseLinker.size(); i++) {
-		if (_ifElseLinker.at(i)->_ifPtr == ptr) { return _ifElseLinker.at(i); }
-		if (_ifElseLinker.at(i)->_elsePtr == ptr) { return _ifElseLinker.at(i); }
-	}
-	return nullptr;
-}
-
 void Container::printContainerTree(int nestedLevel) {
 	for (int i = 0; i < _childContainers.size(); i++) {
 		Container* container = _childContainers.at(i);
@@ -43,7 +35,7 @@ void Container::printContainerTree(int nestedLevel) {
 			cout << " "; // tab for formatting
 		}
 		if (container->_type == "else") {
-			cout << "else container for : " << getIfElseLinker(container)->_ifPtr->_statements.at(0)->_stmt;
+			cout << "else container";
 		}
 		else {
 			cout << container->_type << " container : " << container->_statements.at(0)->_stmt;

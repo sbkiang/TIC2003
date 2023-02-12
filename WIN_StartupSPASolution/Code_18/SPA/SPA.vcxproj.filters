@@ -36,9 +36,6 @@
     <ClCompile Include="..\source\SourceProcessor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="IfElseLinker.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Struct.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -66,9 +63,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Procedure.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="IfElseLinker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Struct.h">
