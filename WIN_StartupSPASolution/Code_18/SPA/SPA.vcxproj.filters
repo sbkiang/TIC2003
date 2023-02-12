@@ -42,6 +42,9 @@
     <ClCompile Include="CFG.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CFGBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\Database.h">
@@ -69,6 +72,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CFG.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CFGBuilder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

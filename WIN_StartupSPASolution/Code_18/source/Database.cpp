@@ -66,17 +66,6 @@ void Database::initialize() {
 	string createUseTableSQL = "CREATE TABLE use ( line_num INT REFERENCES statement(line_num), procedure_name VARCHAR(50) REFERENCES procedure(name), variable_name VARCHAR(50) REFERENCES variable(name), PRIMARY KEY(line_num, procedure_name, variable_name));";
 	sqlite3_exec(dbConnection, createUseTableSQL.c_str(), NULL, 0, &errorMessage);
 
-	// drop the existing use table (if any)
-	string dropNextTableSQL = "DROP TABLE IF EXISTS next";
-	sqlite3_exec(dbConnection, dropUseTableSQL.c_str(), NULL, 0, &errorMessage);
-
-	// create next table
-	string createNextTableSQL = "CREATE TABL next ( line_num_1 INT REFERENCES statement(line_num), line_num_2 INT REFERENCES statement(line_num), CONSTRAINT line_num_not_equal check (line_num_1 <> line_num_2), PRIMARY KEY(line_num_1));";
-	sqlite3_exec(dbConnection, createNextTableSQL.c_str(), NULL, 0, &errorMessage);
-	if (errorMessage) {
-		cout << "SQL Error: " << errorMessage << endl;
-	}
-
 	// initialize the result vector
 	dbResults = vector<vector<string>>();
 }
@@ -88,44 +77,39 @@ void Database::close() {
 
 // method to insert a procedure into the database
 void Database::insertProcedure(string procedureName) {
-	//string sql = "INSERT INTO procedures ('name') VALUES ('" + procedureName + "');";
-	string sql = ("INSERT INTO procedures ('name') VALUES ('{}');", procedureName);
+	string sql = "INSERT INTO procedures ('name') VALUES ('" + procedureName + "');";
 	sqlite3_exec(dbConnection, sql.c_str(), NULL, 0, &errorMessage);
 }
 
 // method to insert a statement into the database
-void Database::insertStatement(int stmtNum, string stmtName, string entity, string text) {
-	//string sql = "INSERT INTO statement ('line_num', 'procedure_name', 'entity', 'text') VALUES ('" + to_string(statementNumber) + "', '" + statementName + "', '" + entity + "', '" + text + "');";
-	string sql = ("INSERT INTO statement ('line_num', 'procedure_name', 'entity', 'text') VALUES ('{}','{}','{}','{}');", to_string(stmtNum), stmtName, entity, text);	
+void Database::insertStatement(int statementNumber, string statementName, string entity, string text) {
+	string sql = "INSERT INTO statement ('line_num', 'procedure_name', 'entity', 'text') VALUES ('" + to_string(statementNumber) + "', '" + statementName + "', '" + entity + "', '" + text + "');";
 	sqlite3_exec(dbConnection, sql.c_str(), NULL, 0, &errorMessage);
-	if (errorMessage) {
-		cout << "SQL Error: " << errorMessage;
-	}
 }
 
 // method to insert a statement into the database
-void Database::insertVariable(string varName, int stmtNum) {
-	string sql = ("INSERT INTO variable ('name', 'line_num') VALUES ('{}','{}');", varName, to_string(stmtNum));
+void Database::insertVariable(string statementName, int statementNumber) {
+	string sql = "INSERT INTO variable ('name', 'line_num') VALUES ('" + statementName + "', '" + to_string(statementNumber) + "');";
 	sqlite3_exec(dbConnection, sql.c_str(), NULL, 0, &errorMessage);
 }
 
 void Database::insertConstant(string value) {
-	string sql = ("INSERT INTO constant ('value') VALUES ('{}');", value);
+	string sql = "INSERT INTO constant ('value') VALUES ('" + value + "');";
 	sqlite3_exec(dbConnection, sql.c_str(), NULL, 0, &errorMessage);
 }
 
 void Database::insertParent(int parent, int child, bool direct) {
-	string sql = ("INSERT INTO parent ('parent_line', 'child_line', 'direct_child' ) VALUES ('{}','{}','{}');", to_string(parent), to_string(child), to_string(direct));
+	string sql = "INSERT INTO parent ('parent_line', 'child_line', 'direct_child' ) VALUES ('" + to_string(parent) + "', '" + to_string(child) + "', '" + to_string(direct) + "');";
 	sqlite3_exec(dbConnection, sql.c_str(), NULL, 0, &errorMessage);
 }
 
 void Database::insertUse(int statementNumber, string procedureName, string variablename) {
-	string sql = ("INSERT INTO use ('line_num', 'procedure_name', 'variable_name' ) VALUES ('{}','{}','{}');", to_string(statementNumber), procedureName, variablename);
+	string sql = "INSERT INTO use ('line_num', 'procedure_name', 'variable_name' ) VALUES ('" + to_string(statementNumber) + "', '" + procedureName + "', '" + variablename + "');";
 	sqlite3_exec(dbConnection, sql.c_str(), NULL, 0, &errorMessage);
 }
 
 void Database::insertModifies(int statementNumber, string procedureName, string variablename) {
-	string sql = ("INSERT INTO modify ('line_num', 'procedure_name', 'variable_name' ) VALUES ('{}','{}','{}');", to_string(statementNumber), procedureName, variablename);
+	string sql = "INSERT INTO modify ('line_num', 'procedure_name', 'variable_name' ) VALUES ('" + to_string(statementNumber) + "', '" + procedureName + "', '" + variablename + "');";
 	sqlite3_exec(dbConnection, sql.c_str(), NULL, 0, &errorMessage);
 }
 
@@ -230,8 +214,6 @@ void Database::getStatement(string type, vector<string>& results) {
 		results.push_back(result);
 	}
 }
-
-
 
 // callback method to put one row of results from the database into the dbResults vector
 // This method is called each time a row of results is returned from the database

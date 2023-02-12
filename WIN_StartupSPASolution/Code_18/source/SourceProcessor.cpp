@@ -5,11 +5,10 @@
 // using some highly simplified logic.
 // You should modify this method to complete the logic for handling all the required syntax.
 
-//CFG* createCFG(Container* container);
 map<int, CFGNode*> _buildStatements(Container* container);
 CFG* buildStatements(Container* container);
 CFGNode* findNextStmt(stack<Container*> parentStack, int startStmtNum, map<int, CFGNode*> stmts);
-void printHeadTail(map<int, CFGNode*> stmts);
+void printStmt(map<int, CFGNode*> stmts);
 
 void SourceProcessor::process(string program) {
 	// initialize the database
@@ -228,11 +227,12 @@ void SourceProcessor::process(string program) {
 			}
 		}
 	}
-	procedures.at(0)->printContainerTree(0);
-	CFG* cfg = buildStatements(procedures.at(0));
-	cfg->printCFG();
-	CFG* cfg2 = buildStatements(procedures.at(1));
-	cfg2->printCFG();
+	vector<CFG*> CFGs;
+	for (int i = 0; i < procedures.size(); i++) {
+		procedures.at(i)->printContainerTree(0);
+		CFG* cfg = CFGBuilder::buildCFG(procedures.at(i));
+		cfg->printCFG();
+	}
 }
 
 CFG* buildStatements(Container* container) {
@@ -242,7 +242,7 @@ CFG* buildStatements(Container* container) {
 	stack<Container*> tempParentStack;
 	Container* tempContainer = container;
 	map<int, CFGNode*> stmts = _buildStatements(container);
-	printHeadTail(stmts);
+	printStmt(stmts);
 	int startIndex = stmts.begin()->first;
 	CFG* cfg = new CFG(stmts.at(startIndex));
 	int loopStart = 0, loopEnd = 0;
@@ -311,8 +311,8 @@ CFG* buildStatements(Container* container) {
 			}
 
 		}
-		if(node->_sJump){ cout << "node " << node->_stmtPtr->_stmtNum << " sJump : " << node->_sJump->_stmtPtr->_stmtNum << endl; }
-		if (node->_fJump) { cout << "node " << node->_stmtPtr->_stmtNum << " fJump : " << node->_fJump->_stmtPtr->_stmtNum << endl; }
+		//if(node->_sJump){ cout << "node " << node->_stmtPtr->_stmtNum << " sJump : " << node->_sJump->_stmtPtr->_stmtNum << endl; }
+		//if (node->_fJump) { cout << "node " << node->_stmtPtr->_stmtNum << " fJump : " << node->_fJump->_stmtPtr->_stmtNum << endl; }
 	}
 	return cfg;	
 }
@@ -331,7 +331,6 @@ map<int, CFGNode*> _buildStatements(Container* container) {
 		node->_stmtPtr = stmt;
 		myMap.insert(pair<int, CFGNode*>(stmt->_stmtNum, node));
 	}
-	//myMap.at(container->_statements.at(container->_statements.size()-1)->
 	for (int i = 0; i < container->_childContainers.size(); i++) {
 		Container* childContainer = container->_childContainers.at(i);
 		map<int, CFGNode*> childMap = _buildStatements(childContainer);
@@ -342,7 +341,7 @@ map<int, CFGNode*> _buildStatements(Container* container) {
 
 // this function finds the next statement from startStmtNum to endStmtNum. StartStmtNum is normally the end of the current block, endStmtNum is normally the endStmtNum of parent block
 //	1) if encounter else stmt, skip the block
-//	2) if can't find the stmt, i
+//	2) if can't find the stmt,
 //		2a) if parent container is while, loop back
 //		2b) if parent container is not while, search from current block endStmtNum + 1 to parentBlock endStmtNum
 CFGNode* findNextStmt(stack<Container*> parentStack, int startStmtNum, map<int, CFGNode*> stmts) {
@@ -362,11 +361,11 @@ CFGNode* findNextStmt(stack<Container*> parentStack, int startStmtNum, map<int, 
 			break;
 		}
 	}
-	if (!nextStmt) { // if can't find
+	if (!nextStmt) { // if can't find stmt
 		if (parentStack.top()->_type == "while") { // if parent container is a while, then next stmt will be the while parent head
 			return stmts.at(parentStack.top()->_startStmtNum);
 		}
-		else { // if not, we continue to the higher parent
+		else { // if parent container is not while, we continue to the higher parent
 			currContainer = parentStack.top();
 			parentStack.pop();
 			nextStmt = findNextStmt(parentStack, currContainer->_endStmtNum + 1, stmts);
@@ -376,7 +375,7 @@ CFGNode* findNextStmt(stack<Container*> parentStack, int startStmtNum, map<int, 
 	return nextStmt;
 }
 
-void printHeadTail(map<int, CFGNode*> stmts) {
+void printStmt(map<int, CFGNode*> stmts) {
 	cout << "   | H | T | " << endl;
 	int startIndex = stmts.begin()->first;
 	for (map<int, CFGNode*>::iterator it = stmts.begin(); it != stmts.end(); it++) {

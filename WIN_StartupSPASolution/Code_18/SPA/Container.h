@@ -25,7 +25,6 @@ public:
 	int _startStmtNum;
 	int _endStmtNum;
 
-	//CFG* linkStatements();  // Create a CFGNode for each statement. Then, link them together in a CFG, and following the if-else and while CFG rule
 	void printContainerTree(int tab);
 	void printStmt();
 };
