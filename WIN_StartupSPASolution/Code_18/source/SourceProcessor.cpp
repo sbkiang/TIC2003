@@ -29,7 +29,11 @@ void SourceProcessor::process(string program) {
 
 	vector<Procedure*> procedures;
 	stack<Container*> parentStack;
+<<<<<<< Updated upstream
 	int elseStmtNumOffset = 0;
+=======
+	int elseKeywordCounter = 0;
+>>>>>>> Stashed changes
 	int stmtNum = 0;
 	int nestedLevel = 0;
 	for (int i = 0; i < tokens.size(); i++) {
@@ -60,7 +64,11 @@ void SourceProcessor::process(string program) {
 			container->_type = "while";
 			container->_startStmtNum = stmtNum;
 			container->_level = nestedLevel;
+<<<<<<< Updated upstream
 			Statement* stmt = new Statement(stmtNum, nestedLevel, container);
+=======
+			Statement* stmt = new Statement(stmtNum, nestedLevel, container, elseKeywordCounter);
+>>>>>>> Stashed changes
 			if (!parentStack.empty()) {
 				parentStack.top()->_childContainers.push_back(container);
 			}
@@ -74,19 +82,32 @@ void SourceProcessor::process(string program) {
 				if (regex_match(tokens.at(i), regex(var_constants))) {
 					Database::insertConstant(tokens.at(i));
 				}
+<<<<<<< Updated upstream
 				else if (regex_match(tokens.at(i), regex(var_variables))) {
 					variableStore.push_back(Statement(stmtNum, tokens.at(i)));
 				}
 				
 				if (!regex_match(tokens.at(i), regex(var_use))) {
 					useStore.push_back(Statement(stmtNum, tokens.at(i), container)); 
+=======
+				else if (regex_match(tokens.at(i), regex(regexVariables))) {
+					variableStore.push_back(Statement(stmtNum, tokens.at(i), container, elseKeywordCounter));
+				}
+				
+				if (!regex_match(tokens.at(i), regex(regexUse))) {
+					useStore.push_back(Statement(stmtNum, tokens.at(i), container, elseKeywordCounter));
+>>>>>>> Stashed changes
 				}
 
 				i++;
 			}
 
 			container->_statements.push_back(stmt);
+<<<<<<< Updated upstream
 			Database::insertStatement(stmtNum, procedures.back()->_name, word, stmt->_stmt);
+=======
+			Database::insertStatement(stmt->_stmtNum, procedures.back()->_name, word, stmt->_stmt);
+>>>>>>> Stashed changes
 			for (int i = 0; i < variableStore.size(); i++) { // insert the variable after inserting the statement due to FK
 				Database::insertVariable(variableStore.at(i)._stmt, variableStore.at(i)._stmtNum);
 			}
@@ -102,7 +123,11 @@ void SourceProcessor::process(string program) {
 			container->_type = "if";
 			container->_startStmtNum = stmtNum;
 			container->_level = nestedLevel;
+<<<<<<< Updated upstream
 			Statement* stmt = new Statement(stmtNum, nestedLevel, container);
+=======
+			Statement* stmt = new Statement(stmtNum, nestedLevel, container, elseKeywordCounter);
+>>>>>>> Stashed changes
 			if (!parentStack.empty()) { // if there's parent container, add current container to parent's child
 				parentStack.top()->_childContainers.push_back(container);
 			}
@@ -116,6 +141,7 @@ void SourceProcessor::process(string program) {
 				if (regex_match(tokens.at(i), regex(var_constants))) {
 					Database::insertConstant(tokens.at(i));
 				}
+<<<<<<< Updated upstream
 				else if (regex_match(tokens.at(i), regex(var_variables))) {
 					variableStore.push_back(Statement(stmtNum, tokens.at(i)));
 				}
@@ -123,6 +149,15 @@ void SourceProcessor::process(string program) {
 				// ** !regex_match(..), yet push to useStore. Mistake?
 				if (!regex_match(tokens.at(i), regex(var_use))) {
 					useStore.push_back(Statement(stmtNum, tokens.at(i), container));
+=======
+				else if (regex_match(tokens.at(i), regex(regexVariables))) {
+					variableStore.push_back(Statement(stmtNum, tokens.at(i), container, elseKeywordCounter));
+				}
+
+				// ** !regex_match(..), yet push to useStore. Mistake?
+				if (!regex_match(tokens.at(i), regex(regexUse))) {
+					useStore.push_back(Statement(stmtNum, tokens.at(i), container, elseKeywordCounter));
+>>>>>>> Stashed changes
 				}
 
 				i++;
@@ -140,10 +175,17 @@ void SourceProcessor::process(string program) {
 		else if (word == "else") { // for else container
 			stmtNum++;
 			nestedLevel++;
+<<<<<<< Updated upstream
 			elseStmtNumOffset++;
 			Container* container = new Container();
 			container->_type = "else";
 			Statement* stmt = new Statement(stmtNum, nestedLevel, container);
+=======
+			Container* container = new Container();
+			container->_type = "else";
+			Statement* stmt = new Statement(stmtNum, nestedLevel, container, elseKeywordCounter);
+			elseKeywordCounter++;
+>>>>>>> Stashed changes
 			stmt->_stmt = "else";
 			container->_statements.push_back(stmt);
 			container->_startStmtNum = stmtNum;
@@ -155,6 +197,7 @@ void SourceProcessor::process(string program) {
 		}
 		else if (word == "=") { // for assign
 			stmtNum++;
+<<<<<<< Updated upstream
 			Statement* stmt = new Statement(stmtNum, nestedLevel, parentStack.top());
 			stmt->_stmt += tokens.at(i - 1);
 			vector<Statement> variableStore; // we need to insert statement first before inserting variable due to FK. So, we store the variables here
@@ -162,6 +205,15 @@ void SourceProcessor::process(string program) {
 			vector<Statement> useStore;
 			vector<Statement> modifiesStore;
 			variableStore.push_back(Statement(stmtNum, tokens.at(i - 1), parentStack.top()));
+=======
+			Statement* stmt = new Statement(stmtNum, nestedLevel, parentStack.top(), elseKeywordCounter);
+			stmt->_stmt += tokens.at(i - 1);
+			vector<Statement> variableStore; // we need to insert statement first before inserting variable due to FK. So, we store the variables here
+			variableStore.push_back(Statement(stmtNum, tokens.at(i - 1), parentStack.top(), elseKeywordCounter));
+			vector<Statement> useStore;
+			vector<Statement> modifiesStore;
+			variableStore.push_back(Statement(stmtNum, tokens.at(i - 1), parentStack.top(), elseKeywordCounter));
+>>>>>>> Stashed changes
 			//useStore.push_back(Statement(stmtNum, tokens.at(i + 1), nestedLevel));
 			string LHS = tokens.at(i - 1);
 			while (tokens.at(i) != ";") {
@@ -169,17 +221,30 @@ void SourceProcessor::process(string program) {
 				if (regex_match(tokens.at(i), regex(var_constants))) {
 					Database::insertConstant(tokens.at(i));
 				}
+<<<<<<< Updated upstream
 				else if (regex_match(tokens.at(i), regex(var_variables))) {
 					variableStore.push_back(Statement(stmtNum, tokens.at(i), nestedLevel, parentStack.top()));
 				}
 				
 				if (!regex_match(tokens.at(i), regex(var_use))) {
 					useStore.push_back(Statement(stmtNum, tokens.at(i), parentStack.top()));
+=======
+				else if (regex_match(tokens.at(i), regex(regexVariables))) {
+					variableStore.push_back(Statement(stmtNum, tokens.at(i), nestedLevel, parentStack.top(), elseKeywordCounter));
+				}
+				
+				if (!regex_match(tokens.at(i), regex(regexUse))) {
+					useStore.push_back(Statement(stmtNum, tokens.at(i), parentStack.top(), elseKeywordCounter));
+>>>>>>> Stashed changes
 				}
 				
 				i++;
 			}
+<<<<<<< Updated upstream
 			modifiesStore.push_back(Statement(stmtNum, LHS, parentStack.top())); //Store LHS variable
+=======
+			modifiesStore.push_back(Statement(stmtNum, LHS, parentStack.top(), elseKeywordCounter)); //Store LHS variable
+>>>>>>> Stashed changes
 			parentStack.top()->_statements.push_back(stmt);
 			Database::insertStatement(stmtNum, procedures.back()->_name, "assign", stmt->_stmt);
 			for (int i = 0; i < variableStore.size(); i++) {
@@ -196,7 +261,11 @@ void SourceProcessor::process(string program) {
 		}
 		else if (word == "read" || word == "print" || word == "call") {
 			stmtNum++;
+<<<<<<< Updated upstream
 			Statement* stmt = new Statement(stmtNum, nestedLevel, parentStack.top());
+=======
+			Statement* stmt = new Statement(stmtNum, nestedLevel, parentStack.top(), elseKeywordCounter);
+>>>>>>> Stashed changes
 			stmt->_stmt += tokens.at(i);
 			stmt->_stmt += tokens.at(i + 1);
 			Database::insertStatement(stmtNum, procedures.back()->_name, word, stmt->_stmt);
@@ -210,8 +279,13 @@ void SourceProcessor::process(string program) {
 				i++; // skip the "print" keyword for the while loop below
 				while (tokens.at(i) != ";") {
 					stmt->_stmt += tokens.at(i);
+<<<<<<< Updated upstream
 					if (!regex_match(tokens.at(i), regex(var_use))) {
 						useStore.push_back(Statement(stmtNum, tokens.at(i), parentStack.top()));
+=======
+					if (!regex_match(tokens.at(i), regex(regexUse))) {
+						useStore.push_back(Statement(stmt->getAdjustedStmtNum(), tokens.at(i), parentStack.top(), elseKeywordCounter));
+>>>>>>> Stashed changes
 					}
 					i++;
 				}
@@ -224,11 +298,45 @@ void SourceProcessor::process(string program) {
 
 			if (word == "read") {
 				vector<Statement> modifiesStore;
+<<<<<<< Updated upstream
 
 				modifiesStore.push_back(Statement(stmtNum, tokens.at(i + 1), parentStack.top()));
 
 				for (int i = 0; i < modifiesStore.size(); i++) {
 					Database::insertModifies(modifiesStore.at(i)._stmtNum, procedures.back()->_name, modifiesStore.at(i)._stmt);
+=======
+				modifiesStore.push_back(Statement(stmtNum, tokens.at(i + 1), parentStack.top(), elseKeywordCounter));
+				for (int i = 0; i < modifiesStore.size(); i++) {
+					Database::insertModifies(modifiesStore.at(i)._stmtNum, procedures.back()->_name, modifiesStore.at(i)._stmt);
+				}
+			}
+		}
+	}
+	vector<CFG*> CFGs;
+	for (int i = 0; i < procedures.size(); i++) {
+		procedures.at(i)->printContainerTree(0);
+		CFG* cfg = CFGBuilder::buildCFG(procedures.at(i));
+		vector<CFGNode*> nodes = cfg->getAllCFGNodes();
+		for (int i = 0; i < nodes.size(); i++) {
+			CFGNode* node = nodes.at(i);
+			int nodeStmtNum = node->_stmtPtr->getAdjustedStmtNum();
+			if (node->_sJump) {
+				int nextStmtNum = node->_sJump->_stmtPtr->getAdjustedStmtNum();
+				if (nodeStmtNum > nextStmtNum) { // only while loop back would have this occurence
+					Database::insertNext(nodeStmtNum, nextStmtNum, "y");
+				}
+				else {
+					Database::insertNext(nodeStmtNum, nextStmtNum, "n");
+				}
+			}
+			if (node->_fJump) {
+				int nextStmtNum = node->_fJump->_stmtPtr->getAdjustedStmtNum();
+				if (nodeStmtNum > nextStmtNum) { // only while loop back would have this occurence
+					Database::insertNext(nodeStmtNum, nextStmtNum, "y");
+				}
+				else {
+					Database::insertNext(nodeStmtNum, nextStmtNum, "n");
+>>>>>>> Stashed changes
 				}
 			}
 		}

@@ -10,7 +10,11 @@ struct Statement {
 	string _stmt;
 	int _stmtNum;
 	int _level;
+<<<<<<< Updated upstream
 	int _elseOffset;
+=======
+	int _cfgStmtNum;
+>>>>>>> Stashed changes
 	bool _containerHead = false;
 	bool _containerTail = false;
 	Container* _container;
