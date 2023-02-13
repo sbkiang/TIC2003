@@ -150,10 +150,9 @@ void SourceProcessor::process(string program) {
 			Statement* stmt = new Statement(stmtNum, nestedLevel, parentStack.top(), stmtNumSubtract);
 			stmt->_stmt += tokens.at(i - 1);
 			vector<Statement> variableStore; // we need to insert statement first before inserting variable due to FK. So, we store the variables here
-			variableStore.push_back(Statement(stmtNum, tokens.at(i - 1), parentStack.top(), stmtNumSubtract));
 			vector<Statement> useStore;
 			vector<Statement> modifiesStore;
-			variableStore.push_back(Statement(stmtNum, tokens.at(i - 1), parentStack.top(), stmtNumSubtract));
+			variableStore.push_back(Statement(stmtNum, tokens.at(i - 1), stmtNumSubtract));
 			//useStore.push_back(Statement(stmtNum, tokens.at(i + 1), nestedLevel));
 			string LHS = tokens.at(i - 1);
 			while (tokens.at(i) != ";") {
@@ -222,6 +221,7 @@ void SourceProcessor::process(string program) {
 	vector<CFG*> CFGs;
 	for (int i = 0; i < procedures.size(); i++) {
 		procedures.at(i)->printContainerTree(0);
+		vector<Container*> containers = procedures.at(i)->getAllContainers();
 		CFG* cfg = CFGBuilder::buildCFG(procedures.at(i));
 		vector<CFGNode*> nodes = cfg->getAllCFGNodes();
 		for (int i = 0; i < nodes.size(); i++) {
@@ -229,21 +229,11 @@ void SourceProcessor::process(string program) {
 			int nodeStmtNum = node->_stmtPtr->getAdjustedStmtNum();
 			if (node->_sJump) {
 				int nextStmtNum = node->_sJump->_stmtPtr->getAdjustedStmtNum();
-				if (nodeStmtNum > nextStmtNum) { // only while loop back would have this occurence
-					Database::insertNext(nodeStmtNum, nextStmtNum, "y");
-				}
-				else {
-					Database::insertNext(nodeStmtNum, nextStmtNum, "n");
-				}
+				Database::insertNext(nodeStmtNum, nextStmtNum);
 			}
 			if (node->_fJump) {
 				int nextStmtNum = node->_fJump->_stmtPtr->getAdjustedStmtNum();
-				if (nodeStmtNum > nextStmtNum) { // only while loop back would have this occurence
-					Database::insertNext(nodeStmtNum, nextStmtNum, "y");
-				}
-				else {
-					Database::insertNext(nodeStmtNum, nextStmtNum, "n");
-				}
+				Database::insertNext(nodeStmtNum, nextStmtNum);
 			}
 		}
 	}

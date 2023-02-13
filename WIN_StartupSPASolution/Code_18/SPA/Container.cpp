@@ -18,11 +18,28 @@ void Container::printContainerTree(int nestedLevel) {
 		else {
 			cout << container->_type << " container";
 		}
-		cout << "\t\tStmt start : " << container->_startStmtNum << "\tStmt end: " << container->_endStmtNum << "\t ElseCountSubtract: " << container->_elseCountSubtract;
+		cout << "\t\tStmt start : " << container->_startStmtNum << "\tStmt end: " << container->_endStmtNum;
 		cout << endl;
 		_childContainers.at(i)->printContainerTree(nestedLevel + 1);
 	}
 }
+
+vector<Container*> Container::getAllContainers() {
+	vector<Container*> containers;
+	_getAllContainers(this, containers);
+	return containers;
+}
+
+void Container::_getAllContainers(Container* container, vector<Container*> &containers) {
+	if (!container) { return; }
+	if (container->_type != "procedure") {
+		containers.push_back(container);
+	}
+	for (int i = 0; i < container->_childContainers.size(); i++) {
+		_getAllContainers(_childContainers.at(i), containers);
+	}
+}
+
 /*
 void Container::printStmt() {
 	for (int i = 0; i < _statements.size(); i++) {

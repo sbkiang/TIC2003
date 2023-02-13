@@ -32,16 +32,16 @@ public:
 	static void getConstant(vector<string>& results);
 
 	// method to insert a parent into the database
-	static void insertParent(int parentNumber, int childNumber, bool direct);
+	static void insertParent(int parentStmt, int childStart, int childEnd);
 
 	// method to insert a modify into the database
 	static void insertModifies(int statementNumber, string procedureName, string variablename);
 
 	// method to insert a use into the database
 	static void insertUse(int statementNumber, string procedureName, string variablename);
-	static void insertNext(int stmtNum1, int stmtNum2, string whileLoop);
-	static void getNext_direct(int stmtNum1, int stmtNum2);
-	static void getNext_indirect(int stmtNum1, int stmtNum2);
+	static void insertNext(int stmtNum1, int stmtNum2);
+	static void getNext(int stmtNum1, int stmtNum2, vector<string>& results);
+	static void getNext_T(int stmtNum1, int stmtNum2, vector<string>& results);
 
 
 private:

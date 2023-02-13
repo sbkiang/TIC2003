@@ -15,7 +15,7 @@ class Container {
 public:
 	// Constructor
 	Container();
-	//Container(int elseCountSubtract);
+
 	// Destructor
 	~Container();
 
@@ -23,11 +23,12 @@ public:
 	vector<Container*> _childContainers;
 	string _condition;
 	string _type;
-	int _elseCountSubtract;
 	int _level;
 	int _startStmtNum;
 	int _endStmtNum;
 
 	void printContainerTree(int tab);
+	vector<Container*> getAllContainers();
+	void _getAllContainers(Container* container, vector<Container*> &containers);
 	//void printStmt();
 };
