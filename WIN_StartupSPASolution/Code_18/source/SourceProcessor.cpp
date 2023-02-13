@@ -72,7 +72,7 @@ void SourceProcessor::process(string program) {
 				}
 				
 				if (!regex_match(tokens.at(i), regex(regexUse))) {
-					useStore.push_back(Statement(stmtNum, tokens.at(i), container, stmtNumSubtract));
+					useStore.push_back(Statement(stmtNum, tokens.at(i), stmtNumSubtract));
 				}
 				i++;
 			}
@@ -113,7 +113,7 @@ void SourceProcessor::process(string program) {
 
 				// ** !regex_match(..), yet push to useStore. Mistake?
 				if (!regex_match(tokens.at(i), regex(regexUse))) {
-					useStore.push_back(Statement(stmtNum, tokens.at(i), container, stmtNumSubtract));
+					useStore.push_back(Statement(stmtNum, tokens.at(i), stmtNumSubtract));
 				}
 
 				i++;
@@ -166,12 +166,14 @@ void SourceProcessor::process(string program) {
 				}
 				
 				if (!regex_match(tokens.at(i), regex(regexUse))) {
-					useStore.push_back(Statement(stmtNum, tokens.at(i), parentStack.top(), stmtNumSubtract));
+					useStore.push_back(Statement(stmtNum, tokens.at(i), stmtNumSubtract));
 				}
 				i++;
 			}
-			modifiesStore.push_back(Statement(stmtNum, LHS, parentStack.top(), stmtNumSubtract)); //Store LHS variable
+			modifiesStore.push_back(Statement(stmtNum, LHS, stmtNumSubtract)); //Store LHS variable
+
 			parentStack.top()->_statements.push_back(stmt);
+
 			Database::insertStatement(stmt->getAdjustedStmtNum(), procedures.back()->_name, "assign", stmt->_stmt);
 			for (int i = 0; i < variableStore.size(); i++) {
 				Database::insertVariable(variableStore.at(i)._stmt, variableStore.at(i).getAdjustedStmtNum());
@@ -201,7 +203,7 @@ void SourceProcessor::process(string program) {
 				while (tokens.at(i) != ";") {
 					stmt->_stmt += tokens.at(i);
 					if (!regex_match(tokens.at(i), regex(regexUse))) {
-						useStore.push_back(Statement(stmt->getAdjustedStmtNum(), tokens.at(i), parentStack.top(), stmtNumSubtract));
+						useStore.push_back(Statement(stmtNum, tokens.at(i), stmtNumSubtract));
 					}
 					i++;
 				}
@@ -212,7 +214,7 @@ void SourceProcessor::process(string program) {
 
 			if (word == "read") {
 				vector<Statement> modifiesStore;
-				modifiesStore.push_back(Statement(stmtNum, tokens.at(i + 1), parentStack.top(), stmtNumSubtract));
+				modifiesStore.push_back(Statement(stmtNum, tokens.at(i + 1), stmtNumSubtract));
 				for (int i = 0; i < modifiesStore.size(); i++) {
 					Database::insertModifies(modifiesStore.at(i).getAdjustedStmtNum(), procedures.back()->_name, modifiesStore.at(i)._stmt);
 				}

@@ -16,6 +16,7 @@ struct Statement {
 	Statement(int stmtNum, string stmt, Container* container, int _stmtNumSubtract);
 	Statement(int stmtNum, int level, Container* container, int _stmtNumSubtract);
 	Statement(int stmtNum, string stmt, int level, Container* container, int _stmtNumSubtract);
+	Statement(int stmtNum, string stmt, int _stmtNumSubtract);
 	int getAdjustedStmtNum();
 };
 
