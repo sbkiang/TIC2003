@@ -115,7 +115,7 @@ void Database::insertConstant(string value) {
 
 void Database::insertParent(int parent, int child_start, int child_end) {
 	char sqlBuf[256];
-	sprintf(sqlBuf, "INSERT INTO parent ('parent_line','child_start','child_end') VALUES ('%i','%i','%i');", parent, child_start, child_end);
+	sprintf(sqlBuf, "INSERT INTO parent ('parent_line','child_start','child_end') VALUES (%i,%i,%i);", parent, child_start, child_end);
 	//string sql = "INSERT INTO parent ('parent_line', 'child_line', 'direct_child' ) VALUES ('" + to_string(parent) + "', '" + to_string(child) + "', '" + to_string(direct) + "');";
 	sqlite3_exec(dbConnection, sqlBuf, NULL, 0, &errorMessage);
 }
@@ -147,10 +147,11 @@ void Database::insertNext(int stmtNum1, int stmtNum2) {
 void Database::getNext_T(int stmtNum1, int stmtNum2, vector<string>& results) {
 	dbResults.clear();
 	char sqlBuf[256];
-	sprintf(sqlBuf, "SELECT * FROM next WHERE line_num_1 = '%i' AND line_num_2 = '%i';", stmtNum1, stmtNum2);
+	// cannot use line_num_1 > line_num_2. Consider casees select next*(while end, while head). Then, my SQL query won't return
+	sprintf(sqlBuf, "SELECT * FROM next WHERE line_num_1 = '%i' AND line_num_2 = '%i' AND line_num_1 > line_num_2;", stmtNum1, stmtNum2);
 	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
 	if (errorMessage) {
-		cout << "SQL Error: " << errorMessage;
+		cout << "getNext_T SQL Error: " << errorMessage;
 		return;
 	}
 	for (vector<string> dbRow : dbResults) {
@@ -163,10 +164,10 @@ void Database::getNext_T(int stmtNum1, int stmtNum2, vector<string>& results) {
 void Database::getNext(int stmtNum1, int stmtNum2, vector<string>& results) {
 	dbResults.clear();
 	char sqlBuf[256];
-	sprintf(sqlBuf, "SELECT * FROM next WHERE line_num_1 = '%i' AND line_num_2 = '%i' AND line_num_1 > line_num_2;", stmtNum1, stmtNum2);
+	sprintf(sqlBuf, "SELECT * FROM next WHERE line_num_1 = '%i' AND line_num_2 = '%i';", stmtNum1, stmtNum2);
 	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
 	if (errorMessage) {
-		cout << "SQL Error: " << errorMessage;
+		cout << "getNext SQL Error: " << errorMessage;
 		return;
 	}
 	for (vector<string> dbRow : dbResults) {
@@ -183,7 +184,7 @@ void Database::getProcedures(vector<string>& results) {
 
 	// retrieve the procedures from the procedure table
 	// The callback method is only used when there are results to be returned.
-	string sql = "SELECT * FROM procedures;";
+	string sql = "SELECT name FROM procedures;";
 	sqlite3_exec(dbConnection, sql.c_str(), callback, 0, &errorMessage);
 	
 	if (errorMessage) {
@@ -277,7 +278,7 @@ void Database::getStatement(string type, vector<string>& results) {
 	sqlite3_exec(dbConnection, sql.c_str(), callback, 0, &errorMessage);
 
 	if (errorMessage) {
-		cout << "SQL Error: " << errorMessage;
+		cout << "getStatement SQL Error: " << errorMessage;
 		return;
 	}
 
@@ -285,6 +286,24 @@ void Database::getStatement(string type, vector<string>& results) {
 		string result;
 		result = dbRow.at(0);
 		results.push_back(result);
+	}
+}
+
+void Database::getParent(int stmtNum1, int stmtNum2, vector<string>& results) {
+	char sqlBuf[256];
+	sprintf(sqlBuf, "SELECT parent_line FROM parent WHERE %i > child_start AND %i < child_end ORDER BY parent_line ASC LIMIT 1;", stmtNum2, stmtNum2);
+	sqlite3_exec(dbConnection, sqlBuf, NULL, 0, &errorMessage);
+	if (errorMessage) {
+		cout << "getParent SQL Error: " << errorMessage;
+	}
+}
+
+void Database::getParent_T(int stmtNum1, int stmtNum2, vector<string>& results) {
+	char sqlBuf[256];
+	sprintf(sqlBuf, "SELECT parent_line FROM parent WHERE %i > child_start AND %i < child_end ORDER BY parent_line ASC;", stmtNum2, stmtNum2);
+	sqlite3_exec(dbConnection, sqlBuf, NULL, 0, &errorMessage);
+	if (errorMessage) {
+		cout << "getParent_T SQL Error: " << errorMessage;
 	}
 }
 

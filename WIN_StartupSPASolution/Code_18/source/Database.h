@@ -33,6 +33,8 @@ public:
 
 	// method to insert a parent into the database
 	static void insertParent(int parentStmt, int childStart, int childEnd);
+	static void getParent(int stmtNum1, int stmtNum2, vector<string>& results);
+	static void getParent_T(int stmtNum1, int stmtNum2, vector<string>& results);
 
 	// method to insert a modify into the database
 	static void insertModifies(int statementNumber, string procedureName, string variablename);

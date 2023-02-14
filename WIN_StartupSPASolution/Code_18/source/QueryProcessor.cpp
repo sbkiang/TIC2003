@@ -109,13 +109,13 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			if (designAbstract == "parent") {
 				//Relationship between statement
 			}
-			else if (designAbstract == "parentt") { //parentt = parent*
+			else if (designAbstract == "parentT") { //parentT = parent*
 				//Relationship between statement
 			}
 			else if (designAbstract == "next") {
 				//Relationship between statement
 			}
-			else if (designAbstract == "nextT") { //nextt = next* 
+			else if (designAbstract == "nextT") { //nextT = next* 
 				//Relationship between statement
 			}
 			else if (designAbstract == "calls") {
