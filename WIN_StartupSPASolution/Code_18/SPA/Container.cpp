@@ -32,10 +32,13 @@ vector<Container*> Container::getAllContainers() {
 
 void Container::_getAllContainers(Container* container, vector<Container*> &containers) {
 	if (!container) { return; }
-	if (container->_type != "procedure") {
+	if ((container->_type != "procedure" && container->_type != "else")) { // don't add procedure and else container to the result
 		containers.push_back(container);
 	}
 	for (int i = 0; i < container->_childContainers.size(); i++) {
+		if (_childContainers.at(i)->_type == "if") {
+			_childContainers.at(i)->_endStmtNum = _childContainers.at(i + 1)->_endStmtNum;
+		}
 		_getAllContainers(_childContainers.at(i), containers);
 	}
 }

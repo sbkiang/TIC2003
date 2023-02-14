@@ -223,7 +223,10 @@ void SourceProcessor::process(string program) {
 	vector<CFG*> CFGs;
 	for (int i = 0; i < procedures.size(); i++) {
 		procedures.at(i)->printContainerTree(0);
-		vector<Container*> containers = procedures.at(i)->getAllContainers();
+		vector<Container*> containers = procedures.at(i)->getAllContainers(); // get all the if and while containers
+		for (int i = 0; i < containers.size(); i++) {
+			Database::insertParent(containers.at(i)->_startStmtNum, containers.at(i)->_startStmtNum - 1, containers.at(i)->_endStmtNum);
+		}
 		CFG* cfg = CFGBuilder::buildCFG(procedures.at(i));
 		vector<CFGNode*> nodes = cfg->getAllCFGNodes();
 		for (int i = 0; i < nodes.size(); i++) {
