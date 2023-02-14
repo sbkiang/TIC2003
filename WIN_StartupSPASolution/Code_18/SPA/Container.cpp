@@ -39,7 +39,7 @@ void Container::_getAllContainers(Container* container, vector<Container*> &cont
 		if (_childContainers.at(i)->_type == "if") {
 			_childContainers.at(i)->_endStmtNum = _childContainers.at(i + 1)->_endStmtNum;
 		}
-		_getAllContainers(_childContainers.at(i), containers);
+		_getAllContainers(container->_childContainers.at(i), containers);
 	}
 }
 
