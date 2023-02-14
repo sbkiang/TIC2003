@@ -115,7 +115,7 @@ void Database::insertConstant(string value) {
 
 void Database::insertParent(int parent, int child_start, int child_end) {
 	char sqlBuf[256];
-	sprintf(sqlBuf, "INSERT INTO parent ('parent_line','child_start','child_end') VALUES ('%i','%i','%s');", parent, child_start, child_end);
+	sprintf(sqlBuf, "INSERT INTO parent ('parent_line','child_start','child_end') VALUES ('%i','%i','%i');", parent, child_start, child_end);
 	//string sql = "INSERT INTO parent ('parent_line', 'child_line', 'direct_child' ) VALUES ('" + to_string(parent) + "', '" + to_string(child) + "', '" + to_string(direct) + "');";
 	sqlite3_exec(dbConnection, sqlBuf, NULL, 0, &errorMessage);
 }
