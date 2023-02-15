@@ -29,7 +29,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	// create a vector for storing the results from database
 	vector<string> databaseResults;
 
-	string designAbstract = "", firstValue = "", secondValue = "";
+	string designAbstract = "", stmtNum1 = "", stmtNum2 = "";
 	int idx;
 	bool comma = false;
 
@@ -97,31 +97,37 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 						comma = true;
 					}
 					else if (tokens[idx] != "(" && tokens[idx] != "\"" && comma == false) {
-						firstValue = tokens[idx];
+						stmtNum1 = tokens[idx];
 					}
 					else if (tokens[idx] != "\"" && comma == true) {
-						secondValue = tokens[idx];
+						stmtNum2 = tokens[idx];
 					}
 					idx++;
 				}
 			}
 
-			if (designAbstract == "parent") {
+			if (designAbstract == "parent" || designAbstract == "parentt") {
 				//Relationship between statement
-			}
-			else if (designAbstract == "parentT") { //parentT = parent*
-				//Relationship between statement
+				if (!isNumber(stmtNum1) && isNumber(stmtNum2)) {
+					Database::getParent(stmtNum1, stmtNum2, databaseResults);
+				}
+				else if(isNumber(stmtNum1) && !isNumber(stmtNum2)){
+					Database::getChildren(stmtNum1, stmtNum2, databaseResults);
+				}
+				else {
+					//Database::getParentChildren(stmtNum1, stmtNum2, databaseResults);
+				}
 			}
 			else if (designAbstract == "next") {
 				//Relationship between statement
 			}
-			else if (designAbstract == "nextT") { //nextT = next* 
+			else if (designAbstract == "nextt") { //nextT = next* 
 				//Relationship between statement
 			}
 			else if (designAbstract == "calls") {
 				//Relationship between procedure
 			}
-			else if (designAbstract == "callsT") { //callt = call* 
+			else if (designAbstract == "callst") { //callT = call* 
 				//Relationship between procedure
 			}
 			else if (designAbstract == "use") {

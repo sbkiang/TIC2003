@@ -11,7 +11,7 @@ procedure printResults {
     print flag;
     print cenX;
     print cenY;
-    print normSq;
+    print normSq; 
 }
 procedure computeCentroid {
     count = 0;
@@ -30,4 +30,7 @@ procedure computeCentroid {
         cenX = cenX / count;
         cenY = cenY / count; }
     normSq = cenX * cenX + cenY * cenY;
+    while ((x + y) != 0) {
+        count = count + 1;
+    }
 }
