@@ -26,6 +26,8 @@ public:
 	int _level;
 	int _startStmtNum;
 	int _endStmtNum;
+	int _adjustedStartStmtNum;
+	int _adjustedEndStmtNum;
 
 	void printContainerTree(int tab);
 	vector<Container*> getAllContainers();

@@ -147,8 +147,13 @@ void Database::insertNext(int stmtNum1, int stmtNum2) {
 void Database::getNext_T(int stmtNum1, int stmtNum2, vector<string>& results) {
 	dbResults.clear();
 	char sqlBuf[256];
-	// cannot use line_num_1 > line_num_2. Consider casees select next*(while end, while head). Then, my SQL query won't return
-	sprintf(sqlBuf, "SELECT * FROM next WHERE line_num_1 = '%i' AND line_num_2 = '%i' AND line_num_1 > line_num_2;", stmtNum1, stmtNum2);
+	vector<string> resultStore;
+	sprintf(sqlBuf, "with recursive nextStmt as ("
+						"select n.line_num_1, n.line_num_2 from next n where line_num_1 = %i"
+						" union "
+						"select n.line_num_1, n.line_num_2 from next n join nextStmt ns where n.line_num_1 = ns.line_num_2 and n.line_num_2 <= %i"
+						")"
+						"select* from nextStmt;", stmtNum1, stmtNum2);
 	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
 	if (errorMessage) {
 		cout << "getNext_T SQL Error: " << errorMessage;
@@ -156,7 +161,7 @@ void Database::getNext_T(int stmtNum1, int stmtNum2, vector<string>& results) {
 	}
 	for (vector<string> dbRow : dbResults) {
 		string result;
-		result = dbRow.at(0);
+		result = dbRow.at(0) + "," + dbRow.at(1);
 		results.push_back(result);
 	}
 }
@@ -172,7 +177,7 @@ void Database::getNext(int stmtNum1, int stmtNum2, vector<string>& results) {
 	}
 	for (vector<string> dbRow : dbResults) {
 		string result;
-		result = dbRow.at(0);
+		result = dbRow.at(0) + "," + dbRow.at(1);
 		results.push_back(result);
 	}
 }

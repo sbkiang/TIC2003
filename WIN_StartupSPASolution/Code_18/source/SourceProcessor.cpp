@@ -32,6 +32,7 @@ void SourceProcessor::process(string program) {
 			if (!parentStack.empty()) {
 				nestedLevel--;
 				parentStack.top()->_endStmtNum = stmtNum;
+				parentStack.top()->_adjustedEndStmtNum = stmtNum - stmtNumSubtract;
 				parentStack.pop();
 			}
 		}
@@ -40,6 +41,7 @@ void SourceProcessor::process(string program) {
 			Procedure* procedure = new Procedure(tokens.at(i));
 			procedure->_type = "procedure";
 			procedure->_startStmtNum = stmtNum + 1;
+			procedure->_adjustedStartStmtNum = stmtNum + 1 - stmtNumSubtract;
 			procedure->_level = nestedLevel;
 			procedures.push_back(procedure);
 			parentStack.push(procedure);
@@ -52,6 +54,7 @@ void SourceProcessor::process(string program) {
 			Container* container = new Container();
 			container->_type = "while";
 			container->_startStmtNum = stmtNum;
+			container->_adjustedStartStmtNum = stmtNum - stmtNumSubtract;
 			container->_level = nestedLevel;
 			Statement* stmt = new Statement(stmtNum, nestedLevel, container, stmtNumSubtract);
 			if (!parentStack.empty()) {
@@ -92,6 +95,7 @@ void SourceProcessor::process(string program) {
 			Container* container = new Container();
 			container->_type = "if";
 			container->_startStmtNum = stmtNum;
+			container->_adjustedStartStmtNum = stmtNum - stmtNumSubtract;
 			container->_level = nestedLevel;
 			Statement* stmt = new Statement(stmtNum, nestedLevel, container, stmtNumSubtract);
 			if (!parentStack.empty()) { // if there's parent container, add current container to parent's child
@@ -134,10 +138,11 @@ void SourceProcessor::process(string program) {
 			stmtNumSubtract++;
 			Container* container = new Container();
 			container->_type = "else";
-			Statement* stmt = new Statement(stmtNum, nestedLevel, container, stmtNumSubtract);
+			Statement* stmt = new Statement(stmtNum, nestedLevel, container, stmtNumSubtract-1);
 			stmt->_stmt = "else";
 			container->_statements.push_back(stmt);
 			container->_startStmtNum = stmtNum;
+			container->_adjustedStartStmtNum = stmtNum - stmtNumSubtract;
 			container->_level = nestedLevel;
 			stack<Container*> tempParentStack;
 			if (!parentStack.empty()) { // if there's parent container, add current container to parent's child
@@ -222,16 +227,14 @@ void SourceProcessor::process(string program) {
 	}
 	vector<CFG*> CFGs;
 	for (int i = 0; i < procedures.size(); i++) {
-		procedures.at(i)->printContainerTree(0);
-		vector<Container*> containers = procedures.at(i)->getAllContainers(); // get all the if and while containers
-		for (int i = 0; i < containers.size(); i++) {
-			Database::insertParent(containers.at(i)->_startStmtNum, containers.at(i)->_startStmtNum + 1, containers.at(i)->_endStmtNum);
-		}
 		CFG* cfg = CFGBuilder::buildCFG(procedures.at(i));
 		vector<CFGNode*> nodes = cfg->getAllCFGNodes();
 		for (int i = 0; i < nodes.size(); i++) {
 			CFGNode* node = nodes.at(i);
 			int nodeStmtNum = node->_stmtPtr->getAdjustedStmtNum();
+			if (node->_stmtPtr->_stmt == "else") {
+				continue;
+			}
 			if (node->_sJump) {
 				int nextStmtNum = node->_sJump->_stmtPtr->getAdjustedStmtNum();
 				Database::insertNext(nodeStmtNum, nextStmtNum);
@@ -241,6 +244,15 @@ void SourceProcessor::process(string program) {
 				Database::insertNext(nodeStmtNum, nextStmtNum);
 			}
 		}
+		procedures.at(i)->printContainerTree(0);
+		vector<Container*> containers = procedures.at(i)->getAllContainers(); // get all the if and while containers
+		for (int i = 0; i < containers.size(); i++) {
+			Database::insertParent(containers.at(i)->_adjustedStartStmtNum, containers.at(i)->_adjustedStartStmtNum + 1, containers.at(i)->_adjustedEndStmtNum);
+		}
 	}
 	//Database::getParent()
+	vector<string> result;
+	//Database::getNext_T(5, 8, result);
+	Database::getNext(5, 6, result);
+	//int i = 0;
 }

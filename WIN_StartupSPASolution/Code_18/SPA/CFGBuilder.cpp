@@ -17,7 +17,7 @@ CFG* CFGBuilder::buildCFG(Container* procedure) {
 				tempContainer = node->_stmtPtr->_container;
 			}
 		}
-		if (!(node->_stmtPtr->_containerHead || node->_stmtPtr->_containerTail)) {
+		if (!(node->_stmtPtr->_containerHead || node->_stmtPtr->_containerTail)) { // if node is body, just set sJump to next statement
 			node->_sJump = stmts.at(i + 1);
 			cout << "node " << node->_stmtPtr->_stmtNum << " sJump : " << node->_sJump->_stmtPtr->_stmtNum << endl;
 			continue;
@@ -42,7 +42,7 @@ CFG* CFGBuilder::buildCFG(Container* procedure) {
 			}
 			else { // if stmt is both if container head and tail, or head only, sJump = next stmt, fJump = else stmt
 				node->_sJump = stmts.at(i + 1);
-				loopStart = node->_stmtPtr->_container->_endStmtNum + 1; // skip self stmt
+				loopStart = node->_stmtPtr->_container->_endStmtNum + 1;
 				loopEnd = parentStack.top()->_endStmtNum;
 				for (int j = loopStart; j < loopEnd; j++) { // fJump is the first stmt in else container of same nestedLevel
 					if (stmts.at(j)->_stmtPtr->_level != node->_stmtPtr->_level) {
