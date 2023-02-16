@@ -295,16 +295,11 @@ void Database::getStatement(string type, vector<string>& results) {
 }
 
 void Database::getParent(string stmtNum1, string stmtNum2, vector<string>& results) {
-	//char sqlBuf[256];
-	//sprintf(sqlBuf, "SELECT parent_line FROM parent WHERE %i > child_start AND %i < child_end ORDER BY parent_line ASC LIMIT 1;", stmtNum2, stmtNum2);
-
-	// clear the existing results
 	dbResults.clear();
 
 	string sql = "SELECT MAX(parent_line) FROM parent WHERE child_start <= '" + stmtNum2 + "' AND child_end >= '" + stmtNum2 + "';";
-
 	sqlite3_exec(dbConnection, sql.c_str(), callback, 0, &errorMessage);
-	
+		
 	if (errorMessage) {
 		cout << "getParent SQL Error: " << errorMessage;
 	}
@@ -316,12 +311,17 @@ void Database::getParent(string stmtNum1, string stmtNum2, vector<string>& resul
 	}
 }
 
-void Database::getChildren(string stmtNum1, string stmtNum2, vector<string>& results) {
+void Database::getChildren(string stmtNum1, string stmtNum2, string statementType, vector<string>& results) {
 	
 	// clear the existing results
 	dbResults.clear();
 
-	string sql = "SELECT child_start, child_end FROM parent WHERE parent_line = '" + stmtNum1 + "';";
+	string sql;
+
+	if(statementType == "stmt")
+		 sql = "WITH RECURSIVE expanded_range(n) AS ( SELECT child_start FROM parent WHERE parent_line = '" + stmtNum1 + "' UNION ALL SELECT n+1 FROM expanded_range WHERE n+1 <= (SELECT child_end FROM parent )) SELECT line_num FROM statement WHERE line_num IN (SELECT n FROM expanded_range);";
+	else
+		 sql = "WITH RECURSIVE expanded_range(n) AS ( SELECT child_start FROM parent WHERE parent_line = '" + stmtNum1 + "' UNION ALL SELECT n+1 FROM expanded_range WHERE n+1 <= (SELECT child_end FROM parent )) SELECT line_num FROM statement WHERE line_num IN (SELECT n FROM expanded_range) AND entity = '" + statementType + "';";
 
 	sqlite3_exec(dbConnection, sql.c_str(), callback, 0, &errorMessage);
 
@@ -329,16 +329,38 @@ void Database::getChildren(string stmtNum1, string stmtNum2, vector<string>& res
 		cout << "getParent SQL Error: " << errorMessage;
 	}
 
-	for (vector<string> dbCol : dbResults) {
-		int start, end;
-		start = stoi(dbCol.at(0)); //convert string to int
-		end = stoi(dbCol.at(1)); //convert string to int
-		for (int i = start; i <= end; i++) {
-			results.push_back(to_string(i));
-		}
+	for (vector<string> dbRow : dbResults) {
+		string result;
+		result = dbRow.at(0);
+		results.push_back(result);
 	}
 }
 
+void Database::getParentChildren(bool findparent, string resultType, string filterType, vector<string>& results) {
+
+	// clear the existing results
+	dbResults.clear();
+	string sql;
+
+	if (findparent)
+		sql = "SELECT parent_line FROM parent WHERE child_start <= '" + filterType + "' AND child_end >= '" + filterType + "';";
+	 
+	else 
+		sql = "WITH RECURSIVE expanded_range(n) AS ( SELECT child_start FROM parent WHERE parent_line IN (SELECT line_num FROM statement WHERE entity = '" + filterType + "') UNION ALL SELECT n+1 FROM expanded_range WHERE n+1 <= (SELECT child_end FROM parent WHERE parent_line IN (SELECT line_num FROM statement WHERE entity = '" + filterType + "'))) SELECT line_num FROM statement WHERE line_num IN (SELECT n FROM expanded_range) AND entity = '" + resultType + "';";
+
+	sqlite3_exec(dbConnection, sql.c_str(), callback, 0, &errorMessage);
+
+	if (errorMessage) {
+		cout << "getParent SQL Error: " << errorMessage;
+	}
+
+	for (vector<string> dbRow : dbResults) {
+		string result;
+		result = dbRow.at(0);
+		results.push_back(result);
+	}
+	
+}
 
 // callback method to put one row of results from the database into the dbResults vector
 // This method is called each time a row of results is returned from the database

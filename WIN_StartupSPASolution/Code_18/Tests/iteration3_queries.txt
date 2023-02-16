@@ -33,46 +33,37 @@ stmt s;
 Select s
 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25
 5000
-8 - Such That (parent of #20)
+8 - Find Parent
 parent t;
 select t such that Parent(t,20)
 19
 5000
-9 - such that (parent(i,a))
-assign a; if i;
-select a such that parent(i,a)
-20
+9 - Find Parent
+stmt t;
+select t such that Parent(t,20)
+19
 5000
-10 - such that (parent(w,a))
-assign a; while w;
-select a such that parent(w,a)
-15,16,17
-5000
-11 - Such That (parentT of #15)
-parentT t
-select t such that parent*(t,15)
-14
-5000
-12 - Such That (parentT(w,a))
-assign a; while w;
-select a such that parent*(w,a)
-15,16,17
-5000
-13 - such that (parentT(i,a))
-assign a; if i;
-select a such that parent*(i,a)
-20,21,22
-5000
-14 - such that (parent(14,a))
-stmt a;
-select a such that parent(14,a)
+10 - Find Stmt from Parent
+stmt t;
+select t such that Parent(14, t)
 15,16,17,18
 5000
-14 - such that (parent(25,a))
-stmt a;
-select a such that parent(25,a)
-26
+11 - Find children of assign from Parent
+assign t;
+select t such that Parent(14, t)
+15,16,17
 5000
+12 - Find children of call from Parent
+call t;
+select t such that Parent(14, t)
+18
+5000
+12 - Find children of call from Parent
+assign t; while s;
+select t such that Parent(s, t)
+15,16,17
+5000
+
 
 
 
