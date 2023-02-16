@@ -343,10 +343,11 @@ void Database::getParentChildren(bool findparent, string resultType, string filt
 	string sql;
 
 	if (findparent)
-		sql = "SELECT parent_line FROM parent WHERE child_start <= '" + filterType + "' AND child_end >= '" + filterType + "';";
+		sql = "SELECT DISTINCT(p.parent_line) FROM parent p JOIN statement s ON s.line_num BETWEEN p.child_start AND p.child_end WHERE s.entity = '" + filterType + "';";
 	 
 	else 
 		sql = "WITH RECURSIVE expanded_range(n) AS ( SELECT child_start FROM parent WHERE parent_line IN (SELECT line_num FROM statement WHERE entity = '" + filterType + "') UNION ALL SELECT n+1 FROM expanded_range WHERE n+1 <= (SELECT child_end FROM parent WHERE parent_line IN (SELECT line_num FROM statement WHERE entity = '" + filterType + "'))) SELECT line_num FROM statement WHERE line_num IN (SELECT n FROM expanded_range) AND entity = '" + resultType + "';";
+
 
 	sqlite3_exec(dbConnection, sql.c_str(), callback, 0, &errorMessage);
 
