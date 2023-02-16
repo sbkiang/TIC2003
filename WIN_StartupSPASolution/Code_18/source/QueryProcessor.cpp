@@ -123,6 +123,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			}
 			else if (designAbstract == "nextt") { //nextT = next* 
 				//Relationship between statement
+				// Use recursive query
 			}
 			else if (designAbstract == "calls") {
 				//Relationship between procedure

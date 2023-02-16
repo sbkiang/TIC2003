@@ -52,10 +52,13 @@ void CFG::_getAllCFGNodes(CFGNode* node, set<int> visited, int spaces, vector<CF
 	}
 	visited.insert(node->_stmtPtr->_stmtNum);
 	cout << setfill('0') << setw(2) << node->_stmtPtr->_stmtNum << "(" << node->_stmtPtr->getAdjustedStmtNum() << ")" << "->";
-	spaces += to_string(node->_stmtPtr->_stmtNum).length() + 2;
-	nodes.push_back(node);
+	spaces += to_string(node->_stmtPtr->_stmtNum).length() + 4;
+	if (find(nodes.begin(), nodes.end(), node) == nodes.end()) { // if node not in nodes
+		nodes.push_back(node);
+	}
 	_getAllCFGNodes(node->_sJump, visited, spaces, nodes);
 	if (node->_fJump) {
+		cout << endl;
 		cout << setfill(' ') << setw(spaces) << " ";
 		cout << setfill('0') << setw(2) << node->_stmtPtr->_stmtNum << "(" << node->_stmtPtr->getAdjustedStmtNum() << ")" << "->";
 		_getAllCFGNodes(node->_fJump, visited, spaces, nodes);
