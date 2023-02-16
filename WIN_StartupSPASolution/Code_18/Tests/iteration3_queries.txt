@@ -64,9 +64,9 @@ select t such that Parent(s, t)
 15,16,17
 5000
 13 - Find Parent
-assign t; while s;
+assign t; if s;
 select s such that Parent(s, t)
-14,19
+19
 5000
 
 

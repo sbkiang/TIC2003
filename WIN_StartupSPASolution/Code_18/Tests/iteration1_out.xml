@@ -1,28 +1,28 @@
 <?xml-stylesheet type="text/xsl" href="analysis.xsl"?>
 <test_results>
 <info>
-<name>AutoTester</name><parsing_time_taken>125.000000</parsing_time_taken>
+<name>AutoTester</name><parsing_time_taken>119.000000</parsing_time_taken>
 </info>
 <queries>
 <query>
 <id ReturnTuple="1" CondNum="1" RelNum="0" comment="Procedure">1</id><querystr><![CDATA[procedure p; Select p]]></querystr>
 <stuans>main,readPoint,printResults,computeCentroid</stuans>
 <correct>main,readPoint,printResults,computeCentroid</correct>
-<time_taken>9.000000</time_taken>
+<time_taken>11.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" CondNum="1" RelNum="0" comment="Variable">2</id><querystr><![CDATA[variable v; Select v]]></querystr>
 <stuans>cenX,cenY,count,flag,normSq,x,y</stuans>
 <correct>flag,x,y,count,cenX,cenY,normSq</correct>
-<time_taken>10.000000</time_taken>
+<time_taken>11.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" CondNum="1" RelNum="0" comment="Constant">3</id><querystr><![CDATA[constant c; Select c]]></querystr>
 <stuans>0,1</stuans>
 <correct>0,1</correct>
-<time_taken>11.000000</time_taken>
+<time_taken>10.000000</time_taken>
 <passed/>
 </query>
 <query>
@@ -43,7 +43,7 @@
 <id ReturnTuple="1" CondNum="1" RelNum="0" comment="Read">6</id><querystr><![CDATA[read rd; Select rd]]></querystr>
 <stuans>4,5</stuans>
 <correct>4,5</correct>
-<time_taken>11.000000</time_taken>
+<time_taken>12.000000</time_taken>
 <passed/>
 </query>
 <query>
@@ -57,49 +57,49 @@
 <id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Find Parent">8</id><querystr><![CDATA[parent t; select t such that Parent(t,20)]]></querystr>
 <stuans>19</stuans>
 <correct>19</correct>
-<time_taken>9.000000</time_taken>
+<time_taken>13.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Find Parent">9</id><querystr><![CDATA[stmt t; select t such that Parent(t,20)]]></querystr>
 <stuans>19</stuans>
 <correct>19</correct>
-<time_taken>12.000000</time_taken>
+<time_taken>11.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Find Stmt from Parent">10</id><querystr><![CDATA[stmt t; select t such that Parent(14, t)]]></querystr>
 <stuans>15,16,17,18</stuans>
 <correct>15,16,17,18</correct>
-<time_taken>14.000000</time_taken>
+<time_taken>13.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Find children of assign from Parent">11</id><querystr><![CDATA[assign t; select t such that Parent(14, t)]]></querystr>
 <stuans>15,16,17</stuans>
 <correct>15,16,17</correct>
-<time_taken>13.000000</time_taken>
+<time_taken>12.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Find children of call from Parent">12</id><querystr><![CDATA[call t; select t such that Parent(14, t)]]></querystr>
 <stuans>18</stuans>
 <correct>18</correct>
-<time_taken>18.000000</time_taken>
+<time_taken>12.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Find children of call from Parent">12</id><querystr><![CDATA[assign t; while s; select t such that Parent(s, t)]]></querystr>
 <stuans>15,16,17</stuans>
 <correct>15,16,17</correct>
-<time_taken>13.000000</time_taken>
+<time_taken>14.000000</time_taken>
 <passed/>
 </query>
 <query>
-<id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Find Parent">13</id><querystr><![CDATA[assign t; while s; select s such that Parent(s, t)]]></querystr>
-<stuans>14,19</stuans>
-<correct>14,19</correct>
-<time_taken>12.000000</time_taken>
+<id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Find Parent">13</id><querystr><![CDATA[assign t; if s; select s such that Parent(s, t)]]></querystr>
+<stuans>19</stuans>
+<correct>19</correct>
+<time_taken>11.000000</time_taken>
 <passed/>
 </query>
 </queries>
