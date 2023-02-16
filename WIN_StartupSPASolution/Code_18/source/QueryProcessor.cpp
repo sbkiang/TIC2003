@@ -121,23 +121,21 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 				}
 				else {
 					string resultType, filterType;
-					string var = tokens[selectIdx + 1];
+					string selectVar = tokens[selectIdx + 1];
 					int i = 0;
 					for (string _var : synonymVar) {
-						if (var == _var) {
+						if (selectVar == _var) {
 							resultType = tokens[i];
-							cout << resultType << "!!";
 						}
 						else {
 							filterType = tokens[i];
-							cout << filterType << "@";
 						}
 						i = i + 3;
 					}
-					if (var == stmtNum1) {
+					if (selectVar == stmtNum1) { //find parent
 						Database::getParentChildren(1, resultType, filterType, databaseResults);
 					}
-					else {
+					else { //find children
 						Database::getParentChildren(0, resultType, filterType, databaseResults);
 					}
 						

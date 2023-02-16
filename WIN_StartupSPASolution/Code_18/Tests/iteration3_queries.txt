@@ -58,6 +58,12 @@ call t;
 select t such that Parent(14, t)
 18
 5000
+12 - Find children of call from Parent
+assign t; while s;
+select t such that Parent(s, t)
+15,16,17
+5000
+
 
 
 
