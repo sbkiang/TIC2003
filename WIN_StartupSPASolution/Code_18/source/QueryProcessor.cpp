@@ -22,7 +22,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	tk.tokenize(query, tokens);
 
 	// check what type of synonym is being declared
-	vector<string> synonymType;
+	vector<string> synonymType, synonymVar;
 	// check for such that or pattern is being declared
 	vector<int> suchThatIdx, patternIdx;
 
@@ -30,7 +30,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	vector<string> databaseResults;
 
 	string designAbstract = "", stmtNum1 = "", stmtNum2 = "";
-	int idx;
+	int idx, selectIdx;
 	bool comma = false;
 
 	for (int i = 0; i < tokens.size(); i++) {
@@ -39,12 +39,16 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 
 		if (tokens[i] == "procedure" || tokens[i] == "variable" || tokens[i] == "constant" || tokens[i] == "call" || tokens[i] == "assign" || tokens[i] == "stmt" || tokens[i] == "read" || tokens[i] == "print" || tokens[i] == "while" || tokens[i] == "if") {
 			synonymType.push_back(tokens[i]);
+			synonymVar.push_back(tokens[i + 1]);
 		}
 		else if (tokens[i] == "such" && tokens[i + 1] == "that") {
 			suchThatIdx.push_back(i);
 		}
 		else if (tokens[i] == "pattern") {
 			patternIdx.push_back(i);
+		}
+		else if (tokens[i] == "select") {
+			selectIdx = i;
 		}
 	}
 
@@ -109,13 +113,34 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			if (designAbstract == "parent" || designAbstract == "parentt") {
 				//Relationship between statement
 				if (!isNumber(stmtNum1) && isNumber(stmtNum2)) {
+					
 					Database::getParent(stmtNum1, stmtNum2, databaseResults);
 				}
 				else if(isNumber(stmtNum1) && !isNumber(stmtNum2)){
-					Database::getChildren(stmtNum1, stmtNum2, databaseResults);
+					Database::getChildren(stmtNum1, stmtNum2, tokens[0], databaseResults);
 				}
 				else {
-					//Database::getParentChildren(stmtNum1, stmtNum2, databaseResults);
+					string resultType, filterType;
+					string var = tokens[selectIdx + 1];
+					int i = 0;
+					for (string _var : synonymVar) {
+						if (var == _var) {
+							resultType = tokens[i];
+							cout << resultType << "!!";
+						}
+						else {
+							filterType = tokens[i];
+							cout << filterType << "@";
+						}
+						i = i + 3;
+					}
+					if (var == stmtNum1) {
+						Database::getParentChildren(1, resultType, filterType, databaseResults);
+					}
+					else {
+						Database::getParentChildren(0, resultType, filterType, databaseResults);
+					}
+						
 				}
 			}
 			else if (designAbstract == "next") {
