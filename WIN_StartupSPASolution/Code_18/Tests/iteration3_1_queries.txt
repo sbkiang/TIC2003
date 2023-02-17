@@ -1,0 +1,15 @@
+1 - Parent Case (3,t)
+stmt t;
+select t such that Parent(3,t)
+4,5,6
+5000
+2 - Parent Case (7,t)
+stmt a;
+select a such that Parent(7,a)
+8,9
+5000
+3 - Parent Case (7,t)
+assign a;
+select a such that Parent(3,a)
+4,6
+5000

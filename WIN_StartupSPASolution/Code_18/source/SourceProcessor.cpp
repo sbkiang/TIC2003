@@ -145,9 +145,11 @@ void SourceProcessor::process(string program) {
 			container->_adjustedStartStmtNum = stmtNum - stmtNumSubtract;
 			container->_level = nestedLevel;
 			stack<Container*> tempParentStack;
+
 			if (!parentStack.empty()) { // if there's parent container, add current container to parent's child
 				parentStack.top()->_childContainers.push_back(container);
 			}
+
 			parentStack.push(container); // we push the current "else" container to the parentStack for future statements
 		}
 		else if (word == "=") { // for assign

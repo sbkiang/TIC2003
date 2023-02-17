@@ -319,9 +319,9 @@ void Database::getChildren(string stmtNum1, string stmtNum2, string statementTyp
 	string sql;
 
 	if(statementType == "stmt")
-		 sql = "WITH RECURSIVE expanded_range(n) AS ( SELECT child_start FROM parent WHERE parent_line = '" + stmtNum1 + "' UNION ALL SELECT n+1 FROM expanded_range WHERE n+1 <= (SELECT child_end FROM parent )) SELECT line_num FROM statement WHERE line_num IN (SELECT n FROM expanded_range);";
+		 sql = "WITH RECURSIVE expanded_range(n) AS ( SELECT child_start FROM parent WHERE parent_line = '" + stmtNum1 + "' UNION ALL SELECT n+1 FROM expanded_range WHERE n+1 <= (SELECT child_end FROM parent WHERE parent_line = '" + stmtNum1 + "')) SELECT line_num FROM statement WHERE line_num IN (SELECT n FROM expanded_range);";
 	else
-		 sql = "WITH RECURSIVE expanded_range(n) AS ( SELECT child_start FROM parent WHERE parent_line = '" + stmtNum1 + "' UNION ALL SELECT n+1 FROM expanded_range WHERE n+1 <= (SELECT child_end FROM parent )) SELECT line_num FROM statement WHERE line_num IN (SELECT n FROM expanded_range) AND entity = '" + statementType + "';";
+		 sql = "WITH RECURSIVE expanded_range(n) AS ( SELECT child_start FROM parent WHERE parent_line = '" + stmtNum1 + "' UNION ALL SELECT n+1 FROM expanded_range WHERE n+1 <= (SELECT child_end FROM parent WHERE parent_line = '" + stmtNum1 + "')) SELECT line_num FROM statement WHERE line_num IN (SELECT n FROM expanded_range) AND entity = '" + statementType + "';";
 
 	sqlite3_exec(dbConnection, sql.c_str(), callback, 0, &errorMessage);
 
@@ -333,6 +333,7 @@ void Database::getChildren(string stmtNum1, string stmtNum2, string statementTyp
 		string result;
 		result = dbRow.at(0);
 		results.push_back(result);
+		cout << result << "@@";
 	}
 }
 
