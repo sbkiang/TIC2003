@@ -3,13 +3,48 @@ stmt t;
 select t such that Parent(3,t)
 4,5,6
 5000
-2 - Parent Case (7,t)
+2 - Parent Case (7,a)
 stmt a;
 select a such that Parent(7,a)
 8,9
 5000
-3 - Parent Case (7,t)
+3 - Parent Case (7,a)
 assign a;
 select a such that Parent(3,a)
+4,6
+5000
+4 - Parent Case (3,a)
+call a;
+select a such that Parent(3,a)
+5
+5000
+5 - Parent Case (s,4)
+stmt a;
+select a such that Parent(s,4)
+3
+5000
+6 - Parent Case (s,4)
+stmt a;
+select a such that Parent(s,9)
+7
+5000
+8 - Parent Case (a,t)
+assign a; while t;
+select a such that Parent(t,a)
+4,6
+5000
+9 - Parent Case (s,t)
+assign s; while t;
+select t such that Parent(t,s)
+3
+5000
+10 - Parent Case (a,t)
+while a; assign t;
+select a such that Parent(a,t)
+3
+5000
+10 - Parent Case (a,t)
+while a; assign t;
+select t such that Parent(a,t)
 4,6
 5000

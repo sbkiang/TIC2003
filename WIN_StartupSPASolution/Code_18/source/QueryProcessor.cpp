@@ -30,7 +30,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	vector<string> databaseResults;
 
 	string designAbstract = "", stmtNum1 = "", stmtNum2 = "";
-	int idx, selectIdx;
+	int idx = 0, selectIdx = 0;
 	bool comma = false;
 
 	for (int i = 0; i < tokens.size(); i++) {
@@ -113,7 +113,6 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			if (designAbstract == "parent" || designAbstract == "parentt") {
 				//Relationship between statement
 				if (!isNumber(stmtNum1) && isNumber(stmtNum2)) {
-					
 					Database::getParent(stmtNum1, stmtNum2, databaseResults);
 				}
 				else if(isNumber(stmtNum1) && !isNumber(stmtNum2)){
@@ -132,13 +131,14 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 						}
 						i = i + 3;
 					}
+
 					if (selectVar == stmtNum1) { //find parent
 						Database::getParentChildren(1, resultType, filterType, databaseResults);
 					}
 					else { //find children
 						Database::getParentChildren(0, resultType, filterType, databaseResults);
 					}
-						
+	
 				}
 			}
 			else if (designAbstract == "next") {
@@ -159,7 +159,34 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			}
 			else if (designAbstract == "modifies") {
 				//Relationship between statement/procedure and variable
+				
+				if (isNumber(stmtNum1) && !isNumber(stmtNum2)) { //For now, only work on variable query
+					Database::getUseStmt(stmtNum1, stmtNum2, 1, databaseResults);
+				}
+				else if (!isNumber(stmtNum1) && isNumber(stmtNum2)) { //For now, only work on variable query
+					Database::getUseStmt(stmtNum1, stmtNum2, 0, databaseResults);
+				}
+				else { //WIP
+					string resultType, filterType;
+					string selectVar = tokens[selectIdx + 1];
+					int i = 0;
+					for (string _var : synonymVar) {
+						if (selectVar == _var) {
+							resultType = tokens[i];
+						}
+						else {
+							filterType = tokens[i];
+						}
+						i = i + 3;
+					}
+
+					//WIP
+
+				}
 			}
+		}
+		else if (patternIdx.size() > 0) {
+
 		}
 	}
 

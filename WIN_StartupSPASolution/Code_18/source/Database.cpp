@@ -333,7 +333,6 @@ void Database::getChildren(string stmtNum1, string stmtNum2, string statementTyp
 		string result;
 		result = dbRow.at(0);
 		results.push_back(result);
-		cout << result << "@@";
 	}
 }
 
@@ -363,6 +362,31 @@ void Database::getParentChildren(bool findparent, string resultType, string filt
 	}
 	
 }
+
+void Database::getUseStmt(string stmtNum1, string stmtNum2, bool lhs, vector<string>& results) {
+	// clear the existing results
+	dbResults.clear();
+	string sql;
+
+	if (lhs) {
+		sql = "SELECT variable_name FROM modify WHERE line_num = '" + stmtNum1 + "'";
+	}
+	else {
+		sql = "SELECT variable_name FROM modify WHERE line_num = '" + stmtNum2 + "'";
+	}
+
+	sqlite3_exec(dbConnection, sql.c_str(), callback, 0, &errorMessage);
+
+	if (errorMessage) {
+		cout << "getParent SQL Error: " << errorMessage;
+	}
+
+	for (vector<string> dbRow : dbResults) {
+		string result;
+		result = dbRow.at(0);
+		results.push_back(result);
+	}
+ }
 
 // callback method to put one row of results from the database into the dbResults vector
 // This method is called each time a row of results is returned from the database

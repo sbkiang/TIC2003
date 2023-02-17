@@ -61,13 +61,19 @@ select t such that Parent(14, t)
 12 - Find children of call from Parent
 assign t; while s;
 select t such that Parent(s, t)
-15,16,17
+15,16,17,25
 5000
 13 - Find Parent
 assign t; if s;
 select s such that Parent(s, t)
 19
 5000
+14 - Find Parent
+assign t; while s;
+select s such that Parent(s, t)
+14,24
+5000
+
 
 
 
