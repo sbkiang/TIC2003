@@ -1,6 +1,7 @@
 <?xml-stylesheet type="text/xsl" href="analysis.xsl"?>
 <test_results>
 <info>
+<<<<<<< Updated upstream
 <name>AutoTester</name><parsing_time_taken>913.000000</parsing_time_taken>
 </info>
 <queries>
@@ -107,6 +108,30 @@
 <stuans>14,24</stuans>
 <correct>14,24</correct>
 <time_taken>12.000000</time_taken>
+=======
+<name>AutoTester</name><parsing_time_taken>331.000000</parsing_time_taken>
+</info>
+<queries>
+<query>
+<id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Parent Case (3,t)">1</id><querystr><![CDATA[stmt t; select t such that Parent(3,t)]]></querystr>
+<stuans>4,5,6</stuans>
+<correct>4,5,6</correct>
+<time_taken>8.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Parent Case (7,t)">2</id><querystr><![CDATA[stmt a; select a such that Parent(7,a)]]></querystr>
+<stuans>8,9</stuans>
+<correct>8,9</correct>
+<time_taken>5.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Parent Case (7,t)">3</id><querystr><![CDATA[assign a; select a such that Parent(3,a)]]></querystr>
+<stuans>4,6</stuans>
+<correct>4,6</correct>
+<time_taken>5.000000</time_taken>
+>>>>>>> Stashed changes
 <passed/>
 </query>
 </queries>

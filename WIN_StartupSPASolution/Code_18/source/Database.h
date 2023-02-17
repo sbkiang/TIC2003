@@ -40,20 +40,28 @@ public:
 	static void getChildren(string stmtNum1, string stmtNum2, string statementType, vector<string>& results);
 	static void getParentChildren(bool findparent, string resultType, string filterType, vector<string>& results);
 	
+<<<<<<< Updated upstream
 
 	// method to insert/get a modify into the database
+=======
+	// method to insert a modify into the database
+>>>>>>> Stashed changes
 	static void insertModifies(int statementNumber, string procedureName, string variablename);
 
 	// method to insert/get a use into the database
 	static void insertUse(int statementNumber, string procedureName, string variablename);
+<<<<<<< Updated upstream
 	static void getUseStmt(string stmtNum1, string stmtNum2, bool lhs, vector<string>& results);
 	static void getUseEnt(string stmtNum1, string stmtNum2, vector<string>& results);
 
 	// method to insert/get a next into the database
+=======
+	static void getUse(string entity, string variable, vector<string>& results); // for "assign a" and "print pn"
+
+>>>>>>> Stashed changes
 	static void insertNext(int stmtNum1, int stmtNum2);
 	static void getNext(int stmtNum1, int stmtNum2, vector<string>& results);
 	static void getNext_T(int stmtNum1, int stmtNum2, vector<string>& results);
-
 
 private:
 	// the connection pointer to the database

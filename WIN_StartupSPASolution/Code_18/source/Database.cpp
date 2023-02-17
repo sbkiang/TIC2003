@@ -360,7 +360,14 @@ void Database::getParentChildren(bool findparent, string resultType, string filt
 		result = dbRow.at(0);
 		results.push_back(result);
 	}
-	
+}
+
+void Database::getUse(string entity, string variable, vector<string>& results) {
+	dbResults.clear();
+	char sqlBuf[256];
+	if (entity == "assign" || entity == "print") {
+		sprintf(sqlBuf, "SELECT line_num FROM statement s JOIN use u ON  s.line_num = u.line_num WHERE s.entity = '%s';", variable);
+	}
 }
 
 void Database::getUseStmt(string stmtNum1, string stmtNum2, bool lhs, vector<string>& results) {
