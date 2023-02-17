@@ -196,7 +196,7 @@ void SourceProcessor::process(string program) {
 		else if (word == "read" || word == "print" || word == "call") {
 			stmtNum++;
 			Statement* stmt = new Statement(stmtNum, nestedLevel, parentStack.top(), stmtNumSubtract);
-			stmt->_stmt += tokens.at(i);
+			//stmt->_stmt += tokens.at(i);
 			stmt->_stmt += tokens.at(i + 1);
 			parentStack.top()->_statements.push_back(stmt);
 			Database::insertStatement(stmt->getAdjustedStmtNum(), procedures.back()->_name, word, stmt->_stmt);

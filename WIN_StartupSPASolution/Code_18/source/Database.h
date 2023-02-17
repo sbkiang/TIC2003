@@ -41,11 +41,8 @@ public:
 	static void insertModifies(int statementNumber, string procedureName, string variablename);
 
 	// method to insert/get a use into the database
-	static void insertUse(int statementNumber, string procedureName, string variablename);
 	static void getUseStmt(string stmtNum1, string stmtNum2, bool lhs, vector<string>& results);
 	static void getUseEnt(string stmtNum1, string stmtNum2, vector<string>& results);
-
-	// method to insert/get a next into the database
 
 	// method to insert a use into the database
 	static void insertUse(int statementNumber, string procedureName, string variablename);
