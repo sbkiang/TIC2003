@@ -11,11 +11,11 @@ void Database::initialize() {
 	sqlite3_open("database.db", &dbConnection);
 
 	// drop the existing procedure table (if any)
-	string dropProcedureTableSQL = "DROP TABLE IF EXISTS procedures";
+	string dropProcedureTableSQL = "DROP TABLE IF EXISTS procedure";
 	sqlite3_exec(dbConnection, dropProcedureTableSQL.c_str(), NULL, 0, &errorMessage);
 
 	// create a procedure table
-	string createProcedureTableSQL = "CREATE TABLE procedures ( name VARCHAR(50) PRIMARY KEY, start INT, end INT);";
+	string createProcedureTableSQL = "CREATE TABLE procedure ( name VARCHAR(50) PRIMARY KEY, start INT, end INT);";
 	sqlite3_exec(dbConnection, createProcedureTableSQL.c_str(), NULL, 0, &errorMessage);
 
 	// drop the existing stmt table (if any)
@@ -23,7 +23,7 @@ void Database::initialize() {
 	sqlite3_exec(dbConnection, dropStatementTableSQL.c_str(), NULL, 0, &errorMessage);
 
 	// create a statement table
-	string createStatementTableSQL = "CREATE TABLE statement ( line_num INT PRIMARY KEY, procedure_name VARCHAR(255) REFERENCES procedures(name), entity VARCHAR(255), text VARCHAR(255));";
+	string createStatementTableSQL = "CREATE TABLE statement ( line_num INT PRIMARY KEY, procedure_name VARCHAR(255) REFERENCES procedure(name), entity VARCHAR(255), text VARCHAR(255));";
 	sqlite3_exec(dbConnection, createStatementTableSQL.c_str(), NULL, 0, &errorMessage);
 
 	// drop the existing variable table (if any)
@@ -47,7 +47,7 @@ void Database::initialize() {
 	sqlite3_exec(dbConnection, dropParentTableSQL.c_str(), NULL, 0, &errorMessage);
 
 	// create a parent table
-	string createParentTableSQL = "CREATE TABLE parent ( parent_line INT REFERENCES statement(line_num), child_start INT REFERENCES statement(line_num), child_end INT REFERENCES statement(line_num));";
+	string createParentTableSQL = "CREATE TABLE parent ( line_num INT REFERENCES statement(line_num), child_start INT REFERENCES statement(line_num), child_end INT REFERENCES statement(line_num));";
 	sqlite3_exec(dbConnection, createParentTableSQL.c_str(), NULL, 0, &errorMessage);
 
 	// drop the existing modify table (if any)
@@ -86,7 +86,7 @@ void Database::close() {
 // method to insert a procedure into the database
 void Database::insertProcedure(string procedureName, int start, int end) {
 	char sqlBuf[256];
-	sprintf(sqlBuf, "INSERT INTO procedures ('name','start','end') VALUES ('%s',%i,%i);", procedureName.c_str(), start, end);
+	sprintf(sqlBuf, "INSERT INTO procedure ('name','start','end') VALUES ('%s',%i,%i);", procedureName.c_str(), start, end);
 	sqlite3_exec(dbConnection, sqlBuf, NULL, 0, &errorMessage);
 	if (errorMessage) { cout << "insertProcedure SQL Error: " << errorMessage << endl; }
 }
@@ -97,6 +97,7 @@ void Database::insertStatement(int stmtNum, string stmtName, string entity, stri
 	sprintf(sqlBuf, "INSERT INTO statement ('line_num','procedure_name','entity','text') VALUES ('%i','%s','%s','%s');", stmtNum, stmtName.c_str(), entity.c_str(), text.c_str());
 	//string sql = "INSERT INTO statement ('line_num', 'procedure_name', 'entity', 'text') VALUES ('" + to_string(statementNumber) + "', '" + statementName + "', '" + entity + "', '" + text + "');";
 	sqlite3_exec(dbConnection, sqlBuf, NULL, 0, &errorMessage);
+	if (errorMessage) { cout << "insertStatement SQL Error: " << errorMessage << endl; }
 }
 
 // method to insert a statement into the database
@@ -105,6 +106,9 @@ void Database::insertVariable(string stmtName, int stmtNum) {
 	sprintf(sqlBuf, "INSERT INTO variable('name','line_num') VALUES('%s','%i');", stmtName.c_str(), stmtNum);
 	//string sql = "INSERT INTO variable ('name', 'line_num') VALUES ('" + statementName + "', '" + to_string(statementNumber) + "');";
 	sqlite3_exec(dbConnection, sqlBuf, NULL, 0, &errorMessage);
+	char sqlError[256];
+	sprintf_s(sqlError, "insertVariable SQL Error for %s at stmtNum %i: ", stmtName.c_str(), stmtNum);
+	if (errorMessage) { cout << sqlError << errorMessage << endl; }
 }
 
 void Database::insertConstant(string value) {
@@ -112,13 +116,15 @@ void Database::insertConstant(string value) {
 	sprintf(sqlBuf, "INSERT INTO constant ('value') VALUES ('%s');", value.c_str());
 	//string sql = "INSERT INTO constant ('value') VALUES ('" + value + "');";
 	sqlite3_exec(dbConnection, sqlBuf, NULL, 0, &errorMessage);
+	//if (errorMessage) { cout << "insertConstant SQL Error: " << errorMessage << endl; }
 }
 
 void Database::insertParent(int parent, int child_start, int child_end) {
 	char sqlBuf[256];
-	sprintf(sqlBuf, "INSERT INTO parent ('parent_line','child_start','child_end') VALUES (%i,%i,%i);", parent, child_start, child_end);
-	//string sql = "INSERT INTO parent ('parent_line', 'child_line', 'direct_child' ) VALUES ('" + to_string(parent) + "', '" + to_string(child) + "', '" + to_string(direct) + "');";
+	sprintf(sqlBuf, "INSERT INTO parent ('line_num','child_start','child_end') VALUES (%i,%i,%i);", parent, child_start, child_end);
+	//string sql = "INSERT INTO parent ('line_num', 'child_line', 'direct_child' ) VALUES ('" + to_string(parent) + "', '" + to_string(child) + "', '" + to_string(direct) + "');";
 	sqlite3_exec(dbConnection, sqlBuf, NULL, 0, &errorMessage);
+	if (errorMessage) { cout << "insertParent SQL Error: " << errorMessage << endl; }
 }
 
 void Database::insertUse(int stmtNum, string procedureName, string variableName) {
@@ -126,6 +132,10 @@ void Database::insertUse(int stmtNum, string procedureName, string variableName)
 	sprintf(sqlBuf, "INSERT INTO use ('line_num','procedure_name','variable_name' ) VALUES ('%i','%s','%s');", stmtNum, procedureName.c_str(), variableName.c_str());
 	//string sql = "INSERT INTO use ('line_num', 'procedure_name', 'variable_name' ) VALUES ('" + to_string(statementNumber) + "', '" + procedureName + "', '" + variablename + "');";
 	sqlite3_exec(dbConnection, sqlBuf, NULL, 0, &errorMessage);
+	char sqlError[256];
+	sprintf_s(sqlError, "insertUse SQL Error for %s at stmtNum %i: ", variableName.c_str(), stmtNum);
+	if (errorMessage) { cout << sqlError << errorMessage << endl; }
+
 }
 
 void Database::insertModifies(int stmtNum, string procedureName, string variablename) {
@@ -133,6 +143,7 @@ void Database::insertModifies(int stmtNum, string procedureName, string variable
 	sprintf(sqlBuf, "INSERT INTO modify ('line_num','procedure_name','variable_name' ) VALUES ('%i','%s','%s');", stmtNum, procedureName.c_str(), variablename.c_str());
 	//string sql = "INSERT INTO modify ('line_num', 'procedure_name', 'variable_name' ) VALUES ('" + to_string(statementNumber) + "', '" + procedureName + "', '" + variablename + "');";
 	sqlite3_exec(dbConnection, sqlBuf, NULL, 0, &errorMessage);
+	if (errorMessage) { cout << "insertModifies SQL Error: " << errorMessage << endl; }
 }
 
 void Database::insertNext(int stmtNum1, int stmtNum2) {
@@ -140,9 +151,7 @@ void Database::insertNext(int stmtNum1, int stmtNum2) {
 	sprintf(sqlBuf, "INSERT INTO next ('line_num_1','line_num_2') VALUES ('%i','%i');", stmtNum1, stmtNum2);
 	//string sql = "INSERT INTO next ('line_num_1', 'line_num_2') VALUES ('" + to_string(stmtNum1) + "', '" + to_string(stmtNum2) + "');";
 	sqlite3_exec(dbConnection, sqlBuf, NULL, 0, &errorMessage);
-	if (errorMessage) {
-		cout << "SQL Error: " << errorMessage;
-	}
+	if (errorMessage) { cout << "insertNext SQL Error: " << errorMessage; }
 }
 
 void Database::getNext_T(int stmtNum1, int stmtNum2, vector<string>& results) {
@@ -150,11 +159,11 @@ void Database::getNext_T(int stmtNum1, int stmtNum2, vector<string>& results) {
 	char sqlBuf[256];
 	vector<string> resultStore;
 	sprintf(sqlBuf, "with recursive nextStmt as ("
-						"select n.line_num_1, n.line_num_2 from next n where line_num_1 = %i"
-						" union "
-						"select n.line_num_1, n.line_num_2 from next n join nextStmt ns where n.line_num_1 = ns.line_num_2 and n.line_num_2 <= %i"
-						")"
-						"select* from nextStmt;", stmtNum1, stmtNum2);
+					"select n.line_num_1, n.line_num_2 from next n where line_num_1 = %i"
+					" union "
+					"select n.line_num_1, n.line_num_2 from next n join nextStmt ns where n.line_num_1 = ns.line_num_2 and n.line_num_2 <= %i"
+					")"
+					"select* from nextStmt;", stmtNum1, stmtNum2);
 	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
 	if (errorMessage) {
 		cout << "getNext_T SQL Error: " << errorMessage;
@@ -183,14 +192,14 @@ void Database::getNext(int stmtNum1, int stmtNum2, vector<string>& results) {
 	}
 }
 
-// method to get all the procedures from the database
+// method to get all the procedure from the database
 void Database::getProcedures(vector<string>& results) {
 	// clear the existing results
 	dbResults.clear();
 
-	// retrieve the procedures from the procedure table
+	// retrieve the procedure from the procedure table
 	// The callback method is only used when there are results to be returned.
-	string sql = "SELECT name FROM procedures;";
+	string sql = "SELECT name FROM procedure;";
 	sqlite3_exec(dbConnection, sql.c_str(), callback, 0, &errorMessage);
 	
 	if (errorMessage) {
@@ -278,7 +287,7 @@ void Database::getStatement(string type, vector<string>& results) {
 	// clear the existing results
 	dbResults.clear();
 
-	// retrieve the procedures from the procedure table
+	// retrieve the procedure from the procedure table
 	// The callback method is only used when there are results to be returned.
 	string sql = "SELECT * FROM statement WHERE stmtType = '" + type + "';";
 	sqlite3_exec(dbConnection, sql.c_str(), callback, 0, &errorMessage);
@@ -298,7 +307,7 @@ void Database::getStatement(string type, vector<string>& results) {
 void Database::getParent(string stmtNum1, string stmtNum2, vector<string>& results) {
 	dbResults.clear();
 
-	string sql = "SELECT MAX(parent_line) FROM parent WHERE child_start <= '" + stmtNum2 + "' AND child_end >= '" + stmtNum2 + "';";
+	string sql = "SELECT MAX(line_num) FROM parent WHERE child_start <= '" + stmtNum2 + "' AND child_end >= '" + stmtNum2 + "';";
 	sqlite3_exec(dbConnection, sql.c_str(), callback, 0, &errorMessage);
 		
 	if (errorMessage) {
@@ -320,9 +329,9 @@ void Database::getChildren(string stmtNum1, string stmtNum2, string statementTyp
 	string sql;
 
 	if(statementType == "stmt")
-		 sql = "WITH RECURSIVE expanded_range(n) AS ( SELECT child_start FROM parent WHERE parent_line = '" + stmtNum1 + "' UNION ALL SELECT n+1 FROM expanded_range WHERE n+1 <= (SELECT child_end FROM parent WHERE parent_line = '" + stmtNum1 + "')) SELECT line_num FROM statement WHERE line_num IN (SELECT n FROM expanded_range);";
+		 sql = "WITH RECURSIVE expanded_range(n) AS ( SELECT child_start FROM parent WHERE line_num = '" + stmtNum1 + "' UNION ALL SELECT n+1 FROM expanded_range WHERE n+1 <= (SELECT child_end FROM parent WHERE line_num = '" + stmtNum1 + "')) SELECT line_num FROM statement WHERE line_num IN (SELECT n FROM expanded_range);";
 	else
-		 sql = "WITH RECURSIVE expanded_range(n) AS ( SELECT child_start FROM parent WHERE parent_line = '" + stmtNum1 + "' UNION ALL SELECT n+1 FROM expanded_range WHERE n+1 <= (SELECT child_end FROM parent WHERE parent_line = '" + stmtNum1 + "')) SELECT line_num FROM statement WHERE line_num IN (SELECT n FROM expanded_range) AND entity = '" + statementType + "';";
+		 sql = "WITH RECURSIVE expanded_range(n) AS ( SELECT child_start FROM parent WHERE line_num = '" + stmtNum1 + "' UNION ALL SELECT n+1 FROM expanded_range WHERE n+1 <= (SELECT child_end FROM parent WHERE line_num = '" + stmtNum1 + "')) SELECT line_num FROM statement WHERE line_num IN (SELECT n FROM expanded_range) AND entity = '" + statementType + "';";
 
 	sqlite3_exec(dbConnection, sql.c_str(), callback, 0, &errorMessage);
 
@@ -344,10 +353,10 @@ void Database::getParentChildren(bool findparent, string resultType, string filt
 	string sql;
 
 	if (findparent)
-		sql = "SELECT DISTINCT(p.parent_line) FROM parent p JOIN statement s ON s.line_num BETWEEN p.child_start AND p.child_end WHERE s.entity = '" + filterType + "' AND parent_line IN (SELECT line_num FROM statement WHERE entity = '" + resultType + "');";
+		sql = "SELECT DISTINCT(p.line_num) FROM parent p JOIN statement s ON s.line_num BETWEEN p.child_start AND p.child_end WHERE s.entity = '" + filterType + "' AND line_num IN (SELECT line_num FROM statement WHERE entity = '" + resultType + "');";
 	 
 	else 
-		sql = "WITH RECURSIVE expanded_range(n) AS ( SELECT child_start FROM parent WHERE parent_line IN (SELECT line_num FROM statement WHERE entity = '" + filterType + "') UNION ALL SELECT n+1 FROM expanded_range WHERE n+1 <= (SELECT child_end FROM parent WHERE parent_line IN (SELECT line_num FROM statement WHERE entity = '" + filterType + "'))) SELECT line_num FROM statement WHERE line_num IN (SELECT n FROM expanded_range) AND entity = '" + resultType + "';";
+		sql = "WITH RECURSIVE expanded_range(n) AS ( SELECT child_start FROM parent WHERE line_num IN (SELECT line_num FROM statement WHERE entity = '" + filterType + "') UNION ALL SELECT n+1 FROM expanded_range WHERE n+1 <= (SELECT child_end FROM parent WHERE line_num IN (SELECT line_num FROM statement WHERE entity = '" + filterType + "'))) SELECT line_num FROM statement WHERE line_num IN (SELECT n FROM expanded_range) AND entity = '" + resultType + "';";
 
 
 	sqlite3_exec(dbConnection, sql.c_str(), callback, 0, &errorMessage);
@@ -367,10 +376,46 @@ void Database::getUse(string entity, string variable, vector<string>& results) {
 	dbResults.clear();
 	char sqlBuf[256];
 	if (entity == "assign" || entity == "print") {
-		sprintf(sqlBuf, "SELECT distinct s.line_num FROM statement s JOIN use u ON s.line_num = u.line_num WHERE s.entity = '%s';", variable);
+		sprintf_s(sqlBuf, "SELECT distinct s.line_num FROM statement s JOIN use u ON s.line_num = u.line_num WHERE s.entity = '%s';", variable.c_str());
 	}
-	else if (entity == "call") { // for each called procedure, check if use(p,v) exists
-		sprintf(sqlBuf, "SELECT distinct s.line_num FROM statement s JOIN use u ON s.line_num = u.line_num WHERE s.entity = '%s';", variable);
+
+	/*
+	recursive query to
+		1) find the procedure that contains stmtNum for use(assign, v), use(print, v), use(container, v) in "use" table
+		2) for each procedure found, find the parent procedure
+		3) repeat until no more parent procedure
+	*/
+	else if (entity == "call" || entity == "procedure") {
+		sprintf_s(sqlBuf, "with recursive cte as("
+			"select name from procedure p where(select line_num from statement s where s.line_num between p.start and p.end and s.text = '%s')"
+			"union"
+			"select p.name from procedure p join cte c where(select line_num from statement s where s.entity = 'call' and s.text = c.name) between p.start and p.end)"
+			"select * from cte;", variable.c_str());
+	}
+
+	/*
+	recursive query to
+		1) find immediate parent container of variable
+		2) for each immediate parent container found, find the it's parent
+		3) repeat until no more parent found
+	*/
+	else if (entity == "if" || entity == "while") {
+		sprintf_s(sqlBuf, "with recursive cte as("
+			"select line_num from parent p where(select line_num from use u where u.line_num between p.line_num and p.child_end and u.variable_name = '%s')"
+			"union"
+			"select p.line_num from parent p join cte c where c.line_num between p.line_num and p.child_end)"
+			"select * from cte;", variable.c_str());
+	}
+
+	if (errorMessage) {
+		cout << "getUse SQL Error: " << errorMessage;
+		return;
+	}
+
+	for (vector<string> dbRow : dbResults) {
+		string result;
+		result = dbRow.at(0);
+		results.push_back(result);
 	}
 }
 

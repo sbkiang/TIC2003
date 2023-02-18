@@ -15,8 +15,8 @@ namespace DatabaseTests
 		{
 			// initialize the database and insert a procedure
 			Database::initialize();
-			Database::insertProcedure("echo1");
-			Database::insertProcedure("echo2");
+			Database::insertProcedure("echo1",0,0);
+			Database::insertProcedure("echo2",0,0);
 			
 			// retrieve the procedures from the database
 			vector<string> dbResults;

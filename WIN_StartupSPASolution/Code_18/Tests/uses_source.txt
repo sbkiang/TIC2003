@@ -3,39 +3,116 @@ procedure main {
     x = return2;
     x = return3;
     call calleeL1;
+    if(x = L1Use)then{
+        a = use1;
+        b = use2;
+        if(x = L2Use)then{
+            c = use3;
+            d = use4;
+            while(d = use20){
+                d = use21;
+            }
+        }
+        else{
+            while(d = use20){
+                d = use21;
+            }
+            e = use5;
+            f = use6;
+        }
+    }
+    else{
+        d = use4;
+    }
+    while(x = y){
+        while(y = z){
+            while(z = a){
+                while(a = b){
+                    wwww = yyyy;
+                }
+            }
+        }
+    }
 }
 
 procedure calleeL1{
     x = return4;
     x = return5 + return6;
-    calleeL2;
+    call calleeL2;
+    if(a = b)then{
+        if(b = c)then{
+            if(c = d)then{
+                xxx = bbc2;
+            }
+            else{
+                xxx = x;
+            }
+        }
+        else{
+            xxx = yyy;
+        }
+    }
+    else{
+        x1 = x2;
+    }
 }
 
 procedure calleeL2{
     x = returnL21;
     x = returnL22;
     call calleeL3;
-    if(x == returnL23)then{
-        x = returnL24;
+    if(x = L1Use)then{
+        a = use1;
+        b = use2;
+        if(x = L2Use)then{
+            c = use3;
+            d = use4;
+            while(d = use20){
+                d = use21;
+            }
+        }
+        else{
+            while(d = use20){
+                d = use21;
+            }
+            e = use5;
+            f = use6;
+        }
     }
     else{
-        x = returnL25;
-    }
-    while(x < returnL26){
-        x = returnL27 + returnL28;
+        d = use4;
     }
 }
 
 procedure calleeL3{
     x = returnL31;
     x = returnL32;
-    if(x == returnL33)then{
-        x = returnL34;
+    if(b == returnL33)then{
+        if(c == d)then{
+            x = returnL34;
+        }
+        else{
+            d = f;
+        }
     }
     else{
         x = returnL35;
     }
-    while(x < returnL36){
+    while(c < returnL36){
         x = returnL37 + returnL38;
     }
+}
+
+procedure callNone{
+    b = cccccc;
+    call a1;
+}
+
+procedure a1{
+    b = c;
+}
+
+procedure a2{
+    c = d;
+    call a1;
 }

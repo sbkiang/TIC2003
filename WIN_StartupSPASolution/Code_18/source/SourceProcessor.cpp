@@ -87,6 +87,7 @@ void SourceProcessor::process(string program) {
 			}
 
 			for (int i = 0; i < useStore.size(); i++) {
+				// database PK constraint will trigger for duplicate variables with same line_num to prevent duplicate insertion
 				Database::insertUse(useStore.at(i).getAdjustedStmtNum(), procedures.back()->_name, useStore.at(i)._stmt);
 			}
 		}
@@ -130,6 +131,7 @@ void SourceProcessor::process(string program) {
 			}
 
 			for (int i = 0; i < useStore.size(); i++) {
+				// database PK constraint will trigger for duplicate variables with same line_num to prevent duplicate insertion
 				Database::insertUse(useStore.at(i).getAdjustedStmtNum(), procedures.back()->_name, useStore.at(i)._stmt);
 			}
 		}
@@ -188,7 +190,7 @@ void SourceProcessor::process(string program) {
 			}
 
 			for (int i = 0; i < useStore.size(); i++) {
-				// database unique constraint will trigger for duplicate variables. but, not a problem
+				// database PK constraint will trigger for duplicate variables with same line_num to prevent duplicate insertion
 				Database::insertUse(useStore.at(i).getAdjustedStmtNum(), procedures.back()->_name, useStore.at(i)._stmt);
 			}
 
@@ -199,7 +201,7 @@ void SourceProcessor::process(string program) {
 		else if (word == "read" || word == "print" || word == "call") {
 			stmtNum++;
 			Statement* stmt = new Statement(stmtNum, nestedLevel, parentStack.top(), stmtNumSubtract);
-			stmt->_stmt += tokens.at(i);
+			//stmt->_stmt += tokens.at(i); // skip the (read, print, call) keywords
 			stmt->_stmt += tokens.at(i + 1);
 			parentStack.top()->_statements.push_back(stmt);
 			Database::insertStatement(stmt->getAdjustedStmtNum(), procedures.back()->_name, word, stmt->_stmt);
@@ -235,8 +237,8 @@ void SourceProcessor::process(string program) {
 		Database::insertProcedure(procedures.at(i)->_name, procedures.at(i)->_adjustedStartStmtNum, procedures.at(i)->_adjustedEndStmtNum);
 		CFG* cfg = CFGBuilder::buildCFG(procedures.at(i));
 		vector<CFGNode*> nodes = cfg->getAllCFGNodes();
-		for (int i = 0; i < nodes.size(); i++) {
-			CFGNode* node = nodes.at(i);
+		for (int j = 0; j < nodes.size(); j++) {
+			CFGNode* node = nodes.at(j);
 			int nodeStmtNum = node->_stmtPtr->getAdjustedStmtNum();
 			if (node->_stmtPtr->_stmt == "else") {
 				continue;
@@ -252,8 +254,8 @@ void SourceProcessor::process(string program) {
 		}
 		procedures.at(i)->printContainerTree(0);
 		vector<Container*> containers = procedures.at(i)->getAllContainers(); // get all the if and while containers
-		for (int i = 0; i < containers.size(); i++) {
-			Database::insertParent(containers.at(i)->_adjustedStartStmtNum, containers.at(i)->_adjustedStartStmtNum + 1, containers.at(i)->_adjustedEndStmtNum);
+		for (int j = 0; j < containers.size(); j++) {
+			Database::insertParent(containers.at(j)->_adjustedStartStmtNum, containers.at(j)->_adjustedStartStmtNum + 1, containers.at(j)->_adjustedEndStmtNum);
 		}
 	}
 	//Database::getParent()
