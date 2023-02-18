@@ -15,7 +15,7 @@ void Database::initialize() {
 	sqlite3_exec(dbConnection, dropProcedureTableSQL.c_str(), NULL, 0, &errorMessage);
 
 	// create a procedure table
-	string createProcedureTableSQL = "CREATE TABLE procedures ( name VARCHAR(50) PRIMARY KEY );";
+	string createProcedureTableSQL = "CREATE TABLE procedures ( name VARCHAR(50) PRIMARY KEY, start INT, end INT);";
 	sqlite3_exec(dbConnection, createProcedureTableSQL.c_str(), NULL, 0, &errorMessage);
 
 	// drop the existing stmt table (if any)
@@ -84,10 +84,11 @@ void Database::close() {
 }
 
 // method to insert a procedure into the database
-void Database::insertProcedure(string procedureName) {
+void Database::insertProcedure(string procedureName, int start, int end) {
 	char sqlBuf[256];
-	sprintf(sqlBuf, "INSERT INTO procedures ('name') VALUES ('%s');", procedureName.c_str());
+	sprintf(sqlBuf, "INSERT INTO procedures ('name','start','end') VALUES ('%s',%i,%i);", procedureName.c_str(), start, end);
 	sqlite3_exec(dbConnection, sqlBuf, NULL, 0, &errorMessage);
+	if (errorMessage) { cout << "insertProcedure SQL Error: " << errorMessage << endl; }
 }
 
 // method to insert a statement into the database

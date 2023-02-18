@@ -17,7 +17,7 @@ public:
 	// method to close the database connection
 	static void close();
 
-	static void insertProcedure(string procedureName);
+	static void insertProcedure(string procedureName, int start, int end);
 	static void getProcedures(vector<string>& results);
 
 	static void insertStatement(int statementNumber, string statementName, string statementType, string text);

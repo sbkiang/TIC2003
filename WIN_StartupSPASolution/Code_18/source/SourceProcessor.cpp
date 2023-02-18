@@ -45,7 +45,7 @@ void SourceProcessor::process(string program) {
 			procedure->_level = nestedLevel;
 			procedures.push_back(procedure);
 			parentStack.push(procedure);
-			Database::insertProcedure(procedure->_name);
+			//Database::insertProcedure(procedure->_name);
 			nestedLevel++;
 		}
 		else if (word == "while") { // while(...){...}
@@ -74,7 +74,8 @@ void SourceProcessor::process(string program) {
 					variableStore.push_back(Statement(stmtNum, tokens.at(i), container, stmtNumSubtract));
 				}
 				
-				if (!regex_match(tokens.at(i), regex(regexUse))) {
+				// changed from "!regex_match(tokens.at(i), regex(regexVariables)" to current one. Makes more sense to match variables instead of not matching operators
+				if (regex_match(tokens.at(i), regex(regexVariables))) { 
 					useStore.push_back(Statement(stmtNum, tokens.at(i), stmtNumSubtract));
 				}
 				i++;
@@ -115,8 +116,8 @@ void SourceProcessor::process(string program) {
 					variableStore.push_back(Statement(stmtNum, tokens.at(i), container, stmtNumSubtract));
 				}
 
-				// ** !regex_match(..), yet push to useStore. Mistake?
-				if (!regex_match(tokens.at(i), regex(regexUse))) {
+				// changed from "!regex_match(tokens.at(i), regex(regexVariables)" to current one. Makes more sense to match variables instead of not matching operators
+				if (regex_match(tokens.at(i), regex(regexVariables))) {
 					useStore.push_back(Statement(stmtNum, tokens.at(i), stmtNumSubtract));
 				}
 
@@ -171,7 +172,8 @@ void SourceProcessor::process(string program) {
 					variableStore.push_back(Statement(stmtNum, tokens.at(i), nestedLevel, parentStack.top(), stmtNumSubtract));
 				}
 				
-				if (!regex_match(tokens.at(i), regex(regexUse))) {
+				// changed from "!regex_match(tokens.at(i), regex(regexVariables)" to current one. Makes more sense to match variables instead of not matching operators
+				if (regex_match(tokens.at(i), regex(regexVariables))) {
 					useStore.push_back(Statement(stmtNum, tokens.at(i), stmtNumSubtract));
 				}
 				i++;
@@ -186,6 +188,7 @@ void SourceProcessor::process(string program) {
 			}
 
 			for (int i = 0; i < useStore.size(); i++) {
+				// database unique constraint will trigger for duplicate variables. but, not a problem
 				Database::insertUse(useStore.at(i).getAdjustedStmtNum(), procedures.back()->_name, useStore.at(i)._stmt);
 			}
 
@@ -196,7 +199,7 @@ void SourceProcessor::process(string program) {
 		else if (word == "read" || word == "print" || word == "call") {
 			stmtNum++;
 			Statement* stmt = new Statement(stmtNum, nestedLevel, parentStack.top(), stmtNumSubtract);
-			//stmt->_stmt += tokens.at(i);
+			stmt->_stmt += tokens.at(i);
 			stmt->_stmt += tokens.at(i + 1);
 			parentStack.top()->_statements.push_back(stmt);
 			Database::insertStatement(stmt->getAdjustedStmtNum(), procedures.back()->_name, word, stmt->_stmt);
@@ -229,6 +232,7 @@ void SourceProcessor::process(string program) {
 	}
 	vector<CFG*> CFGs;
 	for (int i = 0; i < procedures.size(); i++) {
+		Database::insertProcedure(procedures.at(i)->_name, procedures.at(i)->_adjustedStartStmtNum, procedures.at(i)->_adjustedEndStmtNum);
 		CFG* cfg = CFGBuilder::buildCFG(procedures.at(i));
 		vector<CFGNode*> nodes = cfg->getAllCFGNodes();
 		for (int i = 0; i < nodes.size(); i++) {
