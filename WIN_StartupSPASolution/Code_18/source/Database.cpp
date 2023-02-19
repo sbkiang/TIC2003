@@ -372,11 +372,41 @@ void Database::getParentChildren(bool findparent, string resultType, string filt
 	}
 }
 
-void Database::getUse(string entity, string variable, vector<string>& results) {
+void Database::getUse(int stmtNum, vector<string>& results) {
+	dbResults.clear();
+	char sqlBuf[256];
+	sprintf_s(sqlBuf, "SELECT entity, text FROM statement WHERE line_num = %i;", stmtNum);
+	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
+	if (errorMessage) { cout << "getUse SQL Error: " << errorMessage; }
+	string entity = dbResults.at(0).at(0);
+	//string text = dbResults.at(0).at(1);
+	// e.g., next(10, v), and stmt 10 is "x = a + b" or "print x". We just need to select from use table with the correct stmtNum to get the variables
+	if (entity == "assign" || entity == "print") { 
+		sprintf_s(sqlBuf, "SELECT variable_name FROM use WHERE line_num = %i;", stmtNum);
+		sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
+	}
+
+	// e.g, next(10, v), and stmt 10 is "call procedureX". We need to get all the var that fulfills the use(x,v) in all this procedure, and all called procedures in this procedure
+	else if (entity == "call") { // at the specified stmtNum, we get a call statement. Need to find all the procedures that called this procedure
+		
+	}
+
+	if (errorMessage) {
+		cout << "getParent SQL Error: " << errorMessage;
+	}
+
+	for (vector<string> dbRow : dbResults) {
+		string result;
+		result = dbRow.at(0);
+		results.push_back(result);
+	}
+}
+
+void Database::getUse(string entity, string variable, vector<string>& results) { // input is stmtNum (print, assign, container) or name (procedure, call)
 	dbResults.clear();
 	char sqlBuf[256];
 	if (entity == "assign" || entity == "print") {
-		sprintf_s(sqlBuf, "SELECT distinct s.line_num FROM statement s JOIN use u ON s.line_num = u.line_num WHERE s.entity = '%s';", variable.c_str());
+		sprintf_s(sqlBuf, "SELECT s.line_num FROM statement s JOIN use u ON s.line_num = u.line_num WHERE s.entity = '%s' and s.entity = '%s';", variable.c_str(), entity.c_str());
 	}
 
 	/*
@@ -387,10 +417,10 @@ void Database::getUse(string entity, string variable, vector<string>& results) {
 	*/
 	else if (entity == "call" || entity == "procedure") {
 		sprintf_s(sqlBuf, "with recursive cte as("
-			"select name from procedure p where(select line_num from statement s where s.line_num between p.start and p.end and s.text = '%s')"
+			"select name from procedure p where(select line_num from use u where u.line_num between p.start and p.end and u.variable_name = '%s' and p.name = '%s')"
 			"union"
 			"select p.name from procedure p join cte c where(select line_num from statement s where s.entity = 'call' and s.text = c.name) between p.start and p.end)"
-			"select * from cte;", variable.c_str());
+			"select * from cte;", variable.c_str(), entity.c_str());
 	}
 
 	/*

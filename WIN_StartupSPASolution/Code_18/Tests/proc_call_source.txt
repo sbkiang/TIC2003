@@ -1,0 +1,33 @@
+procedure proc1{
+    p1a = varInProc1Only;
+    p1a = varInProc1Common;
+    call nestedCallee1;
+    call proc2a;
+    call proc2;
+}
+
+procedure proc1a{
+    p1a = varInProc1Common;
+    call nestedCallee1;
+}
+
+procedure proc2a{
+    p2a = varInProc2aOnly;
+    x = varInPRoc2Common + varInProc2aOnly;
+    call proc3a;
+    call nestedCallee2;
+}
+
+procedure proc2{
+    p2a = varInProc2Only;
+    x = varInPRoc2Common;
+    call nestedCallee2;
+}
+
+procedure nestedCallee1{
+    x = varInNestedCallee1;
+}
+
+procedure nestedCallee2{
+    x = varInNestedCallee2;
+}

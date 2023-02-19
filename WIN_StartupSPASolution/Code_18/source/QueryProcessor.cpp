@@ -52,7 +52,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		}
 	}
 
-	if (suchThatIdx.empty() && patternIdx.empty()) { //Select Cause (Single)
+	if (suchThatIdx.empty() && patternIdx.empty()) { //Select Clause (Single)
 		if (synonymType[0] == "procedure") {
 			Database::getProcedures(databaseResults);
 		}
@@ -69,7 +69,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			Database::getConstant(databaseResults);
 		}
 	}
-	else { //Select Cause (Multiple)
+	else { //Select Clause (Multiple)
 		if (suchThatIdx.size() > 0) { //More than 1 of "Such That" cause
 
 			for (int i = 0; i < suchThatIdx.size(); i++) {
@@ -154,8 +154,9 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			else if (designAbstract == "callst") { //callT = call* 
 				//Relationship between procedure
 			}
-			else if (designAbstract == "use") {
+			else if (designAbstract == "uses") {
 				//Relationship between statement/procedure and variable
+
 			}
 			else if (designAbstract == "modifies") {
 				//Relationship between statement/procedure and variable

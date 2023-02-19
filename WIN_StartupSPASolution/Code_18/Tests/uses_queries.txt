@@ -1,0 +1,35 @@
+1 - Assign1
+assign a;
+select uses(a, 'returnL34')
+53
+5000
+2 - Assign2
+assign a;
+Select uses(a, 'use21')
+12,14,43,45
+5000
+3 - Print1
+print pn;
+select uses(pn, 'return1')
+1,23
+5000
+4 - Print2
+select pn;
+select uses(pn, 'printx')
+40,53
+5000
+5 - Procedure1
+procedure p;
+select uses(p, 'use20')
+main,calleeL2
+5000
+6 - Procedure2
+procedure p;
+select uses(p, 'returnL33')
+calleeL3,calleeL2
+5000
+7 - Call
+call c;
+select uses(c, '')
+
+

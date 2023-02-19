@@ -45,7 +45,11 @@ public:
 	// method to insert/get a use into the database
 	static void insertUse(int statementNumber, string procedureName, string variablename);
 	static void getUse(string entity, string variable, vector<string>& results); // for "assign a" and "print pn"
+<<<<<<< Updated upstream
 	static void getUseEnt(string stmtNum1, string stmtNum2, vector<string>& results);
+=======
+	static void getUse(int stmtNum, vector<string>& results);
+>>>>>>> Stashed changes
 
 	// method to insert/get a next into the database
 	static void insertNext(int stmtNum1, int stmtNum2);

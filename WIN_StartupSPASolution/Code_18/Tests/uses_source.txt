@@ -1,5 +1,5 @@
 procedure main {
-    x = return1;
+    print return1;
     x = return2;
     x = return3;
     call calleeL1;
@@ -36,9 +36,8 @@ procedure main {
 }
 
 procedure calleeL1{
-    x = return4;
+    print return1;
     x = return5 + return6;
-    call calleeL2;
     if(a = b)then{
         if(b = c)then{
             if(c = d)then{
@@ -65,7 +64,7 @@ procedure calleeL2{
         a = use1;
         b = use2;
         if(x = L2Use)then{
-            c = use3;
+            print printx;
             d = use4;
             while(d = use20){
                 d = use21;
@@ -89,7 +88,7 @@ procedure calleeL3{
     x = returnL32;
     if(b == returnL33)then{
         if(c == d)then{
-            x = returnL34;
+            print printx;
         }
         else{
             d = f;
@@ -108,7 +107,7 @@ procedure callNone{
     call a1;
 }
 
-procedure a1{
+procedure x1{
     b = c;
 }
 
