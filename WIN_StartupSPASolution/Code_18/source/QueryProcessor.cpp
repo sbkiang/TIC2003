@@ -161,10 +161,10 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 				//Relationship between statement/procedure and variable
 				
 				if (isNumber(stmtNum1) && !isNumber(stmtNum2)) { //For now, only work on variable query
-					Database::getUseStmt(stmtNum1, stmtNum2, 1, databaseResults);
+					Database::getModifyStmt(stmtNum1, stmtNum2, 1, databaseResults);
 				}
 				else if (!isNumber(stmtNum1) && isNumber(stmtNum2)) { //For now, only work on variable query
-					Database::getUseStmt(stmtNum1, stmtNum2, 0, databaseResults);
+					Database::getModifyStmt(stmtNum1, stmtNum2, 0, databaseResults);
 				}
 				else { //WIP
 					string resultType, filterType;

@@ -39,15 +39,15 @@ public:
 	
 	// method to insert/get a modify into the database
 	static void insertModifies(int statementNumber, string procedureName, string variablename);
+	static void getModifyStmt(string stmtNum1, string stmtNum2, bool lhs, vector<string>& results);
+
 
 	// method to insert/get a use into the database
-	static void getUseStmt(string stmtNum1, string stmtNum2, bool lhs, vector<string>& results);
-	static void getUseEnt(string stmtNum1, string stmtNum2, vector<string>& results);
-
-	// method to insert a use into the database
 	static void insertUse(int statementNumber, string procedureName, string variablename);
 	static void getUse(string entity, string variable, vector<string>& results); // for "assign a" and "print pn"
+	static void getUseEnt(string stmtNum1, string stmtNum2, vector<string>& results);
 
+	// method to insert/get a next into the database
 	static void insertNext(int stmtNum1, int stmtNum2);
 	static void getNext(int stmtNum1, int stmtNum2, vector<string>& results);
 	static void getNext_T(int stmtNum1, int stmtNum2, vector<string>& results);

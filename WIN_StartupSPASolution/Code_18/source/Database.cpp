@@ -419,7 +419,7 @@ void Database::getUse(string entity, string variable, vector<string>& results) {
 	}
 }
 
-void Database::getUseStmt(string stmtNum1, string stmtNum2, bool lhs, vector<string>& results) {
+void Database::getModifyStmt(string stmtNum1, string stmtNum2, bool lhs, vector<string>& results) {
 	// clear the existing results
 	dbResults.clear();
 	string sql;
@@ -434,7 +434,7 @@ void Database::getUseStmt(string stmtNum1, string stmtNum2, bool lhs, vector<str
 	sqlite3_exec(dbConnection, sql.c_str(), callback, 0, &errorMessage);
 
 	if (errorMessage) {
-		cout << "getParent SQL Error: " << errorMessage;
+		cout << "getModifyStmt SQL Error: " << errorMessage;
 	}
 
 	for (vector<string> dbRow : dbResults) {
