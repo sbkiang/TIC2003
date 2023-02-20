@@ -44,12 +44,9 @@ public:
 
 	// method to insert/get a use into the database
 	static void insertUse(int statementNumber, string procedureName, string variablename);
-	static void getUse(string entity, string variable, vector<string>& results); // for "assign a" and "print pn"
-<<<<<<< Updated upstream
+	static void getUse(string entity, vector<string>& results); // for cases such as use(<entity>,v). Return type depends on PQL
+	static void getUse(int stmtNum, vector<string>& results); // for cases such as use(s,v) where s = statement number. Since PQL is "select v", return name. SHUD BE OK
 	static void getUseEnt(string stmtNum1, string stmtNum2, vector<string>& results);
-=======
-	static void getUse(int stmtNum, vector<string>& results);
->>>>>>> Stashed changes
 
 	// method to insert/get a next into the database
 	static void insertNext(int stmtNum1, int stmtNum2);

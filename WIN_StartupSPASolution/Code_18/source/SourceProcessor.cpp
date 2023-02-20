@@ -1,4 +1,5 @@
 #include "SourceProcessor.h"
+#include "QueryProcessor.h"
 
 // method for processing the source program
 // This method currently only inserts the procedure name into the database
@@ -259,8 +260,10 @@ void SourceProcessor::process(string program) {
 		}
 	}
 	//Database::getParent()
+	
 	vector<string> result;
-	Database::getUse(9, result);
+	Database::getUse(100, result);
+	//Database::getUse(9, result);
 	//Database::getNext_T(5, 8, result);
 	//Database::getNext(5, 6, result);
 	//int i = 0;

@@ -1,9 +1,7 @@
 procedure proc1{
     p1a = varInProc1Only;
     p1a = varInProc1Common;
-    call nestedCallee1;
-    call proc2a;
-    call proc2;
+    call proc1a;
 }
 
 procedure proc1a{
@@ -26,6 +24,7 @@ procedure proc2{
 
 procedure nestedCallee1{
     x = varInNestedCallee1;
+    call nestedCallee2;
 }
 
 procedure nestedCallee2{
