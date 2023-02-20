@@ -44,7 +44,7 @@ public:
 
 	// method to insert/get a use into the database
 	static void insertUse(int statementNumber, string procedureName, string variablename);
-	static void getUse(string entity, vector<string>& results); // for cases such as use(<entity>,v). Return type depends on PQL
+	static void getUse(string entity, vector<string>& results); // for cases such as use(<entity>,v). Return type depends on entity
 	static void getUse(int stmtNum, vector<string>& results); // for cases such as use(s,v) where s = statement number. Since PQL is "select v", return name. SHUD BE OK
 	static void getUseEnt(string stmtNum1, string stmtNum2, vector<string>& results);
 

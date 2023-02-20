@@ -372,12 +372,12 @@ void Database::getParentChildren(bool findparent, string resultType, string filt
 	}
 }
 
-void Database::getUse(int stmtNum, vector<string>& results) { 
+void Database::getUse(int stmtNum, vector<string>& results) { // for cases such as uses(s,v) where s = stmt num, and v is "variable v;"
 	dbResults.clear();
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "SELECT entity, text FROM statement WHERE line_num = %i;", stmtNum);
 	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
-	if (errorMessage) { cout << "getUse SQL Error: " << errorMessage; return; }
+	if (errorMessage) { cout << "getUse start SQL Error: " << errorMessage; return; }
 	
 	string entity = dbResults.at(0).at(0);
 	string text = dbResults.at(0).at(1);
@@ -397,6 +397,7 @@ void Database::getUse(int stmtNum, vector<string>& results) {
 			"select s.text from statement s join procedure p on s.procedure_name = p.name join cte c where p.name = c.text and s.entity = 'call') "
 			"select * from cte;", text.c_str(), text.c_str());
 		sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
+		if (errorMessage) { cout << "getUse entity == call SQL Error: " << errorMessage; return; }
 		string proceduresJoin = "";
 		for (int i = 0; i < dbResults.size(); i++) { // due to recursive query, each result is in its own dbResult[i] 
 			char buf[256] = {};
@@ -405,20 +406,18 @@ void Database::getUse(int stmtNum, vector<string>& results) {
 		}
 		proceduresJoin.pop_back(); // remove the last ","
 		dbResults.clear();
-		sprintf_s(sqlBuf, "select distinct u.variable_name from use u where (select 1 from procedure p where name in (%s) and u.line_num between p.start and p.end);", proceduresJoin.c_str());
+		sprintf_s(sqlBuf, "select distinct u.variable_name from use u where exists (select 1 from procedure p where name in (%s) and u.line_num between p.start and p.end);", proceduresJoin.c_str());
 		sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
 	}
 
 	// e.g., use(10, v), and stmt 10 is "if(...)", and inside "if(...)", there's use(s, v). We get all uses(s,v) in that container
 	else if (entity == "while" || entity == "if") {
 		dbResults.clear();
-		sprintf_s(sqlBuf, "select distinct u.variable_name from use u where (select 1 from parent p where u.line_num between p.line_num and p.child_end and p.line_num = %i);", stmtNum);
+		sprintf_s(sqlBuf, "select distinct u.variable_name from use u where exists (select 1 from parent p where u.line_num between p.line_num and p.child_end and p.line_num = %i);", stmtNum);
 		sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
 	}
 
-	if (errorMessage) {
-		cout << "getParent SQL Error: " << errorMessage;
-	}
+	if (errorMessage) { cout << "getUse end SQL Error: " << errorMessage; return; }
 
 	for (vector<string> dbRow : dbResults) {
 		string result;
@@ -427,44 +426,27 @@ void Database::getUse(int stmtNum, vector<string>& results) {
 	}
 }
 
-void Database::getUse(string entity, vector<string>& results) { // input is stmtNum (print, assign, container) or name (procedure, call)
+void Database::getUse(string entity, vector<string>& results) { // for cases such as uses(<entity>, v), and <entity> and v is a general entity. E.g., "procedure p;" or "assign a;" or "variable v;"
 	dbResults.clear();
-	char sqlBuf[256];
-	if (entity == "assign" || entity == "print") {
+	char sqlBuf[512] = {};
+	if (entity == "assign" || entity == "print") { // for cases such as "assign a; variable v; select uses(a,v)"
 		sprintf_s(sqlBuf, "SELECT s.line_num FROM statement s JOIN use u ON s.line_num = u.line_num WHERE s.entity = '%s';", entity.c_str());
 	}
 
-	/*
-	recursive query to
-		1) find the procedure that contains stmtNum for use(assign, v), use(print, v), use(container, v) in "use" table
-		2) for each procedure found, find the parent procedure
-		3) repeat until no more parent procedure
-	*/
-	/*
-	else if (entity == "call" || entity == "procedure") {
-		sprintf_s(sqlBuf, "with recursive cte as("
-			"select name from procedure p where(select line_num from use u where u.line_num between p.start and p.end and u.variable_name = '%s' and p.name = '%s')"
-			"union"
-			"select p.name from procedure p join cte c where(select line_num from statement s where s.entity = 'call' and s.text = c.name) between p.start and p.end)"
-			"select * from cte;", variable.c_str(), entity.c_str());
+	else if (entity == "call") { // for cases such as "call c; select uses(c,v)" = return all call stmts that has uses(c,v)
+		sprintf_s(sqlBuf,"select line_num from statement s join procedure p on p.name = s.text where s.entity = 'call' and exists (select 1 from use u where u.line_num between p.start and p.end);");
 	}
-	*/
 
-	/*
-	recursive query to
-		1) find immediate parent container of variable
-		2) for each immediate parent container found, find the it's parent
-		3) repeat until no more parent found
-	*/
-	/*
-	else if (entity == "if" || entity == "while") {
-		sprintf_s(sqlBuf, "with recursive cte as("
-			"select line_num from parent p where(select line_num from use u where u.line_num between p.line_num and p.child_end and u.variable_name = '%s')"
-			"union"
-			"select p.line_num from parent p join cte c where c.line_num between p.line_num and p.child_end)"
-			"select * from cte;", variable.c_str());
+	else if (entity == "procedure") { // for cases such as "procedure p; select uses(p,v)" = reuturn all procedure name that has uses(c,v)		
+		sprintf_s(sqlBuf,"select name from procedure p where exists (select 1 from use u where u.line_num between p.start and p.end);");
 	}
-	*/
+
+	else if (entity == "if" || entity == "while") { // for cases such as "if i; select uses(i,v)" = return all if statements that has uses(c,v). Kind of pointless because it'll return all of them
+		sprintf_s(sqlBuf, "select line_num from parent p join statement s on p.line_num = s.line_num where s.entity = '%s' and exists (select 1 from use u where u.line_num between p.line_num and p.child_end);", entity.c_str());
+	}
+
+	dbResults.clear();
+	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
 
 	if (errorMessage) {
 		cout << "getUse SQL Error: " << errorMessage;

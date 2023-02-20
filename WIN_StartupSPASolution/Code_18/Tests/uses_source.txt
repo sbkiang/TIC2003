@@ -33,6 +33,15 @@ procedure main {
             }
         }
     }
+    if (10 == 10) then{
+        x = 10;
+    }
+    else{
+        x = 20;
+    }
+    while(5 != 10){
+        x = 20;
+    }
     call callNone;
 }
 
