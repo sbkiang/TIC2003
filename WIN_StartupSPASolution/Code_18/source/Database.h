@@ -41,12 +41,20 @@ public:
 	static void insertModifies(int statementNumber, string procedureName, string variablename);
 	static void getModifyStmt(string stmtNum1, string stmtNum2, bool lhs, vector<string>& results);
 
-
 	// method to insert/get a use into the database
-	static void insertUse(int statementNumber, string procedureName, string variablename);
-	static void getUse(string entity, vector<string>& results); // for cases such as use(<entity>,v). Return type depends on entity
-	static void getUse(int stmtNum, vector<string>& results); // for cases such as use(s,v) where s = statement number. Since PQL is "select v", return name. SHUD BE OK
-	static void getUseEnt(string stmtNum1, string stmtNum2, vector<string>& results);
+	static void insertUses(int statementNumber, string procedureName, string variablename);
+
+	// for cases such as uses(<entity>,v) where <entity> = if,while,procedure,call,assign and v = variable v. Return type depends on entity
+	static void getUses(string entity, vector<string>& results); 
+
+	// for cases such as uses(<entity>,v) where <entity> = if,while,procedure,call,assign and v = named variable. Return type depends on entity, filtered to named variable
+	static void getUses(string entity, string variable, vector<string>& results);
+
+	// for cases such as uses(s,v) where s = stmt num and v = variable v. Return all variables in the specified stmt num
+	static void getUses(int stmtNum, vector<string>& results); 
+
+	// for cases such as uses(s,v) where s = stmt num and v = named variable. Return stmt num that has uses(s,"named_var")
+	static void getUses(int stmtNum, string variable, vector<string>& results);
 
 	// method to insert/get a next into the database
 	static void insertNext(int stmtNum1, int stmtNum2);

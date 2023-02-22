@@ -127,7 +127,7 @@ void Database::insertParent(int parent, int child_start, int child_end) {
 	if (errorMessage) { cout << "insertParent SQL Error: " << errorMessage << endl; }
 }
 
-void Database::insertUse(int stmtNum, string procedureName, string variableName) {
+void Database::insertUses(int stmtNum, string procedureName, string variableName) {
 	char sqlBuf[256];
 	sprintf(sqlBuf, "INSERT INTO use ('line_num','procedure_name','variable_name' ) VALUES ('%i','%s','%s');", stmtNum, procedureName.c_str(), variableName.c_str());
 	//string sql = "INSERT INTO use ('line_num', 'procedure_name', 'variable_name' ) VALUES ('" + to_string(statementNumber) + "', '" + procedureName + "', '" + variablename + "');";
@@ -356,7 +356,7 @@ void Database::getParentChildren(bool findparent, string resultType, string filt
 		sql = "SELECT DISTINCT(p.line_num) FROM parent p JOIN statement s ON s.line_num BETWEEN p.child_start AND p.child_end WHERE s.entity = '" + filterType + "' AND line_num IN (SELECT line_num FROM statement WHERE entity = '" + resultType + "');";
 	 
 	else 
-		sql = "WITH RECURSIVE expanded_range(n) AS ( SELECT child_start FROM parent WHERE line_num IN (SELECT line_num FROM statement WHERE entity = '" + filterType + "') UNION ALL SELECT n+1 FROM expanded_range WHERE n+1 <= (SELECT child_end FROM parent WHERE line_num IN (SELECT line_num FROM statement WHERE entity = '" + filterType + "'))) SELECT line_num FROM statement WHERE line_num IN (SELECT n FROM expanded_range) AND entity = '" + resultType + "';";
+		sql = "WITH RECURSIVE expanded_range(n) AS ( SELECT child_start FROM parent WHERE p.line_num IN (SELECT line_num FROM statement WHERE entity = '" + filterType + "') UNION ALL SELECT n+1 FROM expanded_range WHERE n+1 <= (SELECT child_end FROM parent WHERE line_num IN (SELECT line_num FROM statement WHERE entity = '" + filterType + "'))) SELECT line_num FROM statement WHERE line_num IN (SELECT n FROM expanded_range) AND entity = '" + resultType + "';";
 
 
 	sqlite3_exec(dbConnection, sql.c_str(), callback, 0, &errorMessage);
@@ -372,7 +372,7 @@ void Database::getParentChildren(bool findparent, string resultType, string filt
 	}
 }
 
-void Database::getUse(int stmtNum, vector<string>& results) { // for cases such as uses(s,v) where s = stmt num, and v is "variable v;"
+void Database::getUses(int stmtNum, vector<string>& results) { // for cases such as uses(s,v) where s = stmt num, and v is "variable v;"
 	dbResults.clear();
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "SELECT entity, text FROM statement WHERE line_num = %i;", stmtNum);
@@ -397,7 +397,7 @@ void Database::getUse(int stmtNum, vector<string>& results) { // for cases such 
 			"select s.text from statement s join procedure p on s.procedure_name = p.name join cte c where p.name = c.text and s.entity = 'call') "
 			"select * from cte;", text.c_str(), text.c_str());
 		sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
-		if (errorMessage) { cout << "getUse entity == call SQL Error: " << errorMessage; return; }
+		if (errorMessage) { cout << "getUse \"entity == call\" SQL Error: " << errorMessage; return; }
 		string proceduresJoin = "";
 		for (int i = 0; i < dbResults.size(); i++) { // due to recursive query, each result is in its own dbResult[i] 
 			char buf[256] = {};
@@ -426,7 +426,17 @@ void Database::getUse(int stmtNum, vector<string>& results) { // for cases such 
 	}
 }
 
-void Database::getUse(string entity, vector<string>& results) { // for cases such as uses(<entity>, v), and <entity> and v is a general entity. E.g., "procedure p;" or "assign a;" or "variable v;"
+void Database::getUses(int stmtNum, string variable, vector<string>& results) {
+	vector<string> localResults;
+	Database::getUses(stmtNum, localResults);
+	for (int i = 0; i < localResults.size(); i++) {
+		if (localResults.at(i) == variable) {
+
+		}
+	}
+}
+
+void Database::getUses(string entity, vector<string>& results) { // for cases such as uses(<entity>, v), and <entity> and v is a general entity. E.g., "procedure p;" or "assign a;" or "variable v;"
 	dbResults.clear();
 	char sqlBuf[512] = {};
 	if (entity == "assign" || entity == "print") { // for cases such as "assign a; variable v; select uses(a,v)"

@@ -89,7 +89,7 @@ void SourceProcessor::process(string program) {
 
 			for (int i = 0; i < useStore.size(); i++) {
 				// database PK constraint will trigger for duplicate variables with same line_num to prevent duplicate insertion
-				Database::insertUse(useStore.at(i).getAdjustedStmtNum(), procedures.back()->_name, useStore.at(i)._stmt);
+				Database::insertUses(useStore.at(i).getAdjustedStmtNum(), procedures.back()->_name, useStore.at(i)._stmt);
 			}
 		}
 		else if (word == "if") { // if(...) then {...} else {...}
@@ -133,7 +133,7 @@ void SourceProcessor::process(string program) {
 
 			for (int i = 0; i < useStore.size(); i++) {
 				// database PK constraint will trigger for duplicate variables with same line_num to prevent duplicate insertion
-				Database::insertUse(useStore.at(i).getAdjustedStmtNum(), procedures.back()->_name, useStore.at(i)._stmt);
+				Database::insertUses(useStore.at(i).getAdjustedStmtNum(), procedures.back()->_name, useStore.at(i)._stmt);
 			}
 		}
 		else if (word == "else") { // for else container
@@ -192,7 +192,7 @@ void SourceProcessor::process(string program) {
 
 			for (int i = 0; i < useStore.size(); i++) {
 				// database PK constraint will trigger for duplicate variables with same line_num to prevent duplicate insertion
-				Database::insertUse(useStore.at(i).getAdjustedStmtNum(), procedures.back()->_name, useStore.at(i)._stmt);
+				Database::insertUses(useStore.at(i).getAdjustedStmtNum(), procedures.back()->_name, useStore.at(i)._stmt);
 			}
 
 			for (int i = 0; i < modifiesStore.size(); i++) {
@@ -220,7 +220,7 @@ void SourceProcessor::process(string program) {
 					i++;
 				}
 				for (int i = 0; i < useStore.size(); i++) {
-					Database::insertUse(useStore.at(i).getAdjustedStmtNum(), procedures.back()->_name, useStore.at(i)._stmt);
+					Database::insertUses(useStore.at(i).getAdjustedStmtNum(), procedures.back()->_name, useStore.at(i)._stmt);
 				}
 			}
 
@@ -262,7 +262,7 @@ void SourceProcessor::process(string program) {
 	//Database::getParent()
 	
 	vector<string> result;
-	Database::getUse("assign", result);
+	Database::getUses("assign", result);
 	//Database::getUse(9, result);
 	//Database::getNext_T(5, 8, result);
 	//Database::getNext(5, 6, result);

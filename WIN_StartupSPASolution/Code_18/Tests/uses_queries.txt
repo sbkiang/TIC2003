@@ -1,35 +1,30 @@
-1 - Assign1
+1 - Assign_uses(a,v)
 assign a;
-select uses(a, 'returnL34')
+select uses(a,"returnL34")
 53
 5000
-2 - Assign2
-assign a;
-Select uses(a, 'use21')
-12,14,43,45
-5000
-3 - Print1
+2 - Print_uses(pn,v)
 print pn;
-select uses(pn, 'return1')
+select uses(pn,"return1")
 1,23
 5000
-4 - Print2
-select pn;
-select uses(pn, 'printx')
+4 - Call_uses(call,v)
+call c;
+select uses(c, "printx")
 40,53
 5000
-5 - Procedure1
+5 - Procedure_uses(p,v)
 procedure p;
-select uses(p, 'use20')
+select uses(p, "use20")
 main,calleeL2
 5000
-6 - Procedure2
-procedure p;
-select uses(p, 'returnL33')
+6 - If_uses(i,v)
+if i;
+select uses(i,"returnL33")
 calleeL3,calleeL2
 5000
-7 - Call
-call c;
-select uses(c, '')
+7 - While_uses(w,v)
+while w;
+select uses(w, "use21")
 
 

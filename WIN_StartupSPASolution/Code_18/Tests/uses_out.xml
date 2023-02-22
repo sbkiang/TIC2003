@@ -1,0 +1,8 @@
+<?xml-stylesheet type="text/xsl" href="analysis.xsl"?>
+<test_results>
+<info>
+<name>AutoTester</name><parsing_time_taken>1734.000000</parsing_time_taken>
+</info>
+<queries>
+<query>
+<id ReturnTuple="1" CondNum="1" RelNum="0" comment="Assign_uses(a,v)">1</id><querystr><![CDATA[assign a; select uses(a,"returnL34")]]></querystr>
