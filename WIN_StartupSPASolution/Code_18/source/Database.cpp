@@ -470,18 +470,33 @@ void Database::getUses(string entity, vector<string>& results) { // for cases su
 	}
 }
 
-void Database::getModifyStmt(string stmtNum1, string stmtNum2, bool lhs, vector<string>& results) {
+void Database::getModifies(int type, string resultType, string filterType, vector<string>& results) {
 	// clear the existing results
 	dbResults.clear();
 	string sql;
-
-	if (lhs) {
-		sql = "SELECT variable_name FROM modify WHERE line_num = '" + stmtNum1 + "'";
+	
+	if (type == 0) { //Ex. variable v; select v such that modifies(10,v)
+		sql = "SELECT variable_name FROM modify WHERE line_num = '" + filterType + "'";
 	}
-	else {
-		sql = "SELECT variable_name FROM modify WHERE line_num = '" + stmtNum2 + "'";
+	else if (type == 1) {
+		if (resultType == "variable") {
+			if (filterType == "assign" || filterType == "read") {
+				sql = "SELECT DISTINCT(m.variable_name) FROM modify m, statement s WHERE m.line_num = s.line_num AND s.entity = '" + filterType + "';";
+			}
+			else if (filterType == "procedure") {
+				sql = "SELECT DISTINCT(variable_name) FROM modify;";
+			}
+		}
+		else if (resultType == "procedure") {
+			if (filterType == "variable") {
+				sql = "SELECT DISTINCT(procedure_name) FROM modify;";
+			}
+		}
 	}
-
+	else if (type == 2) {
+		sql = 
+	}
+	
 	sqlite3_exec(dbConnection, sql.c_str(), callback, 0, &errorMessage);
 
 	if (errorMessage) {

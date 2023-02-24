@@ -31,7 +31,9 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 
 	string designAbstract = "", stmtNum1 = "", stmtNum2 = "";
 	int idx = 0, selectIdx = 0;
-	bool comma = false;
+	bool comma = false, IDENT_LHS = false, IDENT_RHS = false;
+
+	string resultType, filterType, selectVar;
 
 	for (int i = 0; i < tokens.size(); i++) {
 		//change any uppercase char to lowercase
@@ -72,7 +74,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	else { //Select Clause (Multiple)
 		if (suchThatIdx.size() > 0) { //More than 1 of "Such That" cause
 
-			for (int i = 0; i < suchThatIdx.size(); i++) {
+			for (int i = 0; i < suchThatIdx.size(); i++) { 
 				idx = suchThatIdx[i];
 
 				//change any uppercase char to lowercase
@@ -97,6 +99,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 
 				idx = idx + 3;
 				while (tokens[idx] != ")") {
+
 					if (tokens[idx] == ",") {
 						comma = true;
 					}
@@ -106,7 +109,29 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 					else if (tokens[idx] != "\"" && comma == true) {
 						stmtNum2 = tokens[idx];
 					}
+
+					if (tokens[idx] == "\"" &&comma == false) {
+						IDENT_LHS = true;
+					}
+					else if (tokens[idx] == "\"" && comma == true) {
+						IDENT_RHS = true;
+					}
+
 					idx++;
+				}
+			}
+
+			if (!isNumber(stmtNum1) && !isNumber(stmtNum2)) { //(x,y) which are output result and filter query
+				int i = 0;
+				selectVar = tokens[selectIdx + 1];
+				for (string _var : synonymVar) {
+					if (selectVar == _var) {
+						resultType = tokens[i];
+					}
+					else {
+						filterType = tokens[i];
+					}
+					i = i + 3;
 				}
 			}
 
@@ -119,18 +144,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 					Database::getChildren(stmtNum1, stmtNum2, tokens[0], databaseResults);
 				}
 				else {
-					string resultType, filterType;
-					string selectVar = tokens[selectIdx + 1];
-					int i = 0;
-					for (string _var : synonymVar) {
-						if (selectVar == _var) {
-							resultType = tokens[i];
-						}
-						else {
-							filterType = tokens[i];
-						}
-						i = i + 3;
-					}
+					
 
 					if (selectVar == stmtNum1) { //find parent
 						Database::getParentChildren(1, resultType, filterType, databaseResults);
@@ -160,30 +174,24 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			}
 			else if (designAbstract == "modifies") {
 				//Relationship between statement/procedure and variable
-				
-				if (isNumber(stmtNum1) && !isNumber(stmtNum2)) { //For now, only work on variable query
-					Database::getModifyStmt(stmtNum1, stmtNum2, 1, databaseResults);
+
+				if (isNumber(stmtNum1) && !isNumber(stmtNum2)) { //‘Modifies’ ‘(’ stmtRef ‘,’ entRef ‘)’ -> (integer, synonym)
+					Database::getModifies(0, "", stmtNum1, databaseResults);
 				}
-				else if (!isNumber(stmtNum1) && isNumber(stmtNum2)) { //For now, only work on variable query
-					Database::getModifyStmt(stmtNum1, stmtNum2, 0, databaseResults);
-				}
-				else { //WIP
-					string resultType, filterType;
-					string selectVar = tokens[selectIdx + 1];
-					int i = 0;
-					for (string _var : synonymVar) {
-						if (selectVar == _var) {
-							resultType = tokens[i];
-						}
-						else {
-							filterType = tokens[i];
-						}
-						i = i + 3;
+				else if (!isNumber(stmtNum1) && !isNumber(stmtNum2)) { 
+
+					if (!IDENT_LHS && !IDENT_RHS) { //‘Modifies’ ‘(’ stmtRef ‘,’ entRef ‘)’ || ‘(’ entRef ‘,’ entRef ‘)’ -> (synonym, synonym)
+						Database::getModifies(1, resultType, filterType, databaseResults);
+					}
+					else if (!IDENT_LHS && IDENT_RHS) { //‘Modifies’ ‘(’ entRef ‘,’ entRef ‘)’ -> (synonym, ‘"’ IDENT ‘"’)
+						Database::getModifies(2, resultType, stmtNum2, databaseResults);
 					}
 
-					//WIP
-
+					else if (IDENT_LHS && !IDENT_RHS) { //‘Modifies’ ‘(’ entRef ‘,’ entRef ‘)’ -> (‘"’ IDENT ‘"’, synonym)
+						Database::getModifies(3, resultType, stmtNum1, databaseResults);
+					}
 				}
+
 			}
 		}
 		else if (patternIdx.size() > 0) {

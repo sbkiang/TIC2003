@@ -39,7 +39,7 @@ public:
 	
 	// method to insert/get a modify into the database
 	static void insertModifies(int statementNumber, string procedureName, string variablename);
-	static void getModifyStmt(string stmtNum1, string stmtNum2, bool lhs, vector<string>& results);
+	static void getModifies(int type, string resultType, string filterType, vector<string>& results);
 
 	// method to insert/get a use into the database
 	static void insertUses(int statementNumber, string procedureName, string variablename);

@@ -1,0 +1,45 @@
+1 - Variable
+variable v;
+Select v such that Modifies (10, v)
+count
+5000
+2 - read (r,v)
+read a; variable v; 
+Select v such that Modifies(r, v)
+x, y
+5000
+3 - swap read (r,v)
+variable v; read a;
+Select v such that Modifies(r, v)
+x, y
+5000
+4 - Assign (a,v)
+assign a; variable v;  
+Select v such that Modifies(a, v)
+flag, count, cenX, cenY, normSq
+5000
+5 - Swap Assign (a,v)
+variable v; assign a;
+Select v such that Modifies(a, v)
+flag, count, cenX, cenY, normSq
+5000
+6 - Procedure (p, v)
+variable v; procedure p;
+Select p such that Modifies (p, v)
+main, computeCentroid, readPoint
+5000
+7 - swap Procedure (p, v)
+procedure p; variable v;
+Select p such that Modifies (p, v)
+main, computeCentroid, readPoint
+5000
+8 - Procedure (p, v)
+variable v; procedure p;
+Select v such that Modifies (p, v)
+flag, x, y, count, cenX, cenY, normSq
+5000
+9 - Procedure (p, v)
+variable v; procedure p;
+Select p such that Modifies (p, "x")
+flag, x, y, count, cenX, cenY, normSq
+5000
