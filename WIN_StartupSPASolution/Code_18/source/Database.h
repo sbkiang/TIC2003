@@ -62,7 +62,7 @@ public:
 	static void getNext_T(int stmtNum1, int stmtNum2, vector<string>& results);
 
 	// method to insert/get a call into the database
-	static void insertCall(int statementNumber, string procedureName, string variablename, bool directcall);
+	static void insertCall(int statementNumber, string procedureName, string variablename, int directcall);
 
 private:
 	// the connection pointer to the database
