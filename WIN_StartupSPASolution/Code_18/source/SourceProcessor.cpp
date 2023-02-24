@@ -24,6 +24,7 @@ void SourceProcessor::process(string program) {
 
 	vector<Procedure*> procedures;
 	stack<Container*> parentStack;
+	vector<string> call, caller;
 	int stmtNumSubtract = 0;
 	int stmtNum = 0;
 	int nestedLevel = 0;
@@ -231,6 +232,30 @@ void SourceProcessor::process(string program) {
 					Database::insertModifies(modifiesStore.at(i).getAdjustedStmtNum(), procedures.back()->_name, modifiesStore.at(i)._stmt);
 				}
 			}
+<<<<<<< Updated upstream
+=======
+
+			if (word == "call") {
+				vector<Statement> callStore;
+				callStore.push_back(Statement(stmtNum, tokens.at(i + 1), stmtNumSubtract));
+				caller.push_back(procedures.back()->_name);
+				call.push_back(tokens.at(i + 1));
+
+				for (int i = 0; i < callStore.size(); i++) { //Direct Call
+					Database::insertCall(callStore.at(i).getAdjustedStmtNum(), procedures.back()->_name, callStore.at(i)._stmt, 1);
+				}
+
+				for (int j = 0; j < call.size(); j++) {
+					if (call[j] == procedures.back()->_name) {
+						cout << call.at(j) << "@@@" << procedures.back()->_name;
+						Database::insertCall(callStore.at(j).getAdjustedStmtNum(), caller[j], tokens.at(i + 1), 0);
+						break;
+					}
+				}
+
+			}
+
+>>>>>>> Stashed changes
 		}
 	}
 	vector<CFG*> CFGs;

@@ -1,0 +1,80 @@
+<?xml-stylesheet type="text/xsl" href="analysis.xsl"?>
+<test_results>
+<info>
+<name>AutoTester</name><parsing_time_taken>914.000000</parsing_time_taken>
+</info>
+<queries>
+<query>
+<id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="Variable">1</id><querystr><![CDATA[variable v; Select v such that Modifies (10, v)]]></querystr>
+<stuans>count</stuans>
+<correct>count</correct>
+<time_taken>9.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="read (r,v)">2</id><querystr><![CDATA[read a; variable v;  Select v such that Modifies(r, v)]]></querystr>
+<stuans>x,y</stuans>
+<correct>x,y</correct>
+<time_taken>10.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="swap read (r,v)">3</id><querystr><![CDATA[variable v; read a; Select v such that Modifies(r, v)]]></querystr>
+<stuans>x,y</stuans>
+<correct>x,y</correct>
+<time_taken>7.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="Assign (a,v)">4</id><querystr><![CDATA[assign a; variable v;   Select v such that Modifies(a, v)]]></querystr>
+<stuans>flag,count,cenX,cenY,normSq</stuans>
+<correct>flag,count,cenX,cenY,normSq</correct>
+<time_taken>8.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="Swap Assign (a,v)">5</id><querystr><![CDATA[variable v; assign a; Select v such that Modifies(a, v)]]></querystr>
+<stuans>flag,count,cenX,cenY,normSq</stuans>
+<correct>flag,count,cenX,cenY,normSq</correct>
+<time_taken>9.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="Procedure (p, v)">6</id><querystr><![CDATA[variable v; procedure p; Select p such that Modifies (p, v)]]></querystr>
+<stuans>main,readPoint,computeCentroid</stuans>
+<correct>main,computeCentroid,readPoint</correct>
+<time_taken>8.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="swap Procedure (p, v)">7</id><querystr><![CDATA[procedure p; variable v; Select p such that Modifies (p, v)]]></querystr>
+<stuans>main,readPoint,computeCentroid</stuans>
+<correct>main,computeCentroid,readPoint</correct>
+<time_taken>18.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="Procedure (p, v)">8</id><querystr><![CDATA[variable v; procedure p; Select v such that Modifies (p, v)]]></querystr>
+<stuans>flag,x,y,count,cenX,cenY,normSq</stuans>
+<correct>flag,x,y,count,cenX,cenY,normSq</correct>
+<time_taken>16.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="Procedure (p, v)">9</id><querystr><![CDATA[variable v; procedure p; Select p such that Modifies (p, "x")]]></querystr>
+<stuans></stuans>
+<correct>flag,x,y,count,cenX,cenY,normSq</correct>
+<time_taken>9.000000</time_taken>
+<failed>
+<missing>cenX,cenY,count,flag,normSq,x,y</missing>
+<additional></additional>
+<summary>
+<expected>7</expected>
+<matched>0</matched>
+<missing>7</missing>
+<additional>0</additional>
+</summary>
+</failed>
+</query>
+</queries>
+</test_results>

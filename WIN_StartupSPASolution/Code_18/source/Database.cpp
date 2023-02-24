@@ -154,6 +154,14 @@ void Database::insertNext(int stmtNum1, int stmtNum2) {
 	if (errorMessage) { cout << "insertNext SQL Error: " << errorMessage; }
 }
 
+void Database::insertCall(int stmtNum, string procedureName, string variablename, int direct_call) {
+	char sqlBuf[256];
+	sprintf(sqlBuf, "INSERT INTO call ('line_num','procedure_name','variable_name','direct_call' ) VALUES ('%i','%s','%s','%i');", stmtNum, procedureName.c_str(), variablename.c_str(), direct_call);
+	//string sql = "INSERT INTO modify ('line_num', 'procedure_name', 'variable_name' ) VALUES ('" + to_string(statementNumber) + "', '" + procedureName + "', '" + variablename + "');";
+	sqlite3_exec(dbConnection, sqlBuf, NULL, 0, &errorMessage);
+	if (errorMessage) { cout << "insertModifies SQL Error: " << errorMessage << endl; }
+}
+
 void Database::getNext_T(int stmtNum1, int stmtNum2, vector<string>& results) {
 	dbResults.clear();
 	char sqlBuf[256];
