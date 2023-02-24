@@ -66,10 +66,24 @@ void Database::initialize() {
 	string createUseTableSQL = "CREATE TABLE use ( line_num INT REFERENCES statement(line_num), procedure_name VARCHAR(50) REFERENCES procedure(name), variable_name VARCHAR(50) REFERENCES variable(name), PRIMARY KEY(line_num, procedure_name, variable_name));";
 	sqlite3_exec(dbConnection, createUseTableSQL.c_str(), NULL, 0, &errorMessage);
 
+	// drop the existing call table (if any)
+	string dropCallTableSQL = "DROP TABLE IF EXISTS call";
+	sqlite3_exec(dbConnection, dropCallTableSQL.c_str(), NULL, 0, &errorMessage);
+
+	// create a call table
+	string createCallTableSQL = "CREATE TABLE call ( line_num INT REFERENCES statement(line_num), procedure_name VARCHAR(50) REFERENCES procedure(name), variable_name VARCHAR(50) REFERENCES variable(name), direct_call INT(1));";
+	sqlite3_exec(dbConnection, createCallTableSQL.c_str(), NULL, 0, &errorMessage);
+		
+	// drop the existing next table (if any)
 	string dropNextTableSQL = "DROP TABLE IF EXISTS next";
 	sqlite3_exec(dbConnection, dropNextTableSQL.c_str(), NULL, 0, &errorMessage);
+
+	// create a next table
 	string createNextTableSQL = "CREATE TABLE next (line_num_1 INT REFERENCES statement(line_num), line_num_2 INT REFERENCES statement(line_num), CONSTRAINT line_num_not_equal check(line_num_1 <> line_num_2));";
 	sqlite3_exec(dbConnection, createNextTableSQL.c_str(), NULL, 0, &errorMessage);
+	
+	
+	
 	if (errorMessage) {
 		cout << errorMessage << endl;
 	}
@@ -494,7 +508,7 @@ void Database::getModifies(int type, string resultType, string filterType, vecto
 		}
 	}
 	else if (type == 2) {
-		sql = 
+		
 	}
 	
 	sqlite3_exec(dbConnection, sql.c_str(), callback, 0, &errorMessage);

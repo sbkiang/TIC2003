@@ -231,6 +231,11 @@ void SourceProcessor::process(string program) {
 					Database::insertModifies(modifiesStore.at(i).getAdjustedStmtNum(), procedures.back()->_name, modifiesStore.at(i)._stmt);
 				}
 			}
+
+			if (word == "call") {
+				
+			}
+
 		}
 	}
 	vector<CFG*> CFGs;
