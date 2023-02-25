@@ -118,11 +118,12 @@ void Database::insertStatement(int stmtNum, string stmtName, string entity, stri
 void Database::insertVariable(string stmtName, int stmtNum) {
 	char sqlBuf[256];
 	sprintf(sqlBuf, "INSERT INTO variable('name','line_num') VALUES('%s','%i');", stmtName.c_str(), stmtNum);
-	//string sql = "INSERT INTO variable ('name', 'line_num') VALUES ('" + statementName + "', '" + to_string(statementNumber) + "');";
+	//string sql = "INSERT INTO variable ('name', 'line_num') VALUES ('" + stmtName + "', '" + to_string(stmtNum) + "');";
 	sqlite3_exec(dbConnection, sqlBuf, NULL, 0, &errorMessage);
-	char sqlError[256];
-	sprintf_s(sqlError, "insertVariable SQL Error for %s at stmtNum %i: ", stmtName.c_str(), stmtNum);
-	if (errorMessage) { cout << sqlError << errorMessage << endl; }
+	//char sqlError[256];
+	//sprintf_s(sqlError, "insertVariable SQL Error for %s at stmtNum %i: ", stmtName.c_str(), stmtNum);
+	//if (errorMessage) { cout << sqlError << errorMessage << endl; }
+	if (errorMessage) { cout << "insertVariable SQL Error: " << errorMessage << endl; }
 }
 
 void Database::insertConstant(string value) {
@@ -130,7 +131,7 @@ void Database::insertConstant(string value) {
 	sprintf(sqlBuf, "INSERT INTO constant ('value') VALUES ('%s');", value.c_str());
 	//string sql = "INSERT INTO constant ('value') VALUES ('" + value + "');";
 	sqlite3_exec(dbConnection, sqlBuf, NULL, 0, &errorMessage);
-	//if (errorMessage) { cout << "insertConstant SQL Error: " << errorMessage << endl; }
+	if (errorMessage) { cout << "insertConstant SQL Error: " << errorMessage << endl; }
 }
 
 void Database::insertParent(int parent, int child_start, int child_end) {
@@ -496,11 +497,11 @@ void Database::getModifies(int type, string resultType, string filterType, vecto
 	dbResults.clear();
 	string sql;
 	
-	if (type == 0) { //Ex. variable v; select v such that modifies(10,v)
+	if (type == 0) { //‘Modifies’ ‘(’ stmtRef ‘,’ entRef ‘)’ -> (integer, synonym)
 		sql = "SELECT variable_name FROM modify WHERE line_num = '" + filterType + "'";
 	}
 	else if (type == 1) {
-		if (resultType == "variable") {
+		if (resultType == "variable") { //‘Modifies’ ‘(’ stmtRef ‘,’ entRef ‘)’ || ‘(’ entRef ‘,’ entRef ‘)’ -> (synonym, synonym)
 			if (filterType == "assign" || filterType == "read") {
 				sql = "SELECT DISTINCT(m.variable_name) FROM modify m, statement s WHERE m.line_num = s.line_num AND s.entity = '" + filterType + "';";
 			}
@@ -514,9 +515,13 @@ void Database::getModifies(int type, string resultType, string filterType, vecto
 			}
 		}
 	}
-	else if (type == 2) {
-		
+	else if (type == 2) { //‘Modifies’ ‘(’ entRef ‘,’ entRef ‘)’ -> (synonym, ‘"’ IDENT ‘"’)
+		if (resultType == "procedure") {
+			sql = "SELECT DISTINCT(c.procedure_name) FROM call c WHERE c.variable_name in (SELECT DISTINCT(m.procedure_name) FROM modify m WHERE m.variable_name = '" + filterType + "') UNION SELECT DISTINCT(m2.procedure_name) FROM modify m2 WHERE m2.variable_name = '" + filterType + "'";
+		}
 	}
+
+
 	
 	sqlite3_exec(dbConnection, sql.c_str(), callback, 0, &errorMessage);
 

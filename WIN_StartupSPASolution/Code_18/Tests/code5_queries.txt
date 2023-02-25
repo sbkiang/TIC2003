@@ -41,5 +41,5 @@ flag, x, y, count, cenX, cenY, normSq
 9 - Procedure (p, v)
 variable v; procedure p;
 Select p such that Modifies (p, "x")
-flag, x, y, count, cenX, cenY, normSq
+main, computeCentroid, readPoint
 5000

@@ -176,7 +176,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 				//Relationship between statement/procedure and variable
 
 				if (isNumber(stmtNum1) && !isNumber(stmtNum2)) { //‘Modifies’ ‘(’ stmtRef ‘,’ entRef ‘)’ -> (integer, synonym)
-					Database::getModifies(0, "", stmtNum1, databaseResults);
+					Database::getModifies(0, "", stmtNum1, databaseResults); 
 				}
 				else if (!isNumber(stmtNum1) && !isNumber(stmtNum2)) { 
 
@@ -191,7 +191,6 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 						Database::getModifies(3, resultType, stmtNum1, databaseResults);
 					}
 				}
-
 			}
 		}
 		else if (patternIdx.size() > 0) {
