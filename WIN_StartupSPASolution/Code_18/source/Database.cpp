@@ -1,9 +1,12 @@
 #include "Database.h"
 #include <iostream>
+#include <regex>
+
 
 sqlite3* Database::dbConnection;
 vector<vector<string>> Database::dbResults;
 char* Database::errorMessage;
+SqlResultSet* sqlResultSetPtr;
 
 // method to connect to the database and initialize tables in the database
 void Database::initialize() {
@@ -248,8 +251,9 @@ void Database::getStmt(string type, vector<string>& results) {
 		sqlite3_exec(dbConnection, sql.c_str(), callback, 0, &errorMessage);
 	}
 	else {
-		string sql = "SELECT line_num FROM statement WHERE entity = '" + type + "';";
-		sqlite3_exec(dbConnection, sql.c_str(), callback, 0, &errorMessage);
+		char sqlBuf[256];
+		sprintf(sqlBuf, "SELECT line_num FROM statement WHERE entity = '%s';", type.c_str());
+		sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
 	}
 	
 	if (errorMessage) {
@@ -296,7 +300,21 @@ void Database::getStatement(string type, vector<string>& results) {
 		cout << "getStatement SQL Error: " << errorMessage;
 		return;
 	}
+	for (vector<string> dbRow : dbResults) {
+		string result;
+		result = dbRow.at(0);
+		results.push_back(result);
+	}
+}
 
+void Database::getStatement(vector<string>& results) {
+	dbResults.clear();
+	string sql = "SELECT line_num FROM statement;";
+	sqlite3_exec(dbConnection, sql.c_str(), callback, 0, &errorMessage);
+	if (errorMessage) {
+		cout << "getStatement SQL Error: " << errorMessage;
+		return;
+	}
 	for (vector<string> dbRow : dbResults) {
 		string result;
 		result = dbRow.at(0);
@@ -436,26 +454,27 @@ void Database::getUses(int stmtNum, string variable, vector<string>& results) {
 	}
 }
 
-void Database::getUses(string entity, vector<string>& results) { // for cases such as uses(<entity>, v), and <entity> and v is a general entity. E.g., "procedure p;" or "assign a;" or "variable v;"
+void Database::getUses(string entity, SqlResult* sqlResult) { // for cases such as uses(<entity>, v), and <entity> and v is a general entity. E.g., "procedure p;" or "assign a;" or "variable v;"
 	dbResults.clear();
 	char sqlBuf[512] = {};
 	if (entity == "assign" || entity == "print") { // for cases such as "assign a; variable v; select uses(a,v)"
-		sprintf_s(sqlBuf, "SELECT s.line_num FROM statement s JOIN use u ON s.line_num = u.line_num WHERE s.entity = '%s';", entity.c_str());
+		sprintf_s(sqlBuf, "SELECT * FROM statement s JOIN use u ON s.line_num = u.line_num WHERE s.entity = '%s';", entity.c_str());
 	}
 
 	else if (entity == "call") { // for cases such as "call c; select uses(c,v)" = return all call stmts that has uses(c,v)
-		sprintf_s(sqlBuf,"select line_num from statement s join procedure p on p.name = s.text where s.entity = 'call' and exists (select 1 from use u where u.line_num between p.start and p.end);");
+		sprintf_s(sqlBuf,"select s.line_num from statement s join procedure p on p.name = s.text where s.entity = 'call' and exists (select 1 from use u where u.line_num between p.start and p.end);");
 	}
 
 	else if (entity == "procedure") { // for cases such as "procedure p; select uses(p,v)" = reuturn all procedure name that has uses(c,v)		
-		sprintf_s(sqlBuf,"select name from procedure p where exists (select 1 from use u where u.line_num between p.start and p.end);");
+		sprintf_s(sqlBuf,"select p.name from procedure p where exists (select 1 from use u where u.line_num between p.start and p.end);");
 	}
 
 	else if (entity == "if" || entity == "while") { // for cases such as "if i; select uses(i,v)" = return all if statements that has uses(c,v). Kind of pointless because it'll return all of them
-		sprintf_s(sqlBuf, "select line_num from parent p join statement s on p.line_num = s.line_num where s.entity = '%s' and exists (select 1 from use u where u.line_num between p.line_num and p.child_end);", entity.c_str());
+		sprintf_s(sqlBuf, "select p.line_num from parent p join statement s on p.line_num = s.line_num where s.entity = '%s' and exists (select 1 from use u where u.line_num between p.line_num and p.child_end);", entity.c_str());
 	}
 
 	dbResults.clear();
+	sqlResultSetPtr = sqlResult;
 	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
 
 	if (errorMessage) {
@@ -463,11 +482,14 @@ void Database::getUses(string entity, vector<string>& results) { // for cases su
 		return;
 	}
 
+	/*
 	for (vector<string> dbRow : dbResults) {
 		string result;
 		result = dbRow.at(0);
 		results.push_back(result);
 	}
+	*/
+
 }
 
 void Database::getModifyStmt(string stmtNum1, string stmtNum2, bool lhs, vector<string>& results) {
@@ -495,12 +517,153 @@ void Database::getModifyStmt(string stmtNum1, string stmtNum2, bool lhs, vector<
 	}
  }
 
+void Database::GenerateSynonymSQL(vector<string>& tableSQL, vector<string>& whereSQL, vector<string>& columnSQL, vector<string>& asSQL, map<string, string> synonymEntityMap) {
+	string stmtNumEntityRegex = "stmt|read|print|assign|while|if|call", nameEntityRegex = "variable|procedure", columnName = "", stmtTable = "statement";
+	map<string, int> tableCountMap;
+	int counter = 0;
+	char sqlBuf[1024] = {};	
+	for (auto it = synonymEntityMap.begin(); it != synonymEntityMap.end(); it++) {
+		string synonym = it->first;
+		string entity = it->second;
+		sqlResultSetPtr->resultColumns.insert(synonym);
+		string tableAlias = "";
+		if (regex_match(entity, regex(stmtNumEntityRegex))) { // assign stmt can be obtained from statement table
+			if (tableCountMap.find(stmtTable) == tableCountMap.end()) { tableCountMap.insert(pair<string, int>(stmtTable, 0)); }
+			else { tableCountMap.at(stmtTable)++; }
+			columnName = "line_num";
+			sprintf_s(sqlBuf, "s%s", to_string(tableCountMap.at(stmtTable)).c_str());
+			tableAlias = sqlBuf;
+			sprintf_s(sqlBuf, "%s %s", stmtTable.c_str(), tableAlias.c_str()); // E.g., statement s0, statement s1
+		}
+		else if (regex_match(entity, regex(nameEntityRegex))) { // entity belongs to the group that returns name
+			if (tableCountMap.find(entity) == tableCountMap.end()) { tableCountMap.insert(pair<string, int>(entity, 0)); }
+			else { tableCountMap.at(entity)++; }
+			columnName = "name";
+			sprintf_s(sqlBuf, "%c%s", entity[0], to_string(tableCountMap.at(entity)).c_str());
+			tableAlias = sqlBuf;
+			sprintf_s(sqlBuf, "%s %s", entity.c_str(), tableAlias.c_str()); // E.g., statement s0, statement s1
+		}
+		tableSQL.push_back(sqlBuf);
+		sprintf_s(sqlBuf, "%s.%s", tableAlias.c_str(), columnName.c_str()); // E.g., s0.line_num as a, s1.line_num as b, p0.name as p
+		columnSQL.push_back(sqlBuf);
+		sprintf_s(sqlBuf, "AS %s", synonym.c_str());
+		asSQL.push_back(sqlBuf);
+		if (entity != "stmt" && !regex_match(entity, regex(nameEntityRegex))) { // not stmt and not procedure and not variable
+			sprintf_s(sqlBuf, "%s.entity='%s'", tableAlias.c_str(), entity.c_str()); // E.g., s0.type='while', s1.type='if'
+			whereSQL.push_back(sqlBuf);
+		}
+	}
+}
+
+// get all the columns of PQL select block
+//void Database::select(Select& st, SqlResultSet* sqlResultSet) {
+void Database::select(Select& st, SqlResultSet* sqlResultSet, map<string,string> synonymEntityMap) {
+	string stmtNumEntityRegex = "stmt|read|print|assign|while|if|call", nameEntityRegex = "variable|procedure", columnName = "", stmtTable = "statement";
+	map<string, int> tableCountMap;
+	vector<string> tableSQL, whereSQL, columnSQL, asSQL;
+	int counter = 0;
+	char sqlBuf[1024] = {};
+	sqlResultSetPtr = sqlResultSet;
+	//for (auto it = st.synonymEntityMap.begin(); it != st.synonymEntityMap.end(); it++) {
+	for (auto it = synonymEntityMap.begin(); it != synonymEntityMap.end(); it++) {
+		string synonym = it->first;
+		string entity = it->second;
+		sqlResultSetPtr->resultColumns.insert(synonym);
+		string tableAlias = "";
+		if (regex_match(entity, regex(stmtNumEntityRegex))){ // assign stmt can be obtained from statement table
+			if (tableCountMap.find(stmtTable) == tableCountMap.end()) { tableCountMap.insert(pair<string, int>(stmtTable, 0)); }
+			else { tableCountMap.at(stmtTable)++; }
+			columnName = "line_num";
+			sprintf_s(sqlBuf, "s%s", to_string(tableCountMap.at(stmtTable)).c_str());
+			tableAlias = sqlBuf;
+			sprintf_s(sqlBuf, "%s %s", stmtTable.c_str(), tableAlias.c_str()); // E.g., statement s0, statement s1
+		}
+		else if (regex_match(entity, regex(nameEntityRegex))) { // entity belongs to the group that returns name
+			if (tableCountMap.find(entity) == tableCountMap.end()) { tableCountMap.insert(pair<string, int>(entity, 0)); }
+			else { tableCountMap.at(entity)++; }
+			columnName = "name";
+			sprintf_s(sqlBuf, "%c%s", entity[0], to_string(tableCountMap.at(entity)).c_str());
+			tableAlias = sqlBuf;
+			sprintf_s(sqlBuf, "%s %s", entity.c_str(), tableAlias.c_str()); // E.g., statement s0, statement s1
+		}
+		tableSQL.push_back(sqlBuf);
+		sprintf_s(sqlBuf, "%s.%s", tableAlias.c_str(), columnName.c_str()); // E.g., s0.line_num as a, s1.line_num as b, p0.name as p
+		columnSQL.push_back(sqlBuf);
+		sprintf_s(sqlBuf, "AS %s", synonym.c_str());
+		asSQL.push_back(sqlBuf);
+		if (entity != "stmt" && !regex_match(entity, regex(nameEntityRegex))) { // not stmt and not procedure and not variable
+			sprintf_s(sqlBuf, "%s.entity='%s'", tableAlias.c_str(), entity.c_str()); // E.g., s0.type='while', s1.type='if'
+			whereSQL.push_back(sqlBuf);
+		}
+	}
+	
+	string selectFromTable = "";
+	string selectColumnName = "";
+	string whereColumnFilter = "";
+	string whereDuplicateFilter = "";
+	string sqlAND = " AND ";
+	for (int i = 0; i < tableSQL.size(); i++) {
+		selectFromTable += (tableSQL.at(i) + ",");
+		sprintf_s(sqlBuf, "%s %s,", columnSQL.at(i).c_str(), asSQL.at(i).c_str());
+		selectColumnName += sqlBuf;
+	}
+	for (int i = 0; i < whereSQL.size(); i++) {
+		whereColumnFilter += (whereSQL.at(i) + sqlAND);
+	}
+	for (int i = 0; i < columnSQL.size(); i++) {
+		for (int j = i + 1; j < columnSQL.size(); j++) {
+			if (columnSQL.at(i)[0] != columnSQL.at(j)[0]) { continue; }
+			sprintf_s(sqlBuf, "%s <> %s%s", columnSQL.at(i).c_str(), columnSQL.at(j).c_str(), sqlAND.c_str());
+			whereDuplicateFilter += sqlBuf;
+		}
+	}
+
+	selectFromTable.pop_back(); // remove the last ","
+	selectColumnName.pop_back(); // remove the last ","
+	whereColumnFilter = whereColumnFilter.substr(0, whereColumnFilter.size() - sqlAND.size()); // remove the last " AND "
+	whereDuplicateFilter = whereDuplicateFilter.substr(0, whereDuplicateFilter.size() - sqlAND.size()); // remove the last " AND "
+	//if(whereDuplicateFilter == ""){ sprintf_s(sqlBuf, "SELECT %s FROM %s WHERE %s", selectColumnName.c_str(), selectFromTable.c_str(), whereColumnFilter.c_str()); }
+	//else{ sprintf_s(sqlBuf, "SELECT %s FROM %s WHERE %s AND %s", selectColumnName.c_str(), selectFromTable.c_str(), whereColumnFilter.c_str(), whereDuplicateFilter.c_str()); }
+	sprintf_s(sqlBuf, "SELECT %s FROM %s WHERE %s", selectColumnName.c_str(), selectFromTable.c_str(), whereColumnFilter.c_str());
+	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
+	if (errorMessage) { cout << "PQL select SQL Error: " << errorMessage; }
+}
+
+void Database::suchThat(SuchThat& st, SqlResultSet* sqlResultSet) {
+	if (st.relationship == "Parent") {
+
+	}
+}
+
+
 // callback method to put one row of results from the database into the dbResults vector
 // This method is called each time a row of results is returned from the database
-int Database::callback(void* NotUsed, int argc, char** argv, char** azColName) {
+int Database::callback(void* NotUsed, int columnCount, char** columnValues, char** columnNames) {
 	NotUsed = 0;
 	vector<string> dbRow;
+	SqlResult* sqlResult = new SqlResult;
+	// argc is the number of columns for this row of results
+	// argv contains the values for the columns
+	// Each value is pushed into a vector.
+	for (int i = 0; i < columnCount; i++) {
+		dbRow.push_back(columnValues[i]);
+		sqlResult->row.insert(std::pair<string, string>(columnNames[i], string(columnValues[i])));
+	}
+	
+	// The row is pushed to the vector for storing all rows of results 
+	dbResults.push_back(dbRow);
+	sqlResultSetPtr->sqlResult.push_back(sqlResult);
+	sqlResultSetPtr->sqlResultSet.insert(sqlResult);
 
+	return 0;
+}
+
+//void Database::select(map)
+
+int Database::callback_new(void* NotUsed, int argc, char** argv, char** azColName) {
+	NotUsed = 0;
+	vector<string> dbRow;
+	
 	// argc is the number of columns for this row of results
 	// argv contains the values for the columns
 	// Each value is pushed into a vector.

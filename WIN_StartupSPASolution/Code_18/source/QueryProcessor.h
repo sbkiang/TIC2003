@@ -4,6 +4,7 @@
 #include <vector>
 #include "Database.h"
 #include "Tokenizer.h"
+#include <regex>
 
 using namespace std;
 

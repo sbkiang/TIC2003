@@ -17,7 +17,7 @@ void SourceProcessor::process(string program) {
 
 	string regexVariables = "^((?!(procedure|while|if|then|else|call|read|print)$)[A-Za-z][A-Za-z0-9]*)";
 	string regexConstants = "^[0-9]+$";
-	string regexUse = "[+\\-*/\\(\\)\\=\\d+\\!]";
+	//string regexUse = "[+\\-*/\\(\\)\\=\\d+\\!]";
 	//string regexUse_2 = "\\d+";
 	// This logic is highly simplified based on iteration 1 requirements and 
 	// the assumption that the programs are valid.
@@ -175,7 +175,7 @@ void SourceProcessor::process(string program) {
 					variableStore.push_back(Statement(stmtNum, tokens.at(i), nestedLevel, parentStack.top(), stmtNumSubtract));
 				}
 				
-				// changed from "!regex_match(tokens.at(i), regex(regexVariables)" to current one. Makes more sense to match variables instead of not matching operators
+				// changed from "!regex_match(tokens.at(i), regex(regexUse)" to current one. Makes more sense to match variables instead of not matching operators
 				if (regex_match(tokens.at(i), regex(regexVariables))) {
 					useStore.push_back(Statement(stmtNum, tokens.at(i), stmtNumSubtract));
 				}
@@ -214,7 +214,7 @@ void SourceProcessor::process(string program) {
 				i++; // skip the "print" keyword for the while loop below
 				while (tokens.at(i) != ";") {
 					stmt->_stmt += tokens.at(i);
-					if (!regex_match(tokens.at(i), regex(regexUse))) {
+					if (regex_match(tokens.at(i), regex(regexVariables))) {
 						useStore.push_back(Statement(stmtNum, tokens.at(i), stmtNumSubtract));
 					}
 					i++;
@@ -261,8 +261,9 @@ void SourceProcessor::process(string program) {
 	}
 	//Database::getParent()
 	
-	vector<string> result;
-	Database::getUses("assign", result);
+	SqlResult result;
+	//Database::getUses("assign", result);
+	vector<string> line_num = result.getColumnValues("line_num");
 	//Database::getUse(9, result);
 	//Database::getNext_T(5, 8, result);
 	//Database::getNext(5, 6, result);

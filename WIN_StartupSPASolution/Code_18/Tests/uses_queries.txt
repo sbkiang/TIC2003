@@ -1,6 +1,6 @@
 1 - Assign_uses(a,v)
-assign a;
-select uses(a,"returnL34")
+assign a,b,c; procedure p,q,r;
+select <a,b,p> such that Uses*(a,"returnL34")
 53
 5000
 2 - Print_uses(pn,v)

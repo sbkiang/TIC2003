@@ -4,6 +4,7 @@
 #include <vector>
 #include "sqlite3.h"
 #include <format>
+#include "../SPA/Struct.h"
 
 using namespace std;
 
@@ -22,6 +23,7 @@ public:
 
 	static void insertStatement(int statementNumber, string statementName, string statementType, string text);
 	static void getStatement(string type, vector<string>& results);
+	static void getStatement(vector<string>& results);
 	static void getStmt(string type, vector<string>& results);
 
 	static void insertVariable(string variablename, int statementNumber);
@@ -46,6 +48,8 @@ public:
 
 	// for cases such as uses(<entity>,v) where <entity> = if,while,procedure,call,assign and v = variable v. Return type depends on entity
 	static void getUses(string entity, vector<string>& results); 
+	static void getUses(string entity, SqlResult& sqlRowSet);
+	static void getUses(string entity, SqlResult* sqlRowSet);
 
 	// for cases such as uses(<entity>,v) where <entity> = if,while,procedure,call,assign and v = named variable. Return type depends on entity, filtered to named variable
 	static void getUses(string entity, string variable, vector<string>& results);
@@ -61,6 +65,11 @@ public:
 	static void getNext(int stmtNum1, int stmtNum2, vector<string>& results);
 	static void getNext_T(int stmtNum1, int stmtNum2, vector<string>& results);
 
+	static void select(Select& st, SqlResultSet* sqlResultSet);
+	static void select(Select& st, SqlResultSet* sqlResultSet, map<string,string> synonymEntityMap);
+	static void suchThat(SuchThat& st, SqlResultSet* sqlResultSet);
+	static void GenerateSynonymSQL(vector<string>& tableSQL, vector<string>& whereSQL, vector<string>& columnSQL, vector<string>& asSQL, map<string, string> synonymEntityMap);
+
 private:
 	// the connection pointer to the database
 	static sqlite3* dbConnection; 
@@ -71,5 +80,7 @@ private:
 	// callback method to put one row of results from the database into the dbResults vector
 	// This method is called each time a row of results is returned from the database
 	static int callback(void* NotUsed, int argc, char** argv, char** azColName);
+	static int callback(void* NotUsed, int argc, char** argv, char** azColName, SqlResult& sqlResult);
+	static int callback_new(void* NotUsed, int argc, char** argv, char** azColName);
 };
 
