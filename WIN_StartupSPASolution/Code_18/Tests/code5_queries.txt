@@ -43,3 +43,18 @@ variable v; procedure p;
 Select p such that Modifies (p, "x")
 main, computeCentroid, readPoint
 5000
+10 - Call (c, v)
+variable v; call c;
+Select v such that Modifies ("readPoint", v)
+x,y
+5000
+11 - Call (c, v)
+variable v; call c;
+Select c such that Modifies (c, "x")
+readPoint
+5000
+12 - while (w, v)
+variable v; while w;
+Select v such that Modifies (w, v)
+x,y,count,cenX,cenY
+5000

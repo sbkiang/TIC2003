@@ -1,0 +1,78 @@
+<?xml-stylesheet type="text/xsl" href="analysis.xsl"?>
+<test_results>
+<info>
+<name>AutoTester</name><parsing_time_taken>650.000000</parsing_time_taken>
+</info>
+<queries>
+<query>
+<id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Parent Case (3,t)">1</id><querystr><![CDATA[stmt t; select t such that Parent(3,t)]]></querystr>
+<stuans>4,5,6</stuans>
+<correct>4,5,6</correct>
+<time_taken>15.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Parent Case (7,a)">2</id><querystr><![CDATA[stmt a; select a such that Parent(7,a)]]></querystr>
+<stuans>8,9</stuans>
+<correct>8,9</correct>
+<time_taken>13.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Parent Case (7,a)">3</id><querystr><![CDATA[assign a; select a such that Parent(3,a)]]></querystr>
+<stuans>4,6</stuans>
+<correct>4,6</correct>
+<time_taken>15.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Parent Case (3,a)">4</id><querystr><![CDATA[call a; select a such that Parent(3,a)]]></querystr>
+<stuans>5</stuans>
+<correct>5</correct>
+<time_taken>15.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Parent Case (s,4)">5</id><querystr><![CDATA[stmt a; select a such that Parent(s,4)]]></querystr>
+<stuans>3</stuans>
+<correct>3</correct>
+<time_taken>12.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Parent Case (s,4)">6</id><querystr><![CDATA[stmt a; select a such that Parent(s,9)]]></querystr>
+<stuans>7</stuans>
+<correct>7</correct>
+<time_taken>12.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Parent Case (a,t)">8</id><querystr><![CDATA[assign a; while t; select a such that Parent(t,a)]]></querystr>
+<stuans>4,6</stuans>
+<correct>4,6</correct>
+<time_taken>14.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Parent Case (s,t)">9</id><querystr><![CDATA[assign s; while t; select t such that Parent(t,s)]]></querystr>
+<stuans>3</stuans>
+<correct>3</correct>
+<time_taken>13.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Parent Case (a,t)">10</id><querystr><![CDATA[while a; assign t; select a such that Parent(a,t)]]></querystr>
+<stuans>3</stuans>
+<correct>3</correct>
+<time_taken>15.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Parent Case (a,t)">10</id><querystr><![CDATA[while a; assign t; select t such that Parent(a,t)]]></querystr>
+<stuans>4,6</stuans>
+<correct>4,6</correct>
+<time_taken>13.000000</time_taken>
+<passed/>
+</query>
+</queries>
+</test_results>

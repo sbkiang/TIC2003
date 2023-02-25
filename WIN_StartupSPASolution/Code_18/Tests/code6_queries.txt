@@ -1,0 +1,5 @@
+1- testing
+while w1, w2, w3;
+Select <w1, w2, w3> such that Parent* (w1, w2) such that Parent* (w2, w3)
+count
+5000

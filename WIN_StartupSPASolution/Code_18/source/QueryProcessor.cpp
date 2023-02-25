@@ -18,8 +18,10 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 
 	// tokenize the query
 	Tokenizer tk;
-	vector<string> tokens;
+	vector<string> tokens, lowercap;
 	tk.tokenize(query, tokens);
+
+	lowercap = tokens;
 
 	// check what type of synonym is being declared
 	vector<string> synonymType, synonymVar;
@@ -32,26 +34,28 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	string designAbstract = "", stmtNum1 = "", stmtNum2 = "";
 	int idx = 0, selectIdx = 0;
 	bool comma = false, IDENT_LHS = false, IDENT_RHS = false;
-
+	int test = 0;
 	string resultType, filterType, selectVar;
 
-	for (int i = 0; i < tokens.size(); i++) {
+	for (int i = 0; i < lowercap.size(); i++) {
 		//change any uppercase char to lowercase
-		transform(tokens[i].begin(), tokens[i].end(), tokens[i].begin(), [](unsigned char c) { return std::tolower(c); });
 
-		if (tokens[i] == "procedure" || tokens[i] == "variable" || tokens[i] == "constant" || tokens[i] == "call" || tokens[i] == "assign" || tokens[i] == "stmt" || tokens[i] == "read" || tokens[i] == "print" || tokens[i] == "while" || tokens[i] == "if") {
-			synonymType.push_back(tokens[i]);
-			synonymVar.push_back(tokens[i + 1]);
+		transform(lowercap[i].begin(), lowercap[i].end(), lowercap[i].begin(), [](unsigned char c) { return std::tolower(c); });
+
+		if (lowercap[i] == "procedure" || lowercap[i] == "variable" || lowercap[i] == "constant" || lowercap[i] == "call" || lowercap[i] == "assign" || lowercap[i] == "stmt" || lowercap[i] == "read" || lowercap[i] == "print" || lowercap[i] == "while" || lowercap[i] == "if") {
+			synonymType.push_back(lowercap[i]);
+			synonymVar.push_back(lowercap[i + 1]);
 		}
-		else if (tokens[i] == "such" && tokens[i + 1] == "that") {
+		else if (lowercap[i] == "such" && lowercap[i + 1] == "that") {
 			suchThatIdx.push_back(i);
 		}
-		else if (tokens[i] == "pattern") {
+		else if (lowercap[i] == "pattern") {
 			patternIdx.push_back(i);
 		}
-		else if (tokens[i] == "select") {
+		else if (lowercap[i] == "select") {
 			selectIdx = i;
 		}
+
 	}
 
 	if (suchThatIdx.empty() && patternIdx.empty()) { //Select Clause (Single)
@@ -73,14 +77,10 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	}
 	else { //Select Clause (Multiple)
 		if (suchThatIdx.size() > 0) { //More than 1 of "Such That" cause
-
 			for (int i = 0; i < suchThatIdx.size(); i++) { 
 				idx = suchThatIdx[i];
 
-				//change any uppercase char to lowercase
-				transform(tokens[idx + 2].begin(), tokens[idx + 2].end(), tokens[idx + 2].begin(), [](unsigned char c) { return std::tolower(c); });
-
-				designAbstract = tokens[idx + 2];
+				designAbstract = lowercap[idx + 2];
 
 				if (tokens[idx + 3] == "*") {
 					if (designAbstract == "parent") {
@@ -176,19 +176,22 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 				//Relationship between statement/procedure and variable
 
 				if (isNumber(stmtNum1) && !isNumber(stmtNum2)) { //‘Modifies’ ‘(’ stmtRef ‘,’ entRef ‘)’ -> (integer, synonym)
-					Database::getModifies(0, "", stmtNum1, databaseResults); 
+					Database::getModifies(0, "", stmtNum1, "", "", databaseResults);
 				}
-				else if (!isNumber(stmtNum1) && !isNumber(stmtNum2)) { 
+				else if (!isNumber(stmtNum1) && !isNumber(stmtNum2)) { //No integer
 
 					if (!IDENT_LHS && !IDENT_RHS) { //‘Modifies’ ‘(’ stmtRef ‘,’ entRef ‘)’ || ‘(’ entRef ‘,’ entRef ‘)’ -> (synonym, synonym)
-						Database::getModifies(1, resultType, filterType, databaseResults);
+						Database::getModifies(1, resultType, filterType, "", "", databaseResults);
 					}
 					else if (!IDENT_LHS && IDENT_RHS) { //‘Modifies’ ‘(’ entRef ‘,’ entRef ‘)’ -> (synonym, ‘"’ IDENT ‘"’)
-						Database::getModifies(2, resultType, stmtNum2, databaseResults);
+						Database::getModifies(2, resultType, filterType, "", stmtNum2, databaseResults);
 					}
 
 					else if (IDENT_LHS && !IDENT_RHS) { //‘Modifies’ ‘(’ entRef ‘,’ entRef ‘)’ -> (‘"’ IDENT ‘"’, synonym)
-						Database::getModifies(3, resultType, stmtNum1, databaseResults);
+						Database::getModifies(3, resultType, filterType, "", stmtNum1, databaseResults);
+					}
+					else { //‘Modifies’ ‘(’ entRef ‘,’ entRef ‘)’ -> (‘"’ IDENT ‘"’, ‘"’ IDENT ‘"’)
+						Database::getModifies(4, resultType, filterType, stmtNum2, stmtNum1, databaseResults);
 					}
 				}
 			}

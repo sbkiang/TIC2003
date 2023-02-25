@@ -331,7 +331,7 @@ void Database::getParent(string stmtNum1, string stmtNum2, vector<string>& resul
 
 	string sql = "SELECT MAX(line_num) FROM parent WHERE child_start <= '" + stmtNum2 + "' AND child_end >= '" + stmtNum2 + "';";
 	sqlite3_exec(dbConnection, sql.c_str(), callback, 0, &errorMessage);
-		
+
 	if (errorMessage) {
 		cout << "getParent SQL Error: " << errorMessage;
 	}
@@ -344,21 +344,21 @@ void Database::getParent(string stmtNum1, string stmtNum2, vector<string>& resul
 }
 
 void Database::getChildren(string stmtNum1, string stmtNum2, string statementType, vector<string>& results) {
-	
+
 	// clear the existing results
 	dbResults.clear();
 
 	string sql;
 
-	if(statementType == "stmt")
-		 sql = "WITH RECURSIVE expanded_range(n) AS ( SELECT child_start FROM parent WHERE line_num = '" + stmtNum1 + "' UNION ALL SELECT n+1 FROM expanded_range WHERE n+1 <= (SELECT child_end FROM parent WHERE line_num = '" + stmtNum1 + "')) SELECT line_num FROM statement WHERE line_num IN (SELECT n FROM expanded_range);";
+	if (statementType == "stmt")
+		sql = "WITH RECURSIVE expanded_range(n) AS ( SELECT child_start FROM parent WHERE line_num = '" + stmtNum1 + "' UNION ALL SELECT n+1 FROM expanded_range WHERE n+1 <= (SELECT child_end FROM parent WHERE line_num = '" + stmtNum1 + "')) SELECT line_num FROM statement WHERE line_num IN (SELECT n FROM expanded_range);";
 	else
-		 sql = "WITH RECURSIVE expanded_range(n) AS ( SELECT child_start FROM parent WHERE line_num = '" + stmtNum1 + "' UNION ALL SELECT n+1 FROM expanded_range WHERE n+1 <= (SELECT child_end FROM parent WHERE line_num = '" + stmtNum1 + "')) SELECT line_num FROM statement WHERE line_num IN (SELECT n FROM expanded_range) AND entity = '" + statementType + "';";
+		sql = "WITH RECURSIVE expanded_range(n) AS ( SELECT child_start FROM parent WHERE line_num = '" + stmtNum1 + "' UNION ALL SELECT n+1 FROM expanded_range WHERE n+1 <= (SELECT child_end FROM parent WHERE line_num = '" + stmtNum1 + "')) SELECT line_num FROM statement WHERE line_num IN (SELECT n FROM expanded_range) AND entity = '" + statementType + "';";
 
 	sqlite3_exec(dbConnection, sql.c_str(), callback, 0, &errorMessage);
 
 	if (errorMessage) {
-		cout << "getParent SQL Error: " << errorMessage;
+		cout << "getChildren SQL Error: " << errorMessage;
 	}
 
 	for (vector<string> dbRow : dbResults) {
@@ -375,16 +375,16 @@ void Database::getParentChildren(bool findparent, string resultType, string filt
 	string sql;
 
 	if (findparent)
-		sql = "SELECT DISTINCT(p.line_num) FROM parent p JOIN statement s ON s.line_num BETWEEN p.child_start AND p.child_end WHERE s.entity = '" + filterType + "' AND line_num IN (SELECT line_num FROM statement WHERE entity = '" + resultType + "');";
-	 
-	else 
-		sql = "WITH RECURSIVE expanded_range(n) AS ( SELECT child_start FROM parent WHERE p.line_num IN (SELECT line_num FROM statement WHERE entity = '" + filterType + "') UNION ALL SELECT n+1 FROM expanded_range WHERE n+1 <= (SELECT child_end FROM parent WHERE line_num IN (SELECT line_num FROM statement WHERE entity = '" + filterType + "'))) SELECT line_num FROM statement WHERE line_num IN (SELECT n FROM expanded_range) AND entity = '" + resultType + "';";
+		sql = "SELECT DISTINCT(p.line_num) FROM parent p JOIN statement s ON s.line_num BETWEEN p.child_start AND p.child_end WHERE s.entity = '" + filterType + "' AND p.line_num IN (SELECT line_num FROM statement WHERE entity = '" + resultType + "');";
+
+	else
+		sql = "WITH RECURSIVE expanded_range(n) AS ( SELECT p.child_start FROM parent p WHERE p.line_num IN (SELECT s.line_num FROM statement s WHERE s.entity = '" + filterType + "') UNION ALL SELECT n+1 FROM expanded_range WHERE n+1 <= (SELECT p.child_end FROM parent p WHERE p.line_num IN (SELECT s.line_num FROM statement s WHERE s.entity = '" + filterType + "'))) SELECT s.line_num FROM statement s WHERE s.line_num IN (SELECT n FROM expanded_range) AND s.entity = '" + resultType + "';";
 
 
 	sqlite3_exec(dbConnection, sql.c_str(), callback, 0, &errorMessage);
 
 	if (errorMessage) {
-		cout << "getParent SQL Error: " << errorMessage;
+		cout << "getParentChildren SQL Error: " << errorMessage;
 	}
 
 	for (vector<string> dbRow : dbResults) {
@@ -492,7 +492,7 @@ void Database::getUses(string entity, vector<string>& results) { // for cases su
 	}
 }
 
-void Database::getModifies(int type, string resultType, string filterType, vector<string>& results) {
+void Database::getModifies(int type, string resultType, string filterType, string resultVariable, string filterVariable, vector<string>& results) {
 	// clear the existing results
 	dbResults.clear();
 	string sql;
@@ -508,6 +508,9 @@ void Database::getModifies(int type, string resultType, string filterType, vecto
 			else if (filterType == "procedure") {
 				sql = "SELECT DISTINCT(variable_name) FROM modify;";
 			}
+			else if (filterType == "while") {
+				sql = "SELECT DISTINCT(variable_name) FROM modify;";
+			}
 		}
 		else if (resultType == "procedure") {
 			if (filterType == "variable") {
@@ -515,14 +518,25 @@ void Database::getModifies(int type, string resultType, string filterType, vecto
 			}
 		}
 	}
-	else if (type == 2) { //‘Modifies’ ‘(’ entRef ‘,’ entRef ‘)’ -> (synonym, ‘"’ IDENT ‘"’)
+	else if (type == 2) { //‘Modifies’ ‘(’ entRef ‘,’ entRef ‘)’ -> (synonym, ‘"’ IDENT ‘"’) (p, "x")
 		if (resultType == "procedure") {
-			sql = "SELECT DISTINCT(c.procedure_name) FROM call c WHERE c.variable_name in (SELECT DISTINCT(m.procedure_name) FROM modify m WHERE m.variable_name = '" + filterType + "') UNION SELECT DISTINCT(m2.procedure_name) FROM modify m2 WHERE m2.variable_name = '" + filterType + "'";
+			sql = "SELECT DISTINCT(c.procedure_name) FROM call c WHERE c.variable_name IN (SELECT DISTINCT(m.procedure_name) FROM modify m WHERE m.variable_name = '" + filterVariable + "') UNION SELECT DISTINCT(m2.procedure_name) FROM modify m2 WHERE m2.variable_name = '" + filterVariable + "'";
+		}
+		else if (resultType == "call") {
+			sql = "SELECT DISTINCT(procedure_name) FROM modify WHERE variable_name = '" + filterVariable + "'";
+		}
+		
+	}
+	else if (type == 3) { //‘Modifies’ ‘(’ entRef ‘,’ entRef ‘)’ -> (‘"’ IDENT ‘"’, synonym)
+		if (resultType == "variable" && filterType == "procedure") {
+			//sql = "SELECT DISTINCT(procedure_name) FROM modify WHERE ";
+		}
+		else if (resultType == "variable" && filterType == "call") {
+			sql = "SELECT DISTINCT(variable_name) FROM modify WHERE procedure_name = '" + filterVariable + "';";
 		}
 	}
 
-
-	
+	dbResults.clear();
 	sqlite3_exec(dbConnection, sql.c_str(), callback, 0, &errorMessage);
 
 	if (errorMessage) {
