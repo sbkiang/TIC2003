@@ -79,12 +79,6 @@ struct SqlResult : SqlResultSet{
 	string getColumnValue(string column);
 };
 
-
-struct Synonym {
-	string type;
-	//string<vector> var;
-};
-
 struct SuchThat {
 	string relationship = "";
 	string first = "";
@@ -98,8 +92,10 @@ struct Pattern {
 };
 
 struct Select {
-	vector<string> synonyms; // for cases such as "select <p,q>". may not need this as we have the synonymToEntityMap aldy
-	//unordered_map<string, string> synonymEntityMap; // maps each synonym in select clause to the entity type
-	//unordered_map<string, string> synonymColumnNameMap; // maps each synonym to the database column name
-	vector<SqlResultSet*> SqlResultSet;
+	vector<string> synonym;
+	vector<string> tableSql;
+	vector<string> whereSql;
+	vector<string> columnSql;
+	vector<string> asSql;
+	SqlResultSet sqlResultSet;
 };

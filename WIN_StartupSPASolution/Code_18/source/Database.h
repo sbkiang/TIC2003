@@ -65,10 +65,10 @@ public:
 	static void getNext(int stmtNum1, int stmtNum2, vector<string>& results);
 	static void getNext_T(int stmtNum1, int stmtNum2, vector<string>& results);
 
-	static void select(Select& st, SqlResultSet* sqlResultSet);
-	static void select(Select& st, SqlResultSet* sqlResultSet, map<string,string> synonymEntityMap);
+	//static void select(Select& st, SqlResultSet* sqlResultSet);
+	//static void select(Select& st, SqlResultSet* sqlResultSet, map<string,string> synonymEntityMap);
 	static void suchThat(SuchThat& st, SqlResultSet* sqlResultSet);
-	static void GenerateSynonymSQL(vector<string>& tableSQL, vector<string>& whereSQL, vector<string>& columnSQL, vector<string>& asSQL, map<string, string> synonymEntityMap);
+	static void SelectPql(Select& st, map<string, string> synonymEntityMap);
 
 private:
 	// the connection pointer to the database

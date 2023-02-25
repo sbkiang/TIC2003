@@ -5,6 +5,7 @@
 #include "Database.h"
 #include "Tokenizer.h"
 #include <regex>
+#include "../SPA/Struct.h"
 
 using namespace std;
 
@@ -18,6 +19,7 @@ public:
 
 	// method for evaluating a query
 	void evaluate(string query, vector<string>& results);
+	void EvaluateSelect(Select& st, map<string,string> synEntMap);
 
 	//Check for number or string
 	bool isNumber(string text) {

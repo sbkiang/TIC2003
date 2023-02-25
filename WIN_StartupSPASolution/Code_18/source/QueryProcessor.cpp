@@ -2,12 +2,51 @@
 #include <iostream>
 #include <algorithm>
 #include <stack>
+#include <map>
 
 // constructor
 QueryProcessor::QueryProcessor() {}
 
 // destructor
 QueryProcessor::~QueryProcessor() {}
+
+void QueryProcessor::EvaluateSelect(Select& st, map<string,string> synEntMap) {
+	string stmtNumEntityRegex = "stmt|read|print|assign|while|if|call", nameEntityRegex = "variable|procedure", columnName = "", stmtTable = "statement";
+	map<string, int> tableCountMap;
+	int counter = 0;
+	char sqlBuf[1024] = {};
+	//for (auto it = st.synonymEntityMap.begin(); it != st.synonymEntityMap.end(); it++) {
+	for (auto it = st.synonym.begin(); it != st.synonym.end(); it++) {
+		string synonym = (*it);
+		string entity = synEntMap.at(synonym);
+		string tableAlias = "";
+		if (regex_match(entity, regex(stmtNumEntityRegex))) { // assign stmt can be obtained from statement table
+			if (tableCountMap.find(stmtTable) == tableCountMap.end()) { tableCountMap.insert(pair<string, int>(stmtTable, 0)); }
+			else { tableCountMap.at(stmtTable)++; }
+			columnName = "line_num";
+			sprintf_s(sqlBuf, "s%s", to_string(tableCountMap.at(stmtTable)).c_str());
+			tableAlias = sqlBuf;
+			sprintf_s(sqlBuf, "%s %s", stmtTable.c_str(), tableAlias.c_str()); // E.g., statement s0, statement s1
+		}
+		else if (regex_match(entity, regex(nameEntityRegex))) { // entity belongs to the group that returns name
+			if (tableCountMap.find(entity) == tableCountMap.end()) { tableCountMap.insert(pair<string, int>(entity, 0)); }
+			else { tableCountMap.at(entity)++; }
+			columnName = "name";
+			sprintf_s(sqlBuf, "%c%s", entity[0], to_string(tableCountMap.at(entity)).c_str());
+			tableAlias = sqlBuf;
+			sprintf_s(sqlBuf, "%s %s", entity.c_str(), tableAlias.c_str()); // E.g., statement s0, statement s1
+		}
+		st.tableSql.push_back(sqlBuf);
+		sprintf_s(sqlBuf, "%s.%s", tableAlias.c_str(), columnName.c_str()); // E.g., s0.line_num as a, s1.line_num as b, p0.name as p
+		st.columnSql.push_back(sqlBuf);
+		sprintf_s(sqlBuf, "AS %s", synonym.c_str());
+		st.asSql.push_back(sqlBuf);
+		if (entity != "stmt" && !regex_match(entity, regex(nameEntityRegex))) { // not stmt and not procedure and not variable
+			sprintf_s(sqlBuf, "%s.entity='%s'", tableAlias.c_str(), entity.c_str()); // E.g., s0.type='while', s1.type='if'
+			st.whereSql.push_back(sqlBuf);
+		}
+	}
+}
 
 // method to evaluate a query
 // This method currently only handles queries for getting all the procedure names,
@@ -123,24 +162,25 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			if (tokens.at(i) == "<") {
 				while (tokens.at(i) != ">") {
 					if (regex_match(tokens.at(i), regex(regexWord))) {
-						select.synonyms.push_back(tokens.at(i));
+						select.synonym.push_back(tokens.at(i));
 						//select.synonymEntityMap.insert(pair<string, string>(tokens.at(i),synonymEntityMap.at(tokens.at(i))));
 					}
 					i++;
 				}
 			}
 			else {
-				select.synonyms.push_back(tokens.at(i));
+				select.synonym.push_back(tokens.at(i));
 				//select.synonymEntityMap.insert(pair<string, string>(tokens.at(i), synonymEntityMap.at(tokens.at(i))));
 			}
 		}
 	}
 	SqlResultSet selectPqlResultSet;
-	Database::select(select, &selectPqlResultSet, synonymEntityMap);
+	EvaluateSelect(select, synonymEntityMap);
+	Database::SelectPql(select, synonymEntityMap);
 	vector<SqlResultSet*> suchThatPqlResultVector;
 	
 	while (!suchThatStack.empty()) {
-		SqlResultSet suchThatPqlResultSet;
+		
 	}
 
 
@@ -156,152 +196,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		can use the sqlRow and sqlRowSet. sqlRow store synonym-to-value map for each row
 		
 	*/
-	if (suchThatIdx.empty() && patternIdx.empty()) { //Select Clause (Single)
-		if (synonymType[0] == "procedure") {
-			Database::getProcedures(databaseResults);
-		}
-
-		else if (synonymType[0] == "variable") {
-			Database::getVariable(databaseResults);
-		}
-
-		else if (synonymType[0] == "assign" || synonymType[0] == "print" || synonymType[0] == "read" || synonymType[0] == "stmt" || synonymType[0] == "call") {
-			Database::getStmt(synonymType[0], databaseResults);
-		}
-
-		else if (synonymType[0] == "constant") {
-			Database::getConstant(databaseResults);
-		}
-	}
-	else { //Select Clause (Multiple)
-		if (suchThatIdx.size() > 0) { //More than 1 of "Such That" cause
-
-			for (int i = 0; i < suchThatIdx.size(); i++) {
-				idx = suchThatIdx[i];
-
-				//change any uppercase char to lowercase
-				transform(tokens[idx + 2].begin(), tokens[idx + 2].end(), tokens[idx + 2].begin(), [](unsigned char c) { return std::tolower(c); });
-
-				designAbstract = tokens[idx + 2];
-
-				if (tokens[idx + 3] == "*") {
-					if (designAbstract == "parent") {
-						designAbstract = designAbstract + "t";
-						idx++;
-					}
-					else if (designAbstract == "calls") {
-						designAbstract = designAbstract + "t";
-						idx++;
-					}
-					else if (designAbstract == "next") {
-						designAbstract = designAbstract + "t";
-						idx++;
-					}
-				}
-
-				idx = idx + 3;
-				while (tokens[idx] != ")") {
-					if (tokens[idx] == ",") {
-						comma = true;
-					}
-					else if (tokens[idx] != "(" && tokens[idx] != "\"" && comma == false) {
-						stmtNum1 = tokens[idx];
-					}
-					else if (tokens[idx] != "\"" && comma == true) {
-						stmtNum2 = tokens[idx];
-					}
-					idx++;
-				}
-			}
-
-			if (designAbstract == "parent" || designAbstract == "parentt") {
-				//Relationship between statement
-				if (!isNumber(stmtNum1) && isNumber(stmtNum2)) {
-					Database::getParent(stmtNum1, stmtNum2, databaseResults);
-				}
-				else if(isNumber(stmtNum1) && !isNumber(stmtNum2)){
-					Database::getChildren(stmtNum1, stmtNum2, tokens[0], databaseResults);
-				}
-				else {
-					string resultType, filterType;
-					string selectVar = tokens[selectIdx + 1];
-					int i = 0;
-					for (string _var : synonymVar) {
-						if (selectVar == _var) {
-							resultType = tokens[i];
-						}
-						else {
-							filterType = tokens[i];
-						}
-						i = i + 3;
-					}
-
-					if (selectVar == stmtNum1) { //find parent
-						Database::getParentChildren(1, resultType, filterType, databaseResults);
-					}
-					else { //find children
-						Database::getParentChildren(0, resultType, filterType, databaseResults);
-					}
 	
-				}
-			}
-			else if (designAbstract == "next") {
-				//Relationship between statement
-			}
-			else if (designAbstract == "nextt") { //nextT = next* 
-				//Relationship between statement
-				// Use recursive query
-			}
-			else if (designAbstract == "calls") {
-				//Relationship between procedure
-			}
-			else if (designAbstract == "callst") { //callT = call* 
-				//Relationship between procedure
-			}
-			else if (designAbstract == "uses") {
-				//Relationship between statement/procedure and variable
-
-			}
-			else if (designAbstract == "modifies") {
-				//Relationship between statement/procedure and variable
-				
-				if (isNumber(stmtNum1) && !isNumber(stmtNum2)) { //For now, only work on variable query
-					Database::getModifyStmt(stmtNum1, stmtNum2, 1, databaseResults);
-				}
-				else if (!isNumber(stmtNum1) && isNumber(stmtNum2)) { //For now, only work on variable query
-					Database::getModifyStmt(stmtNum1, stmtNum2, 0, databaseResults);
-				}
-				else { //WIP
-					string resultType, filterType;
-					string selectVar = tokens[selectIdx + 1];
-					int i = 0;
-					for (string _var : synonymVar) {
-						if (selectVar == _var) {
-							resultType = tokens[i];
-						}
-						else {
-							filterType = tokens[i];
-						}
-						i = i + 3;
-					}
-
-					//WIP
-
-				}
-			}
-		}
-		else if (patternIdx.size() > 0) {
-
-		}
-	}
-
-	// call the method in database to retrieve the results
-	// This logic is highly simplified based on iteration 1 requirements and 
-	// the assumption that the queries are valid.
-	/*if (synonymType == "procedure") {
-		Database::getProcedures(databaseResults);
-	}*/
-
 	// post process the results to fill in the output vector
 	for (string databaseResult : databaseResults) {
 		output.push_back(databaseResult);

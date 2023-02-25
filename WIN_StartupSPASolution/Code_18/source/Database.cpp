@@ -6,7 +6,7 @@
 sqlite3* Database::dbConnection;
 vector<vector<string>> Database::dbResults;
 char* Database::errorMessage;
-SqlResultSet* sqlResultSetPtr;
+SqlResultSet* sqlResultSetPtrForCallback;
 
 // method to connect to the database and initialize tables in the database
 void Database::initialize() {
@@ -474,7 +474,7 @@ void Database::getUses(string entity, SqlResult* sqlResult) { // for cases such 
 	}
 
 	dbResults.clear();
-	sqlResultSetPtr = sqlResult;
+	sqlResultSetPtrForCallback = sqlResult;
 	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
 
 	if (errorMessage) {
@@ -517,122 +517,43 @@ void Database::getModifyStmt(string stmtNum1, string stmtNum2, bool lhs, vector<
 	}
  }
 
-void Database::GenerateSynonymSQL(vector<string>& tableSQL, vector<string>& whereSQL, vector<string>& columnSQL, vector<string>& asSQL, map<string, string> synonymEntityMap) {
-	string stmtNumEntityRegex = "stmt|read|print|assign|while|if|call", nameEntityRegex = "variable|procedure", columnName = "", stmtTable = "statement";
-	map<string, int> tableCountMap;
-	int counter = 0;
-	char sqlBuf[1024] = {};	
-	for (auto it = synonymEntityMap.begin(); it != synonymEntityMap.end(); it++) {
-		string synonym = it->first;
-		string entity = it->second;
-		sqlResultSetPtr->resultColumns.insert(synonym);
-		string tableAlias = "";
-		if (regex_match(entity, regex(stmtNumEntityRegex))) { // assign stmt can be obtained from statement table
-			if (tableCountMap.find(stmtTable) == tableCountMap.end()) { tableCountMap.insert(pair<string, int>(stmtTable, 0)); }
-			else { tableCountMap.at(stmtTable)++; }
-			columnName = "line_num";
-			sprintf_s(sqlBuf, "s%s", to_string(tableCountMap.at(stmtTable)).c_str());
-			tableAlias = sqlBuf;
-			sprintf_s(sqlBuf, "%s %s", stmtTable.c_str(), tableAlias.c_str()); // E.g., statement s0, statement s1
-		}
-		else if (regex_match(entity, regex(nameEntityRegex))) { // entity belongs to the group that returns name
-			if (tableCountMap.find(entity) == tableCountMap.end()) { tableCountMap.insert(pair<string, int>(entity, 0)); }
-			else { tableCountMap.at(entity)++; }
-			columnName = "name";
-			sprintf_s(sqlBuf, "%c%s", entity[0], to_string(tableCountMap.at(entity)).c_str());
-			tableAlias = sqlBuf;
-			sprintf_s(sqlBuf, "%s %s", entity.c_str(), tableAlias.c_str()); // E.g., statement s0, statement s1
-		}
-		tableSQL.push_back(sqlBuf);
-		sprintf_s(sqlBuf, "%s.%s", tableAlias.c_str(), columnName.c_str()); // E.g., s0.line_num as a, s1.line_num as b, p0.name as p
-		columnSQL.push_back(sqlBuf);
-		sprintf_s(sqlBuf, "AS %s", synonym.c_str());
-		asSQL.push_back(sqlBuf);
-		if (entity != "stmt" && !regex_match(entity, regex(nameEntityRegex))) { // not stmt and not procedure and not variable
-			sprintf_s(sqlBuf, "%s.entity='%s'", tableAlias.c_str(), entity.c_str()); // E.g., s0.type='while', s1.type='if'
-			whereSQL.push_back(sqlBuf);
-		}
-	}
-}
-
 // get all the columns of PQL select block
 //void Database::select(Select& st, SqlResultSet* sqlResultSet) {
-void Database::select(Select& st, SqlResultSet* sqlResultSet, map<string,string> synonymEntityMap) {
-	string stmtNumEntityRegex = "stmt|read|print|assign|while|if|call", nameEntityRegex = "variable|procedure", columnName = "", stmtTable = "statement";
-	map<string, int> tableCountMap;
-	vector<string> tableSQL, whereSQL, columnSQL, asSQL;
-	int counter = 0;
+void Database::SelectPql(Select& st, map<string,string> synonymEntityMap) {
 	char sqlBuf[1024] = {};
-	sqlResultSetPtr = sqlResultSet;
-	//for (auto it = st.synonymEntityMap.begin(); it != st.synonymEntityMap.end(); it++) {
-	for (auto it = synonymEntityMap.begin(); it != synonymEntityMap.end(); it++) {
-		string synonym = it->first;
-		string entity = it->second;
-		sqlResultSetPtr->resultColumns.insert(synonym);
-		string tableAlias = "";
-		if (regex_match(entity, regex(stmtNumEntityRegex))){ // assign stmt can be obtained from statement table
-			if (tableCountMap.find(stmtTable) == tableCountMap.end()) { tableCountMap.insert(pair<string, int>(stmtTable, 0)); }
-			else { tableCountMap.at(stmtTable)++; }
-			columnName = "line_num";
-			sprintf_s(sqlBuf, "s%s", to_string(tableCountMap.at(stmtTable)).c_str());
-			tableAlias = sqlBuf;
-			sprintf_s(sqlBuf, "%s %s", stmtTable.c_str(), tableAlias.c_str()); // E.g., statement s0, statement s1
-		}
-		else if (regex_match(entity, regex(nameEntityRegex))) { // entity belongs to the group that returns name
-			if (tableCountMap.find(entity) == tableCountMap.end()) { tableCountMap.insert(pair<string, int>(entity, 0)); }
-			else { tableCountMap.at(entity)++; }
-			columnName = "name";
-			sprintf_s(sqlBuf, "%c%s", entity[0], to_string(tableCountMap.at(entity)).c_str());
-			tableAlias = sqlBuf;
-			sprintf_s(sqlBuf, "%s %s", entity.c_str(), tableAlias.c_str()); // E.g., statement s0, statement s1
-		}
-		tableSQL.push_back(sqlBuf);
-		sprintf_s(sqlBuf, "%s.%s", tableAlias.c_str(), columnName.c_str()); // E.g., s0.line_num as a, s1.line_num as b, p0.name as p
-		columnSQL.push_back(sqlBuf);
-		sprintf_s(sqlBuf, "AS %s", synonym.c_str());
-		asSQL.push_back(sqlBuf);
-		if (entity != "stmt" && !regex_match(entity, regex(nameEntityRegex))) { // not stmt and not procedure and not variable
-			sprintf_s(sqlBuf, "%s.entity='%s'", tableAlias.c_str(), entity.c_str()); // E.g., s0.type='while', s1.type='if'
-			whereSQL.push_back(sqlBuf);
-		}
-	}
-	
 	string selectFromTable = "";
 	string selectColumnName = "";
 	string whereColumnFilter = "";
 	string whereDuplicateFilter = "";
-	string sqlAND = " AND ";
-	for (int i = 0; i < tableSQL.size(); i++) {
-		selectFromTable += (tableSQL.at(i) + ",");
-		sprintf_s(sqlBuf, "%s %s,", columnSQL.at(i).c_str(), asSQL.at(i).c_str());
+	string SqlAND = " AND ";
+	sqlResultSetPtrForCallback = &st.sqlResultSet;
+	for (int i = 0; i < st.tableSql.size(); i++) {
+		selectFromTable += (st.tableSql.at(i) + ",");
+		sprintf_s(sqlBuf, "%s %s,", st.columnSql.at(i).c_str(), st.asSql.at(i).c_str());
 		selectColumnName += sqlBuf;
 	}
-	for (int i = 0; i < whereSQL.size(); i++) {
-		whereColumnFilter += (whereSQL.at(i) + sqlAND);
+	for (int i = 0; i < st.whereSql.size(); i++) {
+		whereColumnFilter += (st.whereSql.at(i) + SqlAND);
 	}
-	for (int i = 0; i < columnSQL.size(); i++) {
-		for (int j = i + 1; j < columnSQL.size(); j++) {
-			if (columnSQL.at(i)[0] != columnSQL.at(j)[0]) { continue; }
-			sprintf_s(sqlBuf, "%s <> %s%s", columnSQL.at(i).c_str(), columnSQL.at(j).c_str(), sqlAND.c_str());
+	/*
+	for (int i = 0; i < st.columnSql.size(); i++) {
+		for (int j = i + 1; j < st.columnSql.size(); j++) {
+			if (st.columnSql.at(i)[0] != st.columnSql.at(j)[0]) { continue; }
+			sprintf_s(sqlBuf, "%s <> %s%s", st.columnSql.at(i).c_str(), st.columnSql.at(j).c_str(), SqlAND.c_str());
 			whereDuplicateFilter += sqlBuf;
 		}
 	}
+	*/
 
 	selectFromTable.pop_back(); // remove the last ","
 	selectColumnName.pop_back(); // remove the last ","
-	whereColumnFilter = whereColumnFilter.substr(0, whereColumnFilter.size() - sqlAND.size()); // remove the last " AND "
-	whereDuplicateFilter = whereDuplicateFilter.substr(0, whereDuplicateFilter.size() - sqlAND.size()); // remove the last " AND "
+	whereColumnFilter = whereColumnFilter.substr(0, whereColumnFilter.size() - SqlAND.size()); // remove the last " AND "
+	whereDuplicateFilter = whereDuplicateFilter.substr(0, whereDuplicateFilter.size() - SqlAND.size()); // remove the last " AND "
 	//if(whereDuplicateFilter == ""){ sprintf_s(sqlBuf, "SELECT %s FROM %s WHERE %s", selectColumnName.c_str(), selectFromTable.c_str(), whereColumnFilter.c_str()); }
 	//else{ sprintf_s(sqlBuf, "SELECT %s FROM %s WHERE %s AND %s", selectColumnName.c_str(), selectFromTable.c_str(), whereColumnFilter.c_str(), whereDuplicateFilter.c_str()); }
 	sprintf_s(sqlBuf, "SELECT %s FROM %s WHERE %s", selectColumnName.c_str(), selectFromTable.c_str(), whereColumnFilter.c_str());
 	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
-	if (errorMessage) { cout << "PQL select SQL Error: " << errorMessage; }
-}
-
-void Database::suchThat(SuchThat& st, SqlResultSet* sqlResultSet) {
-	if (st.relationship == "Parent") {
-
-	}
+	if (errorMessage) { cout << "PQL select Sql Error: " << errorMessage; }
 }
 
 
@@ -652,8 +573,8 @@ int Database::callback(void* NotUsed, int columnCount, char** columnValues, char
 	
 	// The row is pushed to the vector for storing all rows of results 
 	dbResults.push_back(dbRow);
-	sqlResultSetPtr->sqlResult.push_back(sqlResult);
-	sqlResultSetPtr->sqlResultSet.insert(sqlResult);
+	sqlResultSetPtrForCallback->sqlResult.push_back(sqlResult);
+	sqlResultSetPtrForCallback->sqlResultSet.insert(sqlResult);
 
 	return 0;
 }
