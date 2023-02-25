@@ -234,16 +234,15 @@ void SourceProcessor::process(string program) {
 
 			if (word == "call") {
 				vector<Statement> modifiesStore;
-				caller.push_back(procedures.back()->_name);
-				called.push_back(tokens.at(i + 1));
+				caller.push_back(procedures.back()->_name); //Which Procedure is caller
+				called.push_back(tokens.at(i + 1)); //Call function
 
 				modifiesStore.push_back(Statement(stmtNum, tokens.at(i + 1), stmtNumSubtract));
-				for (int i = 0; i < modifiesStore.size(); i++) {
+				for (int i = 0; i < modifiesStore.size(); i++) { //direct Call
 					Database::insertCall(modifiesStore.at(i).getAdjustedStmtNum(), procedures.back()->_name, modifiesStore.at(i)._stmt, 1);
 				}
 				for (int j = 0; j < called.size(); j++) {
-					if (called[j] == procedures.back()->_name) {
-						//cout << parentCalled.at(j) << "@@@" << procedureName;
+					if (called[j] == procedures.back()->_name) { //indirect Call
 						Database::insertCall(modifiesStore.at(j).getAdjustedStmtNum(), caller[j], tokens.at(i + 1), 0);
 						break;
 					}
