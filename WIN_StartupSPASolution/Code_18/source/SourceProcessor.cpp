@@ -14,17 +14,16 @@ void SourceProcessor::process(string program) {
 	Tokenizer tk;
 	vector<string> tokens;
 	tk.tokenize(program, tokens);
-
+	
 	string regexVariables = "^((?!(procedure|while|if|then|else|call|read|print)$)[A-Za-z][A-Za-z0-9]*)";
 	string regexConstants = "^[0-9]+$";
 	string regexUse = "[+\\-*/\\(\\)\\=\\d+\\!]";
 	//string regexUse_2 = "\\d+";
 	// This logic is highly simplified based on iteration 1 requirements and 
 	// the assumption that the programs are valid.
-
+	vector<string> caller, called;
 	vector<Procedure*> procedures;
 	stack<Container*> parentStack;
-	vector<string> call, caller;
 	int stmtNumSubtract = 0;
 	int stmtNum = 0;
 	int nestedLevel = 0;
@@ -232,30 +231,26 @@ void SourceProcessor::process(string program) {
 					Database::insertModifies(modifiesStore.at(i).getAdjustedStmtNum(), procedures.back()->_name, modifiesStore.at(i)._stmt);
 				}
 			}
-<<<<<<< Updated upstream
-=======
 
 			if (word == "call") {
-				vector<Statement> callStore;
-				callStore.push_back(Statement(stmtNum, tokens.at(i + 1), stmtNumSubtract));
+				vector<Statement> modifiesStore;
 				caller.push_back(procedures.back()->_name);
-				call.push_back(tokens.at(i + 1));
+				called.push_back(tokens.at(i + 1));
 
-				for (int i = 0; i < callStore.size(); i++) { //Direct Call
-					Database::insertCall(callStore.at(i).getAdjustedStmtNum(), procedures.back()->_name, callStore.at(i)._stmt, 1);
+				modifiesStore.push_back(Statement(stmtNum, tokens.at(i + 1), stmtNumSubtract));
+				for (int i = 0; i < modifiesStore.size(); i++) {
+					Database::insertCall(modifiesStore.at(i).getAdjustedStmtNum(), procedures.back()->_name, modifiesStore.at(i)._stmt, 1);
 				}
-
-				for (int j = 0; j < call.size(); j++) {
-					if (call[j] == procedures.back()->_name) {
-						cout << call.at(j) << "@@@" << procedures.back()->_name;
-						Database::insertCall(callStore.at(j).getAdjustedStmtNum(), caller[j], tokens.at(i + 1), 0);
+				for (int j = 0; j < called.size(); j++) {
+					if (called[j] == procedures.back()->_name) {
+						//cout << parentCalled.at(j) << "@@@" << procedureName;
+						Database::insertCall(modifiesStore.at(j).getAdjustedStmtNum(), caller[j], tokens.at(i + 1), 0);
 						break;
 					}
 				}
 
 			}
 
->>>>>>> Stashed changes
 		}
 	}
 	vector<CFG*> CFGs;

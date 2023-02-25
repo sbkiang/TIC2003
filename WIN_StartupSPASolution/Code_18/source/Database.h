@@ -39,7 +39,7 @@ public:
 	
 	// method to insert/get a modify into the database
 	static void insertModifies(int statementNumber, string procedureName, string variablename);
-	static void getModifyStmt(string stmtNum1, string stmtNum2, bool lhs, vector<string>& results);
+	static void getModifies(int type, string resultType, string filterType, vector<string>& results);
 
 	// method to insert/get a use into the database
 	static void insertUses(int statementNumber, string procedureName, string variablename);
@@ -61,12 +61,9 @@ public:
 	static void getNext(int stmtNum1, int stmtNum2, vector<string>& results);
 	static void getNext_T(int stmtNum1, int stmtNum2, vector<string>& results);
 
-<<<<<<< Updated upstream
-=======
 	// method to insert/get a call into the database
 	static void insertCall(int statementNumber, string procedureName, string variablename, int directcall);
 
->>>>>>> Stashed changes
 private:
 	// the connection pointer to the database
 	static sqlite3* dbConnection; 

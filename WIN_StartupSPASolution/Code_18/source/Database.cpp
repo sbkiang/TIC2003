@@ -66,10 +66,24 @@ void Database::initialize() {
 	string createUseTableSQL = "CREATE TABLE use ( line_num INT REFERENCES statement(line_num), procedure_name VARCHAR(50) REFERENCES procedure(name), variable_name VARCHAR(50) REFERENCES variable(name), PRIMARY KEY(line_num, procedure_name, variable_name));";
 	sqlite3_exec(dbConnection, createUseTableSQL.c_str(), NULL, 0, &errorMessage);
 
+	// drop the existing call table (if any)
+	string dropCallTableSQL = "DROP TABLE IF EXISTS call";
+	sqlite3_exec(dbConnection, dropCallTableSQL.c_str(), NULL, 0, &errorMessage);
+
+	// create a call table
+	string createCallTableSQL = "CREATE TABLE call ( line_num INT REFERENCES statement(line_num), procedure_name VARCHAR(50) REFERENCES procedure(name), variable_name VARCHAR(50) REFERENCES variable(name), direct_call INT(1));";
+	sqlite3_exec(dbConnection, createCallTableSQL.c_str(), NULL, 0, &errorMessage);
+		
+	// drop the existing next table (if any)
 	string dropNextTableSQL = "DROP TABLE IF EXISTS next";
 	sqlite3_exec(dbConnection, dropNextTableSQL.c_str(), NULL, 0, &errorMessage);
+
+	// create a next table
 	string createNextTableSQL = "CREATE TABLE next (line_num_1 INT REFERENCES statement(line_num), line_num_2 INT REFERENCES statement(line_num), CONSTRAINT line_num_not_equal check(line_num_1 <> line_num_2));";
 	sqlite3_exec(dbConnection, createNextTableSQL.c_str(), NULL, 0, &errorMessage);
+	
+	
+	
 	if (errorMessage) {
 		cout << errorMessage << endl;
 	}
@@ -154,12 +168,11 @@ void Database::insertNext(int stmtNum1, int stmtNum2) {
 	if (errorMessage) { cout << "insertNext SQL Error: " << errorMessage; }
 }
 
-void Database::insertCall(int stmtNum, string procedureName, string variablename, int direct_call) {
+void Database::insertCall(int stmtNum, string procedureName, string variablename, int directCall) {
 	char sqlBuf[256];
-	sprintf(sqlBuf, "INSERT INTO call ('line_num','procedure_name','variable_name','direct_call' ) VALUES ('%i','%s','%s','%i');", stmtNum, procedureName.c_str(), variablename.c_str(), direct_call);
-	//string sql = "INSERT INTO modify ('line_num', 'procedure_name', 'variable_name' ) VALUES ('" + to_string(statementNumber) + "', '" + procedureName + "', '" + variablename + "');";
+	sprintf(sqlBuf, "INSERT INTO call ('line_num','procedure_name','variable_name', 'direct_call') VALUES ('%i','%s','%s','%i');", stmtNum, procedureName.c_str(), variablename.c_str(), directCall);
 	sqlite3_exec(dbConnection, sqlBuf, NULL, 0, &errorMessage);
-	if (errorMessage) { cout << "insertModifies SQL Error: " << errorMessage << endl; }
+	if (errorMessage) { cout << "insertCall SQL Error: " << errorMessage << endl; }
 }
 
 void Database::getNext_T(int stmtNum1, int stmtNum2, vector<string>& results) {
@@ -478,18 +491,33 @@ void Database::getUses(string entity, vector<string>& results) { // for cases su
 	}
 }
 
-void Database::getModifyStmt(string stmtNum1, string stmtNum2, bool lhs, vector<string>& results) {
+void Database::getModifies(int type, string resultType, string filterType, vector<string>& results) {
 	// clear the existing results
 	dbResults.clear();
 	string sql;
-
-	if (lhs) {
-		sql = "SELECT variable_name FROM modify WHERE line_num = '" + stmtNum1 + "'";
+	
+	if (type == 0) { //Ex. variable v; select v such that modifies(10,v)
+		sql = "SELECT variable_name FROM modify WHERE line_num = '" + filterType + "'";
 	}
-	else {
-		sql = "SELECT variable_name FROM modify WHERE line_num = '" + stmtNum2 + "'";
+	else if (type == 1) {
+		if (resultType == "variable") {
+			if (filterType == "assign" || filterType == "read") {
+				sql = "SELECT DISTINCT(m.variable_name) FROM modify m, statement s WHERE m.line_num = s.line_num AND s.entity = '" + filterType + "';";
+			}
+			else if (filterType == "procedure") {
+				sql = "SELECT DISTINCT(variable_name) FROM modify;";
+			}
+		}
+		else if (resultType == "procedure") {
+			if (filterType == "variable") {
+				sql = "SELECT DISTINCT(procedure_name) FROM modify;";
+			}
+		}
 	}
-
+	else if (type == 2) {
+		
+	}
+	
 	sqlite3_exec(dbConnection, sql.c_str(), callback, 0, &errorMessage);
 
 	if (errorMessage) {
