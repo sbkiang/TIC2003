@@ -11,7 +11,7 @@ QueryProcessor::QueryProcessor() {}
 QueryProcessor::~QueryProcessor() {}
 
 void QueryProcessor::EvaluateSelect(Select& st, map<string,string> synEntMap) {
-	string stmtNumEntityRegex = "stmt|read|print|assign|while|if|call", nameEntityRegex = "variable|procedure", columnName = "", stmtTable = "statement";
+	string regexStmtNumEntity = "stmt|read|print|assign|while|if|call", regexNameEntity = "variable|procedure", columnName = "", stmtTable = "statement";
 	map<string, int> tableCountMap;
 	int counter = 0;
 	char sqlBuf[1024] = {};
@@ -20,7 +20,7 @@ void QueryProcessor::EvaluateSelect(Select& st, map<string,string> synEntMap) {
 		string synonym = (*it);
 		string entity = synEntMap.at(synonym);
 		string tableAlias = "";
-		if (regex_match(entity, regex(stmtNumEntityRegex))) { // assign stmt can be obtained from statement table
+		if (regex_match(entity, regex(regexStmtNumEntity))) { // assign stmt can be obtained from statement table
 			if (tableCountMap.find(stmtTable) == tableCountMap.end()) { tableCountMap.insert(pair<string, int>(stmtTable, 0)); }
 			else { tableCountMap.at(stmtTable)++; }
 			columnName = "line_num";
@@ -28,7 +28,7 @@ void QueryProcessor::EvaluateSelect(Select& st, map<string,string> synEntMap) {
 			tableAlias = sqlBuf;
 			sprintf_s(sqlBuf, "%s %s", stmtTable.c_str(), tableAlias.c_str()); // E.g., statement s0, statement s1
 		}
-		else if (regex_match(entity, regex(nameEntityRegex))) { // entity belongs to the group that returns name
+		else if (regex_match(entity, regex(regexNameEntity))) { // entity belongs to the group that returns name
 			if (tableCountMap.find(entity) == tableCountMap.end()) { tableCountMap.insert(pair<string, int>(entity, 0)); }
 			else { tableCountMap.at(entity)++; }
 			columnName = "name";
@@ -41,7 +41,7 @@ void QueryProcessor::EvaluateSelect(Select& st, map<string,string> synEntMap) {
 		st.columnSql.push_back(sqlBuf);
 		sprintf_s(sqlBuf, "AS %s", synonym.c_str());
 		st.asSql.push_back(sqlBuf);
-		if (entity != "stmt" && !regex_match(entity, regex(nameEntityRegex))) { // not stmt and not procedure and not variable
+		if (entity != "stmt" && !regex_match(entity, regex(regexNameEntity))) { // not stmt and not procedure and not variable
 			sprintf_s(sqlBuf, "%s.entity='%s'", tableAlias.c_str(), entity.c_str()); // E.g., s0.type='while', s1.type='if'
 			st.whereSql.push_back(sqlBuf);
 		}
@@ -156,7 +156,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			pt.second = word.substr(comma + 1, word.length());
 			patternStack.push(pt);
 		}
-		else if (tokens[i] == "select") {
+		else if (tokens[i] == "Select") {
 			selectIdx = i;
 			i++;
 			if (tokens.at(i) == "<") {
@@ -174,12 +174,17 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			}
 		}
 	}
-	SqlResultSet selectPqlResultSet;
+	SqlResultStore sqlResultStore;
 	EvaluateSelect(select, synonymEntityMap);
-	Database::SelectPql(select, synonymEntityMap);
-	vector<SqlResultSet*> suchThatPqlResultVector;
+	Database::SelectPql(select, sqlResultStore);
 	
 	while (!suchThatStack.empty()) {
+		SuchThat suchThatTemp = suchThatStack.top();
+		for (int i = 0; i < sqlResultStore.sqlResult.size(); i++) {
+			if (suchThatTemp.relationship == "Uses") {
+				//Database::getUses(select.sqlResultSet.)
+			}
+		}
 		
 	}
 

@@ -36,6 +36,7 @@ public:
 	// method to insert a parent into the database
 	static void insertParent(int parentStmt, int childStart, int childEnd);
 	static void getParent(string stmtNum1, string stmtNum2, vector<string>& results);
+	static bool getParent(string input1, string input2); // for Parent(x,y), specific is number. non-specific is synonym
 	static void getChildren(string stmtNum1, string stmtNum2, string statementType, vector<string>& results);
 	static void getParentChildren(bool findparent, string resultType, string filterType, vector<string>& results);
 	
@@ -60,15 +61,27 @@ public:
 	// for cases such as uses(s,v) where s = stmt num and v = named variable. Return stmt num that has uses(s,"named_var")
 	static void getUses(int stmtNum, string variable, vector<string>& results);
 
+
+	// isSpecific is false if the input is not part of select synonym, and can be found on synonymEntityMap
+	static bool GetUsesForWhileIf(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, SqlResultStore& sqlResultStore, map<string, string> synEntMap);
+	static bool GetUsesForCall(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
+	static bool GetUsesForAssign(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
+	static bool GetUsesForPrint(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
+	static bool GetUsesForWhile(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
+	static bool GetUsesForIf(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
+	static bool GetUsesForProcedureCall(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
+	static bool GetUsesForUnknownInput1(string input1, string input2, bool input2IsSpecific); // E.g., Uses(10,v). We don't know what's the entity at statement 10
+
+
 	// method to insert/get a next into the database
 	static void insertNext(int stmtNum1, int stmtNum2);
 	static void getNext(int stmtNum1, int stmtNum2, vector<string>& results);
 	static void getNext_T(int stmtNum1, int stmtNum2, vector<string>& results);
 
-	//static void select(Select& st, SqlResultSet* sqlResultSet);
-	//static void select(Select& st, SqlResultSet* sqlResultSet, map<string,string> synonymEntityMap);
-	static void suchThat(SuchThat& st, SqlResultSet* sqlResultSet);
-	static void SelectPql(Select& st, map<string, string> synonymEntityMap);
+	//static void select(Select& st, SqlResultStore* sqlResultStore);
+	//static void select(Select& st, SqlResultStore* sqlResultStore, map<string,string> synEntMap);
+	static void suchThat(SuchThat& st, SqlResultStore* sqlResultStore);
+	static void SelectPql(Select& st, SqlResultStore& sqlResultStore);
 
 private:
 	// the connection pointer to the database

@@ -39,7 +39,7 @@ string SqlResult::getColumnValue(string col) {
 	return row.at(col);
 }
 
-vector<string> SqlResultSet::getColumnValues(string col) {
+vector<string> SqlResultStore::getColumnValues(string col) {
 	vector<string> result;
 	if (sqlResult.empty()) {
 		return result;
@@ -51,7 +51,7 @@ vector<string> SqlResultSet::getColumnValues(string col) {
 	return result;
 }
 
-vector<string> SqlResultSet::getColumnValues2(string col) {
+vector<string> SqlResultStore::getColumnValues2(string col) {
 	vector<string> result;
 	if (sqlResultSet.empty()) {
 		return result;

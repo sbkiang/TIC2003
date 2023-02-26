@@ -31,7 +31,7 @@ struct CFGNode {
 	CFGNode* _fJump = NULL; //For non-condition statement, _fJump points to NULL. For condition statement, _fJump points to first statement in the fail condition block
 };
 
-struct SqlResultSet {
+struct SqlResultStore {
 	vector<SqlResult*> sqlResult;
 	set<SqlResult*> sqlResultSet;
 	set<string> resultColumns;
@@ -40,7 +40,7 @@ struct SqlResultSet {
 };
 
 
-struct SqlResult : SqlResultSet{
+struct SqlResult : SqlResultStore {
 	map<string, string> row; // store mapping of column name to value
 	SqlResult() {}
 	SqlResult(string col, string val) {
@@ -97,5 +97,5 @@ struct Select {
 	vector<string> whereSql;
 	vector<string> columnSql;
 	vector<string> asSql;
-	SqlResultSet sqlResultSet;
+    //SqlResultSet sqlResultSet;
 };
