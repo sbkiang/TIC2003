@@ -2,8 +2,6 @@
 #include <sstream>
 #include <fstream>
 #include <vector>
-//#include "Struct.h"
-//#include "CFG.h"
 #include <iostream>
 #include <assert.h>
 

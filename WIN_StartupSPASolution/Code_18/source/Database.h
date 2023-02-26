@@ -64,12 +64,12 @@ public:
 
 	// isSpecific is false if the input is not part of select synonym, and can be found on synonymEntityMap
 	static bool GetUsesForWhileIf(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, SqlResultStore& sqlResultStore, map<string, string> synEntMap);
-	static bool GetUsesForCall(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
 	static bool GetUsesForAssign(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
 	static bool GetUsesForPrint(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
 	static bool GetUsesForWhile(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
 	static bool GetUsesForIf(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
-	static bool GetUsesForProcedureCall(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
+	static bool GetUsesForCall(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
+	static bool GetUsesForProcedure(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
 	static bool GetUsesForUnknownInput1(string input1, string input2, bool input2IsSpecific); // E.g., Uses(10,v). We don't know what's the entity at statement 10
 
 

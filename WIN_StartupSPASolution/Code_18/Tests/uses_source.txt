@@ -117,6 +117,10 @@ procedure callNone{
     x = 10;
     y = 10 * 10;
     read y;
+    call x1;
+    while(10 == 10){
+        call a2;
+    }
 }
 
 procedure x1{
@@ -125,5 +129,4 @@ procedure x1{
 
 procedure a2{
     c = d;
-    call a1;
 }

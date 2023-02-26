@@ -12,7 +12,6 @@ procedure proc1a{
 procedure proc2a{
     p2a = varInProc2aOnly;
     x = varInPRoc2Common + varInProc2aOnly;
-    call proc3a;
     call nestedCallee2;
 }
 
