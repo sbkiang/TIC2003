@@ -47,23 +47,7 @@ public:
 	// method to insert/get a use into the database
 	static void insertUses(int statementNumber, string procedureName, string variablename);
 
-	// for cases such as uses(<entity>,v) where <entity> = if,while,procedure,call,assign and v = variable v. Return type depends on entity
-	static void getUses(string entity, vector<string>& results); 
-	static void getUses(string entity, SqlResult& sqlRowSet);
-	static void getUses(string entity, SqlResult* sqlRowSet);
-
-	// for cases such as uses(<entity>,v) where <entity> = if,while,procedure,call,assign and v = named variable. Return type depends on entity, filtered to named variable
-	static void getUses(string entity, string variable, vector<string>& results);
-
-	// for cases such as uses(s,v) where s = stmt num and v = variable v. Return all variables in the specified stmt num
-	static void getUses(int stmtNum, vector<string>& results); 
-
-	// for cases such as uses(s,v) where s = stmt num and v = named variable. Return stmt num that has uses(s,"named_var")
-	static void getUses(int stmtNum, string variable, vector<string>& results);
-
-
 	// isSpecific is false if the input is not part of select synonym, and can be found on synonymEntityMap
-	static bool GetUsesForWhileIf(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, SqlResultStore& sqlResultStore, map<string, string> synEntMap);
 	static bool GetUsesForAssign(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
 	static bool GetUsesForPrint(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
 	static bool GetUsesForWhile(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);

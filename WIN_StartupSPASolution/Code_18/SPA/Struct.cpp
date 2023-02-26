@@ -45,8 +45,8 @@ vector<string> SqlResultStore::getColumnValues(string col) {
 		return result;
 	}
 	for (auto it = sqlResult.begin(); it != sqlResult.end(); it++) {
-		if ((*it)->getColumnValue(col) == "") { break; }
-		result.push_back((*it)->getColumnValue(col));
+		if ((*it).getColumnValue(col) == "") { break; }
+		result.push_back((*it).getColumnValue(col));
 	}
 	return result;
 }
@@ -57,8 +57,8 @@ vector<string> SqlResultStore::getColumnValues2(string col) {
 		return result;
 	}
 	for (auto it = sqlResultSet.begin(); it != sqlResultSet.end(); it++) {
-		if ((*it)->row.find(col) == (*it)->row.end()) { break; } // can't find the col in the result
-		result.push_back((*it)->row.at(col));
+		if ((*it).row.find(col) == (*it).row.end()) { break; } // can't find the col in the result
+		result.push_back((*it).row.at(col));
 	}
 	return result;
 }

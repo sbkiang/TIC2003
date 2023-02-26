@@ -32,9 +32,10 @@ struct CFGNode {
 };
 
 struct SqlResultStore {
-	vector<SqlResult*> sqlResult;
-	set<SqlResult*> sqlResultSet;
+	vector<SqlResult> sqlResult;
+	set<SqlResult> sqlResultSet;
 	set<string> resultColumns;
+	vector<string> column;
 	vector<string> getColumnValues(string column);
 	vector<string> getColumnValues2(string column);
 };

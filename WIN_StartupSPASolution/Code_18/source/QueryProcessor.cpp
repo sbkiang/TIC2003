@@ -74,17 +74,16 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	bool comma = false;
 	string regexWord = "\\w+";
 	string regexQuote = "\\\"";
-	string regexRelation = "Parent|Next|Calls|Modifies|Uses";
+	string regexRelation = "(Parent|Next|Calls|Modifies|Uses)";
+	string regexEntity = "(variable|constant|call|assign|stmt|read|print|while|if)";
 	map<string, string> synonymEntityMap;
 	//vector<map<string, string>> synonymEntityMapVector;
 	stack<SuchThat> suchThatStack;
 	stack<Pattern> patternStack;
 	Select select;
 	for (int i = 0; i < tokens.size(); i++) {
-		//change any uppercase char to lowercase
-		//transform(tokens[i].begin(), tokens[i].end(), tokens[i].begin(), [](unsigned char c) { return std::tolower(c); });
-
-		if (tokens[i] == "procedure" || tokens[i] == "variable" || tokens[i] == "constant" || tokens[i] == "call" || tokens[i] == "assign" || tokens[i] == "stmt" || tokens[i] == "read" || tokens[i] == "print" || tokens[i] == "while" || tokens[i] == "if") {
+		//if (tokens[i] == "procedure" || tokens[i] == "variable" || tokens[i] == "constant" || tokens[i] == "call" || tokens[i] == "assign" || tokens[i] == "stmt" || tokens[i] == "read" || tokens[i] == "print" || tokens[i] == "while" || tokens[i] == "if") {
+		if (regex_match(tokens.at(i), regex(regexEntity))){
 			synonymType.push_back(tokens[i]);
 			synonymVar.push_back(tokens[i + 1]);
 			string entityType = tokens.at(i);
@@ -176,35 +175,52 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	}
 	SqlResultStore sqlResultStore;
 	EvaluateSelect(select, synonymEntityMap);
+	vector<SqlResult> sqlResultPass;
 	Database::SelectPql(select, sqlResultStore);
 	
+
+	// need to determine if the input to such that is generic or specific
+	//	generic when it's a synonym and not part of select
+	//  specific when it's part of select or it's not a synonym
 	while (!suchThatStack.empty()) {
 		SuchThat suchThatTemp = suchThatStack.top();
+		bool synonymFirst = (synonymEntityMap.find(suchThatTemp.first) != synonymEntityMap.end()); // first input is a synonym
+		bool synonymSecond = (synonymEntityMap.find(suchThatTemp.second) != synonymEntityMap.end()); // second input is a synonym
+		bool synonymFirstSelect = (find(select.synonym.begin(), select.synonym.end(), suchThatTemp.first) != select.synonym.end()); // first input is part of select
+		bool synonymSecondSelect = (find(select.synonym.begin(), select.synonym.end(), suchThatTemp.second) != select.synonym.end()); // second input is part of select
+		string entity = "", first = suchThatTemp.first, second = suchThatTemp.second;
+		if (synonymFirstSelect) { entity = synonymEntityMap.at(suchThatTemp.first); }
+		if (synonymSecondSelect) { entity = synonymEntityMap.at(suchThatTemp.second); }
 		for (int i = 0; i < sqlResultStore.sqlResult.size(); i++) {
+			SqlResult sqlResulTemp = sqlResultStore.sqlResult.at(i);
+			if (synonymFirstSelect) { // if the first input is a synonym, and is part of select, get the input 
+				first = sqlResulTemp.row.at(suchThatTemp.first);
+			}
+			if (synonymSecondSelect) { // if the second input is a synonym, and is part of select, get the input 
+				second = sqlResulTemp.row.at(suchThatTemp.second);
+			}
 			if (suchThatTemp.relationship == "Uses") {
-				//Database::getUses(select.sqlResultSet.)
+				bool pass = false;
+				if (entity == "assign") { pass = Database::GetUsesForAssign(first, second, synonymFirstSelect, synonymSecondSelect); }
+				else if (entity == "print") { pass = Database::GetUsesForPrint(first, second, synonymFirstSelect, synonymSecondSelect); }
+				else if (entity == "while") { pass = Database::GetUsesForWhile(first, second, synonymFirstSelect, synonymSecondSelect); }
+				else if (entity == "call") { pass = Database::GetUsesForCall(first, second, synonymFirstSelect, synonymSecondSelect); }
+				else if (entity == "procedure") { pass = Database::GetUsesForProcedure(first, second, synonymFirstSelect, synonymSecondSelect); }
+				if (pass) { sqlResultPass.push_back(sqlResulTemp); }
 			}
 		}
-		
+		sqlResultStore.sqlResult = sqlResultPass;
+		suchThatStack.pop();
 	}
-
-
-	/*
-		Generate the database result for "select <synonym>".If is tuple, create SQL to join
-		Create a Select function in database. Will take in synonym type, and synonym count
-		Will craft SQL statement. If synonym count > 1, will create join SQL statements
-			E.g., stmt a,b; Select <a,b> = SELECT s1.stmtNum, s2.stmtNum from statement s1 join statement s2. But hard to craft statement?
-			E.g., stmt a,b; procedure p; Select <a,p> = SELECT line_num, proc_name from stmt a join procedure
-		
-		need to know the entity type for select table. so now, we get either the stmt num or name based on the entity type, joined together if needed
-		then, need to know what each synonym's value for all the "such that" and "pattern". We pass in the synonym, and each synonym maps to the value
-		can use the sqlRow and sqlRowSet. sqlRow store synonym-to-value map for each row
-		
-	*/
 	
 	// post process the results to fill in the output vector
-	for (string databaseResult : databaseResults) {
-		output.push_back(databaseResult);
+	for (SqlResult sqlResult : sqlResultStore.sqlResult) {
+		string ouptut;
+		for (int i = 0; i < sqlResultStore.column.size(); i++) {
+			string col = sqlResult.column.at(i);
+			auto test = sqlResult.row.at(col);
+		}
+		output.push_back(ouptut);
 	}
 
 }

@@ -422,10 +422,11 @@ bool Database::GetUsesForAssign(string input1, string input2, bool input1IsSpeci
 	else if (!input1IsSpecific && !input2IsSpecific) {
 		sprintf_s(sqlBuf, "SELECT 1 FROM use u WHERE u.line_num in (SELECT s.line_num FROM statement s WHERE s.entity = 'assign');");
 	}
+
 	SqlResultStore rs;
 	sqlResultStoreForCallback = &rs;
 	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
-	return (sqlResultStoreForCallback->sqlResult.empty());
+	return (!(sqlResultStoreForCallback->sqlResult.empty()));
 }
 
 bool Database::GetUsesForPrint(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific) {
@@ -449,10 +450,11 @@ bool Database::GetUsesForPrint(string input1, string input2, bool input1IsSpecif
 	else if (!input1IsSpecific && !input2IsSpecific) {
 		sprintf_s(sqlBuf, "SELECT 1 FROM use u WHERE u.line_num in (SELECT s.line_num FROM statement s WHERE s.entity = 'print');");
 	}
+
 	SqlResultStore rs;
 	sqlResultStoreForCallback = &rs;
 	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
-	return (sqlResultStoreForCallback->sqlResult.empty());
+	return (!(sqlResultStoreForCallback->sqlResult.empty()));
 }
 
 bool Database::GetUsesForWhile(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific) {
@@ -481,18 +483,18 @@ bool Database::GetUsesForWhile(string input1, string input2, bool input1IsSpecif
 	else if (!input1IsSpecific && !input2IsSpecific) {
 		sprintf_s(sqlBuf, "select 1 from use u where exists (select 1 from parent p join statement s on p.line_num = s.line_num where s.entity = 'while' and u.line_num between p.line_num and p.child_end);");
 	}
+
 	SqlResultStore rs;
 	sqlResultStoreForCallback = &rs;
 	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
-	return (sqlResultStoreForCallback->sqlResult.empty());
+	return (!(sqlResultStoreForCallback->sqlResult.empty()));
 }
 
 bool Database::GetUsesForIf(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific) {
 	//select 1 from use u where u.variable_name = '%s' and exists (select 1 from parent p join statement s on p.line_num = s.line_num where s.entity = 'if' and u.line_num between p.line_num and p.child_end)
 	
 	char sqlBuf[512] = {};
-	SqlResultStore rs;
-	sqlResultStoreForCallback = &rs;
+
 
 	// Uses(i,"cenX") or Uses(i,v) where "i" is "if i", "v" is "variable v", "i" not present in select, "v" present in select
 	if (!input1IsSpecific && input2IsSpecific) {
@@ -514,14 +516,17 @@ bool Database::GetUsesForIf(string input1, string input2, bool input1IsSpecific,
 		sprintf_s(sqlBuf, "select 1 from use u where exists (select 1 from parent p join statement s on p.line_num = s.line_num where s.entity = 'if' and u.line_num between p.line_num and p.child_end);");
 	}
 
+	SqlResultStore rs;
+	sqlResultStoreForCallback = &rs;
 	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
-	return (sqlResultStoreForCallback->sqlResult.empty());
+	return (!(sqlResultStoreForCallback->sqlResult.empty()));
 }
 
 bool Database::GetUsesForCall(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific) {
 	//select 1 from use u where u.variable_name = '%s' and exists (select 1 from statement s where s.entity = 'call' and s.text = '%s' and s.line_num = u.line_num)
 	
 	char sqlBuf[512] = {};
+
 	// Uses(c,"cenX") or Uses(c,v) is true, where "c" is "call c", "v" is variable v, "c" not present in select, "v" present in select
 	if (!input1IsSpecific && input2IsSpecific) {
 		sprintf_s(sqlBuf, "select 1 from use u where u.variable_name = '%s' and exists (select 1 from statement s where s.entity = 'call' and s.line_num = u.line_num);", input2.c_str());
@@ -544,13 +549,14 @@ bool Database::GetUsesForCall(string input1, string input2, bool input1IsSpecifi
 	SqlResultStore rs;
 	sqlResultStoreForCallback = &rs;
 	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
-	return (sqlResultStoreForCallback->sqlResult.empty());
+	return (!(sqlResultStoreForCallback->sqlResult.empty()));
 }
 
 bool Database::GetUsesForProcedure(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific) {
 	//select 1 from use u where u.variable_name = '%s' and exists (select 1 from procedure p where p.name = '%s' and u.line_num between p.start and p.end)
 
 	char sqlBuf[512] = {};
+
 	// Uses(p,"cenX") or Uses(p,v) is true, where "p" is "procedure p", "v" is variable v, "p" not present in select, "v" present in select
 	if (!input1IsSpecific && input2IsSpecific) {
 		sprintf_s(sqlBuf, "select 1 from use u where u.variable_name = '%s' and exists (select 1 from procedure p where u.line_num between p.start and p.end);", input2.c_str());
@@ -573,7 +579,7 @@ bool Database::GetUsesForProcedure(string input1, string input2, bool input1IsSp
 	SqlResultStore rs;
 	sqlResultStoreForCallback = &rs;
 	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
-	return (sqlResultStoreForCallback->sqlResult.empty());
+	return (!(sqlResultStoreForCallback->sqlResult.empty()));
 }
 
 bool Database::GetUsesForUnknownInput1(string input1, string input2, bool input2IsSpecific) { // for cases like "uses(10,v)" . stmt 10 can be if, while, call. we don't know
@@ -583,8 +589,8 @@ bool Database::GetUsesForUnknownInput1(string input1, string input2, bool input2
 	sprintf_s(sqlBuf, "SELECT entity, text FROM statement WHERE line_num = '%s';", input1.c_str());
 	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
 	if (errorMessage) { cout << "GetUsesForUnknownInput1 SQL Error: " << errorMessage; }
-	string entity = rs.sqlResult.at(0)->row.at("entity");
-	string text = rs.sqlResult.at(0)->row.at("text");
+	string entity = rs.sqlResult.at(0).row.at("entity");
+	string text = rs.sqlResult.at(0).row.at("text");
 
 	// e.g., use(10, v), and stmt 10 is "x = a + b" or "print x". We just need to select from use table with the correct stmtNum to get the variables
 	if (entity == "assign") { return Database::GetUsesForAssign(input1, input2, true, input2IsSpecific); }
@@ -592,154 +598,7 @@ bool Database::GetUsesForUnknownInput1(string input1, string input2, bool input2
 	if (entity == "call") { return Database::GetUsesForCall(input1, input2, true, input2IsSpecific); }
 	if (entity == "while") { return Database::GetUsesForWhile(input1, input2, true, input2IsSpecific); }
 	if (entity == "if") { return Database::GetUsesForIf(input1, input2, true, input2IsSpecific); }
-
-	/*
-	if (entity == "assign" || entity == "print") {
-		sprintf_s(sqlBuf, "SELECT variable_name FROM use WHERE line_num = '%s';", input1.c_str());
-		sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
-	}
-
-	// e.g, use(10, v), and stmt 10 is "call procedureX". We need to get all the var that fulfills the use(x,v) in this procedure, and all direct/indirect called procedures in this procedure
-	else if (entity == "call") {
-		rs.sqlResult.clear();
-		sprintf_s(sqlBuf, "with recursive cte as("
-			"select s.text from statement s join procedure p on s.procedure_name = p.name where p.name = '%s' and s.entity = 'call' union select '%s' "
-			"union "
-			"select s.text from statement s join procedure p on s.procedure_name = p.name join cte c where p.name = c.text and s.entity = 'call') "
-			"select * from cte;", text.c_str(), text.c_str());
-		sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
-		if (errorMessage) { cout << "getUse \"entity == call\" SQL Error: " << errorMessage; }
-		string proceduresJoin = "";
-		for (int i = 0; i < dbResults.size(); i++) { // due to recursive query, each result is in its own dbResult[i] 
-			char buf[256] = {};
-			sprintf_s(buf, "'%s',", dbResults.at(i).at(0).c_str());
-			proceduresJoin.append(buf);
-		}
-		proceduresJoin.pop_back(); // remove the last ","
-		dbResults.clear();
-		sprintf_s(sqlBuf, "select distinct u.variable_name from use u where exists (select 1 from procedure p where name in (%s) and u.line_num between p.start and p.end);", proceduresJoin.c_str());
-		sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
-	}
-
-	// e.g., use(10, v), and stmt 10 is "if(...)", and inside "if(...)", there's use(s, v). We get all uses(s,v) in that container
-	else if (entity == "while" || entity == "if") {
-		dbResults.clear();
-		sprintf_s(sqlBuf, "select distinct u.variable_name from use u where exists (select 1 from parent p where u.line_num between p.line_num and p.child_end and p.line_num = %i);", input1.c_str());
-		sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
-	}
-
-	if (errorMessage) { cout << "GetUsesForUnknownInput1SQL Error: " << errorMessage; }
-	return false;
-	*/
 }
-
-/*
-void Database::getUses(int stmtNum, vector<string>& results) { // for cases such as uses(s,v) where s = stmt num, and v is "variable v;"
-	dbResults.clear();
-	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, "SELECT entity, text FROM statement WHERE line_num = %i;", stmtNum);
-	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
-	if (errorMessage) { cout << "getUse start SQL Error: " << errorMessage; return; }
-	
-	string entity = dbResults.at(0).at(0);
-	string text = dbResults.at(0).at(1);
-
-	// e.g., use(10, v), and stmt 10 is "x = a + b" or "print x". We just need to select from use table with the correct stmtNum to get the variables
-	if (entity == "assign" || entity == "print") { 
-		sprintf_s(sqlBuf, "SELECT variable_name FROM use WHERE line_num = %i;", stmtNum);
-		sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
-	}
-
-	// e.g, use(10, v), and stmt 10 is "call procedureX". We need to get all the var that fulfills the use(x,v) in this procedure, and all direct/indirect called procedures in this procedure
-	else if (entity == "call") {
-		dbResults.clear();
-		sprintf_s(sqlBuf, "with recursive cte as("
-			"select s.text from statement s join procedure p on s.procedure_name = p.name where p.name = '%s' and s.entity = 'call' union select '%s' "
-			"union "
-			"select s.text from statement s join procedure p on s.procedure_name = p.name join cte c where p.name = c.text and s.entity = 'call') "
-			"select * from cte;", text.c_str(), text.c_str());
-		sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
-		if (errorMessage) { cout << "getUse \"entity == call\" SQL Error: " << errorMessage; return; }
-		string proceduresJoin = "";
-		for (int i = 0; i < dbResults.size(); i++) { // due to recursive query, each result is in its own dbResult[i] 
-			char buf[256] = {};
-			sprintf_s(buf, "'%s',", dbResults.at(i).at(0).c_str());
-			proceduresJoin.append(buf);
-		}
-		proceduresJoin.pop_back(); // remove the last ","
-		dbResults.clear();
-		sprintf_s(sqlBuf, "select distinct u.variable_name from use u where exists (select 1 from procedure p where name in (%s) and u.line_num between p.start and p.end);", proceduresJoin.c_str());
-		sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
-	}
-
-	// e.g., use(10, v), and stmt 10 is "if(...)", and inside "if(...)", there's use(s, v). We get all uses(s,v) in that container
-	else if (entity == "while" || entity == "if") {
-		dbResults.clear();
-		sprintf_s(sqlBuf, "select distinct u.variable_name from use u where exists (select 1 from parent p where u.line_num between p.line_num and p.child_end and p.line_num = %i);", stmtNum);
-		sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
-	}
-
-	if (errorMessage) { cout << "getUse end SQL Error: " << errorMessage; return; }
-
-	for (vector<string> dbRow : dbResults) {
-		string result;
-		result = dbRow.at(0);
-		results.push_back(result);
-	}
-}
-*/
-
-/*
-void Database::getUses(int stmtNum, string variable, vector<string>& results) {
-	vector<string> localResults;
-	Database::getUses(stmtNum, localResults);
-	for (int i = 0; i < localResults.size(); i++) {
-		if (localResults.at(i) == variable) {
-
-		}
-	}
-}
-*/
-
-/*
-void Database::getUses(string entity, SqlResult* sqlResult) { // for cases such as uses(<entity>, v), and <entity> and v is a general entity. E.g., "procedure p;" or "assign a;" or "variable v;"
-	dbResults.clear();
-	char sqlBuf[512] = {};
-	if (entity == "assign" || entity == "print") { // for cases such as "assign a; variable v; select uses(a,v)"
-		sprintf_s(sqlBuf, "SELECT * FROM statement s JOIN use u ON s.line_num = u.line_num WHERE s.entity = '%s';", entity.c_str());
-	}
-
-	else if (entity == "call") { // for cases such as "call c; select uses(c,v)" = return all call stmts that has uses(c,v)
-		sprintf_s(sqlBuf,"select s.line_num from statement s join procedure p on p.name = s.text where s.entity = 'call' and exists (select 1 from use u where u.line_num between p.start and p.end);");
-	}
-
-	else if (entity == "procedure") { // for cases such as "procedure p; select uses(p,v)" = reuturn all procedure name that has uses(c,v)		
-		sprintf_s(sqlBuf,"select p.name from procedure p where exists (select 1 from use u where u.line_num between p.start and p.end);");
-	}
-
-	else if (entity == "if" || entity == "while") { // for cases such as "if i; select uses(i,v)" = return all if statements that has uses(c,v). Kind of pointless because it'll return all of them
-		sprintf_s(sqlBuf, "select p.line_num from parent p join statement s on p.line_num = s.line_num where s.entity = '%s' and exists (select 1 from use u where u.line_num between p.line_num and p.child_end);", entity.c_str());
-	}
-
-	dbResults.clear();
-	//sqlResultSetPtrForCallback = sqlResult;
-	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
-
-	if (errorMessage) {
-		cout << "getUse SQL Error: " << errorMessage;
-		return;
-	}
-
-	/*
-	for (vector<string> dbRow : dbResults) {
-		string result;
-		result = dbRow.at(0);
-		results.push_back(result);
-	}
-	*/
-
-}
-*/
 
 void Database::getModifyStmt(string stmtNum1, string stmtNum2, bool lhs, vector<string>& results) {
 	// clear the existing results
@@ -811,19 +670,21 @@ void Database::SelectPql(Select& st, SqlResultStore& sqlResultStore) {
 int Database::callback(void* NotUsed, int columnCount, char** columnValues, char** columnNames) {
 	NotUsed = 0;
 	vector<string> dbRow;
-	SqlResult* sqlResult = new SqlResult;
+	SqlResult sqlResult;
 	// argc is the number of columns for this row of results
 	// argv contains the values for the columns
 	// Each value is pushed into a vector.
 	for (int i = 0; i < columnCount; i++) {
 		dbRow.push_back(columnValues[i]);
-		sqlResult->row.insert(std::pair<string, string>(columnNames[i], string(columnValues[i])));
+		sqlResult.row.insert(std::pair<string, string>(columnNames[i], string(columnValues[i])));
 	}
+	sqlResultStoreForCallback->column.push_back(columnNames[i]);
 	
 	// The row is pushed to the vector for storing all rows of results 
 	dbResults.push_back(dbRow);
 	sqlResultStoreForCallback->sqlResult.push_back(sqlResult);
 	sqlResultStoreForCallback->sqlResultSet.insert(sqlResult);
+	
 
 	return 0;
 }
