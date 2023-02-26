@@ -121,18 +121,16 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 				}
 			}
 
-			if (!isNumber(stmtNum1) && !isNumber(stmtNum2)) { //(x,y) which are output result and filter query
-				int i = 0;
-				selectVar = tokens[selectIdx + 1];
-				for (string _var : synonymVar) {
-					if (selectVar == _var) {
-						resultType = tokens[i];
-					}
-					else {
-						filterType = tokens[i];
-					}
-					i = i + 3;
+			int i = 0;
+			selectVar = tokens[selectIdx + 1];
+			for (string _var : synonymVar) {
+				if (selectVar == _var) {
+					resultType = tokens[i];
 				}
+				else {
+					filterType = tokens[i];
+				}
+				i = i + 3;
 			}
 
 			if (designAbstract == "parent" || designAbstract == "parentt") {
@@ -174,9 +172,8 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			}
 			else if (designAbstract == "modifies") {
 				//Relationship between statement/procedure and variable
-
-				if (isNumber(stmtNum1) && !isNumber(stmtNum2)) { //‘Modifies’ ‘(’ stmtRef ‘,’ entRef ‘)’ -> (integer, synonym)
-					Database::getModifies(0, "", stmtNum1, "", "", databaseResults);
+				if (isNumber(stmtNum1) || isNumber(stmtNum2)) { //‘Modifies’ ‘(’ stmtRef ‘,’ entRef ‘)’ -> (integer, synonym)
+					Database::getModifies(0, resultType, filterType, stmtNum2, stmtNum1, databaseResults);
 				}
 				else if (!isNumber(stmtNum1) && !isNumber(stmtNum2)) { //No integer
 

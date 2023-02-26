@@ -1,14 +1,14 @@
 <?xml-stylesheet type="text/xsl" href="analysis.xsl"?>
 <test_results>
 <info>
-<name>AutoTester</name><parsing_time_taken>955.000000</parsing_time_taken>
+<name>AutoTester</name><parsing_time_taken>911.000000</parsing_time_taken>
 </info>
 <queries>
 <query>
 <id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="Variable">1</id><querystr><![CDATA[variable v; Select v such that Modifies (10, v)]]></querystr>
 <stuans>count</stuans>
 <correct>count</correct>
-<time_taken>13.000000</time_taken>
+<time_taken>12.000000</time_taken>
 <passed/>
 </query>
 <query>
@@ -22,7 +22,7 @@
 <id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="swap read (r,v)">3</id><querystr><![CDATA[variable v; read a; Select v such that Modifies(r, v)]]></querystr>
 <stuans>x,y</stuans>
 <correct>x,y</correct>
-<time_taken>12.000000</time_taken>
+<time_taken>16.000000</time_taken>
 <passed/>
 </query>
 <query>
@@ -36,35 +36,112 @@
 <id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="Swap Assign (a,v)">5</id><querystr><![CDATA[variable v; assign a; Select v such that Modifies(a, v)]]></querystr>
 <stuans>flag,count,cenX,cenY,normSq</stuans>
 <correct>flag,count,cenX,cenY,normSq</correct>
-<time_taken>12.000000</time_taken>
+<time_taken>8.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="Procedure (p, v)">6</id><querystr><![CDATA[variable v; procedure p; Select p such that Modifies (p, v)]]></querystr>
 <stuans>main,readPoint,computeCentroid</stuans>
 <correct>main,computeCentroid,readPoint</correct>
-<time_taken>12.000000</time_taken>
+<time_taken>8.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="swap Procedure (p, v)">7</id><querystr><![CDATA[procedure p; variable v; Select p such that Modifies (p, v)]]></querystr>
 <stuans>main,readPoint,computeCentroid</stuans>
 <correct>main,computeCentroid,readPoint</correct>
-<time_taken>12.000000</time_taken>
+<time_taken>10.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="Procedure (p, v)">8</id><querystr><![CDATA[variable v; procedure p; Select v such that Modifies (p, v)]]></querystr>
 <stuans>flag,x,y,count,cenX,cenY,normSq</stuans>
 <correct>flag,x,y,count,cenX,cenY,normSq</correct>
-<time_taken>14.000000</time_taken>
+<time_taken>12.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="Procedure (p, v)">9</id><querystr><![CDATA[variable v; procedure p; Select p such that Modifies (p, "x")]]></querystr>
 <stuans>computeCentroid,main,readPoint</stuans>
 <correct>main,computeCentroid,readPoint</correct>
-<time_taken>15.000000</time_taken>
+<time_taken>10.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="Call (c, v)">10</id><querystr><![CDATA[variable v; call c; Select v such that Modifies ("readPoint", v)]]></querystr>
+<stuans>x,y</stuans>
+<correct>x,y</correct>
+<time_taken>11.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="Call (c, v)">11</id><querystr><![CDATA[variable v; call c; Select c such that Modifies (c, "x")]]></querystr>
+<stuans>readPoint</stuans>
+<correct>readPoint</correct>
+<time_taken>18.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="while (w, v)">12</id><querystr><![CDATA[variable v; while w; Select v such that Modifies (w, v)]]></querystr>
+<stuans>cenX,cenY,count,x,y</stuans>
+<correct>x,y,count,cenX,cenY</correct>
+<time_taken>18.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" SuchThat="1" CondNum="2" RelNum="0" comment="stmt">13</id><querystr><![CDATA[procedure p; stmt s; select s such that modifies(p,s)]]></querystr>
+<stuans>1,4,5,10,11,12,15,16,17,20,21,22,23</stuans>
+<correct>1,4,5,10,11,12,15,16,17,20,21,22,23</correct>
+<time_taken>16.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" SuchThat="1" CondNum="2" RelNum="0" comment="stmt">14</id><querystr><![CDATA[procedure p; stmt s; select s such that modifies("readPoint",s)]]></querystr>
+<stuans>4,5</stuans>
+<correct>4,5</correct>
+<time_taken>13.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" SuchThat="1" CondNum="2" RelNum="0" comment="if">15</id><querystr><![CDATA[if f; variable v; select v such that modifies(f,v)]]></querystr>
+<stuans>cenX,cenY,flag</stuans>
+<correct>flag,cenX,cenY</correct>
+<time_taken>14.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" SuchThat="1" CondNum="2" RelNum="0" comment="if">16</id><querystr><![CDATA[if f; stmt s; select s such that modifies(f,s)]]></querystr>
+<stuans>20,21,22</stuans>
+<correct>20,21,22</correct>
+<time_taken>12.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" SuchThat="1" CondNum="2" RelNum="0" comment="while">17</id><querystr><![CDATA[while w; stmt s; select s such that modifies(w,s)]]></querystr>
+<stuans>4,5,15,16,17</stuans>
+<correct>4,5,15,16,17</correct>
+<time_taken>13.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="read (r,s)">18</id><querystr><![CDATA[read r; stmt s;  Select s such that Modifies(r, s)]]></querystr>
+<stuans>4,5</stuans>
+<correct>4,5</correct>
+<time_taken>11.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="Assign (a,s)">19</id><querystr><![CDATA[assign a; stmt s;   Select s such that Modifies(a, s)]]></querystr>
+<stuans>1,10,11,12,15,16,17,20,21,22,23</stuans>
+<correct>1,10,11,12,15,16,17,20,21,22,23</correct>
+<time_taken>10.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" SuchThat="1" CondNum="2" RelNum="0" comment="procedure">20</id><querystr><![CDATA[procedure p; select p such that modifies(p,5)]]></querystr>
+<stuans>readPoint</stuans>
+<correct>readPoint</correct>
+<time_taken>9.000000</time_taken>
 <passed/>
 </query>
 </queries>

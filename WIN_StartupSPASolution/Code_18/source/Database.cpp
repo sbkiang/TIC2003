@@ -498,7 +498,12 @@ void Database::getModifies(int type, string resultType, string filterType, strin
 	string sql;
 	
 	if (type == 0) { //‘Modifies’ ‘(’ stmtRef ‘,’ entRef ‘)’ -> (integer, synonym)
-		sql = "SELECT variable_name FROM modify WHERE line_num = '" + filterType + "'";
+		if (resultType == "variable") {
+			sql = "SELECT variable_name FROM modify WHERE line_num = '" + filterVariable + "'";
+		}
+		else if (resultType == "procedure") {
+			sql = "SELECT procedure_name FROM modify WHERE line_num = '" + resultVariable + "'";
+		}
 	}
 	else if (type == 1) {
 		if (resultType == "variable") { //‘Modifies’ ‘(’ stmtRef ‘,’ entRef ‘)’ || ‘(’ entRef ‘,’ entRef ‘)’ -> (synonym, synonym)
@@ -508,13 +513,25 @@ void Database::getModifies(int type, string resultType, string filterType, strin
 			else if (filterType == "procedure") {
 				sql = "SELECT DISTINCT(variable_name) FROM modify;";
 			}
-			else if (filterType == "while") {
-				sql = "SELECT DISTINCT(variable_name) FROM modify;";
+			else if (filterType == "while" || filterType == "if") {
+				sql = "WITH RECURSIVE expanded_range(n) AS ( SELECT p.child_start FROM parent p WHERE p.line_num IN(SELECT s.line_num FROM statement s WHERE s.entity = '" + filterType + "') UNION ALL SELECT n + 1 FROM expanded_range WHERE n + 1 <= (SELECT p.child_end FROM parent p WHERE p.line_num IN(SELECT s.line_num FROM statement s WHERE s.entity = '" + filterType + "'))) SELECT variable_name FROM modify WHERE line_num IN(SELECT n FROM expanded_range) UNION SELECT variable_name FROM modify WHERE procedure_name IN(SELECT DISTINCT(c.variable_name) FROM call c WHERE c.line_num IN(SELECT n FROM expanded_range));";
 			}
+			
 		}
 		else if (resultType == "procedure") {
 			if (filterType == "variable") {
 				sql = "SELECT DISTINCT(procedure_name) FROM modify;";
+			}
+		}
+		else if (resultType == "stmt") {
+			if (filterType == "procedure") {
+				sql = "SELECT line_num FROM modify;";
+			}
+			else if (filterType == "read" || filterType == "assign") {
+				sql = "SELECT DISTINCT(m.line_num) FROM modify m, statement s WHERE m.procedure_name = s.procedure_name AND s.entity = '" + filterType + "';";
+			}
+			else if (filterType == "while" || filterType == "if") {
+				sql = "WITH RECURSIVE expanded_range(n) AS ( SELECT p.child_start FROM parent p WHERE p.line_num IN(SELECT s.line_num FROM statement s WHERE s.entity = '" + filterType + "') UNION ALL SELECT n + 1 FROM expanded_range WHERE n + 1 <= (SELECT p.child_end FROM parent p WHERE p.line_num IN(SELECT s.line_num FROM statement s WHERE s.entity = '" + filterType + "'))) SELECT line_num FROM modify WHERE line_num IN(SELECT n FROM expanded_range) UNION SELECT line_num FROM modify WHERE procedure_name IN(SELECT DISTINCT(c.variable_name) FROM call c WHERE c.line_num IN(SELECT n FROM expanded_range));";
 			}
 		}
 	}
@@ -523,16 +540,29 @@ void Database::getModifies(int type, string resultType, string filterType, strin
 			sql = "SELECT DISTINCT(c.procedure_name) FROM call c WHERE c.variable_name IN (SELECT DISTINCT(m.procedure_name) FROM modify m WHERE m.variable_name = '" + filterVariable + "') UNION SELECT DISTINCT(m2.procedure_name) FROM modify m2 WHERE m2.variable_name = '" + filterVariable + "'";
 		}
 		else if (resultType == "call") {
-			sql = "SELECT DISTINCT(procedure_name) FROM modify WHERE variable_name = '" + filterVariable + "'";
+			sql = "SELECT DISTINCT(procedure_name) FROM modify WHERE variable_name = '" + filterVariable + "';";
 		}
-		
 	}
 	else if (type == 3) { //‘Modifies’ ‘(’ entRef ‘,’ entRef ‘)’ -> (‘"’ IDENT ‘"’, synonym)
-		if (resultType == "variable" && filterType == "procedure") {
-			//sql = "SELECT DISTINCT(procedure_name) FROM modify WHERE ";
+		if (resultType == "variable") {
+			if (filterType == "procedure") {
+				//sql = "SELECT DISTINCT(procedure_name) FROM modify WHERE ";
+			}
+			else if (filterType == "call") {
+				sql = "SELECT DISTINCT(variable_name) FROM modify WHERE procedure_name = '" + filterVariable + "';";
+			}
 		}
-		else if (resultType == "variable" && filterType == "call") {
-			sql = "SELECT DISTINCT(variable_name) FROM modify WHERE procedure_name = '" + filterVariable + "';";
+		else if (resultType == "stmt") {
+			if (filterType == "procedure") {
+				sql = "SELECT line_num FROM modify WHERE procedure_name = '" + filterVariable + "';";
+			}
+		}
+	}
+	else { //‘Modifies’ ‘(’ entRef ‘,’ entRef ‘)’ -> (‘"’ IDENT ‘"’, ‘"’ IDENT ‘"’)
+		if (resultType == "variable") {
+			if (filterType == "procedure") {
+				//sql = "SELECT DISTINCT(procedure_name) FROM modify WHERE ";
+			}
 		}
 	}
 
