@@ -180,14 +180,15 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		} 
 		for (int i = 0; i < sqlResultStore.sqlResult.size(); i++) {
 			SqlResult sqlResulTemp = sqlResultStore.sqlResult.at(i);
+			bool pass = false;
+			string relationship = suchThatTemp.relationship;
 			if (suchThatFirstInSelect) { // if the first input is a synonym, and is part of select, get the input 
 				first = sqlResulTemp.row.at(suchThatTemp.first);
 			}
 			if (suchThatSecondInSelect) { // if the second input is a synonym, and is part of select, get the input 
 				second = sqlResulTemp.row.at(suchThatTemp.second);
 			}
-			if (suchThatTemp.relationship == "Uses") {
-				bool pass = false;
+			if (relationship == "Uses") {
 				if (entity == "assign") { pass = Database::GetUsesForAssign(first, second, input1Specific, input2Specific); }
 				else if (entity == "print") { pass = Database::GetUsesForPrint(first, second, input1Specific, input2Specific); }
 				else if (entity == "while") { pass = Database::GetUsesForWhile(first, second, input1Specific, input2Specific); }
@@ -197,7 +198,16 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 				if (pass) { sqlResultPass.push_back(sqlResulTemp); }
 				// add in code to check if synonym used in query. If not, then just need to test once for first row, and result applies to all row
 			}
-			if (suchThatTemp.relationship == "Parent*") {
+			else if(relationship == "Modifies") {
+				if (entity == "assign") { pass = Database::GetModifiesForAssign(first, second, input1Specific, input2Specific); }
+				else if (entity == "read") { pass = Database::GetModifiesForRead(first, second, input1Specific, input2Specific); }
+				else if (entity == "while") { pass = Database::GetModifiesForWhile(first, second, input1Specific, input2Specific); }
+				else if (entity == "call") { pass = Database::GetModifiesForCall(first, second, input1Specific, input2Specific); }
+				else if (entity == "procedure") { pass = Database::GetModifiesForProcedure(first, second, input1Specific, input2Specific); }
+				else { pass = Database::GetModifiesForUnknownInput1(first, second, input1Specific, input2Specific); } // e.g., uses(10,v) or uses("main",v). just pass in here even
+				if (pass) { sqlResultPass.push_back(sqlResulTemp); }
+			}
+			else if (relationship == "Parent") {
 
 			}
 		} 

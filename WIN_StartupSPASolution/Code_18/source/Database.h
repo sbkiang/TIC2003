@@ -41,11 +41,11 @@ public:
 	static void getParentChildren(bool findparent, string resultType, string filterType, vector<string>& results);
 	
 	// method to insert/get a modify into the database
-	static void insertModifies(int statementNumber, string procedureName, string variablename);
+	static void insertModifies(int statementNumber, string variablename);
 	static void getModifyStmt(string stmtNum1, string stmtNum2, bool lhs, vector<string>& results);
 
 	// method to insert/get a use into the database
-	static void insertUses(int statementNumber, string procedureName, string variablename);
+	static void insertUses(int statementNumber, string variablename);
 
 	// isSpecific is false if the input is not part of select synonym, and can be found on synonymEntityMap
 	static bool GetUsesForAssign(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
@@ -55,6 +55,14 @@ public:
 	static bool GetUsesForCall(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
 	static bool GetUsesForProcedure(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
 	static bool GetUsesForUnknownInput1(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific); // E.g., Uses(10,v). We don't know what's the entity at statement 10
+
+	static bool GetModifiesForAssign(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
+	static bool GetModifiesForRead(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
+	static bool GetModifiesForWhile(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
+	static bool GetModifiesForIf(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
+	static bool GetModifiesForCall(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
+	static bool GetModifiesForProcedure(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
+	static bool GetModifiesForUnknownInput1(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific); // E.g., Uses(10,v). We don't know what's the entity at statement 10
 
 
 	// method to insert/get a next into the database

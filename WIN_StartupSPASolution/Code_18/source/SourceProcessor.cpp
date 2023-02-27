@@ -91,7 +91,7 @@ void SourceProcessor::process(string program) {
 
 			for (int i = 0; i < useStore.size(); i++) {
 				// database PK constraint will trigger for duplicate variables with same line_num to prevent duplicate insertion
-				Database::insertUses(useStore.at(i).getAdjustedStmtNum(), procedure.back()->_name, useStore.at(i)._stmt);
+				Database::insertUses(useStore.at(i).getAdjustedStmtNum(), useStore.at(i)._stmt);
 				procedure.back()->_uses.push_back(useStore.at(i)._stmt);
 				//container->_uses.push_back((useStore.at(i)._stmt));
 			}
@@ -137,7 +137,7 @@ void SourceProcessor::process(string program) {
 
 			for (int i = 0; i < useStore.size(); i++) {
 				// database PK constraint will trigger for duplicate variables with same line_num to prevent duplicate insertion
-				Database::insertUses(useStore.at(i).getAdjustedStmtNum(), procedure.back()->_name, useStore.at(i)._stmt);
+				Database::insertUses(useStore.at(i).getAdjustedStmtNum(), useStore.at(i)._stmt);
 				procedure.back()->_uses.push_back((useStore.at(i)._stmt));
 				//container->_uses.push_back((useStore.at(i)._stmt));
 			}
@@ -196,13 +196,13 @@ void SourceProcessor::process(string program) {
 
 			for (int i = 0; i < useStore.size(); i++) {
 				// database PK constraint will trigger for duplicate variables with same line_num to prevent duplicate insertion
-				Database::insertUses(useStore.at(i).getAdjustedStmtNum(), procedure.back()->_name, useStore.at(i)._stmt);
+				Database::insertUses(useStore.at(i).getAdjustedStmtNum(), useStore.at(i)._stmt);
 				procedure.back()->_uses.push_back(useStore.at(i)._stmt);
 				//parentStack.top()->_uses.push_back((useStore.at(i)._stmt));
 			}
 
 			for (int i = 0; i < modifiesStore.size(); i++) {
-				Database::insertModifies(modifiesStore.at(i).getAdjustedStmtNum(), procedure.back()->_name, modifiesStore.at(i)._stmt);
+				Database::insertModifies(modifiesStore.at(i).getAdjustedStmtNum(), modifiesStore.at(i)._stmt);
 				procedure.back()->_modifies.push_back(modifiesStore.at(i)._stmt);
 				//parentStack.top()->_modifies.push_back((modifiesStore.at(i)._stmt));
 			}
@@ -233,7 +233,7 @@ void SourceProcessor::process(string program) {
 					i++;
 				}
 				for (int i = 0; i < useStore.size(); i++) {
-					Database::insertUses(useStore.at(i).getAdjustedStmtNum(), procedure.back()->_name, useStore.at(i)._stmt);
+					Database::insertUses(useStore.at(i).getAdjustedStmtNum(), useStore.at(i)._stmt);
 					procedure.back()->_uses.push_back(useStore.at(i)._stmt);
 					//parentStack.top()->_uses.push_back(useStore.at(i)._stmt);
 				}
@@ -243,7 +243,7 @@ void SourceProcessor::process(string program) {
 				vector<Statement> modifiesStore;
 				modifiesStore.push_back(Statement(stmtNum, tokens.at(i + 1), stmtNumSubtract));
 				for (int i = 0; i < modifiesStore.size(); i++) {
-					Database::insertModifies(modifiesStore.at(i).getAdjustedStmtNum(), procedure.back()->_name, modifiesStore.at(i)._stmt);
+					Database::insertModifies(modifiesStore.at(i).getAdjustedStmtNum(), modifiesStore.at(i)._stmt);
 					procedure.back()->_modifies.push_back(modifiesStore.at(i)._stmt);
 					//parentStack.top()->_modifies.push_back(modifiesStore.at(i)._stmt);
 				}
@@ -278,8 +278,8 @@ void SourceProcessor::process(string program) {
 		Procedure* proc = (*it).second;
 		vector<string> allUses = proc->GetAllUses();
 		vector<string> allModifies = proc->GetAllModifies();
-		for (int i = 0; i < allUses.size(); i++) { Database::insertUses(stmt->getAdjustedStmtNum(), "", allUses.at(i));	}
-		for (int i = 0; i < allModifies.size(); i++) { Database::insertModifies(stmt->getAdjustedStmtNum(), "", allModifies.at(i)); }
+		for (int i = 0; i < allUses.size(); i++) { Database::insertUses(stmt->getAdjustedStmtNum(), allUses.at(i));	}
+		for (int i = 0; i < allModifies.size(); i++) { Database::insertModifies(stmt->getAdjustedStmtNum(), allModifies.at(i)); }
 	}
 
 	vector<CFG*> CFGs;

@@ -59,7 +59,7 @@ void Database::initialize() {
 	sqlite3_exec(dbConnection, dropModifyTableSQL.c_str(), NULL, 0, &errorMessage);
 
 	// create a modify table
-	string createModifyTableSQL = "CREATE TABLE modify ( line_num INT REFERENCES statement(line_num), procedure_name VARCHAR(50) REFERENCES procedure(name), variable_name VARCHAR(50) REFERENCES variable(name));";
+	string createModifyTableSQL = "CREATE TABLE modify ( line_num INT REFERENCES statement(line_num), variable_name VARCHAR(50) REFERENCES variable(name), PRIMARY KEY(line_num, variable_name));";
 	sqlite3_exec(dbConnection, createModifyTableSQL.c_str(), NULL, 0, &errorMessage);
 
 	// drop the existing use table (if any)
@@ -67,16 +67,14 @@ void Database::initialize() {
 	sqlite3_exec(dbConnection, dropUseTableSQL.c_str(), NULL, 0, &errorMessage);
 
 	// create a use table
-	string createUseTableSQL = "CREATE TABLE use ( line_num INT REFERENCES statement(line_num), procedure_name VARCHAR(50) REFERENCES procedure(name), variable_name VARCHAR(50) REFERENCES variable(name), PRIMARY KEY(line_num, procedure_name, variable_name));";
+	string createUseTableSQL = "CREATE TABLE use ( line_num INT REFERENCES statement(line_num), variable_name VARCHAR(50) REFERENCES variable(name), PRIMARY KEY(line_num, variable_name));";
 	sqlite3_exec(dbConnection, createUseTableSQL.c_str(), NULL, 0, &errorMessage);
 
 	string dropNextTableSQL = "DROP TABLE IF EXISTS next";
 	sqlite3_exec(dbConnection, dropNextTableSQL.c_str(), NULL, 0, &errorMessage);
 	string createNextTableSQL = "CREATE TABLE next (line_num_1 INT REFERENCES statement(line_num), line_num_2 INT REFERENCES statement(line_num), CONSTRAINT line_num_not_equal check(line_num_1 <> line_num_2));";
 	sqlite3_exec(dbConnection, createNextTableSQL.c_str(), NULL, 0, &errorMessage);
-	if (errorMessage) {
-		cout << errorMessage << endl;
-	}
+	if (errorMessage) { cout << "insertStatement SQL Error: " << errorMessage << endl; return; }
 
 	// initialize the result vector
 	dbResults = vector<vector<string>>();
@@ -112,15 +110,17 @@ void Database::insertVariable(string stmtName, int stmtNum) {
 	sqlite3_exec(dbConnection, sqlBuf, NULL, 0, &errorMessage);
 	char sqlError[256];
 	sprintf_s(sqlError, "insertVariable SQL Error for %s at stmtNum %i: ", stmtName.c_str(), stmtNum);
-	if (errorMessage) { cout << sqlError << errorMessage << endl; }
+	if (errorMessage) { 
+
+		cout << sqlError << errorMessage << endl; 
+	}
 }
 
 void Database::insertConstant(string value) {
 	char sqlBuf[256];
 	sprintf_s(sqlBuf, "INSERT INTO constant ('value') VALUES ('%s');", value.c_str());
-	//string sql = "INSERT INTO constant ('value') VALUES ('" + value + "');";
 	sqlite3_exec(dbConnection, sqlBuf, NULL, 0, &errorMessage);
-	//if (errorMessage) { cout << "insertConstant SQL Error: " << errorMessage << endl; }
+	if (errorMessage) { cout << "insertConstant SQL Error: " << errorMessage << endl; }
 }
 
 void Database::insertParent(int parent, int child_start, int child_end) {
@@ -131,9 +131,9 @@ void Database::insertParent(int parent, int child_start, int child_end) {
 	if (errorMessage) { cout << "insertParent SQL Error: " << errorMessage << endl; }
 }
 
-void Database::insertUses(int stmtNum, string procedureName, string variableName) {
+void Database::insertUses(int stmtNum, string variableName) {
 	char sqlBuf[256];
-	sprintf_s(sqlBuf, "INSERT INTO use ('line_num','procedure_name','variable_name' ) VALUES ('%i','%s','%s');", stmtNum, procedureName.c_str(), variableName.c_str());
+	sprintf_s(sqlBuf, "INSERT INTO use ('line_num','variable_name' ) VALUES ('%i','%s');", stmtNum, variableName.c_str());
 	//string sql = "INSERT INTO use ('line_num', 'procedure_name', 'variable_name' ) VALUES ('" + to_string(statementNumber) + "', '" + procedureName + "', '" + variablename + "');";
 	sqlite3_exec(dbConnection, sqlBuf, NULL, 0, &errorMessage);
 	char sqlError[256];
@@ -142,9 +142,9 @@ void Database::insertUses(int stmtNum, string procedureName, string variableName
 
 }
 
-void Database::insertModifies(int stmtNum, string procedureName, string variablename) {
+void Database::insertModifies(int stmtNum, string variablename) {
 	char sqlBuf[256];
-	sprintf_s(sqlBuf, "INSERT INTO modify ('line_num','procedure_name','variable_name' ) VALUES ('%i','%s','%s');", stmtNum, procedureName.c_str(), variablename.c_str());
+	sprintf_s(sqlBuf, "INSERT INTO modify ('line_num','variable_name' ) VALUES ('%i','%s');", stmtNum, variablename.c_str());
 	//string sql = "INSERT INTO modify ('line_num', 'procedure_name', 'variable_name' ) VALUES ('" + to_string(statementNumber) + "', '" + procedureName + "', '" + variablename + "');";
 	sqlite3_exec(dbConnection, sqlBuf, NULL, 0, &errorMessage);
 	if (errorMessage) { cout << "insertModifies SQL Error: " << errorMessage << endl; }
@@ -593,18 +593,227 @@ bool Database::GetUsesForUnknownInput1(string input1, string input2, bool input1
 		sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
 		if (errorMessage) { cout << "GetUsesForUnknownInput1 SQL Error: " << errorMessage; }
 		string entity = rs.sqlResult.at(0).row.at("entity");
+		string text = rs.sqlResult.at(0).row.at("text");
 
 		// e.g., use(10, v), and stmt 10 is "x = a + b" or "print x". We just need to select from use table with the correct stmtNum to get the variables
 		if (entity == "assign") { return Database::GetUsesForAssign(input1, input2, input1IsSpecific, input2IsSpecific); }
 		if (entity == "print") { return Database::GetUsesForPrint(input1, input2, input1IsSpecific, input2IsSpecific); }
-		if (entity == "call") { return Database::GetUsesForCall(input1, input2, input1IsSpecific, input2IsSpecific); }
+		if (entity == "call") { return Database::GetUsesForCall(text, input2, input1IsSpecific, input2IsSpecific); }
 		if (entity == "while") { return Database::GetUsesForWhile(input1, input2, input1IsSpecific, input2IsSpecific); }
 		if (entity == "if") { return Database::GetUsesForIf(input1, input2, input1IsSpecific, input2IsSpecific); }
+		return false;
 	}
-	else { // input is a char is not a digit = a name
-		return Database::GetUsesForProcedure(input1, input2, true, input2IsSpecific);
-	}	
+	else { // input first char is not a digit = a name
+		return Database::GetUsesForProcedure(input1, input2, input1IsSpecific, input2IsSpecific);
+	}
 }
+
+bool Database::GetModifiesForAssign(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific) {
+	// select 1 from modify m where m.variable_name = '%s' and m.line_num in (select s.line_num from statement s where entity = 'assign' and s.line_num = '%s');
+
+	char sqlBuf[512] = {};
+	// Modifies(a,"cenX") or Modifies(a,v) where "a" is "assign a", "v" is "variable v", "a" not present in select, "v" present in select
+	if (!input1IsSpecific && input2IsSpecific) {
+		sprintf_s(sqlBuf, "select 1 from modify m where m.variable_name = '%s' and m.line_num in (select s.line_num from statement s where entity = 'assign');", input2.c_str());
+	}
+
+	// Modifies(a,"cenX") or Modifies(a,v) where "a" is "assign a", "v" is "variable v", both present in select
+	else if (input1IsSpecific && input2IsSpecific) {
+		sprintf_s(sqlBuf, "select 1 from modify m where m.variable_name = '%s' and m.line_num in (select s.line_num from statement s where entity = 'assign' and s.line_num = '%s');", input2.c_str(), input1.c_str());
+	}
+
+	// Modifies(a,v) where "a" is assign a,"v" is variable v, only "a" present in select
+	else if (input1IsSpecific && !input2IsSpecific) {
+		sprintf_s(sqlBuf, "select 1 from modify m where m.line_num in (select s.line_num from statement s where entity = 'assign' and s.line_num = '%s');", input1.c_str());
+	}
+
+	// Modifies(a,v) where "a" is assign a, "v" is variable, both not present in select
+	else if (!input1IsSpecific && !input2IsSpecific) {
+		sprintf_s(sqlBuf, "select 1 from modify m where m.line_num in (select s.line_num from statement s where entity = 'assign');");
+	}
+
+	SqlResultStore rs;
+	sqlResultStoreForCallback = &rs;
+	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
+	return (!(sqlResultStoreForCallback->sqlResult.empty()));
+}
+
+bool Database::GetModifiesForRead(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific) {
+	// select 1 from modify m where m.variable_name = '%s' and m.line_num in (select s.line_num from statement s where entity = 'print' and s.line_num = '%s');
+
+	char sqlBuf[512] = {};
+	// Modifies(p,"cenX") or Modifies(p,v) where "r" is "read r", "v" is "variable v", "r" not present in select, "v" present in select
+	if (!input1IsSpecific && input2IsSpecific) {
+		sprintf_s(sqlBuf, "select 1 from modify m where m.variable_name = '%s' and m.line_num in (select s.line_num from statement s where entity = 'read');", input2.c_str());
+	}
+
+	// Modifies(p,"cenX") or Modifies(p,v) where "r" is "read r", "v" is "variable v", both present in select
+	else if (input1IsSpecific && input2IsSpecific) {
+		sprintf_s(sqlBuf, "select 1 from modify m where m.variable_name = '%s' and m.line_num in (select s.line_num from statement s where entity = 'print' and s.line_num = '%s');", input2.c_str(), input1.c_str());
+	}
+
+	// Modifies(p,"cenX") or Modifies(p,v) where "r" is "read r", "v" is "variable v", only "r" present in select
+	else if (input1IsSpecific && !input2IsSpecific) {
+		sprintf_s(sqlBuf, "select 1 from modify m where m.line_num in (select s.line_num from statement s where entity = 'print' and s.line_num = '%s');", input1.c_str());
+	}
+
+	// Modifies(p,"cenX") or Modifies(p,v) where "r" is "read r", "v" is "variable v", both not present in select
+	else if (!input1IsSpecific && !input2IsSpecific) {
+		sprintf_s(sqlBuf, "select 1 from modify m where m.line_num in (select s.line_num from statement s where entity = 'read');");
+	}
+
+	SqlResultStore rs;
+	sqlResultStoreForCallback = &rs;
+	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
+	return (!(sqlResultStoreForCallback->sqlResult.empty()));
+}
+
+bool Database::GetModifiesForWhile(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific) {
+	//select 1 from modify m where m.variable_name = '%s' and exists (select 1 from parent p join statement s on p.line_num = s.line_num where s.entity = 'while' and m.line_num between p.line_num and p.child_end)
+
+	char sqlBuf[512] = {};
+	// Modifies(w,"cenX") or Modifies(w,v) is true, where "w" is while w, "v" is variable v, "w" not present in select, "v" present in select
+	if (!input1IsSpecific && input2IsSpecific) {
+		//sprintf_s(sqlBuf, "SELECT p.line_num FROM parent p JOIN statement s ON p.line_num = s.line_num WHERE s.entity = 'while' AND EXISTS (SELECT 1 FROM modify m WHERE m.line_num BETWEEN p.line_num AND p.child_end AND m.variable_name = '%s');", input2.c_str());
+		sprintf_s(sqlBuf, "select 1 from modify m where m.variable_name = '%s' and exists (select 1 from parent p join statement s on p.line_num = s.line_num where s.entity = 'while' and m.line_num between p.line_num and p.child_end);", input2.c_str());
+	}
+
+	// Modifies(w,"cenX") or Modifies(w,v) is true, where "w" is while w, "v" is variable v, and both are present in select
+	else if (input1IsSpecific && input2IsSpecific) {
+		sprintf_s(sqlBuf, "select 1 from modify m where m.variable_name = '%s' and exists (select 1 from parent p where p.line_num = '%s' and m.line_num between p.line_num and p.child_end);", input2.c_str(), input1.c_str());
+	}
+
+	// Modifies(w,v) where "w" is while w,"v" is variable v, and only "w" is present in select
+	else if (input1IsSpecific && !input2IsSpecific) {
+		sprintf_s(sqlBuf, "select 1 from modify m where exists (select 1 from parent p where p.line_num = '%s' and m.line_num between p.line_num and p.child_end);", input1.c_str());
+	}
+
+	// we are looking for each statement and checking if Modifies(pn,v) is true, where "pn" is assign pn, "v" is variable, and both are not present in select
+	else if (!input1IsSpecific && !input2IsSpecific) {
+		sprintf_s(sqlBuf, "select 1 from modify m where exists (select 1 from parent p join statement s on p.line_num = s.line_num where s.entity = 'while' and m.line_num between p.line_num and p.child_end);");
+	}
+
+	SqlResultStore rs;
+	sqlResultStoreForCallback = &rs;
+	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
+	return (!(sqlResultStoreForCallback->sqlResult.empty()));
+}
+
+bool Database::GetModifiesForIf(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific) {
+	//select 1 from modify m where m.variable_name = '%s' and exists (select 1 from parent p join statement s on p.line_num = s.line_num where s.entity = 'if' and m.line_num between p.line_num and p.child_end)
+
+	char sqlBuf[512] = {};
+
+
+	// Modifies(i,"cenX") or Modifies(i,v) where "i" is "if i", "v" is "variable v", "i" not present in select, "v" present in select
+	if (!input1IsSpecific && input2IsSpecific) {
+		sprintf_s(sqlBuf, "select 1 from modify m where m.variable_name = '%s' and exists (select 1 from parent p join statement s on p.line_num = s.line_num where s.entity = 'if' and m.line_num between p.line_num and p.child_end);", input2.c_str());
+	}
+
+	// Modifies(i,"cenX") or Modifies(i,v) where "i" is "if i", "v" is "variable v", and both are present in select
+	else if (input1IsSpecific && input2IsSpecific) {
+		sprintf_s(sqlBuf, "select 1 from modify m where m.variable_name = '%s' and exists (select 1 from parent p where p.line_num = '%s' and m.line_num between p.line_num and p.child_end);", input2.c_str(), input1.c_str());
+	}
+
+	// Modifies(i,v) where "i" is "if i", "v" is "variable v", and only "i" is present in select
+	else if (input1IsSpecific && !input2IsSpecific) {
+		sprintf_s(sqlBuf, "select 1 from modify m where exists (select 1 from parent p where p.line_num = '%s' and m.line_num between p.line_num and p.child_end);", input1.c_str());
+	}
+
+	// Modifies(pn,v) where "pn" is "if i", "v" "is variable", and both are not present in select
+	else if (!input1IsSpecific && !input2IsSpecific) {
+		sprintf_s(sqlBuf, "select 1 from modify m where exists (select 1 from parent p join statement s on p.line_num = s.line_num where s.entity = 'if' and m.line_num between p.line_num and p.child_end);");
+	}
+
+	SqlResultStore rs;
+	sqlResultStoreForCallback = &rs;
+	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
+	return (!(sqlResultStoreForCallback->sqlResult.empty()));
+}
+
+bool Database::GetModifiesForCall(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific) {
+	//select 1 from modify m where m.variable_name = '%s' and exists (select 1 from statement s where s.entity = 'call' and s.text = '%s' and s.line_num = m.line_num)
+
+	char sqlBuf[512] = {};
+
+	// Modifies(c,"cenX") or Modifies(c,v) is true, where "c" is "call c", "v" is variable v, "c" not present in select, "v" present in select
+	if (!input1IsSpecific && input2IsSpecific) {
+		sprintf_s(sqlBuf, "select 1 from modify m where m.variable_name = '%s' and exists (select 1 from statement s where s.entity = 'call' and s.line_num = m.line_num);", input2.c_str());
+	}
+
+	// Modifies(c,"cenX") or Modifies(c,v) is true, where "c" is "call c", "v" is "variable v", and both are present in select
+	else if (input1IsSpecific && input2IsSpecific) {
+		sprintf_s(sqlBuf, "select 1 from modify m where m.variable_name = '%s' and exists (select 1 from statement s where s.entity = 'call' and s.text = '%s' and s.line_num = m.line_num);", input2.c_str(), input1.c_str());
+	}
+
+	// Modifies(c,v) where "c" is "call c", "v" is "variable v", and only "c" is present in select
+	else if (input1IsSpecific && !input2IsSpecific) {
+		sprintf_s(sqlBuf, "select 1 from modify m where exists (select 1 from statement s where s.entity = 'call' and s.text = '%s' and s.line_num = m.line_num);", input1.c_str());
+	}
+
+	// we are looking for each statement and checking if Modifies(c,v) is true, where "c" is "call c", "v" is variable, and both are not present in select
+	else if (!input1IsSpecific && !input2IsSpecific) {
+		sprintf_s(sqlBuf, "select 1 from modify m where exists (select 1 from statement s where s.entity = 'call' and s.line_num = m.line_num);");
+	}
+	SqlResultStore rs;
+	sqlResultStoreForCallback = &rs;
+	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
+	return (!(sqlResultStoreForCallback->sqlResult.empty()));
+}
+
+bool Database::GetModifiesForProcedure(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific) {
+	//select 1 from modify m where m.variable_name = '%s' and exists (select 1 from procedure p where p.name = '%s' and m.line_num between p.start and p.end)
+
+	char sqlBuf[512] = {};
+
+	// Modifies(p,"cenX") or Modifies(p,v) is true, where "r" is "procedure p", "v" is variable v, "r" not present in select, "v" present in select
+	if (!input1IsSpecific && input2IsSpecific) {
+		sprintf_s(sqlBuf, "select 1 from modify m where m.variable_name = '%s' and exists (select 1 from procedure p where m.line_num between p.start and p.end);", input2.c_str());
+	}
+
+	// Modifies(p,"cenX") or Modifies(p,v) is true, where "r" is "procedure p", "v" is "variable v", and both are present in select
+	else if (input1IsSpecific && input2IsSpecific) {
+		sprintf_s(sqlBuf, "select 1 from modify m where m.variable_name = '%s' and exists (select 1 from procedure p where p.name = '%s' and m.line_num between p.start and p.end);", input2.c_str(), input1.c_str());
+	}
+
+	// Modifies(p,v) where "r" is "procedure p", "v" is "variable v", and only "r" is present in select
+	else if (input1IsSpecific && !input2IsSpecific) {
+		sprintf_s(sqlBuf, "select 1 from modify m where exists (select 1 from procedure p where p.name = '%s' and m.line_num between p.start and p.end);", input1.c_str());
+	}
+
+	// we are looking for each statement and checking if Modifies(c,v) is true, where "c" is "call c", "v" is variable, and both are not present in select
+	else if (!input1IsSpecific && !input2IsSpecific) {
+		sprintf_s(sqlBuf, "select 1 from modify m where exists (select 1 from procedure p where m.line_num between p.start and p.end);");
+	}
+	SqlResultStore rs;
+	sqlResultStoreForCallback = &rs;
+	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
+	return (!(sqlResultStoreForCallback->sqlResult.empty()));
+}
+
+bool Database::GetModifiesForUnknownInput1(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific) { // for cases like "Modifies(10,v)" . stmt 10 can be if, while, call. we don't know
+	SqlResultStore rs;
+	sqlResultStoreForCallback = &rs;
+	char sqlBuf[512] = {};
+	if (isdigit(input1[0])) { // input first char is a digit = statement number
+		sprintf_s(sqlBuf, "SELECT entity, text FROM statement WHERE line_num = '%s';", input1.c_str());
+		sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
+		if (errorMessage) { cout << "GetModifiesForUnknownInput1 SQL Error: " << errorMessage; }
+		string entity = rs.sqlResult.at(0).row.at("entity");
+		string text = rs.sqlResult.at(0).row.at("text");
+
+		// e.g., use(10, v), and stmt 10 is "x = a + b" or "print x". We just need to select from use table with the correct stmtNum to get the variables
+		if (entity == "assign") { return Database::GetModifiesForAssign(input1, input2, input1IsSpecific, input2IsSpecific); }
+		if (entity == "print") { return Database::GetModifiesForRead(input1, input2, input1IsSpecific, input2IsSpecific); }
+		if (entity == "call") { return Database::GetModifiesForCall(text, input2, input1IsSpecific, input2IsSpecific); }
+		if (entity == "while") { return Database::GetModifiesForWhile(input1, input2, input1IsSpecific, input2IsSpecific); }
+		if (entity == "if") { return Database::GetModifiesForIf(input1, input2, input1IsSpecific, input2IsSpecific); }
+	}
+	else { // input first char is not a digit = a name
+		return Database::GetModifiesForProcedure(input1, input2, input1IsSpecific, input2IsSpecific);
+	}
+}
+
 
 void Database::getModifyStmt(string stmtNum1, string stmtNum2, bool lhs, vector<string>& results) {
 	// clear the existing results
