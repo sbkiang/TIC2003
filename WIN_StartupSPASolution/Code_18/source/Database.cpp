@@ -402,25 +402,27 @@ void Database::getParentChildren(bool findparent, string resultType, string filt
 */
 
 bool Database::GetUsesForAssign(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific) {
+	// select 1 from use u where u.variable_name = '%s' and u.line_num in (select s.line_num from statement s where entity = 'assign' and s.line_num = '%s');
+
 	char sqlBuf[512] = {};
-	// we are looking for each statements and checking if Uses(a,"cenX") is true, where "a" is assign a, but not present in select
+	// Uses(a,"cenX") or Uses(a,v) where "a" is "assign a", "v" is "variable v", "a" not present in select, "v" present in select
 	if (!input1IsSpecific && input2IsSpecific) { 
-		sprintf_s(sqlBuf, "SELECT 1 FROM use u WHERE u.variable_name = '%s' AND u.line_num in (SELECT s.line_num FROM statement s WHERE entity = 'assign');", input2.c_str());
+		sprintf_s(sqlBuf, "select 1 from use u where u.variable_name = '%s' and u.line_num in (select s.line_num from statement s where entity = 'assign');", input2.c_str());
 	}
 	
-	// we are looking for each statements and checking if Uses(a,"cenX") or Uses(a,v) is true, where "a" is assign a, "v" is variable v, and both are present in select
+	// Uses(a,"cenX") or Uses(a,v) where "a" is "assign a", "v" is "variable v", both present in select
 	else if (input1IsSpecific && input2IsSpecific) { 
-		sprintf_s(sqlBuf, "SELECT 1 FROM use u WHERE u.line_num = '%s' AND u.variable_name = '%s'", input1.c_str(), input2.c_str());
+		sprintf_s(sqlBuf, "select 1 from use u where u.variable_name = '%s' and u.line_num in (select s.line_num from statement s where entity = 'assign' and s.line_num = '%s');", input2.c_str(), input1.c_str());
 	}
 
-	// Uses(a,v) where "a" is assign a,"v" is variable v, and only "a" is present in select
+	// Uses(a,v) where "a" is assign a,"v" is variable v, only "a" present in select
 	else if (input1IsSpecific && !input2IsSpecific) {
-		sprintf_s(sqlBuf, "SELECT 1 FROM statement s WHERE s.line_num = '%s' AND s.entity = 'assign'", input1.c_str());
+		sprintf_s(sqlBuf, "select 1 from use u where u.line_num in (select s.line_num from statement s where entity = 'assign' and s.line_num = '%s');", input1.c_str());
 	}
 
-	// we are looking for each statement and checking if Uses(a,v) is true, where "a" is assign a, "v" is variable, and both are not present in select
+	// Uses(a,v) where "a" is assign a, "v" is variable, both not present in select
 	else if (!input1IsSpecific && !input2IsSpecific) {
-		sprintf_s(sqlBuf, "SELECT 1 FROM use u WHERE u.line_num in (SELECT s.line_num FROM statement s WHERE s.entity = 'assign');");
+		sprintf_s(sqlBuf, "select 1 from use u where u.line_num in (select s.line_num from statement s where entity = 'assign');");
 	}
 
 	SqlResultStore rs;
@@ -430,25 +432,27 @@ bool Database::GetUsesForAssign(string input1, string input2, bool input1IsSpeci
 }
 
 bool Database::GetUsesForPrint(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific) {
+	// select 1 from use u where u.variable_name = '%s' and u.line_num in (select s.line_num from statement s where entity = 'print' and s.line_num = '%s');
+
 	char sqlBuf[512] = {};
-	// we are looking for each statements and checking if Uses(pn,"cenX") is true, where "pn" is print pn, but not present in select
+	// Uses(p,"cenX") or Uses(p,v) where "p" is "print p", "v" is "variable v", "p" not present in select, "v" present in select
 	if (!input1IsSpecific && input2IsSpecific) {
-		sprintf_s(sqlBuf, "SELECT 1 FROM use u WHERE u.variable_name = '%s' AND u.line_num in (SELECT s.line_num FROM statement s WHERE entity = 'print');", input2.c_str());
+		sprintf_s(sqlBuf, "select 1 from use u where u.variable_name = '%s' and u.line_num in (select s.line_num from statement s where entity = 'print');", input2.c_str());
 	}
 
-	// we are looking for each statements and checking if Uses(pn,"cenX") or Uses(pn,v) is true, where "pn" is print pn, "v" is variable v, and both are present in select
+	// Uses(p,"cenX") or Uses(p,v) where "p" is "print p", "v" is "variable v", both present in select
 	else if (input1IsSpecific && input2IsSpecific) {
-		sprintf_s(sqlBuf, "SELECT 1 FROM use u WHERE u.line_num = '%s' AND u.variable_name = '%s'", input1.c_str(), input2.c_str());
+		sprintf_s(sqlBuf, "select 1 from use u where u.variable_name = '%s' and u.line_num in (select s.line_num from statement s where entity = 'print' and s.line_num = '%s');", input2.c_str(), input1.c_str());
 	}
 
-	// Uses(pn,v) where "pn" is print pn,"v" is variable v, and only "pn" is present in select
+	// Uses(p,"cenX") or Uses(p,v) where "p" is "print p", "v" is "variable v", only "p" present in select
 	else if (input1IsSpecific && !input2IsSpecific) {
-		sprintf_s(sqlBuf, "SELECT 1 FROM statement s WHERE s.line_num = '%s' AND s.entity = 'print'", input1.c_str());
+		sprintf_s(sqlBuf, "select 1 from use u where u.line_num in (select s.line_num from statement s where entity = 'print' and s.line_num = '%s');", input1.c_str());
 	}
 
-	// we are looking for each statement and checking if Uses(pn,v) is true, where "pn" is assign pn, "v" is variable, and both are not present in select
+	// Uses(p,"cenX") or Uses(p,v) where "p" is "print p", "v" is "variable v", both not present in select
 	else if (!input1IsSpecific && !input2IsSpecific) {
-		sprintf_s(sqlBuf, "SELECT 1 FROM use u WHERE u.line_num in (SELECT s.line_num FROM statement s WHERE s.entity = 'print');");
+		sprintf_s(sqlBuf, "select 1 from use u where u.line_num in (select s.line_num from statement s where entity = 'print');");
 	}
 
 	SqlResultStore rs;
@@ -467,13 +471,11 @@ bool Database::GetUsesForWhile(string input1, string input2, bool input1IsSpecif
 		sprintf_s(sqlBuf, "select 1 from use u where u.variable_name = '%s' and exists (select 1 from parent p join statement s on p.line_num = s.line_num where s.entity = 'while' and u.line_num between p.line_num and p.child_end);", input2.c_str());
 	}
 
-	// we are looking for each statements and checking if Uses(w,"cenX") or Uses(w,v) is true, where "w" is while w, "v" is variable v, and both are present in select
+	// Uses(w,"cenX") or Uses(w,v) is true, where "w" is while w, "v" is variable v, and both are present in select
 	else if (input1IsSpecific && input2IsSpecific) {
-		sprintf_s(sqlBuf, "select 1 from use u where u.variable_name = '%s' and exists (select 1 from parent p where p.line_num = '%s' and u.line_num between p.line_num and p.child_end);", input1.c_str(), input2.c_str());
+		sprintf_s(sqlBuf, "select 1 from use u where u.variable_name = '%s' and exists (select 1 from parent p where p.line_num = '%s' and u.line_num between p.line_num and p.child_end);", input2.c_str(), input1.c_str());
 	}
 
-	// issue when inside while loop, we have a call statement, and inside call statement have uses(s,v) So there's only indirect uses(s,v). Need to know if call statement exists in container
-	// , and know if call statement fulfills uses(s,v)
 	// Uses(w,v) where "w" is while w,"v" is variable v, and only "w" is present in select
 	else if (input1IsSpecific && !input2IsSpecific) {
 		sprintf_s(sqlBuf, "select 1 from use u where exists (select 1 from parent p where p.line_num = '%s' and u.line_num between p.line_num and p.child_end);", input1.c_str());
@@ -503,7 +505,7 @@ bool Database::GetUsesForIf(string input1, string input2, bool input1IsSpecific,
 
 	// Uses(i,"cenX") or Uses(i,v) where "i" is "if i", "v" is "variable v", and both are present in select
 	else if (input1IsSpecific && input2IsSpecific) {
-		sprintf_s(sqlBuf, "select 1 from use u where u.variable_name = '%s' and exists (select 1 from parent p where p.line_num = '%s' and u.line_num between p.line_num and p.child_end);", input1.c_str(), input2.c_str());
+		sprintf_s(sqlBuf, "select 1 from use u where u.variable_name = '%s' and exists (select 1 from parent p where p.line_num = '%s' and u.line_num between p.line_num and p.child_end);", input2.c_str(), input1.c_str());
 	}
 
 	// Uses(i,v) where "i" is "if i", "v" is "variable v", and only "i" is present in select
@@ -564,7 +566,7 @@ bool Database::GetUsesForProcedure(string input1, string input2, bool input1IsSp
 
 	// Uses(p,"cenX") or Uses(p,v) is true, where "p" is "procedure p", "v" is "variable v", and both are present in select
 	else if (input1IsSpecific && input2IsSpecific) {
-		sprintf_s(sqlBuf, "select 1 from use u where u.variable_name = '%s' and exists (select 1 from procedure p where p.name = '%s' and u.line_num between p.start and p.end));", input2.c_str(), input1.c_str());
+		sprintf_s(sqlBuf, "select 1 from use u where u.variable_name = '%s' and exists (select 1 from procedure p where p.name = '%s' and u.line_num between p.start and p.end);", input2.c_str(), input1.c_str());
 	}
 
 	// Uses(p,v) where "p" is "procedure p", "v" is "variable v", and only "p" is present in select
@@ -582,22 +584,26 @@ bool Database::GetUsesForProcedure(string input1, string input2, bool input1IsSp
 	return (!(sqlResultStoreForCallback->sqlResult.empty()));
 }
 
-bool Database::GetUsesForUnknownInput1(string input1, string input2, bool input2IsSpecific) { // for cases like "uses(10,v)" . stmt 10 can be if, while, call. we don't know
+bool Database::GetUsesForUnknownInput1(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific) { // for cases like "uses(10,v)" . stmt 10 can be if, while, call. we don't know
 	SqlResultStore rs;
 	sqlResultStoreForCallback = &rs;
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, "SELECT entity, text FROM statement WHERE line_num = '%s';", input1.c_str());
-	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
-	if (errorMessage) { cout << "GetUsesForUnknownInput1 SQL Error: " << errorMessage; }
-	string entity = rs.sqlResult.at(0).row.at("entity");
-	string text = rs.sqlResult.at(0).row.at("text");
+	if (isdigit(input1[0])) { // input first char is a digit = statement number
+		sprintf_s(sqlBuf, "SELECT entity, text FROM statement WHERE line_num = '%s';", input1.c_str());
+		sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
+		if (errorMessage) { cout << "GetUsesForUnknownInput1 SQL Error: " << errorMessage; }
+		string entity = rs.sqlResult.at(0).row.at("entity");
 
-	// e.g., use(10, v), and stmt 10 is "x = a + b" or "print x". We just need to select from use table with the correct stmtNum to get the variables
-	if (entity == "assign") { return Database::GetUsesForAssign(input1, input2, true, input2IsSpecific); }
-	if (entity == "print") { return Database::GetUsesForPrint(input1, input2, true, input2IsSpecific); }
-	if (entity == "call") { return Database::GetUsesForCall(input1, input2, true, input2IsSpecific); }
-	if (entity == "while") { return Database::GetUsesForWhile(input1, input2, true, input2IsSpecific); }
-	if (entity == "if") { return Database::GetUsesForIf(input1, input2, true, input2IsSpecific); }
+		// e.g., use(10, v), and stmt 10 is "x = a + b" or "print x". We just need to select from use table with the correct stmtNum to get the variables
+		if (entity == "assign") { return Database::GetUsesForAssign(input1, input2, input1IsSpecific, input2IsSpecific); }
+		if (entity == "print") { return Database::GetUsesForPrint(input1, input2, input1IsSpecific, input2IsSpecific); }
+		if (entity == "call") { return Database::GetUsesForCall(input1, input2, input1IsSpecific, input2IsSpecific); }
+		if (entity == "while") { return Database::GetUsesForWhile(input1, input2, input1IsSpecific, input2IsSpecific); }
+		if (entity == "if") { return Database::GetUsesForIf(input1, input2, input1IsSpecific, input2IsSpecific); }
+	}
+	else { // input is a char is not a digit = a name
+		return Database::GetUsesForProcedure(input1, input2, true, input2IsSpecific);
+	}	
 }
 
 void Database::getModifyStmt(string stmtNum1, string stmtNum2, bool lhs, vector<string>& results) {
@@ -657,11 +663,16 @@ void Database::SelectPql(Select& st, SqlResultStore& sqlResultStore) {
 	selectColumnName.pop_back(); // remove the last ","
 	whereColumnFilter = whereColumnFilter.substr(0, whereColumnFilter.size() - SqlAND.size()); // remove the last " AND "
 	whereDuplicateFilter = whereDuplicateFilter.substr(0, whereDuplicateFilter.size() - SqlAND.size()); // remove the last " AND "
-	//if(whereDuplicateFilter == ""){ sprintf_s(sqlBuf, "SELECT %s FROM %s WHERE %s", selectColumnName.c_str(), selectFromTable.c_str(), whereColumnFilter.c_str()); }
-	//else{ sprintf_s(sqlBuf, "SELECT %s FROM %s WHERE %s AND %s", selectColumnName.c_str(), selectFromTable.c_str(), whereColumnFilter.c_str(), whereDuplicateFilter.c_str()); }
-	sprintf_s(sqlBuf, "SELECT %s FROM %s WHERE %s", selectColumnName.c_str(), selectFromTable.c_str(), whereColumnFilter.c_str());
+	
+																										/*
+	if(whereDuplicateFilter == ""){ sprintf_s(sqlBuf, "SELECT %s FROM %s WHERE %s", selectColumnName.c_str(), selectFromTable.c_str(), whereColumnFilter.c_str()); }
+	else{ sprintf_s(sqlBuf, "SELECT %s FROM %s WHERE %s AND %s", selectColumnName.c_str(), selectFromTable.c_str(), whereColumnFilter.c_str(), whereDuplicateFilter.c_str()); }
+	*/
+
+	if (st.whereSql.empty()) {	sprintf_s(sqlBuf, "SELECT %s FROM %s", selectColumnName.c_str(), selectFromTable.c_str()); }
+	else { sprintf_s(sqlBuf, "SELECT %s FROM %s WHERE %s", selectColumnName.c_str(), selectFromTable.c_str(), whereColumnFilter.c_str()); }
 	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
-	if (errorMessage) { cout << "PQL select Sql Error: " << errorMessage; }
+	if (errorMessage) { cout << "PQL select Sql Error: " << errorMessage; return; }
 }
 
 
@@ -678,8 +689,6 @@ int Database::callback(void* NotUsed, int columnCount, char** columnValues, char
 		dbRow.push_back(columnValues[i]);
 		sqlResult.row.insert(std::pair<string, string>(columnNames[i], string(columnValues[i])));
 	}
-	sqlResultStoreForCallback->column.push_back(columnNames[i]);
-	
 	// The row is pushed to the vector for storing all rows of results 
 	dbResults.push_back(dbRow);
 	sqlResultStoreForCallback->sqlResult.push_back(sqlResult);

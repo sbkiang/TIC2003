@@ -54,7 +54,7 @@ public:
 	static bool GetUsesForIf(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
 	static bool GetUsesForCall(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
 	static bool GetUsesForProcedure(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
-	static bool GetUsesForUnknownInput1(string input1, string input2, bool input2IsSpecific); // E.g., Uses(10,v). We don't know what's the entity at statement 10
+	static bool GetUsesForUnknownInput1(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific); // E.g., Uses(10,v). We don't know what's the entity at statement 10
 
 
 	// method to insert/get a next into the database
