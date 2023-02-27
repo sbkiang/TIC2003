@@ -207,7 +207,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 				else { pass = Database::GetModifiesForUnknownInput1(first, second, input1Specific, input2Specific); } // e.g., uses(10,v) or uses("main",v). just pass in here even
 				if (pass) { sqlResultPass.push_back(sqlResulTemp); }
 			}
-			else if (relationship == "Parent") {
+			else if (relationship == "Parent") { // 
 
 			}
 		} 
@@ -226,12 +226,12 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		output.push_back(result);
 	}
 	
-	/*
+	
 	cout << "MY OUTPUT: ";
 	for (int i = 0; i < output.size(); i++) {
 		cout << output.at(i) << " ";
 	}
-	*/
+
 	cout << endl;
 }
 

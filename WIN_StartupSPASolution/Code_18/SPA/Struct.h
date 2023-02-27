@@ -43,10 +43,13 @@ struct SqlResultStore {
 
 struct SqlResult : SqlResultStore {
 	map<string, string> row; // store mapping of column name to value
+
+	/*
 	SqlResult() {}
 	SqlResult(string col, string val) {
 		row.insert(pair<string, string>(col, val));
 	}
+	*/
 	
 	bool operator< (const SqlResult& otherSqlRow) const
 	{

@@ -4,7 +4,7 @@ Select p such that Uses("main",v)
 53
 5000
 2 - select_1_variable_uses_specific_generic_logical
-while w; variable v; print pn
+while w; variable v; print pn;
 Select w such that Uses(pn,v)
 1,23
 5000
@@ -26,18 +26,3 @@ calleeL3,calleeL2
 7 - While_uses(w,v)
 while w;
 select uses(w, "use21")
-
-
-// what if we get 
-while w; variable v; print pn
-Select w such that Uses(pn,v)
-
-we decide the Database function based on the synonym's entity. So, the old method wouldn't work
-or 
-Select v such that Uses(pn,v)
-    I don't have a function for variable. but i can just test all the function?
-    Or i think i should take the entity from the suchThat.first and suchThat.second
-    
-    for uses(pn,v), we only need to care about whether the suchThat.first is part of select because the 2nd input is always variable
-    So, it's either generic or specific
-    

@@ -323,10 +323,11 @@ void Database::getStatement(vector<string>& results) {
 	}
 }
 
-bool Database::GetParent(string input1, string input2) {
+bool Database::GetParent(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, string entity) {
 	char sqlBuf[256];
 	sprintf_s(sqlBuf, "select 1 from parent where %s between child_start and child_end and line_num = %s", input2.c_str(), input1.c_str());
 	
+
 	SqlResultStore rs;
 	sqlResultStoreForCallback = &rs;
 	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);

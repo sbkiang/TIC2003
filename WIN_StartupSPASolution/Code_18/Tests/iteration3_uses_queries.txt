@@ -1,4 +1,5 @@
 12 - Uses - Get all procedure and variable in the proecdure that satisfies uses(s,v)
 procedure p; variable v;
 Select <p,v> such that Uses(p,v)
-computeCentroid x, computeCentroid y, computeCentroid cenX, computeCentroid cenY, computeCentroid count, main x, main y, main cenX, main cenY, main count
+computeCentroid cenX,computeCentroid cenY,computeCentroid count,computeCentroid x,computeCentroid y,main cenX,main cenY,main count,main flag,main normSq,main x,main y,printResults cenX,printResults cenY,printResults flag,printResults normSq
+5000
