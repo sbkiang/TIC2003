@@ -55,6 +55,6 @@ x,y,count,cenX,cenY
 5000
 15 - if
 if f; variable v;
-select v such that modifies(f,v)
+Select v such that modifies(f,v)
 flag, cenX, cenY
 5000

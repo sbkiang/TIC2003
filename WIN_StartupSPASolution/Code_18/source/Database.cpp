@@ -323,7 +323,15 @@ void Database::getStatement(vector<string>& results) {
 	}
 }
 
+
+// not used
+/*
 bool Database::GetParent(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, string entity) {
+
+}
+*/
+
+bool Database::GetParentForRead(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific) {
 	char sqlBuf[256];
 	sprintf_s(sqlBuf, "select 1 from parent where %s between child_start and child_end and line_num = %s", input2.c_str(), input1.c_str());
 	

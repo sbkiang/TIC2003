@@ -1,16 +1,79 @@
 <?xml-stylesheet type="text/xsl" href="analysis.xsl"?>
 <test_results>
 <info>
-<name>AutoTester</name><parsing_time_taken>230.000000</parsing_time_taken>
+<name>AutoTester</name><parsing_time_taken>632.000000</parsing_time_taken>
 </info>
 <queries>
 <query>
-<id ReturnTuple="1" Uses="1" SuchThat="1" CondNum="3" RelNum="1" comment="select_1_variable_uses_specific_generic_logical">1</id><querystr><![CDATA[variable v; procedure p; Select p such that Uses("main",v)]]></querystr>
+<id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="read (r,v)">2</id><querystr><![CDATA[read r; variable v;  Select v such that Modifies(r, v)]]></querystr>
+<stuans>x,y</stuans>
+<correct>x,y</correct>
+<time_taken>9.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="swap read (r,v)">3</id><querystr><![CDATA[variable v; read r; Select v such that Modifies(r, v)]]></querystr>
+<stuans>x,y</stuans>
+<correct>x,y</correct>
+<time_taken>7.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="Assign (a,v)">4</id><querystr><![CDATA[assign a; variable v;   Select v such that Modifies(a, v)]]></querystr>
+<stuans>cenX,cenY,count,flag,normSq</stuans>
+<correct>flag,count,cenX,cenY,normSq</correct>
+<time_taken>11.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="Swap Assign (a,v)">5</id><querystr><![CDATA[variable v; assign a; Select v such that Modifies(a, v)]]></querystr>
+<stuans>cenX,cenY,count,flag,normSq</stuans>
+<correct>flag,count,cenX,cenY,normSq</correct>
+<time_taken>10.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="Procedure (p, v)">6</id><querystr><![CDATA[variable v; procedure p; Select p such that Modifies (p, v)]]></querystr>
+<stuans>computeCentroid,main,readPoint</stuans>
+<correct>main,computeCentroid,readPoint</correct>
+<time_taken>9.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="swap Procedure (p, v)">7</id><querystr><![CDATA[procedure p; variable v; Select p such that Modifies (p, v)]]></querystr>
+<stuans>computeCentroid,main,readPoint</stuans>
+<correct>main,computeCentroid,readPoint</correct>
+<time_taken>13.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="Procedure (p, v)">8</id><querystr><![CDATA[variable v; procedure p; Select v such that Modifies (p, v)]]></querystr>
+<stuans>cenX,cenY,count,flag,normSq,x,y</stuans>
+<correct>flag,x,y,count,cenX,cenY,normSq</correct>
+<time_taken>13.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="Procedure (p, v)">9</id><querystr><![CDATA[variable v; procedure p; Select p such that Modifies (p, "x")]]></querystr>
+<stuans>computeCentroid,main,readPoint</stuans>
+<correct>main,computeCentroid,readPoint</correct>
+<time_taken>8.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="Call (c, v)">10</id><querystr><![CDATA[variable v; call c; Select v such that Modifies ("readPoint", v)]]></querystr>
+<stuans>x,y</stuans>
+<correct>x,y</correct>
+<time_taken>8.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="Call (c, v)">11</id><querystr><![CDATA[variable v; call c; Select c such that Modifies (c, "x")]]></querystr>
 <stuans></stuans>
-<correct>53</correct>
-<time_taken>6585.000000</time_taken>
+<correct>readPoint</correct>
+<time_taken>7.000000</time_taken>
 <failed>
-<missing>53</missing>
+<missing>readPoint</missing>
 <additional></additional>
 <summary>
 <expected>1</expected>
@@ -21,4 +84,27 @@
 </failed>
 </query>
 <query>
-<id ReturnTuple="1" Uses="1" SuchThat="1" CondNum="3" RelNum="1" comment="select_1_variable_uses_specific_generic_logical">2</id><querystr><![CDATA[while w; variable v; print pn; Select w such that Uses(pn,v)]]></querystr>
+<id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="while (w, v)">12</id><querystr><![CDATA[variable v; while w; Select v such that Modifies (w, v)]]></querystr>
+<stuans>cenX,cenY,count,x,y</stuans>
+<correct>x,y,count,cenX,cenY</correct>
+<time_taken>12.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" SuchThat="1" CondNum="2" RelNum="0" comment="if">15</id><querystr><![CDATA[if f; variable v; Select v such that modifies(f,v)]]></querystr>
+<stuans></stuans>
+<correct>flag,cenX,cenY</correct>
+<time_taken>6.000000</time_taken>
+<failed>
+<missing>cenX,cenY,flag</missing>
+<additional></additional>
+<summary>
+<expected>3</expected>
+<matched>0</matched>
+<missing>3</missing>
+<additional>0</additional>
+</summary>
+</failed>
+</query>
+</queries>
+</test_results>

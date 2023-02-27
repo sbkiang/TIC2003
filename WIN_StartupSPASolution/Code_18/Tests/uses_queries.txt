@@ -10,19 +10,19 @@ Select w such that Uses(pn,v)
 5000
 4 - Call_uses(call,v)
 call c;
-select uses(c, "printx")
+Select uses(c, "printx")
 40,53
 5000
 5 - Procedure_uses(p,v)
 procedure p;
-select uses(p, "use20")
+Select uses(p, "use20")
 main,calleeL2
 5000
 6 - If_uses(i,v)
 if i;
-select uses(i,"returnL33")
+Select uses(i,"returnL33")
 calleeL3,calleeL2
 5000
 7 - While_uses(w,v)
 while w;
-select uses(w, "use21")
+Select uses(w, "use21")

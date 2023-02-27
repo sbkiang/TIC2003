@@ -192,6 +192,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 				if (entity == "assign") { pass = Database::GetUsesForAssign(first, second, input1Specific, input2Specific); }
 				else if (entity == "print") { pass = Database::GetUsesForPrint(first, second, input1Specific, input2Specific); }
 				else if (entity == "while") { pass = Database::GetUsesForWhile(first, second, input1Specific, input2Specific); }
+				else if (entity == "if") { pass = Database::GetUsesForIf(first, second, input1Specific, input2Specific); }
 				else if (entity == "call") { pass = Database::GetUsesForCall(first, second, input1Specific, input2Specific); }
 				else if (entity == "procedure") { pass = Database::GetUsesForProcedure(first, second, input1Specific, input2Specific); }
 				else { pass = Database::GetUsesForUnknownInput1(first, second, input1Specific, input2Specific); } // e.g., uses(10,v) or uses("main",v). just pass in here even
@@ -202,12 +203,13 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 				if (entity == "assign") { pass = Database::GetModifiesForAssign(first, second, input1Specific, input2Specific); }
 				else if (entity == "read") { pass = Database::GetModifiesForRead(first, second, input1Specific, input2Specific); }
 				else if (entity == "while") { pass = Database::GetModifiesForWhile(first, second, input1Specific, input2Specific); }
+				else if (entity == "if") { pass = Database::GetModifiesForIf(first, second, input1Specific, input2Specific); }
 				else if (entity == "call") { pass = Database::GetModifiesForCall(first, second, input1Specific, input2Specific); }
 				else if (entity == "procedure") { pass = Database::GetModifiesForProcedure(first, second, input1Specific, input2Specific); }
 				else { pass = Database::GetModifiesForUnknownInput1(first, second, input1Specific, input2Specific); } // e.g., uses(10,v) or uses("main",v). just pass in here even
 				if (pass) { sqlResultPass.push_back(sqlResulTemp); }
 			}
-			else if (relationship == "Parent") { // 
+			else if (relationship == "Parent") { // assign a; while w; select w such that Parent(w,a). In this case, "a" is generic
 
 			}
 		} 
@@ -226,11 +228,12 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		output.push_back(result);
 	}
 	
-	
+	/*
 	cout << "MY OUTPUT: ";
 	for (int i = 0; i < output.size(); i++) {
 		cout << output.at(i) << " ";
 	}
+	*/
 
 	cout << endl;
 }
