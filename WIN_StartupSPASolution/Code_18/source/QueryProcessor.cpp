@@ -216,6 +216,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	}
 	
 	// post process the results to fill in the output vector
+	
 	for (SqlResult sqlResult : sqlResultStore.sqlResult) {
 		string result;
 		for (auto it = sqlResult.row.begin(); it != sqlResult.row.end(); it++) {
@@ -224,10 +225,13 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		while (result.back() == ' ') { result.pop_back(); }
 		output.push_back(result);
 	}
+	
+	/*
 	cout << "MY OUTPUT: ";
 	for (int i = 0; i < output.size(); i++) {
 		cout << output.at(i) << " ";
 	}
+	*/
 	cout << endl;
 }
 

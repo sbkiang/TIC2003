@@ -35,8 +35,8 @@ public:
 
 	// method to insert a parent into the database
 	static void insertParent(int parentStmt, int childStart, int childEnd);
-	static void getParent(string stmtNum1, string stmtNum2, vector<string>& results);
-	static bool getParent(string input1, string input2); // for Parent(x,y), specific is number. non-specific is synonym
+	static bool GetParent(string stmtNum1, string stmtNum2);
+	static bool GetParentT(string input1, string input2); // for Parent(x,y), specific is number. non-specific is synonym
 	static void getChildren(string stmtNum1, string stmtNum2, string statementType, vector<string>& results);
 	static void getParentChildren(bool findparent, string resultType, string filterType, vector<string>& results);
 	

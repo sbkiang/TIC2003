@@ -5,7 +5,7 @@ CFG* CFGBuilder::buildCFG(Container* procedure) {
 	Container* tempContainer = procedure;
 	map<int, CFGNode*> stmts;
 	_createStmtMap(procedure, stmts);
-	_printStmt(stmts);
+	//_printStmt(stmts);
 	int startIndex = stmts.begin()->first;
 	CFG* cfg = new CFG(stmts.at(startIndex));
 	int loopStart = 0, loopEnd = 0;

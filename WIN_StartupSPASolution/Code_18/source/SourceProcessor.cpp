@@ -302,7 +302,7 @@ void SourceProcessor::process(string program) {
 				Database::insertNext(nodeStmtNum, nextStmtNum);
 			}
 		}
-		procedure.at(i)->printContainerTree(0);
+		//procedure.at(i)->printContainerTree(0);
 		vector<Container*> containers = procedure.at(i)->getAllContainers(); // get all the if and while containers
 		for (int j = 0; j < containers.size(); j++) {
 			Database::insertParent(containers.at(j)->_adjustedStartStmtNum, containers.at(j)->_adjustedStartStmtNum + 1, containers.at(j)->_adjustedEndStmtNum);

@@ -323,22 +323,28 @@ void Database::getStatement(vector<string>& results) {
 	}
 }
 
-void Database::getParent(string stmtNum1, string stmtNum2, vector<string>& results) {
-	dbResults.clear();
-
-	string sql = "SELECT MAX(line_num) FROM parent WHERE child_start <= '" + stmtNum2 + "' AND child_end >= '" + stmtNum2 + "';";
-	sqlite3_exec(dbConnection, sql.c_str(), callback, 0, &errorMessage);
-		
-	if (errorMessage) {
-		cout << "getParent SQL Error: " << errorMessage;
-	}
-
-	for (vector<string> dbRow : dbResults) {
-		string result;
-		result = dbRow.at(0);
-		results.push_back(result);
-	}
+bool Database::GetParent(string input1, string input2) {
+	char sqlBuf[256];
+	sprintf_s(sqlBuf, "select 1 from parent where %s between child_start and child_end and line_num = %s", input2.c_str(), input1.c_str());
+	
+	SqlResultStore rs;
+	sqlResultStoreForCallback = &rs;
+	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
+	if (errorMessage) { cout << "getParent SQL Error: " << errorMessage; exit(0); }
+	return (!(sqlResultStoreForCallback->sqlResult.empty()));
 }
+
+bool Database::GetParentT(string input1, string input2) {
+	char sqlBuf[256];
+	sprintf_s(sqlBuf, "select 1 from parent where %s between child_start and child_end and line_num = %s", input2.c_str(), input1.c_str());
+
+	SqlResultStore rs;
+	sqlResultStoreForCallback = &rs;
+	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
+	if (errorMessage) { cout << "getParent SQL Error: " << errorMessage; exit(0); }
+	return (!(sqlResultStoreForCallback->sqlResult.empty()));
+}
+
 
 void Database::getChildren(string stmtNum1, string stmtNum2, string statementType, vector<string>& results) {
 	
@@ -412,12 +418,12 @@ bool Database::GetUsesForAssign(string input1, string input2, bool input1IsSpeci
 	
 	// Uses(a,"cenX") or Uses(a,v) where "a" is "assign a", "v" is "variable v", both present in select
 	else if (input1IsSpecific && input2IsSpecific) { 
-		sprintf_s(sqlBuf, "select 1 from use u where u.variable_name = '%s' and u.line_num in (select s.line_num from statement s where entity = 'assign' and s.line_num = '%s');", input2.c_str(), input1.c_str());
+		sprintf_s(sqlBuf, "select 1 from use u where u.variable_name = '%s' and u.line_num in (select s.line_num from statement s where entity = 'assign' and s.line_num = %s);", input2.c_str(), input1.c_str());
 	}
 
 	// Uses(a,v) where "a" is assign a,"v" is variable v, only "a" present in select
 	else if (input1IsSpecific && !input2IsSpecific) {
-		sprintf_s(sqlBuf, "select 1 from use u where u.line_num in (select s.line_num from statement s where entity = 'assign' and s.line_num = '%s');", input1.c_str());
+		sprintf_s(sqlBuf, "select 1 from use u where u.line_num in (select s.line_num from statement s where entity = 'assign' and s.line_num = %s);", input1.c_str());
 	}
 
 	// Uses(a,v) where "a" is assign a, "v" is variable, both not present in select
@@ -442,12 +448,12 @@ bool Database::GetUsesForPrint(string input1, string input2, bool input1IsSpecif
 
 	// Uses(p,"cenX") or Uses(p,v) where "p" is "print p", "v" is "variable v", both present in select
 	else if (input1IsSpecific && input2IsSpecific) {
-		sprintf_s(sqlBuf, "select 1 from use u where u.variable_name = '%s' and u.line_num in (select s.line_num from statement s where entity = 'print' and s.line_num = '%s');", input2.c_str(), input1.c_str());
+		sprintf_s(sqlBuf, "select 1 from use u where u.variable_name = '%s' and u.line_num in (select s.line_num from statement s where entity = 'print' and s.line_num = %s);", input2.c_str(), input1.c_str());
 	}
 
 	// Uses(p,"cenX") or Uses(p,v) where "p" is "print p", "v" is "variable v", only "p" present in select
 	else if (input1IsSpecific && !input2IsSpecific) {
-		sprintf_s(sqlBuf, "select 1 from use u where u.line_num in (select s.line_num from statement s where entity = 'print' and s.line_num = '%s');", input1.c_str());
+		sprintf_s(sqlBuf, "select 1 from use u where u.line_num in (select s.line_num from statement s where entity = 'print' and s.line_num = %s);", input1.c_str());
 	}
 
 	// Uses(p,"cenX") or Uses(p,v) where "p" is "print p", "v" is "variable v", both not present in select
@@ -473,12 +479,12 @@ bool Database::GetUsesForWhile(string input1, string input2, bool input1IsSpecif
 
 	// Uses(w,"cenX") or Uses(w,v) is true, where "w" is while w, "v" is variable v, and both are present in select
 	else if (input1IsSpecific && input2IsSpecific) {
-		sprintf_s(sqlBuf, "select 1 from use u where u.variable_name = '%s' and exists (select 1 from parent p where p.line_num = '%s' and u.line_num between p.line_num and p.child_end);", input2.c_str(), input1.c_str());
+		sprintf_s(sqlBuf, "select 1 from use u where u.variable_name = '%s' and exists (select 1 from parent p where p.line_num = %s and u.line_num between p.line_num and p.child_end);", input2.c_str(), input1.c_str());
 	}
 
 	// Uses(w,v) where "w" is while w,"v" is variable v, and only "w" is present in select
 	else if (input1IsSpecific && !input2IsSpecific) {
-		sprintf_s(sqlBuf, "select 1 from use u where exists (select 1 from parent p where p.line_num = '%s' and u.line_num between p.line_num and p.child_end);", input1.c_str());
+		sprintf_s(sqlBuf, "select 1 from use u where exists (select 1 from parent p where p.line_num = %s and u.line_num between p.line_num and p.child_end);", input1.c_str());
 	}
 
 	// we are looking for each statement and checking if Uses(pn,v) is true, where "pn" is assign pn, "v" is variable, and both are not present in select
@@ -505,12 +511,12 @@ bool Database::GetUsesForIf(string input1, string input2, bool input1IsSpecific,
 
 	// Uses(i,"cenX") or Uses(i,v) where "i" is "if i", "v" is "variable v", and both are present in select
 	else if (input1IsSpecific && input2IsSpecific) {
-		sprintf_s(sqlBuf, "select 1 from use u where u.variable_name = '%s' and exists (select 1 from parent p where p.line_num = '%s' and u.line_num between p.line_num and p.child_end);", input2.c_str(), input1.c_str());
+		sprintf_s(sqlBuf, "select 1 from use u where u.variable_name = '%s' and exists (select 1 from parent p where p.line_num = %s and u.line_num between p.line_num and p.child_end);", input2.c_str(), input1.c_str());
 	}
 
 	// Uses(i,v) where "i" is "if i", "v" is "variable v", and only "i" is present in select
 	else if (input1IsSpecific && !input2IsSpecific) {
-		sprintf_s(sqlBuf, "select 1 from use u where exists (select 1 from parent p where p.line_num = '%s' and u.line_num between p.line_num and p.child_end);", input1.c_str());
+		sprintf_s(sqlBuf, "select 1 from use u where exists (select 1 from parent p where p.line_num = %s and u.line_num between p.line_num and p.child_end);", input1.c_str());
 	}
 
 	// Uses(pn,v) where "pn" is "if i", "v" "is variable", and both are not present in select
@@ -589,7 +595,7 @@ bool Database::GetUsesForUnknownInput1(string input1, string input2, bool input1
 	sqlResultStoreForCallback = &rs;
 	char sqlBuf[512] = {};
 	if (isdigit(input1[0])) { // input first char is a digit = statement number
-		sprintf_s(sqlBuf, "SELECT entity, text FROM statement WHERE line_num = '%s';", input1.c_str());
+		sprintf_s(sqlBuf, "SELECT entity, text FROM statement WHERE line_num = %s;", input1.c_str());
 		sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
 		if (errorMessage) { cout << "GetUsesForUnknownInput1 SQL Error: " << errorMessage; }
 		string entity = rs.sqlResult.at(0).row.at("entity");
@@ -619,12 +625,12 @@ bool Database::GetModifiesForAssign(string input1, string input2, bool input1IsS
 
 	// Modifies(a,"cenX") or Modifies(a,v) where "a" is "assign a", "v" is "variable v", both present in select
 	else if (input1IsSpecific && input2IsSpecific) {
-		sprintf_s(sqlBuf, "select 1 from modify m where m.variable_name = '%s' and m.line_num in (select s.line_num from statement s where entity = 'assign' and s.line_num = '%s');", input2.c_str(), input1.c_str());
+		sprintf_s(sqlBuf, "select 1 from modify m where m.variable_name = '%s' and m.line_num in (select s.line_num from statement s where entity = 'assign' and s.line_num = %s);", input2.c_str(), input1.c_str());
 	}
 
 	// Modifies(a,v) where "a" is assign a,"v" is variable v, only "a" present in select
 	else if (input1IsSpecific && !input2IsSpecific) {
-		sprintf_s(sqlBuf, "select 1 from modify m where m.line_num in (select s.line_num from statement s where entity = 'assign' and s.line_num = '%s');", input1.c_str());
+		sprintf_s(sqlBuf, "select 1 from modify m where m.line_num in (select s.line_num from statement s where entity = 'assign' and s.line_num = %s);", input1.c_str());
 	}
 
 	// Modifies(a,v) where "a" is assign a, "v" is variable, both not present in select
@@ -649,12 +655,12 @@ bool Database::GetModifiesForRead(string input1, string input2, bool input1IsSpe
 
 	// Modifies(p,"cenX") or Modifies(p,v) where "r" is "read r", "v" is "variable v", both present in select
 	else if (input1IsSpecific && input2IsSpecific) {
-		sprintf_s(sqlBuf, "select 1 from modify m where m.variable_name = '%s' and m.line_num in (select s.line_num from statement s where entity = 'print' and s.line_num = '%s');", input2.c_str(), input1.c_str());
+		sprintf_s(sqlBuf, "select 1 from modify m where m.variable_name = '%s' and m.line_num in (select s.line_num from statement s where entity = 'print' and s.line_num = %s);", input2.c_str(), input1.c_str());
 	}
 
 	// Modifies(p,"cenX") or Modifies(p,v) where "r" is "read r", "v" is "variable v", only "r" present in select
 	else if (input1IsSpecific && !input2IsSpecific) {
-		sprintf_s(sqlBuf, "select 1 from modify m where m.line_num in (select s.line_num from statement s where entity = 'print' and s.line_num = '%s');", input1.c_str());
+		sprintf_s(sqlBuf, "select 1 from modify m where m.line_num in (select s.line_num from statement s where entity = 'print' and s.line_num = %s);", input1.c_str());
 	}
 
 	// Modifies(p,"cenX") or Modifies(p,v) where "r" is "read r", "v" is "variable v", both not present in select
@@ -680,12 +686,12 @@ bool Database::GetModifiesForWhile(string input1, string input2, bool input1IsSp
 
 	// Modifies(w,"cenX") or Modifies(w,v) is true, where "w" is while w, "v" is variable v, and both are present in select
 	else if (input1IsSpecific && input2IsSpecific) {
-		sprintf_s(sqlBuf, "select 1 from modify m where m.variable_name = '%s' and exists (select 1 from parent p where p.line_num = '%s' and m.line_num between p.line_num and p.child_end);", input2.c_str(), input1.c_str());
+		sprintf_s(sqlBuf, "select 1 from modify m where m.variable_name = '%s' and exists (select 1 from parent p where p.line_num = %s and m.line_num between p.line_num and p.child_end);", input2.c_str(), input1.c_str());
 	}
 
 	// Modifies(w,v) where "w" is while w,"v" is variable v, and only "w" is present in select
 	else if (input1IsSpecific && !input2IsSpecific) {
-		sprintf_s(sqlBuf, "select 1 from modify m where exists (select 1 from parent p where p.line_num = '%s' and m.line_num between p.line_num and p.child_end);", input1.c_str());
+		sprintf_s(sqlBuf, "select 1 from modify m where exists (select 1 from parent p where p.line_num = %s and m.line_num between p.line_num and p.child_end);", input1.c_str());
 	}
 
 	// we are looking for each statement and checking if Modifies(pn,v) is true, where "pn" is assign pn, "v" is variable, and both are not present in select
@@ -712,12 +718,12 @@ bool Database::GetModifiesForIf(string input1, string input2, bool input1IsSpeci
 
 	// Modifies(i,"cenX") or Modifies(i,v) where "i" is "if i", "v" is "variable v", and both are present in select
 	else if (input1IsSpecific && input2IsSpecific) {
-		sprintf_s(sqlBuf, "select 1 from modify m where m.variable_name = '%s' and exists (select 1 from parent p where p.line_num = '%s' and m.line_num between p.line_num and p.child_end);", input2.c_str(), input1.c_str());
+		sprintf_s(sqlBuf, "select 1 from modify m where m.variable_name = '%s' and exists (select 1 from parent p where p.line_num = %s and m.line_num between p.line_num and p.child_end);", input2.c_str(), input1.c_str());
 	}
 
 	// Modifies(i,v) where "i" is "if i", "v" is "variable v", and only "i" is present in select
 	else if (input1IsSpecific && !input2IsSpecific) {
-		sprintf_s(sqlBuf, "select 1 from modify m where exists (select 1 from parent p where p.line_num = '%s' and m.line_num between p.line_num and p.child_end);", input1.c_str());
+		sprintf_s(sqlBuf, "select 1 from modify m where exists (select 1 from parent p where p.line_num = %s and m.line_num between p.line_num and p.child_end);", input1.c_str());
 	}
 
 	// Modifies(pn,v) where "pn" is "if i", "v" "is variable", and both are not present in select
@@ -796,7 +802,7 @@ bool Database::GetModifiesForUnknownInput1(string input1, string input2, bool in
 	sqlResultStoreForCallback = &rs;
 	char sqlBuf[512] = {};
 	if (isdigit(input1[0])) { // input first char is a digit = statement number
-		sprintf_s(sqlBuf, "SELECT entity, text FROM statement WHERE line_num = '%s';", input1.c_str());
+		sprintf_s(sqlBuf, "SELECT entity, text FROM statement WHERE line_num = %s;", input1.c_str());
 		sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
 		if (errorMessage) { cout << "GetModifiesForUnknownInput1 SQL Error: " << errorMessage; }
 		string entity = rs.sqlResult.at(0).row.at("entity");
