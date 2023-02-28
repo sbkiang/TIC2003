@@ -85,14 +85,14 @@ struct SqlResult : SqlResultStore {
 
 struct SuchThat {
 	string relationship = "";
-	string first = "";
-	string second = "";
+	string input1 = "";
+	string input2 = "";
 };
 
 struct Pattern {
 	string synonym = "";
-	string first = "";
-	string second = "";
+	string input1 = "";
+	string input2 = "";
 };
 
 struct Select {

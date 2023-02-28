@@ -1,108 +1,235 @@
 <?xml-stylesheet type="text/xsl" href="analysis.xsl"?>
 <test_results>
 <info>
-<name>AutoTester</name><parsing_time_taken>632.000000</parsing_time_taken>
+<name>AutoTester</name><parsing_time_taken>1915.000000</parsing_time_taken>
 </info>
 <queries>
 <query>
-<id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="read (r,v)">2</id><querystr><![CDATA[read r; variable v;  Select v such that Modifies(r, v)]]></querystr>
-<stuans>x,y</stuans>
-<correct>x,y</correct>
-<time_taken>9.000000</time_taken>
+<id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Parent - Generic If, Generic Assign, Select if">1</id><querystr><![CDATA[if i; assign a; Select i such that Parent(i,a)]]></querystr>
+<stuans>5,8,23,32,33,34,42,45,57,58</stuans>
+<correct>5,8,23,32,33,34,42,45,57,58</correct>
+<time_taken>20.000000</time_taken>
 <passed/>
 </query>
 <query>
-<id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="swap read (r,v)">3</id><querystr><![CDATA[variable v; read r; Select v such that Modifies(r, v)]]></querystr>
-<stuans>x,y</stuans>
-<correct>x,y</correct>
-<time_taken>7.000000</time_taken>
+<id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Parent - Generic If, Generic Assign, Select assign">1</id><querystr><![CDATA[if i; assign a; Select a such that Parent(i,a)]]></querystr>
+<stuans>6,7,9,10,15,16,17,24,25,35,36,37,38,43,44,47,52,53,54,60,61</stuans>
+<correct>6,7,9,10,15,16,17,24,25,35,36,37,38,43,44,47,52,53,54,60,61</correct>
+<time_taken>29.000000</time_taken>
 <passed/>
 </query>
 <query>
-<id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="Assign (a,v)">4</id><querystr><![CDATA[assign a; variable v;   Select v such that Modifies(a, v)]]></querystr>
-<stuans>cenX,cenY,count,flag,normSq</stuans>
-<correct>flag,count,cenX,cenY,normSq</correct>
+<id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Parent - Generic If, Generic While, Select while">1</id><querystr><![CDATA[if i; while w; Select w such that Parent(i,w)]]></querystr>
+<stuans>11,13,48,50</stuans>
+<correct>11,13,48,50</correct>
+<time_taken>13.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Parent - Generic If, Generic If, Select if">1</id><querystr><![CDATA[if i, ia; Select ia such that Parent(i,ia)]]></querystr>
+<stuans>8,33,34,45,58</stuans>
+<correct>8,33,34,45,58</correct>
 <time_taken>11.000000</time_taken>
 <passed/>
 </query>
 <query>
-<id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="Swap Assign (a,v)">5</id><querystr><![CDATA[variable v; assign a; Select v such that Modifies(a, v)]]></querystr>
-<stuans>cenX,cenY,count,flag,normSq</stuans>
-<correct>flag,count,cenX,cenY,normSq</correct>
-<time_taken>10.000000</time_taken>
-<passed/>
-</query>
-<query>
-<id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="Procedure (p, v)">6</id><querystr><![CDATA[variable v; procedure p; Select p such that Modifies (p, v)]]></querystr>
-<stuans>computeCentroid,main,readPoint</stuans>
-<correct>main,computeCentroid,readPoint</correct>
-<time_taken>9.000000</time_taken>
-<passed/>
-</query>
-<query>
-<id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="swap Procedure (p, v)">7</id><querystr><![CDATA[procedure p; variable v; Select p such that Modifies (p, v)]]></querystr>
-<stuans>computeCentroid,main,readPoint</stuans>
-<correct>main,computeCentroid,readPoint</correct>
-<time_taken>13.000000</time_taken>
-<passed/>
-</query>
-<query>
-<id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="Procedure (p, v)">8</id><querystr><![CDATA[variable v; procedure p; Select v such that Modifies (p, v)]]></querystr>
-<stuans>cenX,cenY,count,flag,normSq,x,y</stuans>
-<correct>flag,x,y,count,cenX,cenY,normSq</correct>
-<time_taken>13.000000</time_taken>
-<passed/>
-</query>
-<query>
-<id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="Procedure (p, v)">9</id><querystr><![CDATA[variable v; procedure p; Select p such that Modifies (p, "x")]]></querystr>
-<stuans>computeCentroid,main,readPoint</stuans>
-<correct>main,computeCentroid,readPoint</correct>
-<time_taken>8.000000</time_taken>
-<passed/>
-</query>
-<query>
-<id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="Call (c, v)">10</id><querystr><![CDATA[variable v; call c; Select v such that Modifies ("readPoint", v)]]></querystr>
-<stuans>x,y</stuans>
-<correct>x,y</correct>
-<time_taken>8.000000</time_taken>
-<passed/>
-</query>
-<query>
-<id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="Call (c, v)">11</id><querystr><![CDATA[variable v; call c; Select c such that Modifies (c, "x")]]></querystr>
-<stuans></stuans>
-<correct>readPoint</correct>
-<time_taken>7.000000</time_taken>
-<failed>
-<missing>readPoint</missing>
-<additional></additional>
-<summary>
-<expected>1</expected>
-<matched>0</matched>
-<missing>1</missing>
-<additional>0</additional>
-</summary>
-</failed>
-</query>
-<query>
-<id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="while (w, v)">12</id><querystr><![CDATA[variable v; while w; Select v such that Modifies (w, v)]]></querystr>
-<stuans>cenX,cenY,count,x,y</stuans>
-<correct>x,y,count,cenX,cenY</correct>
+<id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Parent - Generic If, Generic If, Select if">1</id><querystr><![CDATA[if i, ia; Select i such that Parent(i,ia)]]></querystr>
+<stuans>5,32,33,42,57</stuans>
+<correct>5,32,33,42,57</correct>
 <time_taken>12.000000</time_taken>
 <passed/>
 </query>
 <query>
-<id ReturnTuple="1" SuchThat="1" CondNum="2" RelNum="0" comment="if">15</id><querystr><![CDATA[if f; variable v; Select v such that modifies(f,v)]]></querystr>
+<id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Parent - Generic If, Generic Print, Select print">1</id><querystr><![CDATA[if i; print pn; Select pn such that Parent(i,pn)]]></querystr>
+<stuans>46,59</stuans>
+<correct>46,59</correct>
+<time_taken>8.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Parent - Generic If, Generic call, Select call">1</id><querystr><![CDATA[if i; call c; Select c such that Parent(i,c)]]></querystr>
 <stuans></stuans>
-<correct>flag,cenX,cenY</correct>
-<time_taken>6.000000</time_taken>
+<correct></correct>
+<time_taken>8.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Parent - Generic If Generic Print, select if">2</id><querystr><![CDATA[if i; print pn; Select i such that Parent(i,pn)]]></querystr>
+<stuans>45,58</stuans>
+<correct>45,58</correct>
+<time_taken>11.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Parent - Generic If Generic call, select stmt">2</id><querystr><![CDATA[if i; call c; stmt s; Select s such that Parent(i,c)]]></querystr>
+<stuans></stuans>
+<correct></correct>
+<time_taken>55.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Parent - Specific If Specific Stmt, select procedure">2</id><querystr><![CDATA[procedure p; Select p such that Parent(42,43)]]></querystr>
+<stuans>a2,callNone,calleeL1,calleeL2,calleeL3,main,x1</stuans>
+<correct>main,calleeL1,calleeL2,calleeL3,callNone,x1,a2</correct>
+<time_taken>16.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Parent - Specific If Specific Stmt, select procedure">2</id><querystr><![CDATA[procedure p; Select p such that Parent(42,100)]]></querystr>
+<stuans></stuans>
+<correct></correct>
+<time_taken>8.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Parent - Generic If Generic Call, select if">3</id><querystr><![CDATA[if i; call c; Select i such that Parent(i, c)]]></querystr>
+<stuans></stuans>
+<correct></correct>
+<time_taken>10.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Parent - Generic While Generic Assign, select while">4</id><querystr><![CDATA[while w; assign a; Select w such that Parent(w,a)]]></querystr>
+<stuans>11,13,21,26,50,62</stuans>
+<correct>11,13,21,26,50,62</correct>
+<time_taken>21.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Parent - Generic while, generic assign, select assign">4</id><querystr><![CDATA[while w; assign a; Select a such that Parent(w,a)]]></querystr>
+<stuans>12,14,22,27,51,63</stuans>
+<correct>12,14,22,27,51,63</correct>
+<time_taken>24.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Parent - Generic while, genric while, select while">4</id><querystr><![CDATA[while w1,w2; Select w2 such that Parent(w1,w2)]]></querystr>
+<stuans>19,20,21</stuans>
+<correct>19,20,21</correct>
+<time_taken>11.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Parent - Generic while, genric if, select if">4</id><querystr><![CDATA[while w,; if i; Select i such that Parent(w,i)]]></querystr>
+<stuans></stuans>
+<correct></correct>
+<time_taken>9.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Parent - Generic while, generic cal;l, select call">4</id><querystr><![CDATA[while w; call c; Select c such that Parent(w,c)]]></querystr>
+<stuans>69</stuans>
+<correct>69</correct>
+<time_taken>8.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Parent - Generic While Generic Print, select while">5</id><querystr><![CDATA[while w; print pn; Select w such that Parent(w,pn)]]></querystr>
+<stuans>48</stuans>
+<correct>48</correct>
+<time_taken>10.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Parent - Generic While Generic Call, select while">6</id><querystr><![CDATA[call c; while w; Select w such that Parent(w,c)]]></querystr>
+<stuans>68</stuans>
+<correct>68</correct>
+<time_taken>10.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Parent - Generic Stmt, Generic While, select while">7</id><querystr><![CDATA[stmt s; while w; Select w such that Parent(w,s)]]></querystr>
+<stuans>11,13,18,19,20,21,26,48,50,62,68</stuans>
+<correct>waitout</correct>
+<time_taken>17.000000</time_taken>
 <failed>
-<missing>cenX,cenY,flag</missing>
-<additional></additional>
+<missing>waitout</missing>
+<additional>11,13,18,19,20,21,26,48,50,62,68</additional>
 <summary>
-<expected>3</expected>
+<expected>1</expected>
 <matched>0</matched>
-<missing>3</missing>
-<additional>0</additional>
+<missing>1</missing>
+<additional>11</additional>
+</summary>
+</failed>
+</query>
+<query>
+<id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Parent - Generic Stmt, Generic Stmt, select stmt">8</id><querystr><![CDATA[stmt s1,s2; Select s1 such that Parent(s1,s2)]]></querystr>
+<stuans>5,8,11,13,18,19,20,21,23,26,32,33,34,42,45,48,50,57,58,62,68</stuans>
+<correct>waitout</correct>
+<time_taken>54.000000</time_taken>
+<failed>
+<missing>waitout</missing>
+<additional>11,13,18,19,20,21,23,26,32,33,34,42,45,48,5,50,57,58,62,68,8</additional>
+<summary>
+<expected>1</expected>
+<matched>0</matched>
+<missing>1</missing>
+<additional>21</additional>
+</summary>
+</failed>
+</query>
+<query>
+<id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Parent - Generic Stmt, Generic While, select stmt">9</id><querystr><![CDATA[stmt s; while w; Select s such that Parent(w,s)]]></querystr>
+<stuans>12,14,19,20,21,22,27,49,51,63,69</stuans>
+<correct>waitout</correct>
+<time_taken>37.000000</time_taken>
+<failed>
+<missing>waitout</missing>
+<additional>12,14,19,20,21,22,27,49,51,63,69</additional>
+<summary>
+<expected>1</expected>
+<matched>0</matched>
+<missing>1</missing>
+<additional>11</additional>
+</summary>
+</failed>
+</query>
+<query>
+<id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Parent - Generic Stmt, Generic While, select while">9</id><querystr><![CDATA[stmt s; while w; Select w such that Parent(w,s)]]></querystr>
+<stuans>11,13,18,19,20,21,26,48,50,62,68</stuans>
+<correct>waitout</correct>
+<time_taken>15.000000</time_taken>
+<failed>
+<missing>waitout</missing>
+<additional>11,13,18,19,20,21,26,48,50,62,68</additional>
+<summary>
+<expected>1</expected>
+<matched>0</matched>
+<missing>1</missing>
+<additional>11</additional>
+</summary>
+</failed>
+</query>
+<query>
+<id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Parent - Generic Stmt, Generic If, select stmt">10</id><querystr><![CDATA[stmt s; if i; Select s such that Parent(i,s)]]></querystr>
+<stuans>6,7,8,9,10,11,13,15,16,17,24,25,33,34,35,36,37,38,43,44,45,46,47,48,50,52,53,54,58,59,60,61</stuans>
+<correct>waitout</correct>
+<time_taken>42.000000</time_taken>
+<failed>
+<missing>waitout</missing>
+<additional>10,11,13,15,16,17,24,25,33,34,35,36,37,38,43,44,45,46,47,48,50,52,53,54,58,59,6,60,61,7,8,9</additional>
+<summary>
+<expected>1</expected>
+<matched>0</matched>
+<missing>1</missing>
+<additional>32</additional>
+</summary>
+</failed>
+</query>
+<query>
+<id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Parent - Generic Stmt, Generic If, select if">10</id><querystr><![CDATA[stmt s; if i; Select i such that Parent(i,s)]]></querystr>
+<stuans>5,8,23,32,33,34,42,45,57,58</stuans>
+<correct>waitout</correct>
+<time_taken>19.000000</time_taken>
+<failed>
+<missing>waitout</missing>
+<additional>23,32,33,34,42,45,5,57,58,8</additional>
+<summary>
+<expected>1</expected>
+<matched>0</matched>
+<missing>1</missing>
+<additional>10</additional>
 </summary>
 </failed>
 </query>

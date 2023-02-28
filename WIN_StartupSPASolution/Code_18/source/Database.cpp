@@ -158,7 +158,7 @@ void Database::insertNext(int stmtNum1, int stmtNum2) {
 	if (errorMessage) { cout << "insertNext SQL Error: " << errorMessage; }
 }
 
-void Database::getNext_T(int stmtNum1, int stmtNum2, vector<string>& results) {
+void Database::getNextT(int stmtNum1, int stmtNum2, vector<string>& results) {
 	dbResults.clear();
 	char sqlBuf[256];
 	vector<string> resultStore;
@@ -323,23 +323,78 @@ void Database::getStatement(vector<string>& results) {
 	}
 }
 
+bool Database::GetParent(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, string parentEntity, string childEntity) {
+	/*	select 1 from statement s where s.entity = '%s' and ((select p.line_num from parent p where p.line_num = %s and s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1) = (select p.line_num from parent p join statement s2 where s2.entity = '%s' and s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1))
+		select 1 from statement s where s.entity = '%s' and ((select p.line_num from parent p join statement s2 on p.line_num = s2.line_num where s2.entity = '%s' and s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1) = (select p.line_num from parent p join statement s2 where s2.entity = '%s' and s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1))
 
-// not used
-/*
-bool Database::GetParent(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, string entity) {
+		SQL statement for generic containers
+			1) get the nearest parent (the parent with highest line_num) of the specified container type (while / if)
+			2) get the nearest parent (the parent with highest line_num)
+			3) compare if both parent line_num are the same. If the same, then the statement is under the specified container = direct parent. If not, then it's indirect parent	
+				** Even for cases where the parent line_num is specific, we still need the SQL at (2) to ensure that it's direct parent instead of indirect parent
+	*/
 
-}
-*/
+	char sqlBuf[512];
+	// Parent(s1,10) or Parent(s1,s2), only "s2" present in select. "s1' is either "while w" or "if i" = generic
+	if (!input1IsSpecific && input2IsSpecific) {
+		if (parentEntity == "stmt") { // if parentEntity is stmt, then it's any container
+			sprintf_s(sqlBuf, "select 1 from statement s where s.line_num = %s and exists (select 1 from parent p join statement s2 on p.line_num = s2.line_num where s.line_num between p.child_start and p.child_end)", input2.c_str());
+		}
+		else {
+			sprintf_s(sqlBuf, "select 1 from statement s where s.line_num = %s and ((select p.line_num from parent p join statement s2 on p.line_num = s2.line_num where s2.entity = '%s' and s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1) = (select p.line_num from parent p where s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1))", input2.c_str(), parentEntity.c_str());
+		}
+	}
 
-bool Database::GetParentForRead(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific) {
-	char sqlBuf[256];
-	sprintf_s(sqlBuf, "select 1 from parent where %s between child_start and child_end and line_num = %s", input2.c_str(), input1.c_str());
-	
+	// Parent(10,20) or Parent(s1,s2), both present in select
+	else if (input1IsSpecific && input2IsSpecific) {
+		sprintf_s(sqlBuf, "select 1 from statement s where s.line_num = %s and ((select p.line_num from parent p where p.line_num = %s and s.line_num between p.child_start and p.child_end) = (select p.line_num from parent p where s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1))", input2.c_str(), input1.c_str());
+	}
 
+	// Parent(10,s2) or Parent(s1,s2), only "s1" present in select. "s1" will be a line_num, "s2" can be (stmt / read / print / assign / while / if / call)
+	else if (input1IsSpecific && !input2IsSpecific) {
+		if (childEntity == "stmt") { // if childEntity is stmt, then it's any statement nested in a container
+			sprintf_s(sqlBuf, "select 1 from statement s where exists (select p.line_num from parent p where p.line_num = %s and s.line_num between p.child_start and p.child_end)", input1.c_str());
+		}
+		else {
+			sprintf_s(sqlBuf, "select 1 from statement s where s.entity = '%s' and ((select p.line_num from parent p where p.line_num = %s and s.line_num between p.child_start and p.child_end) = (select p.line_num from parent p where s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1))", childEntity.c_str(), input1.c_str());
+		}
+	}
+
+	// Parent(s1,s2), both no in select. "s1" can be (while / if / stmt) = generic. "s2" can be (stmt / read / print / assign / while / if / call) = generic
+	else if (!input1IsSpecific && !input2IsSpecific) {
+		if (childEntity == "stmt" && parentEntity == "stmt") {
+			sprintf_s(sqlBuf, "select 1 from statement s where exists (select p.line_num from parent where s.line_num between p.child_start and p.child_end)");
+		}
+		else {
+			sprintf_s(sqlBuf, "select 1 from statement s where s.entity = '%s' and ((select p.line_num from parent p join statement s2 on p.line_num = s2.line_num where s2.entity = '%s' and s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1) = (select p.line_num from parent p where s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1))", childEntity.c_str(), parentEntity.c_str());
+		}
+	}
+		
 	SqlResultStore rs;
 	sqlResultStoreForCallback = &rs;
 	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
 	if (errorMessage) { cout << "getParent SQL Error: " << errorMessage; exit(0); }
+	return (!(sqlResultStoreForCallback->sqlResult.empty()));
+}
+
+bool Database::GetParentForStmt(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific){
+	SqlResultStore rs;
+	sqlResultStoreForCallback = &rs;
+	char sqlBuf[512] = {};
+	if (input1IsSpecific && input2IsSpecific) { // we know the container stmt num, and the input2 stmt num
+		Database::GetParent(input1, input2, input1IsSpecific, input1IsSpecific, "", ""); 
+	}
+	else if (input1IsSpecific && !input2IsSpecific) { // we know the container stmt number, and we don't know the input2 stmt num
+		sprintf_s(sqlBuf, "select 1 from statement s where exists (select 1 from parent p where p.line_num = %s and s.line_num between p.child_start and p.child_end);", input1.c_str());
+	}
+	else if (!input1IsSpecific && input2IsSpecific) { // we don't know the container, and we know the input2's stmt num
+		sprintf_s(sqlBuf, "select 1 from statement s where s.line_num = %s and exists (select 1 from parent p where s.line_num between p.child_start and p.child_end);", input2.c_str());
+	}
+	else if (!input1IsSpecific && !input2IsSpecific) { // we don't know the container, and we don't know the input2 stmt num
+		sprintf_s(sqlBuf, "select 1 from statement s where exists (select 1 from parent p where s.line_num between p.child_start and p.child_end);");
+	}
+	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
+	if (errorMessage) { cout << "GetParentForStmt SQL Error: " << errorMessage; }
 	return (!(sqlResultStoreForCallback->sqlResult.empty()));
 }
 
@@ -352,58 +407,6 @@ bool Database::GetParentT(string input1, string input2) {
 	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
 	if (errorMessage) { cout << "getParent SQL Error: " << errorMessage; exit(0); }
 	return (!(sqlResultStoreForCallback->sqlResult.empty()));
-}
-
-
-void Database::getChildren(string stmtNum1, string stmtNum2, string statementType, vector<string>& results) {
-	
-	// clear the existing results
-	dbResults.clear();
-
-	string sql;
-
-	if(statementType == "stmt")
-		 sql = "WITH RECURSIVE expanded_range(n) AS ( SELECT child_start FROM parent WHERE line_num = '" + stmtNum1 + "' UNION ALL SELECT n+1 FROM expanded_range WHERE n+1 <= (SELECT child_end FROM parent WHERE line_num = '" + stmtNum1 + "')) SELECT line_num FROM statement WHERE line_num IN (SELECT n FROM expanded_range);";
-	else
-		 sql = "WITH RECURSIVE expanded_range(n) AS ( SELECT child_start FROM parent WHERE line_num = '" + stmtNum1 + "' UNION ALL SELECT n+1 FROM expanded_range WHERE n+1 <= (SELECT child_end FROM parent WHERE line_num = '" + stmtNum1 + "')) SELECT line_num FROM statement WHERE line_num IN (SELECT n FROM expanded_range) AND entity = '" + statementType + "';";
-
-	sqlite3_exec(dbConnection, sql.c_str(), callback, 0, &errorMessage);
-
-	if (errorMessage) {
-		cout << "getParent SQL Error: " << errorMessage;
-	}
-
-	for (vector<string> dbRow : dbResults) {
-		string result;
-		result = dbRow.at(0);
-		results.push_back(result);
-	}
-}
-
-void Database::getParentChildren(bool findparent, string resultType, string filterType, vector<string>& results) {
-
-	// clear the existing results
-	dbResults.clear();
-	string sql;
-
-	if (findparent)
-		sql = "SELECT DISTINCT(p.line_num) FROM parent p JOIN statement s ON s.line_num BETWEEN p.child_start AND p.child_end WHERE s.entity = '" + filterType + "' AND line_num IN (SELECT line_num FROM statement WHERE entity = '" + resultType + "');";
-	 
-	else 
-		sql = "WITH RECURSIVE expanded_range(n) AS ( SELECT child_start FROM parent WHERE p.line_num IN (SELECT line_num FROM statement WHERE entity = '" + filterType + "') UNION ALL SELECT n+1 FROM expanded_range WHERE n+1 <= (SELECT child_end FROM parent WHERE line_num IN (SELECT line_num FROM statement WHERE entity = '" + filterType + "'))) SELECT line_num FROM statement WHERE line_num IN (SELECT n FROM expanded_range) AND entity = '" + resultType + "';";
-
-
-	sqlite3_exec(dbConnection, sql.c_str(), callback, 0, &errorMessage);
-
-	if (errorMessage) {
-		cout << "getParent SQL Error: " << errorMessage;
-	}
-
-	for (vector<string> dbRow : dbResults) {
-		string result;
-		result = dbRow.at(0);
-		results.push_back(result);
-	}
 }
 
 /* Input types
@@ -918,25 +921,6 @@ int Database::callback(void* NotUsed, int columnCount, char** columnValues, char
 	sqlResultStoreForCallback->sqlResult.push_back(sqlResult);
 	sqlResultStoreForCallback->sqlResultSet.insert(sqlResult);
 	
-
-	return 0;
-}
-
-//void Database::select(map)
-
-int Database::callback_new(void* NotUsed, int argc, char** argv, char** azColName) {
-	NotUsed = 0;
-	vector<string> dbRow;
-	
-	// argc is the number of columns for this row of results
-	// argv contains the values for the columns
-	// Each value is pushed into a vector.
-	for (int i = 0; i < argc; i++) {
-		dbRow.push_back(argv[i]);
-	}
-
-	// The row is pushed to the vector for storing all rows of results 
-	dbResults.push_back(dbRow);
 
 	return 0;
 }

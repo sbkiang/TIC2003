@@ -78,7 +78,7 @@ procedure calleeL2{
             print printx;
             d = use4;
             while(d = use20){
-                d = use21;
+                print printUnderWhile;
             }
         }
         else{

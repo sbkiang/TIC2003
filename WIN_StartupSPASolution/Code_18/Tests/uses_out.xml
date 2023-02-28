@@ -1,8 +1,0 @@
-<?xml-stylesheet type="text/xsl" href="analysis.xsl"?>
-<test_results>
-<info>
-<name>AutoTester</name><parsing_time_taken>2303.000000</parsing_time_taken>
-</info>
-<queries>
-<query>
-<id ReturnTuple="1" Uses="1" SuchThat="1" CondNum="3" RelNum="1" comment="select_1_variable_uses_specific_generic_logical">1</id><querystr><![CDATA[variable v; procedure p; Select p such that Uses("main",v)]]></querystr>

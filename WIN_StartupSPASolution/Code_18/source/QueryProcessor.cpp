@@ -109,8 +109,8 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 				i++;
 			} while (brackets > 0);
 			int comma = word.find(",");
-			st.first = word.substr(0, comma);
-			st.second = word.substr(comma + 1, word.length());
+			st.input1 = word.substr(0, comma);
+			st.input2 = word.substr(comma + 1, word.length());
 			suchThatStack.push(st);
 		}
 		else if (tokens[i] == "pattern") {
@@ -135,8 +135,8 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 				i++;
 			} while (brackets > 0);
 			int comma = word.find(",");
-			pt.first = word.substr(0, comma);
-			pt.second = word.substr(comma + 1, word.length());
+			pt.input1 = word.substr(0, comma);
+			pt.input2 = word.substr(comma + 1, word.length());
 			patternStack.push(pt);
 		}
 		else if (tokens[i] == "Select") {
@@ -167,58 +167,79 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	//  specific when it's (a synonym and part of select) or (it's not a synonym)
 	while (!suchThatStack.empty()) {
 		SuchThat suchThatTemp = suchThatStack.top();
-		bool suchThatFirstIsSynonym = (synonymEntityMap.find(suchThatTemp.first) != synonymEntityMap.end()); // first input is a synonym
-		bool suchThatSecondIsSynonym = (synonymEntityMap.find(suchThatTemp.second) != synonymEntityMap.end()); // second input is a synonym
-		bool suchThatFirstInSelect = (find(select.synonym.begin(), select.synonym.end(), suchThatTemp.first) != select.synonym.end()); // first input is part of select
-		bool suchThatSecondInSelect = (find(select.synonym.begin(), select.synonym.end(), suchThatTemp.second) != select.synonym.end()); // second input is part of select
-		bool input1Specific = (!suchThatFirstIsSynonym || suchThatFirstInSelect); // generic when it's a synonym and not part of select, specific when it's part of select or it's not a synonym
-		bool input2Specific = (!suchThatSecondIsSynonym || suchThatSecondInSelect); // generic when it's a synonym and not part of select, specific when it's part of select or it's not a synonym  
+		bool suchThatInput1IsSynonym = (synonymEntityMap.find(suchThatTemp.input1) != synonymEntityMap.end()); // first input is a synonym
+		bool suchThatInput2IsSynonym = (synonymEntityMap.find(suchThatTemp.input2) != synonymEntityMap.end()); // second input is a synonym
+		bool suchThatInput1InSelect = (find(select.synonym.begin(), select.synonym.end(), suchThatTemp.input1) != select.synonym.end()); // first input is part of select
+		bool suchThatInput2InSelect = (find(select.synonym.begin(), select.synonym.end(), suchThatTemp.input2) != select.synonym.end()); // second input is part of select
+		bool input1IsSpecific = (!suchThatInput1IsSynonym || suchThatInput1InSelect); // generic when it's a synonym and not part of select, specific when it's part of select or it's not a synonym
+		bool input2IsSpecific = (!suchThatInput2IsSynonym || suchThatInput2InSelect); // generic when it's a synonym and not part of select, specific when it's part of select or it's not a synonym  
 		
-		string entity = "", first = suchThatTemp.first, second = suchThatTemp.second;
-		if (suchThatFirstIsSynonym) { // if input1 is part of declared synonym, we get the entity that it belongs
-			entity = synonymEntityMap.at(suchThatTemp.first); 
-		} 
+		string entityInput1 = "", entityInput2 = "", first = suchThatTemp.input1, second = suchThatTemp.input2;
+		if (suchThatInput1IsSynonym) { // if input1 is part of declared synonym, we get the entity that it belongs
+			entityInput1 = synonymEntityMap.at(suchThatTemp.input1);
+		}
+		if (suchThatInput2IsSynonym) { // if input1 is part of declared synonym, we get the entity that it belongs
+			entityInput2 = synonymEntityMap.at(suchThatTemp.input2);
+		}
 		for (int i = 0; i < sqlResultStore.sqlResult.size(); i++) {
 			SqlResult sqlResulTemp = sqlResultStore.sqlResult.at(i);
 			bool pass = false;
 			string relationship = suchThatTemp.relationship;
-			if (suchThatFirstInSelect) { // if the first input is a synonym, and is part of select, get the input 
-				first = sqlResulTemp.row.at(suchThatTemp.first);
+			if (suchThatInput1InSelect) { // if the first input is a synonym, and is part of select, get the input 
+				first = sqlResulTemp.row.at(suchThatTemp.input1);
 			}
-			if (suchThatSecondInSelect) { // if the second input is a synonym, and is part of select, get the input 
-				second = sqlResulTemp.row.at(suchThatTemp.second);
+			if (suchThatInput2InSelect) { // if the second input is a synonym, and is part of select, get the input 
+				second = sqlResulTemp.row.at(suchThatTemp.input2);
 			}
-			if (relationship == "Uses") {
-				if (entity == "assign") { pass = Database::GetUsesForAssign(first, second, input1Specific, input2Specific); }
-				else if (entity == "print") { pass = Database::GetUsesForPrint(first, second, input1Specific, input2Specific); }
-				else if (entity == "while") { pass = Database::GetUsesForWhile(first, second, input1Specific, input2Specific); }
-				else if (entity == "if") { pass = Database::GetUsesForIf(first, second, input1Specific, input2Specific); }
-				else if (entity == "call") { pass = Database::GetUsesForCall(first, second, input1Specific, input2Specific); }
-				else if (entity == "procedure") { pass = Database::GetUsesForProcedure(first, second, input1Specific, input2Specific); }
-				else { pass = Database::GetUsesForUnknownInput1(first, second, input1Specific, input2Specific); } // e.g., uses(10,v) or uses("main",v). just pass in here even
-				if (pass) { sqlResultPass.push_back(sqlResulTemp); }
+			if (relationship == "Uses") { // input1 is Stmt Num or Name, input2 is Name
+				if (entityInput1 == "assign") { pass = Database::GetUsesForAssign(first, second, input1IsSpecific, input2IsSpecific); }
+				else if (entityInput1 == "print") { pass = Database::GetUsesForPrint(first, second, input1IsSpecific, input2IsSpecific); }
+				else if (entityInput1 == "while") { pass = Database::GetUsesForWhile(first, second, input1IsSpecific, input2IsSpecific); }
+				else if (entityInput1 == "if") { pass = Database::GetUsesForIf(first, second, input1IsSpecific, input2IsSpecific); }
+				else if (entityInput1 == "call") { pass = Database::GetUsesForCall(first, second, input1IsSpecific, input2IsSpecific); }
+				else if (entityInput1 == "procedure") { pass = Database::GetUsesForProcedure(first, second, input1IsSpecific, input2IsSpecific); }
+				else { pass = Database::GetUsesForUnknownInput1(first, second, input1IsSpecific, input2IsSpecific); } // e.g., uses(10,v) or uses("main",v). just pass in here even
 				// add in code to check if synonym used in query. If not, then just need to test once for first row, and result applies to all row
 			}
-			else if(relationship == "Modifies") {
-				if (entity == "assign") { pass = Database::GetModifiesForAssign(first, second, input1Specific, input2Specific); }
-				else if (entity == "read") { pass = Database::GetModifiesForRead(first, second, input1Specific, input2Specific); }
-				else if (entity == "while") { pass = Database::GetModifiesForWhile(first, second, input1Specific, input2Specific); }
-				else if (entity == "if") { pass = Database::GetModifiesForIf(first, second, input1Specific, input2Specific); }
-				else if (entity == "call") { pass = Database::GetModifiesForCall(first, second, input1Specific, input2Specific); }
-				else if (entity == "procedure") { pass = Database::GetModifiesForProcedure(first, second, input1Specific, input2Specific); }
-				else { pass = Database::GetModifiesForUnknownInput1(first, second, input1Specific, input2Specific); } // e.g., uses(10,v) or uses("main",v). just pass in here even
-				if (pass) { sqlResultPass.push_back(sqlResulTemp); }
+			else if (relationship == "Modifies") { // input1 is Stmt Num or Name, input2 is Name
+				if (entityInput1 == "assign") { pass = Database::GetModifiesForAssign(first, second, input1IsSpecific, input2IsSpecific); }
+				else if (entityInput1 == "read") { pass = Database::GetModifiesForRead(first, second, input1IsSpecific, input2IsSpecific); }
+				else if (entityInput1 == "while") { pass = Database::GetModifiesForWhile(first, second, input1IsSpecific, input2IsSpecific); }
+				else if (entityInput1 == "if") { pass = Database::GetModifiesForIf(first, second, input1IsSpecific, input2IsSpecific); }
+				else if (entityInput1 == "call") { pass = Database::GetModifiesForCall(first, second, input1IsSpecific, input2IsSpecific); }
+				else if (entityInput1 == "procedure") { pass = Database::GetModifiesForProcedure(first, second, input1IsSpecific, input2IsSpecific); }
+				else { pass = Database::GetModifiesForUnknownInput1(first, second, input1IsSpecific, input2IsSpecific); } // e.g., uses(10,v) or uses("main",v). just pass in here even
 			}
-			else if (relationship == "Parent") { // assign a; while w; select w such that Parent(w,a). In this case, "a" is generic
+			else if (relationship == "Parent") { // input1 is Stmt Num, input2 is Stmt Num
+				pass = Database::GetParent(first, second, input1IsSpecific, input2IsSpecific, entityInput1, entityInput2);
+			}
+			else if (relationship == "Parent*") { // input1 is Stmt Num, input2 is Stmt Num
+				//pass = Database::GetParent(first, second, input1IsSpecific, input2IsSpecific, entityInput1, entityInput2);
+			}
+			else if (relationship == "Next") {
 
 			}
-		} 
+			else if (relationship == "Next*"){
+			}
+			else if (relationship == "Calls") {
+
+			}
+			else if (relationship == "Calls*") {
+
+			}
+			
+			if (pass) { sqlResultPass.push_back(sqlResulTemp); }
+			/*
+			char out[256];
+			sprintf_s(out, "first: %s, second: %s , pass: %s", first.c_str(), second.c_str(), pass ? "true" : "false");
+			cout << out << endl;
+			*/
+		}
 		sqlResultStore.sqlResult = sqlResultPass;
 		suchThatStack.pop();
 	}
 	
 	// post process the results to fill in the output vector
-	
 	for (SqlResult sqlResult : sqlResultStore.sqlResult) {
 		string result;
 		for (auto it = sqlResult.row.begin(); it != sqlResult.row.end(); it++) {
@@ -228,12 +249,11 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		output.push_back(result);
 	}
 	
-	/*
 	cout << "MY OUTPUT: ";
 	for (int i = 0; i < output.size(); i++) {
-		cout << output.at(i) << " ";
+		cout << output.at(i) << ",";
 	}
-	*/
+	
 
 	cout << endl;
 }

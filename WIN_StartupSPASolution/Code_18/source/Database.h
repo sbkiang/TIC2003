@@ -36,11 +36,10 @@ public:
 	// method to insert a parent into the database
 	static void insertParent(int parentStmt, int childStart, int childEnd);
 	//static bool GetParent(string stmtNum1, string stmtNum2, bool input1IsSpecific, bool input2IsSpecific, entity);
-	static bool GetParent(string stmtNum1, string stmtNum2, bool input1IsSpecific, bool input2IsSpecific);
-	static bool GetParentForRead(string stmtNum1, string stmtNum2, bool input1IsSpecific, bool input2IsSpecific);
+	static bool GetParent(string stmtNum1, string stmtNum2, bool input1IsSpecific, bool input2IsSpecific, string parentEntity, string childEntity);
+	static bool GetParentForStmt(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
 	static bool GetParentT(string input1, string input2); // for Parent(x,y), specific is number. non-specific is synonym
-	static void getChildren(string stmtNum1, string stmtNum2, string statementType, vector<string>& results);
-	static void getParentChildren(bool findparent, string resultType, string filterType, vector<string>& results);
+	static bool GetParentTForStmt(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, string parentEntity, string childEntity);
 	
 	// method to insert/get a modify into the database
 	static void insertModifies(int statementNumber, string variablename);
@@ -70,11 +69,8 @@ public:
 	// method to insert/get a next into the database
 	static void insertNext(int stmtNum1, int stmtNum2);
 	static void getNext(int stmtNum1, int stmtNum2, vector<string>& results);
-	static void getNext_T(int stmtNum1, int stmtNum2, vector<string>& results);
+	static void getNextT(int stmtNum1, int stmtNum2, vector<string>& results);
 
-	//static void select(Select& st, SqlResultStore* sqlResultStore);
-	//static void select(Select& st, SqlResultStore* sqlResultStore, map<string,string> synEntMap);
-	static void suchThat(SuchThat& st, SqlResultStore* sqlResultStore);
 	static void SelectPql(Select& st, SqlResultStore& sqlResultStore);
 
 private:
@@ -85,9 +81,7 @@ private:
 	// the error message from the database
 	static char* errorMessage;
 	// callback method to put one row of results from the database into the dbResults vector
-	// This method is called each time a row of results is returned from the database
-	static int callback(void* NotUsed, int argc, char** argv, char** azColName);
-	static int callback(void* NotUsed, int argc, char** argv, char** azColName, SqlResult& sqlResult);
-	static int callback_new(void* NotUsed, int argc, char** argv, char** azColName);
+	// This method is called each time a row of results is returned from the database	
+	static int callback(void* NotUsed, int columnCount, char** columnValues, char** columnNames);
 };
 
