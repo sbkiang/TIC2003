@@ -1,0 +1,5 @@
+1 - Assign pattern find all "x" on LHS
+assign a;
+Select a pattern a ("x", _)
+2,3,24,25,27,31,39,49,55,56,61,63,64
+5000

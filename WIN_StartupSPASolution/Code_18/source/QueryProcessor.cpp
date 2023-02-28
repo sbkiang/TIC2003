@@ -128,12 +128,14 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 				}
 				else if (tokens.at(i) == ")") { // closing bracket
 					brackets--;
+					continue;
 				}
 				if (!regex_match(tokens.at(i), regex(regexQuote))) {
 					word += tokens.at(i);
 				}
 				i++;
 			} while (brackets > 0);
+
 			int comma = word.find(",");
 			pt.input1 = word.substr(0, comma);
 			pt.input2 = word.substr(comma + 1, word.length());
@@ -239,6 +241,15 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		suchThatStack.pop();
 	}
 	
+	while (!patternStack.empty()) {
+
+		Pattern patternTemp = patternStack.top();
+		
+		cout << patternTemp.input1 << "@" << patternTemp.input2 << "@" << patternTemp.synonym;
+
+		patternStack.pop();
+	}
+
 	// post process the results to fill in the output vector
 	for (SqlResult sqlResult : sqlResultStore.sqlResult) {
 		string result;
