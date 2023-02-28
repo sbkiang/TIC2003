@@ -161,25 +161,6 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	EvaluateSelect(select, synonymEntityMap);
 	vector<SqlResult> sqlResultPass;
 	Database::SelectPql(select, sqlResultStore);
-	
-	while (!patternStack.empty()) {
-
-		Pattern patternTemp = patternStack.top();
-		string entity = synonymEntityMap.at(patternTemp.synonym);
-
-		for (int i = 0; i < sqlResultStore.sqlResult.size(); i++) {
-
-			SqlResult sqlResulTemp = sqlResultStore.sqlResult.at(i);
-			bool pass = false;
-
-			if (entity == "assign") {
-
-			}
-
-		}
-
-		patternStack.pop();
-	}
 
 	// need to determine if the input to such that is generic or specific
 	//	generic when it's (a synonym and not part of select)
@@ -256,6 +237,25 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		}
 		sqlResultStore.sqlResult = sqlResultPass;
 		suchThatStack.pop();
+	}
+
+	while (!patternStack.empty()) {
+
+		Pattern patternTemp = patternStack.top();
+		string entity = synonymEntityMap.at(patternTemp.synonym);
+
+		for (int i = 0; i < sqlResultStore.sqlResult.size(); i++) {
+
+			SqlResult sqlResulTemp = sqlResultStore.sqlResult.at(i);
+			bool pass = false;
+
+			if (entity == "assign") {
+
+			}
+
+		}
+
+		patternStack.pop();
 	}
 
 	// post process the results to fill in the output vector

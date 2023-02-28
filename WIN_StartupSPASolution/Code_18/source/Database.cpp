@@ -69,11 +69,26 @@ void Database::initialize() {
 	// create a use table
 	string createUseTableSQL = "CREATE TABLE use ( line_num INT REFERENCES statement(line_num), variable_name VARCHAR(50) REFERENCES variable(name), PRIMARY KEY(line_num, variable_name));";
 	sqlite3_exec(dbConnection, createUseTableSQL.c_str(), NULL, 0, &errorMessage);
-
+	
+	// drop the existing next table (if any)
 	string dropNextTableSQL = "DROP TABLE IF EXISTS next";
 	sqlite3_exec(dbConnection, dropNextTableSQL.c_str(), NULL, 0, &errorMessage);
+
+	//create a next table
 	string createNextTableSQL = "CREATE TABLE next (line_num_1 INT REFERENCES statement(line_num), line_num_2 INT REFERENCES statement(line_num), CONSTRAINT line_num_not_equal check(line_num_1 <> line_num_2));";
 	sqlite3_exec(dbConnection, createNextTableSQL.c_str(), NULL, 0, &errorMessage);
+
+	//drop the existing pattern table (if any)
+	string dropPatternTableSQL = "DROP TABLE IF EXISTS pattern";
+	sqlite3_exec(dbConnection, dropPatternTableSQL.c_str(), NULL, 0, &errorMessage);
+
+	//create a pattern table
+	string createPatternTableSQL = "CREATE TABLE pattern (line_num INT REFERENCES statement(line_num), LHS_var VARCHAR(50), RHS_var VARCHAR(50), expression VARCHAR(50));";
+	sqlite3_exec(dbConnection, createPatternTableSQL.c_str(), NULL, 0, &errorMessage);
+
+
+	
+	//error message output
 	if (errorMessage) { cout << "insertStatement SQL Error: " << errorMessage << endl; return; }
 
 	// initialize the result vector
@@ -831,7 +846,6 @@ bool Database::GetModifiesForUnknownInput1(string input1, string input2, bool in
 		return Database::GetModifiesForProcedure(input1, input2, input1IsSpecific, input2IsSpecific);
 	}
 }
-
 
 void Database::getModifyStmt(string stmtNum1, string stmtNum2, bool lhs, vector<string>& results) {
 	// clear the existing results

@@ -18,14 +18,17 @@ public:
 	// method to close the database connection
 	static void close();
 
+	// method to insert a procedure into the database
 	static void insertProcedure(string procedureName, int start, int end);
 	static void getProcedures(vector<string>& results);
 
-	static void insertStatement(int statementNumber, string statementName, string statementType, string text);
+	// method to insert a statement into the database
+	static void insertStatement(int stmtNum, string statementName, string statementType, string text);
 	static void getStatement(string type, vector<string>& results);
 	static void getStatement(vector<string>& results);
 	static void getStmt(string type, vector<string>& results);
 
+	// method to insert a variable into the database
 	static void insertVariable(string variablename, int statementNumber);
 	static void getVariable(vector<string>& results);
 
@@ -42,11 +45,11 @@ public:
 	static bool GetParentTForStmt(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, string parentEntity, string childEntity);
 	
 	// method to insert/get a modify into the database
-	static void insertModifies(int statementNumber, string variablename);
+	static void insertModifies(int stmtNum, string variablename);
 	static void getModifyStmt(string stmtNum1, string stmtNum2, bool lhs, vector<string>& results);
 
 	// method to insert/get a use into the database
-	static void insertUses(int statementNumber, string variablename);
+	static void insertUses(int stmtNum, string variablename);
 
 	// isSpecific is false if the input is not part of select synonym, and can be found on synonymEntityMap
 	static bool GetUsesForAssign(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
@@ -70,6 +73,10 @@ public:
 	static void insertNext(int stmtNum1, int stmtNum2);
 	static void getNext(int stmtNum1, int stmtNum2, vector<string>& results);
 	static void getNextT(int stmtNum1, int stmtNum2, vector<string>& results);
+
+	//method to insert pattern into the database
+	static void insertPattern(int stmtNum, string LHS, string RHS, string experssion);
+
 
 	static void SelectPql(Select& st, SqlResultStore& sqlResultStore);
 

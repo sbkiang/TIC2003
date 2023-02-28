@@ -1,14 +1,14 @@
 <?xml-stylesheet type="text/xsl" href="analysis.xsl"?>
 <test_results>
 <info>
-<name>AutoTester</name><parsing_time_taken>3331.000000</parsing_time_taken>
+<name>AutoTester</name><parsing_time_taken>3808.000000</parsing_time_taken>
 </info>
 <queries>
 <query>
 <id ReturnTuple="1" UnnamedVar="1" Pattern="1" CondNum="3" RelNum="0" comment="Assign pattern find all "x" on LHS">1</id><querystr><![CDATA[assign a; Select a pattern a ("x", _)]]></querystr>
 <stuans>2,3,6,7,9,10,12,14,15,16,17,22,24,25,27,31,35,36,37,38,39,40,43,44,47,51,52,53,54,55,56,60,61,63,64,65,70,71</stuans>
 <correct>2,3,24,25,27,31,39,49,55,56,61,63,64</correct>
-<time_taken>14.000000</time_taken>
+<time_taken>17.000000</time_taken>
 <failed>
 <missing>49</missing>
 <additional>10,12,14,15,16,17,22,35,36,37,38,40,43,44,47,51,52,53,54,6,60,65,7,70,71,9</additional>

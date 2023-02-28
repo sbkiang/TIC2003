@@ -189,6 +189,7 @@ void SourceProcessor::process(string program) {
 			}
 			parentStack.top()->_statements.push_back(stmt);
 			modifiesStore.push_back(Statement(stmtNum, LHS, stmtNumSubtract)); //Store LHS variable
+
 			Database::insertStatement(stmt->getAdjustedStmtNum(), procedure.back()->_name, "assign", stmt->_stmt);
 			for (int i = 0; i < variableStore.size(); i++) {
 				Database::insertVariable(variableStore.at(i)._stmt, variableStore.at(i).getAdjustedStmtNum());
@@ -206,6 +207,7 @@ void SourceProcessor::process(string program) {
 				procedure.back()->_modifies.push_back(modifiesStore.at(i)._stmt);
 				//parentStack.top()->_modifies.push_back((modifiesStore.at(i)._stmt));
 			}
+
 		}
 		else if (word == "read" || word == "print" || word == "call") {
 			stmtNum++;
