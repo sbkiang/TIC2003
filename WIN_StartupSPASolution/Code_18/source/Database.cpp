@@ -165,6 +165,13 @@ void Database::insertModifies(int stmtNum, string variablename) {
 	if (errorMessage) { cout << "insertModifies SQL Error: " << errorMessage << endl; }
 }
 
+void Database::insertPattern(int stmtNum, string LHS, string RHS, string experssion) {
+	char sqlBuf[256];
+	sprintf_s(sqlBuf, "INSERT INTO pattern ('line_num','LHS_var','RHS_var','expression') VALUES ('%i','%s','%s','%s');", stmtNum, LHS.c_str(), RHS.c_str(), experssion.c_str());
+	sqlite3_exec(dbConnection, sqlBuf, NULL, 0, &errorMessage);
+	if (errorMessage) { cout << "insertPattern SQL Error: " << errorMessage; }
+}
+
 void Database::insertNext(int stmtNum1, int stmtNum2) {
 	char sqlBuf[256];
 	sprintf_s(sqlBuf, "INSERT INTO next ('line_num_1','line_num_2') VALUES ('%i','%i');", stmtNum1, stmtNum2);

@@ -2,6 +2,7 @@
 #include "QueryProcessor.h"
 #include <unordered_map>
 
+
 // method for processing the source program
 // This method currently only inserts the procedure name into the database
 // using some highly simplified logic.
@@ -208,6 +209,12 @@ void SourceProcessor::process(string program) {
 				//parentStack.top()->_modifies.push_back((modifiesStore.at(i)._stmt));
 			}
 
+			size_t equal_pos = stmt->_stmt.find("="); // Find position of the equal sign
+			string RHS = stmt->_stmt.substr(equal_pos + 1); //RHS expression
+	
+			Database::insertPattern(stmt->getAdjustedStmtNum(), LHS, RHS, infixToPostfix(RHS));
+			
+		
 		}
 		else if (word == "read" || word == "print" || word == "call") {
 			stmtNum++;
@@ -319,4 +326,53 @@ void SourceProcessor::process(string program) {
 	//Database::getNext_T(5, 8, result);
 	//Database::getNext(5, 6, result);
 	//int i = 0;
+
+}
+
+int SourceProcessor::prec(char c) {
+	if (c == '^')
+		return 3;
+	else if (c == '/' || c == '*')
+		return 2;
+	else if (c == '+' || c == '-')
+		return 1;
+	else
+		return -1;
+}
+
+string SourceProcessor::infixToPostfix(string s) {
+
+	stack<char> st;
+	string result;
+
+	for (int i = 0; i < s.length(); i++) {
+		char c = s[i];
+
+		if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9'))
+			result += c;
+		else if (c == '(')
+			st.push('(');
+		else if (c == ')') {
+			while (st.top() != '(')
+			{
+				result += st.top();
+				st.pop();
+			}
+			st.pop();
+		}
+		else {
+			while (!st.empty() && prec(s[i]) <= prec(st.top())) {
+				result += st.top();
+				st.pop();
+			}
+			st.push(c);
+		}
+	}
+
+	while (!st.empty()) {
+		result += st.top();
+		st.pop();
+	}
+
+	return result;
 }
