@@ -1,5 +1,5 @@
 procedure main {
-  flag = 0;
+  flag = x+1;
   call computeCentroid;
   call printResults;
 }
@@ -20,7 +20,7 @@ procedure computeCentroid {
     call readPoint;
     while ((x * x + y * y) != 0) {
         count = count + 1;
-        cenX = cenX + x;
+        cenX = cenX+x+11*2+v;
         cenY = cenY + y;
         call readPoint;
     }

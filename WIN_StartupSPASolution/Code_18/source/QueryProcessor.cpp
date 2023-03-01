@@ -242,19 +242,23 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	while (!patternStack.empty()) {
 
 		Pattern patternTemp = patternStack.top();
-		string entity = synonymEntityMap.at(patternTemp.synonym);
+		bool patternInput1IsSynonym = (synonymEntityMap.find(patternTemp.input1) != synonymEntityMap.end()); // first input is a synonym
+		bool patternInput2IsSynonym = (synonymEntityMap.find(patternTemp.input2) != synonymEntityMap.end()); // second input is a synonym
+		string entity = synonymEntityMap.at(patternTemp.synonym), first = patternTemp.input1, second = patternTemp.input2;
+		
+		if (second != "_") { second = infixToPostfix(second);  }
 
 		for (int i = 0; i < sqlResultStore.sqlResult.size(); i++) {
-
 			SqlResult sqlResulTemp = sqlResultStore.sqlResult.at(i);
 			bool pass = false;
 
-			if (entity == "assign") {
-
-			}
+			if (entity == "assign") { pass = Database::GetPattern(first, second, patternInput1IsSynonym, patternInput2IsSynonym, entity); }
+			cout << pass;
+			if (pass) { sqlResultPass.push_back(sqlResulTemp); }
 
 		}
 
+		sqlResultStore.sqlResult = sqlResultPass;
 		patternStack.pop();
 	}
 
@@ -277,3 +281,50 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	cout << endl;
 }
 
+int QueryProcessor::prec(char c) {
+	if (c == '^')
+		return 3;
+	else if (c == '/' || c == '*')
+		return 2;
+	else if (c == '+' || c == '-')
+		return 1;
+	else
+		return -1;
+}
+
+string QueryProcessor::infixToPostfix(string s) {
+
+	stack<char> st;
+	string result;
+
+	for (int i = 0; i < s.length(); i++) {
+		char c = s[i];
+
+		if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9'))
+			result += c;
+		else if (c == '(')
+			st.push('(');
+		else if (c == ')') {
+			while (st.top() != '(')
+			{
+				result += st.top();
+				st.pop();
+			}
+			st.pop();
+		}
+		else {
+			while (!st.empty() && prec(s[i]) <= prec(st.top())) {
+				result += st.top();
+				st.pop();
+			}
+			st.push(c);
+		}
+	}
+
+	while (!st.empty()) {
+		result += st.top();
+		st.pop();
+	}
+
+	return result;
+}

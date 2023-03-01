@@ -33,4 +33,7 @@ public:
 		return isNum;
 	}
 
+	int prec(char c);
+	string infixToPostfix(string s);
+
 };
