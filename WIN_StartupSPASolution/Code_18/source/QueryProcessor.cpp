@@ -245,9 +245,9 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		bool patternInput1IsSynonym = (synonymEntityMap.find(patternTemp.input1) != synonymEntityMap.end()); // first input is a synonym
 		bool patternInput2IsSynonym = (synonymEntityMap.find(patternTemp.input2) != synonymEntityMap.end()); // second input is a synonym
 		string entity = synonymEntityMap.at(patternTemp.synonym), first = patternTemp.input1, second = patternTemp.input2, lineNum = "";
-		cout << second << "!";
+
 		if (second != "_") { second = infixToPostfix(second); }
-		cout << second << "@";
+
 		for (int i = 0; i < sqlResultStore.sqlResult.size(); i++) {
 			SqlResult sqlResulTemp = sqlResultStore.sqlResult.at(i);
 			bool pass = false;
