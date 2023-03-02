@@ -64,6 +64,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	vector<string> databaseResults;
 	string regexWord = "\\w+";
 	string regexQuote = "\\\"";
+	//string regexQuote = "[\"_]";
 	string regexRelation = "(Parent|Next|Calls|Modifies|Uses)";
 	string regexEntity = "(procedure|variable|constant|call|assign|stmt|read|print|while|if)";
 	map<string, string> synonymEntityMap;
@@ -240,24 +241,21 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	}
 
 	while (!patternStack.empty()) {
-
 		Pattern patternTemp = patternStack.top();
 		bool patternInput1IsSynonym = (synonymEntityMap.find(patternTemp.input1) != synonymEntityMap.end()); // first input is a synonym
 		bool patternInput2IsSynonym = (synonymEntityMap.find(patternTemp.input2) != synonymEntityMap.end()); // second input is a synonym
 		string entity = synonymEntityMap.at(patternTemp.synonym), first = patternTemp.input1, second = patternTemp.input2, lineNum = "";
-
+		cout << second << "!";
 		if (second != "_") { second = infixToPostfix(second); }
-		//cout << synonymEntityMap.at("cenX");
+		cout << second << "@";
 		for (int i = 0; i < sqlResultStore.sqlResult.size(); i++) {
 			SqlResult sqlResulTemp = sqlResultStore.sqlResult.at(i);
 			bool pass = false;
 			if (entity == "assign") { 
-				lineNum = sqlResulTemp.row.at("line_num");
-				pass = Database::GetPattern(first, second, patternInput1IsSynonym, patternInput2IsSynonym, entity , lineNum); 
+				if (!patternInput1IsSynonym && first != "_") { lineNum = sqlResulTemp.row.at(patternTemp.synonym); } //first input is variable
+				pass = Database::GetPattern(first, second, patternInput1IsSynonym, patternInput2IsSynonym, lineNum); 
 			}
-			
 			if (pass) { sqlResultPass.push_back(sqlResulTemp); }
-
 		}
 
 		sqlResultStore.sqlResult = sqlResultPass;

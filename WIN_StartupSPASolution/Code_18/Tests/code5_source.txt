@@ -14,7 +14,7 @@ procedure printResults {
     print normSq;
 }
 procedure computeCentroid {
-    count = 0;
+    count = count*count;
     cenX = 0;
     cenY = 0;
     call readPoint;

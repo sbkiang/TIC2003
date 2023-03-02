@@ -854,15 +854,38 @@ bool Database::GetModifiesForUnknownInput1(string input1, string input2, bool in
 	}
 }
 
-bool Database::GetPattern(string stmtNum1, string stmtNum2, bool input1IsSynonym, bool input2IsSynonym, string parentEntity, string lineNum) {
-	
+bool Database::GetPattern(string stmtNum1, string stmtNum2, bool input1IsSynonym, bool input2IsSynonym, string lineNum) {
+	cout << input1IsSynonym << " " << stmtNum2;
 	char sqlBuf[512] = {};
-
 	//pattern a("variable",_) (variable name between double quotes, unrestricted)
-	if ((!input1IsSynonym || stmtNum1 != "_") && stmtNum2 == "_") {
-		if (parentEntity == "assign") {
-			sprintf_s(sqlBuf, "select 1 from pattern p where p.LHS_var = '%s' and p.line_num = '%i';", stmtNum1.c_str(), lineNum.c_str());
-		}
+	if ((!input1IsSynonym || stmtNum1 != "_") && stmtNum2 == "_") { 
+		sprintf_s(sqlBuf, "select 1 from pattern p where p.LHS_var = '%s' and p.line_num = '%s';", stmtNum1.c_str(), lineNum.c_str());
+	}
+
+	//pattern a(("variable","_expression_")
+	else if ((!input1IsSynonym || stmtNum1 != "_") && (!input2IsSynonym || stmtNum2 != "_")) {
+		sprintf_s(sqlBuf, "select 1 from pattern p where p.LHS_var = '%s' and p.expression like '%%%s%%' and p.line_num = '%s';", stmtNum1.c_str(), stmtNum2.c_str(), lineNum.c_str());
+	}
+
+	//pattern a(("synonym ",_)
+	else if (input1IsSynonym && stmtNum2 == "_") {
+		cout << stmtNum1 << " " << stmtNum2 << " " << lineNum << endl;
+		//sprintf_s(sqlBuf, "select 1 from pattern p where p.LHS_var = '%s' and p.expression like '%%%s%%' and p.line_num = '%s';", stmtNum1.c_str(), stmtNum2.c_str(), lineNum.c_str());
+	}
+
+	//pattern a(("synonym ","_expression_")
+	else if (input1IsSynonym && (!input2IsSynonym || stmtNum2 != "_")) {
+		cout << stmtNum1 << " " << stmtNum2 << " " << lineNum << endl;
+	}
+
+	//pattern a(_,"_expression_")
+	else if (stmtNum1 != "_" && (!input2IsSynonym || stmtNum2 != "_")) { 
+		cout << stmtNum1 << " " << stmtNum2 << " " << lineNum << endl;
+		sprintf_s(sqlBuf, "select 1 from pattern p where p.expression like '%%%s%%' and p.line_num = '%s';", stmtNum2.c_str(), lineNum.c_str());
+	}
+
+	else { //pattern a(_,_)
+		
 	}
 
 	SqlResultStore rs;
