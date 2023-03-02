@@ -854,14 +854,14 @@ bool Database::GetModifiesForUnknownInput1(string input1, string input2, bool in
 	}
 }
 
-bool Database::GetPattern(string stmtNum1, string stmtNum2, bool input1IsSynonym, bool input2IsSynonym, string parentEntity) {
+bool Database::GetPattern(string stmtNum1, string stmtNum2, bool input1IsSynonym, bool input2IsSynonym, string parentEntity, string lineNum) {
 	
 	char sqlBuf[512] = {};
 
 	//pattern a("variable",_) (variable name between double quotes, unrestricted)
 	if ((!input1IsSynonym || stmtNum1 != "_") && stmtNum2 == "_") {
 		if (parentEntity == "assign") {
-			sprintf_s(sqlBuf, "select 1 from pattern p where p.LHS_var = '%s';", stmtNum1.c_str());
+			sprintf_s(sqlBuf, "select 1 from pattern p where p.LHS_var = '%s' and p.line_num = '%i';", stmtNum1.c_str(), lineNum.c_str());
 		}
 	}
 

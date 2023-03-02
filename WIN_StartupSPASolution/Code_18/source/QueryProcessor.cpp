@@ -244,16 +244,18 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		Pattern patternTemp = patternStack.top();
 		bool patternInput1IsSynonym = (synonymEntityMap.find(patternTemp.input1) != synonymEntityMap.end()); // first input is a synonym
 		bool patternInput2IsSynonym = (synonymEntityMap.find(patternTemp.input2) != synonymEntityMap.end()); // second input is a synonym
-		string entity = synonymEntityMap.at(patternTemp.synonym), first = patternTemp.input1, second = patternTemp.input2;
-		
-		if (second != "_") { second = infixToPostfix(second);  }
+		string entity = synonymEntityMap.at(patternTemp.synonym), first = patternTemp.input1, second = patternTemp.input2, lineNum = "";
 
+		if (second != "_") { second = infixToPostfix(second); }
+		//cout << synonymEntityMap.at("cenX");
 		for (int i = 0; i < sqlResultStore.sqlResult.size(); i++) {
 			SqlResult sqlResulTemp = sqlResultStore.sqlResult.at(i);
 			bool pass = false;
-
-			if (entity == "assign") { pass = Database::GetPattern(first, second, patternInput1IsSynonym, patternInput2IsSynonym, entity); }
-			cout << pass;
+			if (entity == "assign") { 
+				lineNum = sqlResulTemp.row.at("line_num");
+				pass = Database::GetPattern(first, second, patternInput1IsSynonym, patternInput2IsSynonym, entity , lineNum); 
+			}
+			
 			if (pass) { sqlResultPass.push_back(sqlResulTemp); }
 
 		}
