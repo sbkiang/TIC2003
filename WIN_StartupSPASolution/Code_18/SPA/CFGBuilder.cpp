@@ -19,7 +19,7 @@ CFG* CFGBuilder::buildCFG(Container* procedure) {
 		}
 		if (!(node->_stmtPtr->_containerHead || node->_stmtPtr->_containerTail)) { // if node is body, just set sJump to next statement
 			node->_sJump = stmts.at(i + 1);
-			cout << "node " << node->_stmtPtr->_stmtNum << " sJump : " << node->_sJump->_stmtPtr->_stmtNum << endl;
+			cout << "node " << node->_stmtPtr->getStmtNum() << " sJump : " << node->_sJump->_stmtPtr->getStmtNum() << endl;
 			continue;
 		}
 		if (node->_stmtPtr->_container->_type == "procedure") {
@@ -38,14 +38,14 @@ CFG* CFGBuilder::buildCFG(Container* procedure) {
 		}
 		else if (node->_stmtPtr->_container->_type == "if") {
 			if (!node->_stmtPtr->_containerHead && node->_stmtPtr->_containerTail) { // if stmt is if container tail only
-				node->_sJump = _findNextStmt(parentStack, node->_stmtPtr->_stmtNum + 1, stmts);
+				node->_sJump = _findNextStmt(parentStack, node->_stmtPtr->getStmtNum() + 1, stmts);
 			}
 			else { // if stmt is both if container head and tail, or head only, sJump = next stmt, fJump = else stmt
 				node->_sJump = stmts.at(i + 1);
 				loopStart = node->_stmtPtr->_container->_endStmtNum + 1;
 				loopEnd = parentStack.top()->_endStmtNum;
 				for (int j = loopStart; j < loopEnd; j++) { // fJump is the first stmt in else container of same nestedLevel
-					if (stmts.at(j)->_stmtPtr->_level != node->_stmtPtr->_level) {
+					if (stmts.at(j)->_stmtPtr->getLevel() != node->_stmtPtr->getLevel()) {
 						continue;
 					}
 					if (stmts.at(j)->_stmtPtr->_container->_type != "else") {
@@ -62,7 +62,7 @@ CFG* CFGBuilder::buildCFG(Container* procedure) {
 			}
 			else { // if stmt is else container tail only, or head and tail
 
-				node->_sJump = _findNextStmt(parentStack, node->_stmtPtr->_stmtNum + 1, stmts);
+				node->_sJump = _findNextStmt(parentStack, node->_stmtPtr->getStmtNum() + 1, stmts);
 			}
 		}
 		while (!parentStack.empty()) {
@@ -74,8 +74,8 @@ CFG* CFGBuilder::buildCFG(Container* procedure) {
 			}
 
 		}
-		//if(node->_sJump){ cout << "node " << node->_stmtPtr->_stmtNum << " sJump : " << node->_sJump->_stmtPtr->_stmtNum << endl; }
-		//if (node->_fJump) { cout << "node " << node->_stmtPtr->_stmtNum << " fJump : " << node->_fJump->_stmtPtr->_stmtNum << endl; }
+		//if(node->_sJump){ cout << "node " << node->_stmtPtr->getStmtNum() << " sJump : " << node->_sJump->_stmtPtr->getStmtNum() << endl; }
+		//if (node->_fJump) { cout << "node " << node->_stmtPtr->getStmtNum() << " fJump : " << node->_fJump->_stmtPtr->getStmtNum() << endl; }
 	}
 	return cfg;
 }
@@ -83,15 +83,15 @@ CFG* CFGBuilder::buildCFG(Container* procedure) {
 void CFGBuilder::_createStmtMap(Container* container, map<int, CFGNode*> &stmtMap) {
 	for (int i = 0; i < container->_statements.size(); i++) {
 		Statement* stmt = container->_statements.at(i);
-		if (stmt->_stmtNum == (container->_startStmtNum)) {
+		if (stmt->getStmtNum() == (container->_startStmtNum)) {
 			stmt->_containerHead = true;
 		}
-		if (stmt->_stmtNum == (container->_endStmtNum)) {
+		if (stmt->getStmtNum() == (container->_endStmtNum)) {
 			stmt->_containerTail = true;
 		}
 		CFGNode* node = new CFGNode();
 		node->_stmtPtr = stmt;
-		pair<int, CFGNode*> *mypair = new pair<int, CFGNode*>(stmt->_stmtNum, node);
+		pair<int, CFGNode*> *mypair = new pair<int, CFGNode*>(stmt->getStmtNum(), node);
 		stmtMap.insert(*mypair);
 	}
 	for (int i = 0; i < container->_childContainers.size(); i++) {
@@ -117,7 +117,7 @@ CFGNode* CFGBuilder::_findNextStmt(stack<Container*> parentStack, int startStmtN
 				continue;
 			}
 		}
-		if (stmts.at(startStmtNum)->_stmtPtr->_level >= stmts.at(j)->_stmtPtr->_level) { // siblings container = same nestedLevel level. parent container = lower nestedLevel level. So, >=
+		if (stmts.at(startStmtNum)->_stmtPtr->getLevel() >= stmts.at(j)->_stmtPtr->getLevel()) { // siblings container = same nestedLevel level. parent container = lower nestedLevel level. So, >=
 			nextStmt = stmts.at(j);
 			break;
 		}
@@ -141,7 +141,7 @@ void CFGBuilder::_printStmt(map<int, CFGNode*> stmts) {
 	int startIndex = stmts.begin()->first;
 	for (map<int, CFGNode*>::iterator it = stmts.begin(); it != stmts.end(); it++) {
 		CFGNode* node = it->second;
-		cout << setfill('0') << setw(2) << node->_stmtPtr->_stmtNum << " |";
+		cout << setfill('0') << setw(2) << node->_stmtPtr->getStmtNum() << " |";
 		if (node->_stmtPtr->_containerHead) {
 			cout << " Y |";
 		}
@@ -154,10 +154,10 @@ void CFGBuilder::_printStmt(map<int, CFGNode*> stmts) {
 		else {
 			cout << "   | ";
 		}
-		for (int i = 0; i < node->_stmtPtr->_level; i++) { cout << "  "; }
+		for (int i = 0; i < node->_stmtPtr->getLevel(); i++) { cout << "  "; }
 		if (node->_stmtPtr->_containerHead) {
 			cout << node->_stmtPtr->_container->_type << " ";
 		}
-		cout << node->_stmtPtr->_stmt << endl;
+		cout << node->_stmtPtr->getStmt() << endl;
 	}
 }

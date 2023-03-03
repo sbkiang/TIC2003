@@ -215,7 +215,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 				pass = Database::GetParent(first, second, input1IsSpecific, input2IsSpecific, entityInput1, entityInput2);
 			}
 			else if (relationship == "Parent*") { // input1 is Stmt Num, input2 is Stmt Num
-				//pass = Database::GetParent(first, second, input1IsSpecific, input2IsSpecific, entityInput1, entityInput2);
+				pass = Database::GetParentT(first, second, input1IsSpecific, input2IsSpecific, entityInput1, entityInput2);
 			}
 			else if (relationship == "Next") {
 

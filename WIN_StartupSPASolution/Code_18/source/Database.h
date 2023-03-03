@@ -41,8 +41,8 @@ public:
 	//static bool GetParent(string stmtNum1, string stmtNum2, bool input1IsSpecific, bool input2IsSpecific, entity);
 	static bool GetParent(string stmtNum1, string stmtNum2, bool input1IsSpecific, bool input2IsSpecific, string parentEntity, string childEntity);
 	static bool GetParentForStmt(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
-	static bool GetParentT(string input1, string input2); // for Parent(x,y), specific is number. non-specific is synonym
-	static bool GetParentTForStmt(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, string parentEntity, string childEntity);
+	static bool GetParentT(string stmtNum1, string stmtNum2, bool input1IsSpecific, bool input2IsSpecific, string parentEntity, string childEntity);
+	static bool GetParentTForStmt(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
 	
 	// method to insert/get a modify into the database
 	static void insertModifies(int stmtNum, string variablename);

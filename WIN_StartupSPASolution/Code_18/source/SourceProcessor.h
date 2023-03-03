@@ -12,6 +12,7 @@
 #include "..\SPA\Procedure.h"
 #include "..\SPA\Container.h"
 #include "..\SPA\CFGBuilder.h"
+#include "..\SPA\Statement.h"
 
 using namespace std;
 
@@ -22,10 +23,7 @@ public:
 	// method for processing the source program
 	void process(string program);
 
-	bool is_operator(char c) {
-		return (c == '+' || c == '-' || c == '*' || c == '/');
-	}
-
+	bool is_operator(char c);
 	int prec(char c);
 	string infixToPostfix(string s);
 

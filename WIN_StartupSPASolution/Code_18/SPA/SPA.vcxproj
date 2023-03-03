@@ -20,6 +20,7 @@
     <ClCompile Include="CFGBuilder.cpp" />
     <ClCompile Include="Container.cpp" />
     <ClCompile Include="Procedure.cpp" />
+    <ClCompile Include="Statement.cpp" />
     <ClCompile Include="Struct.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -32,6 +33,7 @@
     <ClInclude Include="CFGBuilder.h" />
     <ClInclude Include="Container.h" />
     <ClInclude Include="Procedure.h" />
+    <ClInclude Include="Statement.h" />
     <ClInclude Include="Struct.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

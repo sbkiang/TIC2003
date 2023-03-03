@@ -7,7 +7,7 @@
 
 using namespace std;
 
-struct Statement;
+class Statement;
 
 class Container {
 public:
@@ -19,13 +19,13 @@ public:
 
 	vector<Statement*> _statements;
 	vector<Container*> _childContainers;
-	string _condition;
-	string _type;
-	int _level;
-	int _startStmtNum;
-	int _endStmtNum;
-	int _adjustedStartStmtNum;
-	int _adjustedEndStmtNum;
+	string _condition = "";
+	string _type = "";
+	int _level = 0;
+	int _startStmtNum = 0;
+	int _endStmtNum = 0;
+	int _adjustedStartStmtNum = 0;
+	int _adjustedEndStmtNum = 0;
 
 	void printContainerTree(int tab);
 	vector<Container*> getAllContainers();

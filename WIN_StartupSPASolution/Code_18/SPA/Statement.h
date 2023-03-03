@@ -16,16 +16,19 @@ public:
 	// Default Destructor
 	~Statement();
 
-	int getAdjustedStmtNum();
-
-	string _stmt;
 	bool _containerHead = false;
 	bool _containerTail = false;
 	Container* _container = nullptr;
 
+	int getAdjustedStmtNum();
+	int getStmtNum();
+	void appendStmt(string s);
+	string getStmt();
+	int getLevel();
+
 private:
+	string _stmt = "";
 	int _stmtNum = 0;
 	int _level = 0;
 	int _stmtNumSubtract = 0;
-		
 };

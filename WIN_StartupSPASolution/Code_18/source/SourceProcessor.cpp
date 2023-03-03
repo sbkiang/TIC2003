@@ -8,6 +8,10 @@
 // using some highly simplified logic.
 // You should modify this method to complete the logic for handling all the required syntax.
 
+bool SourceProcessor::is_operator(char c) {
+	return (c == '+' || c == '-' || c == '*' || c == '/');
+}
+
 void SourceProcessor::process(string program) {
 	// initialize the database
 	Database::initialize();
@@ -31,6 +35,7 @@ void SourceProcessor::process(string program) {
 	int stmtNum = 0;
 	int nestedLevel = 0;
 	for (int i = 0; i < tokens.size(); i++) {
+		cout << "i: " << i << endl;
 		string word = tokens.at(i);
 		if (word == "}") { // "}" indicates the end of a container
 			if (!parentStack.empty()) {
@@ -70,7 +75,7 @@ void SourceProcessor::process(string program) {
 			i++; // skip the "while" keyword
 			while (tokens.at(i) != "{") {
 				container->_condition += tokens.at(i);
-				stmt->_stmt += tokens.at(i);
+				stmt->appendStmt(tokens.at(i));
 				if (regex_match(tokens.at(i), regex(regexConstants))) {
 					Database::insertConstant(tokens.at(i));
 				}
@@ -85,16 +90,16 @@ void SourceProcessor::process(string program) {
 				i++;
 			}
 			container->_statements.push_back(stmt);
-			Database::insertStatement(stmt->getAdjustedStmtNum(), procedure.back()->_name, word, stmt->_stmt);
+			Database::insertStatement(stmt->getAdjustedStmtNum(), procedure.back()->_name, word, stmt->getStmt());
 			for (int i = 0; i < variableStore.size(); i++) { // insert the variable after inserting the statement due to FK
-				Database::insertVariable(variableStore.at(i)._stmt, variableStore.at(i).getAdjustedStmtNum());
+				Database::insertVariable(variableStore.at(i).getStmt(), variableStore.at(i).getAdjustedStmtNum());
 			}
 
 			for (int i = 0; i < useStore.size(); i++) {
 				// database PK constraint will trigger for duplicate variables with same line_num to prevent duplicate insertion
-				Database::insertUses(useStore.at(i).getAdjustedStmtNum(), useStore.at(i)._stmt);
-				procedure.back()->_uses.push_back(useStore.at(i)._stmt);
-				//container->_uses.push_back((useStore.at(i)._stmt));
+				Database::insertUses(useStore.at(i).getAdjustedStmtNum(), useStore.at(i).getStmt());
+				procedure.back()->_uses.push_back(useStore.at(i).getStmt());
+				//container->_uses.push_back((useStore.at(i).getStmt()));
 			}
 		}
 		else if (word == "if") { // if(...) then {...} else {...}
@@ -115,7 +120,7 @@ void SourceProcessor::process(string program) {
 			i++; // skip the "if" keyword for the while loop below
 			while (tokens.at(i) != "then") { // from current index till "then", it's the condition. "if(...) then{"
 				container->_condition += tokens.at(i);
-				stmt->_stmt += tokens.at(i);
+				stmt->appendStmt(tokens.at(i));
 				if (regex_match(tokens.at(i), regex(regexConstants))) {
 					Database::insertConstant(tokens.at(i));
 				}
@@ -131,15 +136,15 @@ void SourceProcessor::process(string program) {
 				i++;
 			}
 			container->_statements.push_back(stmt);
-			Database::insertStatement(stmt->getAdjustedStmtNum(), procedure.back()->_name, word, stmt->_stmt);
+			Database::insertStatement(stmt->getAdjustedStmtNum(), procedure.back()->_name, word, stmt->getStmt());
 			for (int i = 0; i < variableStore.size(); i++) {
-				Database::insertVariable(variableStore.at(i)._stmt, variableStore.at(i).getAdjustedStmtNum());
+				Database::insertVariable(variableStore.at(i).getStmt(), variableStore.at(i).getAdjustedStmtNum());
 			}
 
 			for (int i = 0; i < useStore.size(); i++) {
 				// database PK constraint will trigger for duplicate variables with same line_num to prevent duplicate insertion
-				Database::insertUses(useStore.at(i).getAdjustedStmtNum(), useStore.at(i)._stmt);
-				procedure.back()->_uses.push_back((useStore.at(i)._stmt));
+				Database::insertUses(useStore.at(i).getAdjustedStmtNum(), useStore.at(i).getStmt());
+				procedure.back()->_uses.push_back((useStore.at(i).getStmt()));
 				//container->_uses.push_back((useStore.at(i)._stmt));
 			}
 		}
@@ -150,7 +155,7 @@ void SourceProcessor::process(string program) {
 			Container* container = new Container();
 			container->_type = "else";
 			Statement* stmt = new Statement(stmtNum, nestedLevel, container, stmtNumSubtract - 1);
-			stmt->_stmt = "else";
+			stmt->appendStmt("else");
 			container->_statements.push_back(stmt);
 			container->_startStmtNum = stmtNum;
 			container->_adjustedStartStmtNum = stmtNum - stmtNumSubtract;
@@ -166,15 +171,14 @@ void SourceProcessor::process(string program) {
 		else if (word == "=") { // for assign
 			stmtNum++;
 			Statement* stmt = new Statement(stmtNum, nestedLevel, parentStack.top(), stmtNumSubtract);
-			stmt->_stmt += tokens.at(i - 1);
+			stmt->appendStmt(tokens.at(i - 1));
 			vector<Statement> variableStore; // we need to insert statement first before inserting variable due to FK. So, we store the variables here
 			vector<Statement> useStore;
 			vector<Statement> modifiesStore;
 			variableStore.push_back(Statement(stmtNum, tokens.at(i - 1), stmtNumSubtract));
-			//useStore.push_back(Statement(stmtNum, tokens.at(i + 1), nestedLevel));
 			string LHS = tokens.at(i - 1);
 			while (tokens.at(i) != ";") {
-				stmt->_stmt += tokens.at(i);
+				stmt->appendStmt(tokens.at(i));
 				if (regex_match(tokens.at(i), regex(regexConstants))) {
 					Database::insertConstant(tokens.at(i));
 				}
@@ -191,26 +195,26 @@ void SourceProcessor::process(string program) {
 			parentStack.top()->_statements.push_back(stmt);
 			modifiesStore.push_back(Statement(stmtNum, LHS, stmtNumSubtract)); //Store LHS variable
 
-			Database::insertStatement(stmt->getAdjustedStmtNum(), procedure.back()->_name, "assign", stmt->_stmt);
+			Database::insertStatement(stmt->getAdjustedStmtNum(), procedure.back()->_name, "assign", stmt->getStmt());
 			for (int i = 0; i < variableStore.size(); i++) {
-				Database::insertVariable(variableStore.at(i)._stmt, variableStore.at(i).getAdjustedStmtNum());
+				Database::insertVariable(variableStore.at(i).getStmt(), variableStore.at(i).getAdjustedStmtNum());
 			}
 
 			for (int i = 0; i < useStore.size(); i++) {
 				// database PK constraint will trigger for duplicate variables with same line_num to prevent duplicate insertion
-				Database::insertUses(useStore.at(i).getAdjustedStmtNum(), useStore.at(i)._stmt);
-				procedure.back()->_uses.push_back(useStore.at(i)._stmt);
+				Database::insertUses(useStore.at(i).getAdjustedStmtNum(), useStore.at(i).getStmt());
+				procedure.back()->_uses.push_back(useStore.at(i).getStmt());
 				//parentStack.top()->_uses.push_back((useStore.at(i)._stmt));
 			}
 
 			for (int i = 0; i < modifiesStore.size(); i++) {
-				Database::insertModifies(modifiesStore.at(i).getAdjustedStmtNum(), modifiesStore.at(i)._stmt);
-				procedure.back()->_modifies.push_back(modifiesStore.at(i)._stmt);
+				Database::insertModifies(modifiesStore.at(i).getAdjustedStmtNum(), modifiesStore.at(i).getStmt());
+				procedure.back()->_modifies.push_back(modifiesStore.at(i).getStmt());
 				//parentStack.top()->_modifies.push_back((modifiesStore.at(i)._stmt));
 			}
 
-			size_t equal_pos = stmt->_stmt.find("="); // Find position of the equal sign
-			string RHS = stmt->_stmt.substr(equal_pos + 1); //RHS expression
+			size_t equal_pos = (stmt->getStmt()).find("="); // Find position of the equal sign
+			string RHS = (stmt->getStmt()).substr(equal_pos + 1); //RHS expression
 	
 			Database::insertPattern(stmt->getAdjustedStmtNum(), LHS, RHS, infixToPostfix(RHS));
 			
@@ -220,9 +224,9 @@ void SourceProcessor::process(string program) {
 			stmtNum++;
 			Statement* stmt = new Statement(stmtNum, nestedLevel, parentStack.top(), stmtNumSubtract);
 			//stmt->_stmt += tokens.at(i); // skip the (read, print, call) keywords
-			stmt->_stmt += tokens.at(i + 1);
+			stmt->appendStmt(tokens.at(i + 1));
 			parentStack.top()->_statements.push_back(stmt);
-			Database::insertStatement(stmt->getAdjustedStmtNum(), procedure.back()->_name, word, stmt->_stmt);
+			Database::insertStatement(stmt->getAdjustedStmtNum(), procedure.back()->_name, word, stmt->getStmt());
 			if (word == "read" || word == "print") {
 				Database::insertVariable(tokens.at(i + 1), stmt->getAdjustedStmtNum());
 			}
@@ -235,15 +239,15 @@ void SourceProcessor::process(string program) {
 				vector<Statement> useStore;
 				i++; // skip the "print" keyword for the while loop below
 				while (tokens.at(i) != ";") {
-					stmt->_stmt += tokens.at(i);
+					stmt->appendStmt(tokens.at(i));
 					if (regex_match(tokens.at(i), regex(regexVariables))) {
 						useStore.push_back(Statement(stmtNum, tokens.at(i), stmtNumSubtract));
 					}
 					i++;
 				}
 				for (int i = 0; i < useStore.size(); i++) {
-					Database::insertUses(useStore.at(i).getAdjustedStmtNum(), useStore.at(i)._stmt);
-					procedure.back()->_uses.push_back(useStore.at(i)._stmt);
+					Database::insertUses(useStore.at(i).getAdjustedStmtNum(), useStore.at(i).getStmt());
+					procedure.back()->_uses.push_back(useStore.at(i).getStmt());
 					//parentStack.top()->_uses.push_back(useStore.at(i)._stmt);
 				}
 			}
@@ -252,8 +256,8 @@ void SourceProcessor::process(string program) {
 				vector<Statement> modifiesStore;
 				modifiesStore.push_back(Statement(stmtNum, tokens.at(i + 1), stmtNumSubtract));
 				for (int i = 0; i < modifiesStore.size(); i++) {
-					Database::insertModifies(modifiesStore.at(i).getAdjustedStmtNum(), modifiesStore.at(i)._stmt);
-					procedure.back()->_modifies.push_back(modifiesStore.at(i)._stmt);
+					Database::insertModifies(modifiesStore.at(i).getAdjustedStmtNum(), modifiesStore.at(i).getStmt());
+					procedure.back()->_modifies.push_back(modifiesStore.at(i).getStmt());
 					//parentStack.top()->_modifies.push_back(modifiesStore.at(i)._stmt);
 				}
 			}
@@ -272,7 +276,7 @@ void SourceProcessor::process(string program) {
 			if (cp->getAdjustedStmtNum() >= procedure.at(j)->_adjustedStartStmtNum && cp->getAdjustedStmtNum() <= procedure.at(j)->_adjustedEndStmtNum) {
 				parentProc = procedure.at(j);
 			}
-			if (cp->_stmt == procedure.at(j)->_name) {
+			if (cp->getStmt() == procedure.at(j)->_name) {
 				childProc = procedure.at(j);
 			}
 			if (childProc && parentProc) { break; }
@@ -299,7 +303,7 @@ void SourceProcessor::process(string program) {
 		for (int j = 0; j < nodes.size(); j++) {
 			CFGNode* node = nodes.at(j);
 			int nodeStmtNum = node->_stmtPtr->getAdjustedStmtNum();
-			if (node->_stmtPtr->_stmt == "else") {
+			if (node->_stmtPtr->getStmt() == "else") {
 				continue;
 			}
 			if (node->_sJump) {

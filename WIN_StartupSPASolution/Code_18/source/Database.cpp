@@ -375,7 +375,7 @@ bool Database::GetParent(string input1, string input2, bool input1IsSpecific, bo
 	// Parent(10,s2) or Parent(s1,s2), only "s1" present in select. "s1" will be a line_num, "s2" can be (stmt / read / print / assign / while / if / call)
 	else if (input1IsSpecific && !input2IsSpecific) {
 		if (childEntity == "stmt") { // if childEntity is stmt, then it's any statement nested in a container
-			sprintf_s(sqlBuf, "select 1 from statement s where exists (select p.line_num from parent p where p.line_num = %s and s.line_num between p.child_start and p.child_end)", input1.c_str());
+			sprintf_s(sqlBuf, "select 1 from statement s where exists (select 1 from parent p where p.line_num = %s and s.line_num between p.child_start and p.child_end)", input1.c_str());
 		}
 		else {
 			sprintf_s(sqlBuf, "select 1 from statement s where s.entity = '%s' and ((select p.line_num from parent p where p.line_num = %s and s.line_num between p.child_start and p.child_end) = (select p.line_num from parent p where s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1))", childEntity.c_str(), input1.c_str());
@@ -385,7 +385,7 @@ bool Database::GetParent(string input1, string input2, bool input1IsSpecific, bo
 	// Parent(s1,s2), both no in select. "s1" can be (while / if / stmt) = generic. "s2" can be (stmt / read / print / assign / while / if / call) = generic
 	else if (!input1IsSpecific && !input2IsSpecific) {
 		if (childEntity == "stmt" && parentEntity == "stmt") {
-			sprintf_s(sqlBuf, "select 1 from statement s where exists (select p.line_num from parent where s.line_num between p.child_start and p.child_end)");
+			sprintf_s(sqlBuf, "select 1 from statement s where exists (select 1 from parent where s.line_num between p.child_start and p.child_end)");
 		}
 		else {
 			sprintf_s(sqlBuf, "select 1 from statement s where s.entity = '%s' and ((select p.line_num from parent p join statement s2 on p.line_num = s2.line_num where s2.entity = '%s' and s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1) = (select p.line_num from parent p where s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1))", childEntity.c_str(), parentEntity.c_str());
@@ -399,30 +399,42 @@ bool Database::GetParent(string input1, string input2, bool input1IsSpecific, bo
 	return (!(sqlResultStoreForCallback->sqlResult.empty()));
 }
 
-bool Database::GetParentForStmt(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific){
-	SqlResultStore rs;
-	sqlResultStoreForCallback = &rs;
-	char sqlBuf[512] = {};
-	if (input1IsSpecific && input2IsSpecific) { // we know the container stmt num, and the input2 stmt num
-		Database::GetParent(input1, input2, input1IsSpecific, input1IsSpecific, "", ""); 
+bool Database::GetParentT(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, string parentEntity, string childEntity) {
+	char sqlBuf[512];
+	// Parent(s1,10) or Parent(s1,s2), only "s2" present in select. "s1' is either "while w" or "if i" = generic
+	if (!input1IsSpecific && input2IsSpecific) {
+		if (parentEntity == "stmt") { // if parentEntity is stmt, then it's any container
+			sprintf_s(sqlBuf, "select 1 from statement s where s.line_num = %s and exists (select 1 from parent p join statement s2 on p.line_num = s2.line_num where s.line_num between p.child_start and p.child_end)", input2.c_str());
+		}
+		else {
+			sprintf_s(sqlBuf, "select 1 from statement s where s.line_num = %s and exists (select 1 from parent p join statement s2 on p.line_num = s2.line_num where s2.entity = '%s' and s.line_num between p.child_start and p.child_end);", input2.c_str(), parentEntity.c_str());
+		}
 	}
-	else if (input1IsSpecific && !input2IsSpecific) { // we know the container stmt number, and we don't know the input2 stmt num
-		sprintf_s(sqlBuf, "select 1 from statement s where exists (select 1 from parent p where p.line_num = %s and s.line_num between p.child_start and p.child_end);", input1.c_str());
-	}
-	else if (!input1IsSpecific && input2IsSpecific) { // we don't know the container, and we know the input2's stmt num
-		sprintf_s(sqlBuf, "select 1 from statement s where s.line_num = %s and exists (select 1 from parent p where s.line_num between p.child_start and p.child_end);", input2.c_str());
-	}
-	else if (!input1IsSpecific && !input2IsSpecific) { // we don't know the container, and we don't know the input2 stmt num
-		sprintf_s(sqlBuf, "select 1 from statement s where exists (select 1 from parent p where s.line_num between p.child_start and p.child_end);");
-	}
-	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
-	if (errorMessage) { cout << "GetParentForStmt SQL Error: " << errorMessage; }
-	return (!(sqlResultStoreForCallback->sqlResult.empty()));
-}
 
-bool Database::GetParentT(string input1, string input2) {
-	char sqlBuf[256];
-	sprintf_s(sqlBuf, "select 1 from parent where %s between child_start and child_end and line_num = %s", input2.c_str(), input1.c_str());
+	// Parent(10,20) or Parent(s1,s2), both present in select
+	else if (input1IsSpecific && input2IsSpecific) {
+		sprintf_s(sqlBuf, "select 1 from statement s where s.line_num = %s and exists (select 1 from parent p where p.line_num = %s and s.line_num between p.child_start and p.child_end);", input2.c_str(), input1.c_str());
+	}
+
+	// Parent(10,s2) or Parent(s1,s2), only "s1" present in select. "s1" will be a line_num, "s2" can be (stmt / read / print / assign / while / if / call)
+	else if (input1IsSpecific && !input2IsSpecific) {
+		if (childEntity == "stmt") { // if childEntity is stmt, then it's any statement nested in a container
+			sprintf_s(sqlBuf, "select 1 from statement s where exists (select 1 from parent p where p.line_num = %s and s.line_num between p.child_start and p.child_end)", input1.c_str());
+		}
+		else {
+			sprintf_s(sqlBuf, "select 1 from statement s where s.entity = '%s' and exists (select 1 from parent p where p.line_num = %s and s.line_num between p.child_start and p.child_end)", childEntity.c_str(), input1.c_str());
+		}
+	}
+
+	// Parent(s1,s2), both no in select. "s1" can be (while / if / stmt) = generic. "s2" can be (stmt / read / print / assign / while / if / call) = generic
+	else if (!input1IsSpecific && !input2IsSpecific) {
+		if (childEntity == "stmt" && parentEntity == "stmt") {
+			sprintf_s(sqlBuf, "select 1 from statement s where exists (select 1 from parent where s.line_num between p.child_start and p.child_end)");
+		}
+		else {
+			sprintf_s(sqlBuf, "select 1 from statement s where s.entity = '%s' and exists (select 1 from parent p join statement s2 on p.line_num = s2.line_num where s2.entity = '%s' and s.line_num between p.child_start and p.child_end)", childEntity.c_str(), parentEntity.c_str());
+		}
+	}
 
 	SqlResultStore rs;
 	sqlResultStoreForCallback = &rs;
@@ -430,16 +442,6 @@ bool Database::GetParentT(string input1, string input2) {
 	if (errorMessage) { cout << "getParent SQL Error: " << errorMessage; exit(0); }
 	return (!(sqlResultStoreForCallback->sqlResult.empty()));
 }
-
-/* Input types
-	- input1 is statement number or name
-		-- Possible entities are assign, print, container for statement number
-			--- for container, we return true if there's Uses(c,v) inside container
-			--- for assign, print, we return true if statement number is inside "use" table
-		-- Possible entities are procedure, call for name
-			--- for both, we return true if there's Uses(c,v) inside container
-	- input2 is name
-*/
 
 bool Database::GetUsesForAssign(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific) {
 	// select 1 from use u where u.variable_name = '%s' and u.line_num in (select s.line_num from statement s where entity = 'assign' and s.line_num = '%s');
@@ -981,8 +983,6 @@ int Database::callback(void* NotUsed, int columnCount, char** columnValues, char
 	// The row is pushed to the vector for storing all rows of results 
 	dbResults.push_back(dbRow);
 	sqlResultStoreForCallback->sqlResult.push_back(sqlResult);
-	sqlResultStoreForCallback->sqlResultSet.insert(sqlResult);
-	
 
 	return 0;
 }
