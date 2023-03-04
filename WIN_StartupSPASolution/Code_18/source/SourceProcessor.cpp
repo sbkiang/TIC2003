@@ -321,16 +321,6 @@ void SourceProcessor::process(string program) {
 			Database::insertParent(containers.at(j)->_adjustedStartStmtNum, containers.at(j)->_adjustedStartStmtNum + 1, containers.at(j)->_adjustedEndStmtNum);
 		}
 	}
-	//Database::getParent()
-	
-	SqlResult result;
-	//Database::getUses("assign", result);
-	vector<string> line_num = result.getColumnValues("line_num");
-	//Database::getUse(9, result);
-	//Database::getNext_T(5, 8, result);
-	//Database::getNext(5, 6, result);
-	//int i = 0;
-
 }
 
 int SourceProcessor::prec(char c) {

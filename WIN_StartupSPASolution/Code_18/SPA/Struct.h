@@ -17,15 +17,11 @@ struct CFGNode {
 
 struct SqlResultStore {
 	vector<SqlResult> sqlResult;
-	vector<string> column;
-	vector<string> getColumnValues(string column);
-	vector<string> getColumnValues2(string column);
 };
 
 
 struct SqlResult : SqlResultStore {
 	map<string, string> row; // store mapping of column name to value	
-	string getColumnValue(string column);
 };
 
 struct SuchThat {
