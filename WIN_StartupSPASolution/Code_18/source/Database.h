@@ -23,7 +23,7 @@ public:
 	static void getProcedures(vector<string>& results);
 
 	// method to insert a statement into the database
-	static void insertStatement(int stmtNum, string statementName, string statementType, string text);
+	static void insertStatement(int stmtNum, string statementType, string text);
 	static void getStatement(string type, vector<string>& results);
 	static void getStatement(vector<string>& results);
 	static void getStmt(string type, vector<string>& results);
@@ -46,7 +46,6 @@ public:
 	
 	// method to insert/get a modify into the database
 	static void insertModifies(int stmtNum, string variablename);
-	static void getModifyStmt(string stmtNum1, string stmtNum2, bool lhs, vector<string>& results);
 
 	// method to insert/get a use into the database
 	static void insertUses(int stmtNum, string variablename);

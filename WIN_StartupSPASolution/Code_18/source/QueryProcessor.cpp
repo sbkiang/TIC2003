@@ -45,6 +45,7 @@ void QueryProcessor::EvaluateSelect(Select& st, map<string,string> synEntMap) {
 			st.whereSql.push_back(sqlBuf);
 		}
 	}
+	// what about Constant?
 }
 
 // method to evaluate a query
