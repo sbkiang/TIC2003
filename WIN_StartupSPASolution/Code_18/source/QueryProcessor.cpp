@@ -131,14 +131,20 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 					brackets--;
 					continue;
 				}
+
 				if (!regex_match(tokens.at(i), regex(regexQuote))) {
 					word += tokens.at(i);
 				}
+
 				i++;
 			} while (brackets > 0);
+
 			int comma = word.find(",");
 			pt.input1 = word.substr(0, comma);
-			pt.input2 = word.substr(comma + 1, word.length());
+
+			string input2 = word.substr(comma + 1, word.length());
+			if (input2.size() > 1) { input2.erase(remove(input2.begin(), input2.end(), '_'), input2.end()); }
+			pt.input2 = input2;
 			patternStack.push(pt);
 		}
 		else if (tokens[i] == "Select") {
@@ -252,7 +258,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			SqlResult sqlResulTemp = sqlResultStore.sqlResult.at(i);
 			bool pass = false;
 			if (entity == "assign") { 
-				if (!patternInput1IsSynonym && first != "_") { lineNum = sqlResulTemp.row.at(patternTemp.synonym); } //first input is variable
+				lineNum = sqlResulTemp.row.at(patternTemp.synonym);
 				pass = Database::GetPattern(first, second, patternInput1IsSynonym, patternInput2IsSynonym, lineNum); 
 			}
 			if (pass) { sqlResultPass.push_back(sqlResulTemp); }
