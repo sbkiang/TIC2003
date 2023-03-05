@@ -23,8 +23,6 @@ void SourceProcessor::process(string program) {
 
 	string regexVariables = "^((?!(procedure|while|if|then|else|call|read|print)$)[A-Za-z][A-Za-z0-9]*)";
 	string regexConstants = "^[0-9]+$";
-	//string regexUse = "[+\\-*/\\(\\)\\=\\d+\\!]";
-	//string regexUse_2 = "\\d+";
 	// This logic is highly simplified based on iteration 1 requirements and 
 	// the assumption that the programs are valid.
 
@@ -50,7 +48,7 @@ void SourceProcessor::process(string program) {
 			Procedure* p = new Procedure(tokens.at(i));
 			p->_type = "procedure";
 			p->_startStmtNum = stmtNum + 1;
-			p->_adjustedStartStmtNum = stmtNum + 1 - stmtNumSubtract;
+			p->_adjustedStartStmtNum = p->_startStmtNum - stmtNumSubtract;
 			p->_level = nestedLevel;
 			procedure.push_back(p);
 			parentStack.push(p);
@@ -82,8 +80,6 @@ void SourceProcessor::process(string program) {
 				else if (regex_match(tokens.at(i), regex(regexVariables))) {
 					variableStore.push_back(Statement(stmtNum, tokens.at(i), container, stmtNumSubtract));
 				}
-
-				// changed from "!regex_match(tokens.at(i), regex(regexVariables)" to current one. Makes more sense to match variables instead of not matching operators
 				if (regex_match(tokens.at(i), regex(regexVariables))) {
 					useStore.push_back(Statement(stmtNum, tokens.at(i), stmtNumSubtract));
 				}
@@ -99,7 +95,6 @@ void SourceProcessor::process(string program) {
 				// database PK constraint will trigger for duplicate variables with same line_num to prevent duplicate insertion
 				Database::insertUses(useStore.at(i).getAdjustedStmtNum(), useStore.at(i).getStmt());
 				procedure.back()->_uses.push_back(useStore.at(i).getStmt());
-				//container->_uses.push_back((useStore.at(i).getStmt()));
 			}
 		}
 		else if (word == "if") { // if(...) then {...} else {...}
@@ -160,8 +155,6 @@ void SourceProcessor::process(string program) {
 			container->_startStmtNum = stmtNum;
 			container->_adjustedStartStmtNum = stmtNum - stmtNumSubtract;
 			container->_level = nestedLevel;
-			stack<Container*> tempParentStack;
-
 			if (!parentStack.empty()) { // if there's parent container, add current container to parent's child
 				parentStack.top()->_childContainers.push_back(container);
 			}
