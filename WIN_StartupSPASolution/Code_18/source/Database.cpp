@@ -256,21 +256,6 @@ void Database::getConstant(vector<string>& results) {
 	}
 }
 
-void Database::getStatement(vector<string>& results) {
-	dbResults.clear();
-	string sql = "SELECT line_num FROM statement;";
-	sqlite3_exec(dbConnection, sql.c_str(), callback, 0, &errorMessage);
-	if (errorMessage) {
-		cout << "getStatement SQL Error: " << errorMessage;
-		return;
-	}
-	for (vector<string> dbRow : dbResults) {
-		string result;
-		result = dbRow.at(0);
-		results.push_back(result);
-	}
-}
-
 bool Database::GetParent(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, string parentEntity, string childEntity) {
 	/*	select 1 from statement s where s.entity = '%s' and ((select p.line_num from parent p where p.line_num = %s and s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1) = (select p.line_num from parent p join statement s2 where s2.entity = '%s' and s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1))
 		select 1 from statement s where s.entity = '%s' and ((select p.line_num from parent p join statement s2 on p.line_num = s2.line_num where s2.entity = '%s' and s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1) = (select p.line_num from parent p join statement s2 where s2.entity = '%s' and s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1))
@@ -820,31 +805,6 @@ bool Database::GetPattern(string stmtNum1, string stmtNum2, bool input1IsSynonym
 	if (errorMessage) { cout << "GetPattern SQL Error: " << errorMessage << endl; }
 	return (!(sqlResultStoreForCallback->sqlResult.empty()));
 }
-
-void Database::getModifyStmt(string stmtNum1, string stmtNum2, bool lhs, vector<string>& results) {
-	// clear the existing results
-	dbResults.clear();
-	string sql;
-
-	if (lhs) {
-		sql = "SELECT variable_name FROM modify WHERE line_num = '" + stmtNum1 + "'";
-	}
-	else {
-		sql = "SELECT variable_name FROM modify WHERE line_num = '" + stmtNum2 + "'";
-	}
-
-	sqlite3_exec(dbConnection, sql.c_str(), callback, 0, &errorMessage);
-
-	if (errorMessage) {
-		cout << "getModifyStmt SQL Error: " << errorMessage;
-	}
-
-	for (vector<string> dbRow : dbResults) {
-		string result;
-		result = dbRow.at(0);
-		results.push_back(result);
-	}
- }
 
 // get all the columns of PQL select block
 //void Database::select(Select& st, SqlResultSet* sqlResultSet) {

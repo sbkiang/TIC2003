@@ -10,12 +10,12 @@ QueryProcessor::QueryProcessor() {}
 // destructor
 QueryProcessor::~QueryProcessor() {}
 
-void QueryProcessor::EvaluateSelect(Select& st, map<string,string> synEntMap) {
+void QueryProcessor::EvaluateSelect(Select& select, map<string,string> synEntMap) {
 	string regexStmtNumEntity = "(stmt|read|print|assign|while|if|call)", regexNameEntity = "(variable|procedure)", columnName = "", stmtTable = "statement";
 	map<string, int> tableCountMap;
 	int counter = 0;
 	char sqlBuf[1024] = {};
-	for (auto it = st.synonym.begin(); it != st.synonym.end(); it++) {
+	for (auto it = select.synonym.begin(); it != select.synonym.end(); it++) {
 		string synonym = (*it);
 		string entity = synEntMap.at(synonym);
 		string tableAlias = "";
@@ -33,19 +33,26 @@ void QueryProcessor::EvaluateSelect(Select& st, map<string,string> synEntMap) {
 			columnName = "name";
 			sprintf_s(sqlBuf, "%c%s", entity[0], to_string(tableCountMap.at(entity)).c_str());
 			tableAlias = sqlBuf;
-			sprintf_s(sqlBuf, "%s %s", entity.c_str(), tableAlias.c_str()); // E.g., statement s0, statement s1
+			sprintf_s(sqlBuf, "%s %s", entity.c_str(), tableAlias.c_str()); // E.g., procedure p0, variable v0
 		}
-		st.tableSql.push_back(sqlBuf);
+		else if (entity == "constant") {
+			if (tableCountMap.find(stmtTable) == tableCountMap.end()) { tableCountMap.insert(pair<string, int>(stmtTable, 0)); }
+			else { tableCountMap.at(stmtTable)++; }
+			columnName = "value";
+			sprintf_s(sqlBuf, "c%s", to_string(tableCountMap.at(stmtTable)).c_str());
+			tableAlias = sqlBuf;
+			sprintf_s(sqlBuf, "%s %s", stmtTable.c_str(), tableAlias.c_str()); // E.g., constant c0, constant c1
+		}
+		select.tableSql.push_back(sqlBuf);
 		sprintf_s(sqlBuf, "%s.%s", tableAlias.c_str(), columnName.c_str()); // E.g., s0.line_num as a, s1.line_num as b, p0.name as p
-		st.columnSql.push_back(sqlBuf);
+		select.columnSql.push_back(sqlBuf);
 		sprintf_s(sqlBuf, "AS %s", synonym.c_str());
-		st.asSql.push_back(sqlBuf);
+		select.asSql.push_back(sqlBuf);
 		if (entity != "stmt" && !regex_match(entity, regex(regexNameEntity))) { // if we are getting all the statement number entity, we need the "WHERE" SQL to filter based on entity
 			sprintf_s(sqlBuf, "%s.entity='%s'", tableAlias.c_str(), entity.c_str()); // E.g., s0.type='while', s1.type='if'
-			st.whereSql.push_back(sqlBuf);
+			select.whereSql.push_back(sqlBuf);
 		}
 	}
-	// what about Constant?
 }
 
 // method to evaluate a query
@@ -65,7 +72,6 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	vector<string> databaseResults;
 	string regexWord = "\\w+";
 	string regexQuote = "\\\"";
-	//string regexQuote = "[\"_]";
 	string regexRelation = "(Parent|Next|Calls|Modifies|Uses)";
 	string regexEntity = "(procedure|variable|constant|call|assign|stmt|read|print|while|if)";
 	map<string, string> synonymEntityMap;
@@ -161,7 +167,6 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			}
 			else {
 				select.synonym.push_back(tokens.at(i));
-				//select.synonymEntityMap.insert(pair<string, string>(tokens.at(i), synonymEntityMap.at(tokens.at(i))));
 			}
 		}
 	}

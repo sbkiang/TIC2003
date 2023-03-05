@@ -23,10 +23,8 @@ public:
 	static void getProcedures(vector<string>& results);
 
 	// method to insert a statement into the database
-	static void insertStatement(int stmtNum, string statementType, string text);
+	static void insertStatement(int stmtNum, string entity, string text);
 	static void getStatement(string type, vector<string>& results);
-	static void getStatement(vector<string>& results);
-	static void getStmt(string type, vector<string>& results);
 
 	// method to insert a variable into the database
 	static void insertVariable(string variablename, int statementNumber);

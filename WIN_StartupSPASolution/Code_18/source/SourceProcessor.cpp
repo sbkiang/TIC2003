@@ -90,7 +90,7 @@ void SourceProcessor::process(string program) {
 				i++;
 			}
 			container->_statements.push_back(stmt);
-			Database::insertStatement(stmt->getAdjustedStmtNum(), procedure.back()->_name, word, stmt->getStmt());
+			Database::insertStatement(stmt->getAdjustedStmtNum(), word, stmt->getStmt());
 			for (int i = 0; i < variableStore.size(); i++) { // insert the variable after inserting the statement due to FK
 				Database::insertVariable(variableStore.at(i).getStmt(), variableStore.at(i).getAdjustedStmtNum());
 			}
@@ -136,7 +136,7 @@ void SourceProcessor::process(string program) {
 				i++;
 			}
 			container->_statements.push_back(stmt);
-			Database::insertStatement(stmt->getAdjustedStmtNum(), procedure.back()->_name, word, stmt->getStmt());
+			Database::insertStatement(stmt->getAdjustedStmtNum(), word, stmt->getStmt());
 			for (int i = 0; i < variableStore.size(); i++) {
 				Database::insertVariable(variableStore.at(i).getStmt(), variableStore.at(i).getAdjustedStmtNum());
 			}
@@ -195,7 +195,7 @@ void SourceProcessor::process(string program) {
 			parentStack.top()->_statements.push_back(stmt);
 			modifiesStore.push_back(Statement(stmtNum, LHS, stmtNumSubtract)); //Store LHS variable
 
-			Database::insertStatement(stmt->getAdjustedStmtNum(), procedure.back()->_name, "assign", stmt->getStmt());
+			Database::insertStatement(stmt->getAdjustedStmtNum(), "assign", stmt->getStmt());
 			for (int i = 0; i < variableStore.size(); i++) {
 				Database::insertVariable(variableStore.at(i).getStmt(), variableStore.at(i).getAdjustedStmtNum());
 			}
@@ -226,7 +226,7 @@ void SourceProcessor::process(string program) {
 			//stmt->_stmt += tokens.at(i); // skip the (read, print, call) keywords
 			stmt->appendStmt(tokens.at(i + 1));
 			parentStack.top()->_statements.push_back(stmt);
-			Database::insertStatement(stmt->getAdjustedStmtNum(), procedure.back()->_name, word, stmt->getStmt());
+			Database::insertStatement(stmt->getAdjustedStmtNum(), word, stmt->getStmt());
 			if (word == "read" || word == "print") {
 				Database::insertVariable(tokens.at(i + 1), stmt->getAdjustedStmtNum());
 			}
