@@ -4,6 +4,9 @@ https://lucid.app/lucidchart/f3dd4fff-5e14-426e-9660-a087b381bde3/edit?viewport_
 # Class diagram
 https://miro.com/welcomeonboard/N25hZ3VvMWY0bW42c0tUamRvem94UmpadHQ0ZmIxSEx0ZGFEaUZEcktmTmp4WGZXQ2IzU0JPM2FEWkp1bWNUUnwzNDU4NzY0NTQzMzY4Nzc2NTY5fDI=?share_link_id=40637267126
 
+# FlowChart of Query
+https://www.canva.com/design/DAFcSxpRgk8/GHurfdNiwCQCg5MQ17VYwA/edit?utm_content=DAFcSxpRgk8&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
+
 # Tasking
 https://docs.google.com/document/d/1wz7z3CZqi4ypNXZK6oKxiFp_WPf2AE0r7FTidXWOGa4/edit?usp=sharing
 
