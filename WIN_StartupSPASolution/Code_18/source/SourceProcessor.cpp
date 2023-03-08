@@ -32,8 +32,7 @@ void SourceProcessor::process(string program) {
 	int stmtNumSubtract = 0;
 	int stmtNum = 0;
 	int nestedLevel = 0;
-	for (int i = 0; i < tokens.size(); i++) {
-		cout << "i: " << i << endl;
+	for (int i = 0; i < tokens.size(); i++) {	
 		string word = tokens.at(i);
 		if (word == "}") { // "}" indicates the end of a container
 			if (!parentStack.empty()) {
