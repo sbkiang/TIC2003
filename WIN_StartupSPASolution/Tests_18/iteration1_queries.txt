@@ -38,3 +38,13 @@ call c;
 Select c;
 5, 8, 27, 28, 32
 5000
+9 - stmt such that Parent
+stmt s;
+Select s such that Parent ("s", 7)
+6
+5000
+10 - stmt such that Parent
+stmt x;
+Select s such that Parent* (4, "x")
+5000
+

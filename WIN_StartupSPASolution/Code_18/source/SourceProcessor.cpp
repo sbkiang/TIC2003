@@ -51,7 +51,7 @@ void SourceProcessor::process(string program) {
 			p->_level = nestedLevel;
 			procedure.push_back(p);
 			parentStack.push(p);
-			//Database::insertProcedure(procedure->_name);
+			//Database::insertProcedure(p->_name);
 			nestedLevel++;
 		}
 		else if (word == "while") { // while(...){...}
@@ -287,7 +287,7 @@ void SourceProcessor::process(string program) {
 		for (int i = 0; i < allModifies.size(); i++) { Database::insertModifies(stmt->getAdjustedStmtNum(), allModifies.at(i)); }
 	}
 
-	/*
+	
 	vector<CFG*> CFGs;
 	for (int i = 0; i < procedure.size(); i++) {
 		Database::insertProcedure(procedure.at(i)->_name, procedure.at(i)->_adjustedStartStmtNum, procedure.at(i)->_adjustedEndStmtNum);
@@ -314,7 +314,7 @@ void SourceProcessor::process(string program) {
 			Database::insertParent(containers.at(j)->_adjustedStartStmtNum, containers.at(j)->_adjustedStartStmtNum + 1, containers.at(j)->_adjustedEndStmtNum);
 		}
 	}
-	*/
+	
 }
 
 int SourceProcessor::prec(char c) {

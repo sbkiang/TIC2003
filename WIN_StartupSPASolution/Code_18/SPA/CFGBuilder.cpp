@@ -19,7 +19,7 @@ CFG* CFGBuilder::buildCFG(Container* procedure) {
 		}
 		if (!(node->_stmtPtr->_containerHead || node->_stmtPtr->_containerTail)) { // if node is body, just set sJump to next statement
 			node->_sJump = stmts.at(i + 1);
-			cout << "node " << node->_stmtPtr->getStmtNum() << " sJump : " << node->_sJump->_stmtPtr->getStmtNum() << endl;
+			//cout << "node " << node->_stmtPtr->getStmtNum() << " sJump : " << node->_sJump->_stmtPtr->getStmtNum() << endl;
 			continue;
 		}
 		if (node->_stmtPtr->_container->_type == "procedure") {

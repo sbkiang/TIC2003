@@ -1,0 +1,145 @@
+1 - Procedure - specific defined procedure, generic variable, select procedure
+variable v; procedure p;
+Select p such that Uses("main",v)
+a2 callNone,calleeL1,calleeL2,calleeL3,main,x1
+5000
+1a - Procedure - specific procedure, generic  variable, select procedure
+variable v; procedure p;
+Select p such that Uses(p,v)
+a2 callNone,calleeL1,calleeL2,calleeL3,main,x1
+5000
+1b - Procedure - generic procedure, specific variable, select variable
+variable v; procedure p;
+Select v such that Uses(p,v)
+L1Use,L2Use,a,b,bbc2,c,d,f,printUnderWhile,printx,return1,return2,return3,return5,return6,returnL21,returnL22,returnL31,returnL32,returnL33,returnL35,returnL36,returnL37,returnL38,use1,use2,use20,use21,use3,use4,use5,use6,x,x2,y,yyy,yyyy,z
+5000
+1c - Procedure - specific procedure, specific variable, select procedure and variable
+variable v; procedure p;
+Select <p,v> such that Uses(p,v)
+a2 d,callNone c,callNone d,calleeL1 L1Use,calleeL1 L2Use,calleeL1 a,calleeL1 b,calleeL1 bbc2,calleeL1 c,calleeL1 d,calleeL1 f,calleeL1 printUnderWhile,calleeL1 printx,calleeL1 return1,calleeL1 return5,calleeL1 return6,calleeL1 returnL21,calleeL1 returnL22,calleeL1 returnL31,calleeL1 returnL32,calleeL1 returnL33,calleeL1 returnL35,calleeL1 returnL36,calleeL1 returnL37,calleeL1 returnL38,calleeL1 use1,calleeL1 use2,calleeL1 use20,calleeL1 use21,calleeL1 use4,calleeL1 use5,calleeL1 use6,calleeL1 x,calleeL1 x2,calleeL1 yyy,calleeL2 L1Use,calleeL2 L2Use,calleeL2 b,calleeL2 c,calleeL2 d,calleeL2 f,calleeL2 printUnderWhile,calleeL2 printx,calleeL2 returnL21,calleeL2 returnL22,calleeL2 returnL31,calleeL2 returnL32,calleeL2 returnL33,calleeL2 returnL35,calleeL2 returnL36,calleeL2 returnL37,calleeL2 returnL38,calleeL2 use1,calleeL2 use2,calleeL2 use20,calleeL2 use21,calleeL2 use4,calleeL2 use5,calleeL2 use6,calleeL2 x,calleeL3 b,calleeL3 c,calleeL3 d,calleeL3 f,calleeL3 printx,calleeL3 returnL31,calleeL3 returnL32,calleeL3 returnL33,calleeL3 returnL35,calleeL3 returnL36,calleeL3 returnL37,calleeL3 returnL38,main L1Use,main L2Use,main a,main b,main bbc2,main c,main d,main f,main printUnderWhile,main printx,main return1,main return2,main return3,main return5,main return6,main returnL21,main returnL22,main returnL31,main returnL32,main returnL33,main returnL35,main returnL36,main returnL37,main returnL38,main use1,main use2,main use20,main use21,main use3,main use4,main use5,main use6,main x,main x2,main y,main yyy,main yyyy,main z,x1 c,
+5000
+1d - Procedure - specific procedure, specific defined variable, variable
+variable v; procedure p;
+Select p such that Uses(p,"returnL22")
+calleeL1,calleeL2,main
+5000
+2 - Print - specific print, generic variable, select print
+variable v; print pn;
+Select pn such that Uses(pn,v)
+1,29,46,49,59
+5000
+2a - Print - generic print, specific variable, select variable
+variable v; print pn;
+Select v such that Uses(pn,v)
+printUnderWhile,printx,return1
+5000
+2b - Print - generic defined print, specific variable, select variable
+variable v;
+Select v such that Uses(29,v)
+return1
+5000
+2c - Print - specific print, specific defined variable, select print
+print pn;
+Select pn such that Uses(pn,"printx")
+46,59
+5000
+2d - Print - generic print, specific defined variable, select while
+print pn; while w;
+Select w such that Uses(pn,"printx")
+11,13,18,19,20,21,26,48,50,62,68
+5000
+2e - Print - generic print, specific defined variable, select print
+print pn; while w;
+Select pn such that Uses(pn,"notExists")
+None
+5000
+3 - Assign - specific assign, generic variable, select assign
+assign a; variable v;
+Select a such that Uses(a,v)
+2,3,6,7,9,10,12,14,15,16,17,22,31,35,36,37,38,39,40,43,44,47,51,52,53,54,55,56,60,61,63,70,71
+5000
+3a - Assign - generic assign, specific variable, select variable
+assign a; variable v;
+Select v such that Uses(a,v)
+bbc2,c,d,f,return2,return3,return5,return6,returnL21,returnL22,returnL31,returnL32,returnL35,returnL37,returnL38,use1,use2,use21,use3,use4,use5,use6,x,x2,yyy,yyyy
+5000
+3b - Assign - specific defined assign, specific variable, select variable
+assign a; variable v;
+Select v such that Uses(43,v)
+use1
+5000
+3c - Assign - specific defined assign, specific variable, select variable
+assign a; variable v;
+Select v such that Uses(10000,v)
+None
+5000
+3d - Assign - generic assign, specific defined variable, select assign
+assign a;
+Select a such that Uses(a,"use6")
+16,53
+5000
+3e - Assign - generic assign, specific defined variable, select assign
+assign a;
+Select a such that Uses(a,"notExist")
+None
+5000
+4 - If - specific if , generic variable, select if
+if i; variable v;
+Select i such that Uses(i,v)
+5,8,32,33,34,42,45,57,58
+5000
+4a - If - generic if , specific variable, select variable
+if i; variable v;
+Select v such that Uses(i,v)
+L1Use,L2Use,a,b,bbc2,c,d,f,printUnderWhile,printx,returnL33,returnL35,use1,use2,use20,use21,use3,use4,use5,use6,x,x2,yyy
+5000
+4b - If - specific defined if, specific variable, select variable
+if i; variable v;
+Select v such that Uses(8,v)
+L2Use,d,use20,use21,use3,use4,use5,use6,x
+5000
+4c - If - specific defined If, specific variable, select variable
+if i; variable v;
+Select v such that Uses(10000,v)
+None
+5000
+4d - If - generic If, specific defined variable, select If
+if i;
+Select i such that Uses(i,"use6")
+5,8,42,45
+5000
+4e - If - generic If, specific defined variable, select If
+if i;
+Select i such that Uses(i,"notExist")
+None
+5000
+5 - while - specific while , generic variable, select while
+while w; variable v;
+Select w such that Uses(w,v)
+11,13,18,19,20,21,48,50,62,68
+5000
+5a - while - generic while , specific variable, select variable
+while w; variable v;
+Select v such that Uses(w,v)
+a,b,c,d,printUnderWhile,returnL36,returnL37,returnL38,use20,use21,x,y,yyyy,z
+5000
+5b - while - specific defined while, specific variable, select variable
+while w; variable v;
+Select v such that Uses(26,v)
+None
+5000
+5c - while - specific defined while, specific variable, select variable
+while w; variable v;
+Select v such that Uses(10000,v)
+None
+5000
+5d - while - generic while, specific defined variable, select while
+while w;
+Select w such that Uses(w,"L1Use")
+None
+5000
+5e - while - generic while, specific defined variable, select while
+while w;
+Select w such that Uses(w,"notExist")
+None
+5000

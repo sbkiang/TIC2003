@@ -1,0 +1,132 @@
+procedure main {
+    print return1;
+    x = x+y*ss+a-e;
+    x = num1+num2*num3;
+    call calleeL1;
+    if(x = L1Use)then{
+        a = use1*use2+use3;
+        b = use2;
+        if(x = L2Use)then{
+            c = use3;
+            d = use4;
+            while(d = use20){
+                d = use21;
+            }
+        }
+        else{
+            while(d = use20){
+                d = use21;
+            }
+            e = use5;
+            f = use6;
+        }
+    }
+    else{
+        d = use4;
+    }
+    while(x = y){
+        while(y = z){
+            while(z = a){
+                while(a = b){
+                    wwww = yyyy;
+                }
+            }
+        }
+    }
+    if (10 == 10) then{
+        x = 10;
+    }
+    else{
+        x = 20;
+    }
+    while(5 != 10){
+        x = 20;
+    }
+    call callNone;
+}
+
+procedure calleeL1{
+    print return1;
+    call calleeL2;
+    x = return5 + return6;
+    if(a = b)then{
+        if(b = c)then{
+            if(c = d)then{
+                xxx = bbc2;
+            }
+            else{
+                xxx = x;
+            }
+        }
+        else{
+            xxx = yyy;
+        }
+    }
+    else{
+        x1 = x2;
+    }
+}
+
+procedure calleeL2{
+    x = returnL21;
+    x = returnL22;
+    call calleeL3;
+    if(x = L1Use)then{
+        a = use1;
+        b = use2;
+        if(x = L2Use)then{
+            print printx;
+            d = use4;
+            while(d = use20){
+                print printUnderWhile;
+            }
+        }
+        else{
+            while(d = use20){
+                d = use21;
+            }
+            e = use5;
+            f = use6;
+        }
+    }
+    else{
+        d = use4;
+    }
+}
+
+procedure calleeL3{
+    x = returnL31;
+    x = returnL32;
+    if(b == returnL33)then{
+        if(c == d)then{
+            print printx;
+        }
+        else{
+            d = f;
+        }
+    }
+    else{
+        x = returnL35;
+    }
+    while(c < returnL36){
+        x = returnL37 + returnL38;
+    }
+}
+
+procedure callNone{
+    x = 10;
+    y = 10 * 10;
+    read y;
+    call x1;
+    while(10 == 10){
+        call a2;
+    }
+}
+
+procedure x1{
+    b = c;
+}
+
+procedure a2{
+    c = d;
+}

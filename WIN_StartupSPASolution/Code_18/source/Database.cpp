@@ -489,12 +489,12 @@ bool Database::GetUsesForCall(string input1, string input2, bool input1IsSpecifi
 
 	// Uses(c,"cenX") or Uses(c,v) is true, where "c" is "call c", "v" is "variable v", and both are present in select
 	else if (input1IsSpecific && input2IsSpecific) {
-		sprintf_s(sqlBuf, "select 1 from use u where u.variable_name = '%s' and exists (select 1 from statement s where s.entity = 'call' and s.text = '%s' and s.line_num = u.line_num);", input2.c_str(), input1.c_str());
+		sprintf_s(sqlBuf, "select 1 from use u where u.variable_name = '%s' and exists (select 1 from statement s where s.entity = 'call' and s.line_num = %s and s.line_num = u.line_num);", input2.c_str(), input1.c_str());
 	}
 
 	// Uses(c,v) where "c" is "call c", "v" is "variable v", and only "c" is present in select
 	else if (input1IsSpecific && !input2IsSpecific) {
-		sprintf_s(sqlBuf, "select 1 from use u where exists (select 1 from statement s where s.entity = 'call' and s.text = '%s' and s.line_num = u.line_num);", input1.c_str());
+		sprintf_s(sqlBuf, "select 1 from use u where exists (select 1 from statement s where s.entity = 'call' and s.line_num = %s and s.line_num = u.line_num);", input1.c_str());
 	}
 
 	// we are looking for each statement and checking if Uses(c,v) is true, where "c" is "call c", "v" is variable, and both are not present in select
@@ -696,12 +696,12 @@ bool Database::GetModifiesForCall(string input1, string input2, bool input1IsSpe
 
 	// Modifies(c,"cenX") or Modifies(c,v) is true, where "c" is "call c", "v" is "variable v", and both are present in select
 	else if (input1IsSpecific && input2IsSpecific) {
-		sprintf_s(sqlBuf, "select 1 from modify m where m.variable_name = '%s' and exists (select 1 from statement s where s.entity = 'call' and s.text = '%s' and s.line_num = m.line_num);", input2.c_str(), input1.c_str());
+		sprintf_s(sqlBuf, "select 1 from modify m where m.variable_name = '%s' and exists (select 1 from statement s where s.entity = 'call' and s.line_num = %s and s.line_num = m.line_num);", input2.c_str(), input1.c_str());
 	}
 
 	// Modifies(c,v) where "c" is "call c", "v" is "variable v", and only "c" is present in select
 	else if (input1IsSpecific && !input2IsSpecific) {
-		sprintf_s(sqlBuf, "select 1 from modify m where exists (select 1 from statement s where s.entity = 'call' and s.text = '%s' and s.line_num = m.line_num);", input1.c_str());
+		sprintf_s(sqlBuf, "select 1 from modify m where exists (select 1 from statement s where s.entity = 'call' and s.line_num = %s and s.line_num = m.line_num);", input1.c_str());
 	}
 
 	// we are looking for each statement and checking if Modifies(c,v) is true, where "c" is "call c", "v" is variable, and both are not present in select
