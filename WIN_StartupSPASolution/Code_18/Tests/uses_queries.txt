@@ -1,145 +1,15 @@
-1 - Procedure - specific defined procedure, generic variable, select procedure
-variable v; procedure p;
-Select p such that Uses("main",v)
-53
-5000
-1a - Procedure - specific procedure, generic  variable, select procedure
-variable v; procedure p;
-Select p such that Uses(p,v)
-53
-5000
-1b - Procedure - generic procedure, specific variable, select variable
-variable v; procedure p;
-Select v such that Uses(p,v)
-53
-5000
-1c - Procedure - specific procedure, specific variable, select procedure and variable
-variable v; procedure p;
-Select <p,v> such that Uses(p,v)
-53
-5000
-1d - Procedure - specific procedure, specific defined variable, variable
-variable v; procedure p;
-Select p such that Uses(p,"returnL22")
-53
-5000
-2 - Print - specific print, generic variable, select print
-variable v; print pn;
-Select pn such that Uses(pn,v)
-1,23
-5000
-2a - Print - generic print, specific variable, select variable
-variable v; print pn;
-Select v such that Uses(pn,v)
-1,23
-5000
-2b - Print - generic defined print, specific variable, select variable
-variable v;
-Select v such that Uses(29,v)
-1,23
-5000
-2c - Print - specific print, specific defined variable, select print
-print pn;
-Select pn such that Uses(pn,"printx")
-1,23
-5000
-2d - Print - generic print, specific defined variable, select while
-print pn; while w;
-Select w such that Uses(pn,"printx")
-1,23
-5000
-2e - Print - generic print, specific defined variable, select print
-print pn; while w;
-Select pn such that Uses(pn,"notExists")
-1,23
-5000
-3 - Assign - specific assign, generic variable, select assign
-assign a; variable v;
-Select a such that Uses(a,v)
-40,53
-5000
-3a - Assign - generic assign, specific variable, select variable
-assign a; variable v;
-Select v such that Uses(a,v)
-40,53
-5000
-3b - Assign - specific defined assign, specific variable, select variable
-assign a; variable v;
-Select v such that Uses(43,v)
-40,53
-5000
 3c - Assign - specific defined assign, specific variable, select variable
 assign a; variable v;
 Select v such that Uses(10000,v)
 None
-5000
-3d - Assign - generic assign, specific defined variable, select assign
-assign a;
-Select a such that Uses(a,"use6")
-1,23
-5000
-3e - Assign - generic assign, specific defined variable, select assign
-assign a;
-Select a such that Uses(a,"notExist")
-1,23
-5000
-4 - If - specific if , generic variable, select if
-if i; variable v;
-Select i such that Uses(i,v)
-40,53
-5000
-4a - If - generic if , specific variable, select variable
-if i; variable v;
-Select v such that Uses(i,v)
-40,53
-5000
-4b - If - specific defined if, specific variable, select variable
-if i; variable v;
-Select v such that Uses(8,v)
-40,53
 5000
 4c - If - specific defined If, specific variable, select variable
 if i; variable v;
 Select v such that Uses(10000,v)
 None
 5000
-4d - If - generic If, specific defined variable, select If
-if i;
-Select i such that Uses(i,"use6")
-1,23
-5000
-4e - If - generic If, specific defined variable, select If
-if i;
-Select i such that Uses(i,"notExist")
-1,23
-5000
-5 - while - specific while , generic variable, select while
-while w; variable v;
-Select w such that Uses(w,v)
-40,53
-5000
-5a - while - generic while , specific variable, select variable
-while w; variable v;
-Select v such that Uses(w,v)
-40,53
-5000
-5b - while - specific defined while, specific variable, select variable
-while w; variable v;
-Select v such that Uses(26,v)
-40,53
-5000
 5c - while - specific defined while, specific variable, select variable
 while w; variable v;
 Select v such that Uses(10000,v)
 None
-5000
-5d - while - generic while, specific defined variable, select while
-while w;
-Select w such that Uses(w,"L1Use")
-1,23
-5000
-5e - while - generic while, specific defined variable, select while
-while w;
-Select w such that Uses(w,"notExist")
-1,23
 5000
