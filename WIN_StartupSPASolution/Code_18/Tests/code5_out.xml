@@ -1,49 +1,49 @@
 <?xml-stylesheet type="text/xsl" href="analysis.xsl"?>
 <test_results>
 <info>
-<name>AutoTester</name><parsing_time_taken>1126.000000</parsing_time_taken>
+<name>AutoTester</name><parsing_time_taken>4369.000000</parsing_time_taken>
 </info>
 <queries>
 <query>
 <id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="Variable">1</id><querystr><![CDATA[variable v; Select v such that Modifies (15, v)]]></querystr>
 <stuans>count</stuans>
 <correct>count</correct>
-<time_taken>13.000000</time_taken>
+<time_taken>2343.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="Assign and Variable">2</id><querystr><![CDATA[variable v; assign a; Select a such that  Modifies (a, "count")]]></querystr>
 <stuans>10,15</stuans>
 <correct>10,15</correct>
-<time_taken>11.000000</time_taken>
+<time_taken>47.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="Read and Variable">3</id><querystr><![CDATA[variable v; read r; Select r such that  Modifies (r, "x")]]></querystr>
 <stuans>4</stuans>
 <correct>4</correct>
-<time_taken>10.000000</time_taken>
+<time_taken>37.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="If and Variable">4</id><querystr><![CDATA[variable v; if f; Select f such that  Modifies (f, "flag")]]></querystr>
 <stuans>19</stuans>
 <correct>19</correct>
-<time_taken>12.000000</time_taken>
+<time_taken>43.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="while and Variable">4</id><querystr><![CDATA[variable v; while w; Select w such that  Modifies (w, "cenX")]]></querystr>
 <stuans>14</stuans>
 <correct>14</correct>
-<time_taken>8.000000</time_taken>
+<time_taken>35.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="Procedure and Variable">5</id><querystr><![CDATA[variable v; procedure p; Select p such that  Modifies (p, "x")]]></querystr>
 <stuans>computeCentroid,main,readPoint</stuans>
 <correct>main,computeCentroid,readPoint</correct>
-<time_taken>9.000000</time_taken>
+<time_taken>48.000000</time_taken>
 <passed/>
 </query>
 </queries>

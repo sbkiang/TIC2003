@@ -755,9 +755,9 @@ bool Database::GetModifiesForUnknownInput1(string input1, string input2, bool in
 		string entity = rs.sqlResult.at(0).row.at("entity");
 		string text = rs.sqlResult.at(0).row.at("text");
 
-		// e.g., use(10, v), and stmt 10 is "x = a + b" or "print x". We just need to select from use table with the correct stmtNum to get the variables
+		// e.g., use(10, v), and stmt 10 is "x = a + b" or "read x". We just need to select from use table with the correct stmtNum to get the variables
 		if (entity == "assign") { return Database::GetModifiesForAssign(input1, input2, input1IsSpecific, input2IsSpecific); }
-		if (entity == "print") { return Database::GetModifiesForRead(input1, input2, input1IsSpecific, input2IsSpecific); }
+		if (entity == "read") { return Database::GetModifiesForRead(input1, input2, input1IsSpecific, input2IsSpecific); }
 		if (entity == "call") { return Database::GetModifiesForCall(text, input2, input1IsSpecific, input2IsSpecific); }
 		if (entity == "while") { return Database::GetModifiesForWhile(input1, input2, input1IsSpecific, input2IsSpecific); }
 		if (entity == "if") { return Database::GetModifiesForIf(input1, input2, input1IsSpecific, input2IsSpecific); }
