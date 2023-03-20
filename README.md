@@ -17,3 +17,6 @@ https://docs.google.com/document/d/1CV7otxATjUSHi6X-XMz9IOpijloG6mo-uRkFm-vgz20/
 https://docs.google.com/document/d/141C-LXEx03YDosne7JGE2cusOxzt1lSE_h9qrDzEezg/edit?usp=sharing
 
 # lteration 3 Report
+https://docs.google.com/document/d/1bB7gx59PT1cquWKBUzD9juEPpny-NN8-ot8tc_9lC9Q/edit?usp=sharing
+
+#Slides
