@@ -11,7 +11,7 @@ QueryProcessor::QueryProcessor() {}
 QueryProcessor::~QueryProcessor() {}
 
 void QueryProcessor::EvaluateSelect(Select& select, map<string,string> synEntMap) {
-	string regexStmtNumEntity = "(stmt|read|print|assign|while|if|call)", regexNameEntity = "(variable|procedure)", columnName = "", stmtTable = "statement";
+	string regexStmtNumEntity = "(stmt|read|print|assign|while|if|call)", regexNameEntity = "(variable|procedure|constant)", columnName = "", stmtTable = "statement";
 	map<string, int> tableCountMap;
 	int counter = 0;
 	char sqlBuf[1024] = {};
@@ -30,19 +30,20 @@ void QueryProcessor::EvaluateSelect(Select& select, map<string,string> synEntMap
 		else if (regex_match(entity, regex(regexNameEntity))) { // for entity that returns name, we need to get it from their respective table
 			if (tableCountMap.find(entity) == tableCountMap.end()) { tableCountMap.insert(pair<string, int>(entity, 0)); }
 			else { tableCountMap.at(entity)++; }
-			columnName = "name";
+			if (entity == "constant") { columnName = "value"; }
+			else { columnName = "name"; }
 			sprintf_s(sqlBuf, "%c%s", entity[0], to_string(tableCountMap.at(entity)).c_str());
 			tableAlias = sqlBuf;
-			sprintf_s(sqlBuf, "%s %s", entity.c_str(), tableAlias.c_str()); // E.g., procedure p0, variable v0
+			sprintf_s(sqlBuf, "%s %s", entity.c_str(), tableAlias.c_str()); // E.g., procedure p0, variable v0, constant c0
 		}
-		else if (entity == "constant") {
-			if (tableCountMap.find(stmtTable) == tableCountMap.end()) { tableCountMap.insert(pair<string, int>(stmtTable, 0)); }
-			else { tableCountMap.at(stmtTable)++; }
+		/*else if (entity == "constant") {
+			if (tableCountMap.find(entity) == tableCountMap.end()) { tableCountMap.insert(pair<string, int>(entity, 0)); }
+			else { tableCountMap.at(entity)++; }
 			columnName = "value";
-			sprintf_s(sqlBuf, "c%s", to_string(tableCountMap.at(stmtTable)).c_str());
+			sprintf_s(sqlBuf, "c%s", to_string(tableCountMap.at(entity)).c_str());
 			tableAlias = sqlBuf;
-			sprintf_s(sqlBuf, "%s %s", stmtTable.c_str(), tableAlias.c_str()); // E.g., constant c0, constant c1
-		}
+			sprintf_s(sqlBuf, "%s %s", entity.c_str(), tableAlias.c_str()); // E.g., constant c0, constant c1
+		}*/
 		select.tableSql.push_back(sqlBuf);
 		sprintf_s(sqlBuf, "%s.%s", tableAlias.c_str(), columnName.c_str()); // E.g., s0.line_num as a, s1.line_num as b, p0.name as p
 		select.columnSql.push_back(sqlBuf);

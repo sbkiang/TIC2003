@@ -1,0 +1,22 @@
+<?xml-stylesheet type="text/xsl" href="analysis.xsl"?>
+<test_results>
+<info>
+<name>AutoTester</name><parsing_time_taken>1333.000000</parsing_time_taken>
+</info>
+<queries>
+<query>
+<id ReturnTuple="1" CondNum="1" RelNum="0" comment="identify procedures">1001</id><querystr><![CDATA[procedure proc; Select proc]]></querystr>
+<stuans>computeCentroid,main,printResults,readPoint</stuans>
+<correct>main,readPoint,printResults,computeCentroid</correct>
+<time_taken>11.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" CondNum="1" RelNum="0" comment="identify constants">16</id><querystr><![CDATA[constant Const; Select Const]]></querystr>
+<stuans>1,0</stuans>
+<correct>0,1</correct>
+<time_taken>8.000000</time_taken>
+<passed/>
+</query>
+</queries>
+</test_results>

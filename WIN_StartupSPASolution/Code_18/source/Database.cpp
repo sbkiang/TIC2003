@@ -809,6 +809,7 @@ bool Database::GetPattern(string stmtNum1, string stmtNum2, bool input1IsSynonym
 // get all the columns of PQL select block
 //void Database::select(Select& st, SqlResultSet* sqlResultSet) {
 void Database::SelectPql(Select& st, SqlResultStore& sqlResultStore) {
+	
 	sqlResultStoreForCallback = &sqlResultStore;
 	char sqlBuf[1024] = {};
 	string selectFromTable = "";
@@ -843,7 +844,6 @@ void Database::SelectPql(Select& st, SqlResultStore& sqlResultStore) {
 	if(whereDuplicateFilter == ""){ sprintf_s(sqlBuf, "SELECT %s FROM %s WHERE %s", selectColumnName.c_str(), selectFromTable.c_str(), whereColumnFilter.c_str()); }
 	else{ sprintf_s(sqlBuf, "SELECT %s FROM %s WHERE %s AND %s", selectColumnName.c_str(), selectFromTable.c_str(), whereColumnFilter.c_str(), whereDuplicateFilter.c_str()); }
 	*/
-
 	if (st.whereSql.empty()) {	sprintf_s(sqlBuf, "SELECT %s FROM %s", selectColumnName.c_str(), selectFromTable.c_str()); }
 	else { sprintf_s(sqlBuf, "SELECT %s FROM %s WHERE %s", selectColumnName.c_str(), selectFromTable.c_str(), whereColumnFilter.c_str()); }
 	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
