@@ -1,22 +1,38 @@
 <?xml-stylesheet type="text/xsl" href="analysis.xsl"?>
 <test_results>
 <info>
-<name>AutoTester</name><parsing_time_taken>1333.000000</parsing_time_taken>
+<name>AutoTester</name><parsing_time_taken>1133.000000</parsing_time_taken>
 </info>
 <queries>
 <query>
-<id ReturnTuple="1" CondNum="1" RelNum="0" comment="identify procedures">1001</id><querystr><![CDATA[procedure proc; Select proc]]></querystr>
-<stuans>computeCentroid,main,printResults,readPoint</stuans>
-<correct>main,readPoint,printResults,computeCentroid</correct>
+<id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="Variable">1</id><querystr><![CDATA[variable v; Select v such that Modifies (15, v)]]></querystr>
+<stuans>count</stuans>
+<correct>count</correct>
+<time_taken>12.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="Assign and Variable">2</id><querystr><![CDATA[variable v; assign a; Select a such that  Modifies (a, "count")]]></querystr>
+<stuans>10,15</stuans>
+<correct>10,15</correct>
 <time_taken>11.000000</time_taken>
 <passed/>
 </query>
 <query>
-<id ReturnTuple="1" CondNum="1" RelNum="0" comment="identify constants">16</id><querystr><![CDATA[constant Const; Select Const]]></querystr>
-<stuans>1,0</stuans>
-<correct>0,1</correct>
+<id ReturnTuple="1" Modifies="1" SuchThat="1" CondNum="3" RelNum="1" comment="Read and Variable">3</id><querystr><![CDATA[variable v; read r; Select r such that  Modifies (r, "x")]]></querystr>
+<stuans></stuans>
+<correct>4</correct>
 <time_taken>8.000000</time_taken>
-<passed/>
+<failed>
+<missing>4</missing>
+<additional></additional>
+<summary>
+<expected>1</expected>
+<matched>0</matched>
+<missing>1</missing>
+<additional>0</additional>
+</summary>
+</failed>
 </query>
 </queries>
 </test_results>

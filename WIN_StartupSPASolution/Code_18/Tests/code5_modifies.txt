@@ -1,0 +1,20 @@
+1 - Variable
+variable v;
+Select v such that Modifies (15, v)
+count
+5000
+2 - Assign and Variable
+variable v; assign a;
+Select a such that  Modifies (a, "count")
+10, 15
+5000
+3 - Read and Variable
+variable v; read r;
+Select r such that  Modifies (r, "x")
+4
+5000
+
+
+
+
+

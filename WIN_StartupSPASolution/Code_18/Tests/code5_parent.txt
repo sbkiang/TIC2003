@@ -1,0 +1,48 @@
+1 - While Parent 
+stmt s;
+Select s such that Parent (s, 15) 
+14
+5000
+2 - While Parent 
+stmt s;
+Select s such that Parent (14, s) 
+15, 16, 17, 18
+5000
+3 - If Parent
+stmt s;
+Select s such that Parent (s, 20) 
+19
+5000
+4 - If Parent
+stmt s;
+Select s such that Parent (19, s) 
+20
+5000
+5 - If Parent
+stmt s;
+Select s such that Parent* (19, s) 
+20, 21, 22
+5000
+6 - Assign and While
+assign a; while w;
+Select a such that Parent* (w, a)
+15, 16, 17
+5000
+7 - Assign and While
+assign a; while w;
+Select w such that Parent* (w, a)
+14
+5000
+8 - If and While
+assign a; if f;
+Select a such that Parent* (f, a)
+20, 21, 22
+5000
+9 - If and While
+assign a; if f;
+Select f such that Parent* (f, a)
+19
+5000
+
+
+

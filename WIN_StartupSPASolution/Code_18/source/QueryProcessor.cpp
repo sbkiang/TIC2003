@@ -234,6 +234,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 
 			}
 			else if (relationship == "Next*"){
+
 			}
 			else if (relationship == "Calls") {
 
