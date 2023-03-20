@@ -13,6 +13,24 @@ variable v; read r;
 Select r such that  Modifies (r, "x")
 4
 5000
+4 - If and Variable
+variable v; if f;
+Select f such that  Modifies (f, "flag")
+19
+5000
+4 - while and Variable
+variable v; while w;
+Select w such that  Modifies (w, "cenX")
+14
+5000
+5 - Procedure and Variable
+variable v; procedure p;
+Select p such that  Modifies (p, "x")
+main, computeCentroid, readPoint
+5000
+
+
+
 
 
 
