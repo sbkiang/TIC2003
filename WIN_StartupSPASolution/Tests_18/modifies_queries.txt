@@ -58,14 +58,31 @@ stmt s; variable v;
 Select v such that Modifies(14, v)
 count, cenX, cenY, x, y
 5000
-
-
 14 - Call (c, v)
 variable v; call c;
 Select c such that Modifies (c, v)
-readPoint
+13,18,2
 5000
-
+15 - if container (direct) 
+stmt s; variable v; 
+Select s such that Modifies(s, "flag") 
+19 
+5000 
+16 - if container (indirect) 
+stmt s; variable v; 
+Select s such that Modifies(s, "cenY") 
+19 
+5000 
+17 - while container (direct) 
+stmt s; variable v; 
+Select s such that Modifies(s, "count") 
+17 
+5000 
+18 - while container (indirect) 
+stmt s; variable v; 
+Select s such that Modifies(s, "count") 
+14 
+5000
 
 
 
