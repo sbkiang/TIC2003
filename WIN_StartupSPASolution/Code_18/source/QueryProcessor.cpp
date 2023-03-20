@@ -217,7 +217,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			}
 			else if (relationship == "Modifies") { // input1 is Stmt Num or Name, input2 is Name
 				if (entityInput1 == "assign") { pass = Database::GetModifiesForAssign(first, second, input1IsSpecific, input2IsSpecific); }
-				else if (entityInput1 == "read") { pass = Database::GetModifiesForRead(first, second, entityInput1, input1IsSpecific, input2IsSpecific); }
+				else if (entityInput1 == "read") { pass = Database::GetModifiesForRead(first, second, input1IsSpecific, input2IsSpecific); }
 				else if (entityInput1 == "while") { pass = Database::GetModifiesForWhile(first, second, input1IsSpecific, input2IsSpecific); }
 				else if (entityInput1 == "if") { pass = Database::GetModifiesForIf(first, second, input1IsSpecific, input2IsSpecific); }
 				else if (entityInput1 == "call") { pass = Database::GetModifiesForCall(first, second, input1IsSpecific, input2IsSpecific); }

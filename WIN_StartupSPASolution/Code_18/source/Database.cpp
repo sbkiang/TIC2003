@@ -591,7 +591,7 @@ bool Database::GetModifiesForAssign(string input1, string input2, bool input1IsS
 	return (!(sqlResultStoreForCallback->sqlResult.empty()));
 }
 
-bool Database::GetModifiesForRead(string input1, string input2, string entity, bool input1IsSpecific, bool input2IsSpecific) {
+bool Database::GetModifiesForRead(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific) {
 	// select 1 from modify m where m.variable_name = '%s' and m.line_num in (select s.line_num from statement s where entity = 'print' and s.line_num = '%s');
 
 	char sqlBuf[512] = {};
@@ -602,13 +602,12 @@ bool Database::GetModifiesForRead(string input1, string input2, string entity, b
 
 	// Modifies(p,"cenX") or Modifies(p,v) where "r" is "read r", "v" is "variable v", both present in select
 	else if (input1IsSpecific && input2IsSpecific) {
-		//sprintf_s(sqlBuf, "select 1 from modify m where m.variable_name = '%s' and m.line_num in (select s.line_num from statement s where entity = 'print' and s.line_num = %s);", input2.c_str(), input1.c_str());
-		sprintf_s(sqlBuf, "select 1 from modify m where m.variable_name = '%s' and m.line_num in (select s.line_num from statement s where entity = '%s' and s.line_num = %s);", input2.c_str(), entity.c_str(), input1.c_str());
+		sprintf_s(sqlBuf, "select 1 from modify m where m.variable_name = '%s' and m.line_num in (select s.line_num from statement s where entity = 'read' and s.line_num = %s);", input2.c_str(), input1.c_str());
 	}
 
 	// Modifies(p,"cenX") or Modifies(p,v) where "r" is "read r", "v" is "variable v", only "r" present in select
 	else if (input1IsSpecific && !input2IsSpecific) {
-		sprintf_s(sqlBuf, "select 1 from modify m where m.line_num in (select s.line_num from statement s where entity = 'print' and s.line_num = %s);", input1.c_str());
+		sprintf_s(sqlBuf, "select 1 from modify m where m.line_num in (select s.line_num from statement s where entity = 'read' and s.line_num = %s);", input1.c_str());
 	}
 
 	// Modifies(p,"cenX") or Modifies(p,v) where "r" is "read r", "v" is "variable v", both not present in select
@@ -758,7 +757,7 @@ bool Database::GetModifiesForUnknownInput1(string input1, string input2, bool in
 
 		// e.g., use(10, v), and stmt 10 is "x = a + b" or "print x". We just need to select from use table with the correct stmtNum to get the variables
 		if (entity == "assign") { return Database::GetModifiesForAssign(input1, input2, input1IsSpecific, input2IsSpecific); }
-		if (entity == "print") { return Database::GetModifiesForRead(input1, input2, entity, input1IsSpecific, input2IsSpecific); }
+		if (entity == "print") { return Database::GetModifiesForRead(input1, input2, input1IsSpecific, input2IsSpecific); }
 		if (entity == "call") { return Database::GetModifiesForCall(text, input2, input1IsSpecific, input2IsSpecific); }
 		if (entity == "while") { return Database::GetModifiesForWhile(input1, input2, input1IsSpecific, input2IsSpecific); }
 		if (entity == "if") { return Database::GetModifiesForIf(input1, input2, input1IsSpecific, input2IsSpecific); }
