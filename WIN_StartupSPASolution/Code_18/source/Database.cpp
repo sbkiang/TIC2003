@@ -178,7 +178,20 @@ void Database::insertNext(int stmtNum1, int stmtNum2) {
 	if (errorMessage) { cout << "insertNext SQL Error: " << errorMessage; }
 }
 
-void Database::getNextT(int stmtNum1, int stmtNum2, vector<string>& results) {
+
+bool Database::getNext(int stmtNum1, int stmtNum2) {
+	dbResults.clear();
+	char sqlBuf[256];
+	sprintf_s(sqlBuf, "SELECT 1 FROM next WHERE line_num_1 = '%i' AND line_num_2 = '%i';", stmtNum1, stmtNum2);
+	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
+	SqlResultStore rs;
+	sqlResultStoreForCallback = &rs;
+	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
+	if (errorMessage) { cout << "getNext SQL Error: " << errorMessage; exit(0); }
+	return (!(sqlResultStoreForCallback->sqlResult.empty()));
+}
+
+bool Database::getNextT(int stmtNum1, int stmtNum2) {
 	dbResults.clear();
 	char sqlBuf[256];
 	vector<string> resultStore;
@@ -187,33 +200,12 @@ void Database::getNextT(int stmtNum1, int stmtNum2, vector<string>& results) {
 					" union "
 					"select n.line_num_1, n.line_num_2 from next n join nextStmt ns where n.line_num_1 = ns.line_num_2 and n.line_num_2 <= %i"
 					")"
-					"select* from nextStmt;", stmtNum1, stmtNum2);
+					"select * from nextStmt;", stmtNum1, stmtNum2);
+	SqlResultStore rs;
+	sqlResultStoreForCallback = &rs;
 	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
-	if (errorMessage) {
-		cout << "getNext_T SQL Error: " << errorMessage;
-		return;
-	}
-	for (vector<string> dbRow : dbResults) {
-		string result;
-		result = dbRow.at(0) + "," + dbRow.at(1);
-		results.push_back(result);
-	}
-}
-
-void Database::getNext(int stmtNum1, int stmtNum2, vector<string>& results) {
-	dbResults.clear();
-	char sqlBuf[256];
-	sprintf_s(sqlBuf, "SELECT * FROM next WHERE line_num_1 = '%i' AND line_num_2 = '%i';", stmtNum1, stmtNum2);
-	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
-	if (errorMessage) {
-		cout << "getNext SQL Error: " << errorMessage;
-		return;
-	}
-	for (vector<string> dbRow : dbResults) {
-		string result;
-		result = dbRow.at(0) + "," + dbRow.at(1);
-		results.push_back(result);
-	}
+	if (errorMessage) { cout << "getNextT SQL Error: " << errorMessage; exit(0); }
+	return (!(sqlResultStoreForCallback->sqlResult.empty()));
 }
 
 // method to get all the procedure from the database
@@ -541,6 +533,7 @@ bool Database::GetUsesForUnknownInput1(string input1, string input2, bool input1
 	SqlResultStore rs;
 	sqlResultStoreForCallback = &rs;
 	char sqlBuf[512] = {};
+	bool ret = false;
 	if (isdigit(input1[0])) { // input first char is a digit = statement number
 		sprintf_s(sqlBuf, "SELECT entity, text FROM statement WHERE line_num = %s;", input1.c_str());
 		sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
@@ -549,16 +542,16 @@ bool Database::GetUsesForUnknownInput1(string input1, string input2, bool input1
 		string text = rs.sqlResult.at(0).row.at("text");
 
 		// e.g., use(10, v), and stmt 10 is "x = a + b" or "print x". We just need to select from use table with the correct stmtNum to get the variables
-		if (entity == "assign") { return Database::GetUsesForAssign(input1, input2, input1IsSpecific, input2IsSpecific); }
-		if (entity == "print") { return Database::GetUsesForPrint(input1, input2, input1IsSpecific, input2IsSpecific); }
-		if (entity == "call") { return Database::GetUsesForCall(text, input2, input1IsSpecific, input2IsSpecific); }
-		if (entity == "while") { return Database::GetUsesForWhile(input1, input2, input1IsSpecific, input2IsSpecific); }
-		if (entity == "if") { return Database::GetUsesForIf(input1, input2, input1IsSpecific, input2IsSpecific); }
-		return false;
+		if (entity == "assign") { ret = Database::GetUsesForAssign(input1, input2, input1IsSpecific, input2IsSpecific); }
+		else if (entity == "print") { ret = Database::GetUsesForPrint(input1, input2, input1IsSpecific, input2IsSpecific); }
+		else if (entity == "call") { ret = Database::GetUsesForCall(text, input2, input1IsSpecific, input2IsSpecific); }
+		else if (entity == "while") { ret = Database::GetUsesForWhile(input1, input2, input1IsSpecific, input2IsSpecific); }
+		else if (entity == "if") { ret = Database::GetUsesForIf(input1, input2, input1IsSpecific, input2IsSpecific); }
 	}
 	else { // input first char is not a digit = a name
-		return Database::GetUsesForProcedure(input1, input2, input1IsSpecific, input2IsSpecific);
+		ret = Database::GetUsesForProcedure(input1, input2, input1IsSpecific, input2IsSpecific);
 	}
+	return ret;
 }
 
 bool Database::GetModifiesForAssign(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific) {
@@ -748,6 +741,7 @@ bool Database::GetModifiesForUnknownInput1(string input1, string input2, bool in
 	SqlResultStore rs;
 	sqlResultStoreForCallback = &rs;
 	char sqlBuf[512] = {};
+	bool ret = false;
 	if (isdigit(input1[0])) { // input first char is a digit = statement number
 		sprintf_s(sqlBuf, "SELECT entity, text FROM statement WHERE line_num = %s;", input1.c_str());
 		sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
@@ -756,15 +750,16 @@ bool Database::GetModifiesForUnknownInput1(string input1, string input2, bool in
 		string text = rs.sqlResult.at(0).row.at("text");
 
 		// e.g., use(10, v), and stmt 10 is "x = a + b" or "read x". We just need to select from use table with the correct stmtNum to get the variables
-		if (entity == "assign") { return Database::GetModifiesForAssign(input1, input2, input1IsSpecific, input2IsSpecific); }
-		if (entity == "read") { return Database::GetModifiesForRead(input1, input2, input1IsSpecific, input2IsSpecific); }
-		if (entity == "call") { return Database::GetModifiesForCall(text, input2, input1IsSpecific, input2IsSpecific); }
-		if (entity == "while") { return Database::GetModifiesForWhile(input1, input2, input1IsSpecific, input2IsSpecific); }
-		if (entity == "if") { return Database::GetModifiesForIf(input1, input2, input1IsSpecific, input2IsSpecific); }
+		if (entity == "assign") { ret = Database::GetModifiesForAssign(input1, input2, input1IsSpecific, input2IsSpecific); }
+		else if (entity == "read") { ret = Database::GetModifiesForRead(input1, input2, input1IsSpecific, input2IsSpecific); }
+		else if (entity == "call") { ret = Database::GetModifiesForCall(text, input2, input1IsSpecific, input2IsSpecific); }
+		else if (entity == "while") { ret = Database::GetModifiesForWhile(input1, input2, input1IsSpecific, input2IsSpecific); }
+		else if (entity == "if") { ret = Database::GetModifiesForIf(input1, input2, input1IsSpecific, input2IsSpecific); }
 	}
 	else { // input first char is not a digit = a name
-		return Database::GetModifiesForProcedure(input1, input2, input1IsSpecific, input2IsSpecific);
+		ret = Database::GetModifiesForProcedure(input1, input2, input1IsSpecific, input2IsSpecific);
 	}
+	return ret;
 }
 
 bool Database::GetPattern(string stmtNum1, string stmtNum2, bool input1IsSynonym, bool input2IsSynonym, string lineNum) {

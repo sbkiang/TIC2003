@@ -28,7 +28,7 @@ public:
 	int _adjustedEndStmtNum = 0;
 
 	void printContainerTree(int tab);
-	vector<Container*> getAllContainers();
-	void _getAllContainers(Container* container, vector<Container*> &containers);
+	vector<Container> getAllContainers();
+	void _getAllContainers(Container container, vector<Container> &containers);
 	//void printStmt();
 };

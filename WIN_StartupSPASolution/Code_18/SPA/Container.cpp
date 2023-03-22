@@ -24,23 +24,31 @@ void Container::printContainerTree(int nestedLevel) {
 	}
 }
 
-vector<Container*> Container::getAllContainers() {
-	vector<Container*> containers;
-	_getAllContainers(this, containers);
+vector<Container> Container::getAllContainers() {
+	vector<Container> containers;
+	_getAllContainers(*(this), containers);
 	return containers;
 }
 
-void Container::_getAllContainers(Container* container, vector<Container*> &containers) {
-	if (!container) { return; }
-	if ((container->_type != "procedure" && container->_type != "else")) { // don't add procedure and else container to the result
+void Container::_getAllContainers(Container container, vector<Container> &containers) {
+	//if (!container) { return; }
+	/*
+	if ((container._type != "procedure" && container._type != "else")) { // don't add procedure and else container to the result
 		containers.push_back(container);
 	}
-	for (int i = 0; i < container->_childContainers.size(); i++) {
-		if (container->_childContainers.at(i)->_type == "if") { // if childContainer is "if" container
-			container->_childContainers.at(i)->_adjustedEndStmtNum = container->_childContainers.at(i + 1)->_adjustedEndStmtNum;
-			container->_childContainers.at(i)->_endStmtNum = container->_childContainers.at(i + 1)->_endStmtNum;
+	*/
+	for (int i = 0; i < container._childContainers.size(); i++) {
+		Container child = *(container._childContainers.at(i));
+		if (child._type == "if") { // if childContainer is "if" container
+			Container nextChild = *(container._childContainers.at(i + 1));
+			child._adjustedEndStmtNum = nextChild._adjustedEndStmtNum;
+			child._endStmtNum = nextChild._endStmtNum;
+			containers.push_back(child);
 		}
-		_getAllContainers(container->_childContainers.at(i), containers);
+		else if (child._type == "while") {
+			containers.push_back(child);
+		}
+		_getAllContainers(child, containers);
 	}
 }
 

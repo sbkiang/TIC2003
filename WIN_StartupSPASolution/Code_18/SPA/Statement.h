@@ -16,10 +16,13 @@ public:
 	// Default Destructor
 	~Statement();
 
+	string _entity = "";
 	bool _containerHead = false;
 	bool _containerTail = false;
 	Container* _container = nullptr;
 
+	void setEntity(string entity);
+	string getEntity();
 	int getAdjustedStmtNum();
 	int getStmtNum();
 	void appendStmt(string s);

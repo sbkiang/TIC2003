@@ -1,0 +1,301 @@
+procedure normalNext { 	
+	x = 1;
+	print x;
+	read x;
+}
+
+procedure IfElse{
+	if(x=x)then{
+		read c;
+		print c;
+	}
+	else{
+		y = 10;
+		call normalNext;
+	}
+}
+
+procedure IfElseWithHead{
+	head = x;
+	if(c=10)then{
+		c=d;
+		d=g;
+	}
+	else{
+		read f;
+		read k;
+	}
+}
+
+procedure IfElseWithTail{
+	if(c=10)then{
+		f=g;
+		x=g;
+	}
+	else{
+		print f;
+		print k;
+	}
+	b = 10;
+}
+
+procedure IfElseWithHeadTail{
+	call IfElse;
+	if(c=10)then{
+		f=g;
+		x=g;
+	}
+	else{
+		print f;
+		print k;
+	}
+	g = 10;
+}
+
+procedure IfElseNested{
+	if(c=10)then{
+		if(d=10)then{
+			print c;
+		}
+		else{
+			print d;
+		}
+	}
+	else{
+		print e;
+	}
+}
+
+procedure IfElseNestedWithHead{
+	print a;
+	if(c=10)then{
+		print b;
+		if(d=10)then{
+			print c;
+		}
+		else{
+			print d;
+		}
+	}
+	else{
+		print e;
+	}
+}
+
+procedure IfElseNestedWithTail{
+	if(c=10)then{
+		if(d=10)then{
+			print c;
+		}
+		else{
+			print d;
+		}
+		a = 10;
+	}
+	else{
+		print e;
+	}
+	b = c;
+}
+
+procedure IfElseNestedWithHeadTail{
+	print a;
+	if(c=10)then{
+		print b;
+		if(d=10)then{
+			print c;
+		}
+		else{
+			print d;
+		}
+		a = 10;
+	}
+	else{
+		print e;
+	}
+	b = c;
+}
+
+procedure While{
+	while(x=y){
+		g=g+1;
+	}
+}
+
+procedure WhileWithHead{
+	c = d;
+	while(x=y){
+		g=g+1;
+	}
+}
+
+procedure WhileWithTail{
+	while(x=y){
+		g=g+1;
+	}
+	c = d;
+}
+
+procedure WhileWithHeadTail{
+	a = c;
+	while(x=y){
+		g=g+1;
+	}
+	c = d;
+}
+
+procedure WhileNested{
+	while(a=a){
+		while(x=y){
+			g=g+1;
+		}
+	}
+}
+
+procedure WhileNestedWithHead{
+	c = d;
+	while(a=a){
+		d = g;
+		while(x=y){
+			g=g+1;
+		}
+	}
+}
+
+procedure WhileNestedWithTail{
+	while(a=a){
+		while(x=y){
+			g=g+1;
+		}
+		d = g;
+	}
+	c = x;
+}
+
+procedure WhileNestedWithHeadTail{
+	x = y;
+	while(a=a){
+		y = z;
+		while(x=y){
+			g=g+1;
+		}
+		d = g;
+	}
+	c = x;
+}
+
+procedure IfElseNestedWhile{
+	if(c=10)then{
+		while(x=y){
+			x=x+10;
+		}
+	}
+	else{
+		while(y=z){
+			y=y+10;
+		}
+	}
+}
+
+procedure IfElseNestedWhileWithHead{
+	a = b;
+	if(c=10)then{
+		b = c;
+		while(x=y){
+			x=x+10;
+		}
+	}
+	else{
+		c = d;
+		while(y=z){
+			y=y+10;
+		}
+	}
+}
+
+procedure IfElseNestedWhileWithTail{
+	if(c=10)then{
+		while(x=y){
+			x=x+10;
+		}
+		a = b;
+	}
+	else{
+		while(y=z){
+			y=y+10;
+		}
+		c = d;
+	}
+	b = c;
+}
+
+procedure IfElseNestedWhileWithTail{
+	print a;
+	if(c=10)then{
+		print b;
+		while(x=y){
+			x=x+10;
+		}
+		a = b;
+	}
+	else{
+		print c;
+		while(y=z){
+			y=y+10;
+		}
+		c = d;
+	}
+	b = c;
+}
+
+procedure WhileNestedIfElse{
+	while(x=y){
+		if(x=10)then{
+			c = d;
+		}
+		else{
+			c = f;
+		}
+	}
+}
+
+procedure WhileNestedIfElseWithHead{
+	a = b;
+	while(x=y){
+		b = c;
+		if(x=10)then{
+			c = d;
+		}
+		else{
+			c = f;
+		}
+	}
+}
+
+procedure WhileNestedIfElseWithTail{
+	while(x=y){
+		if(x=10)then{
+			c = d;
+		}
+		else{
+			c = f;
+		}
+		b = c;
+	}
+	a = b;
+}
+
+procedure WhileNestedIfElseWithHeadTail{
+	x = y;
+	while(x=y){
+		y = z;
+		if(x=10)then{
+			c = d;
+		}
+		else{
+			c = f;
+		}
+		b = c;
+	}
+	a = b;
+}

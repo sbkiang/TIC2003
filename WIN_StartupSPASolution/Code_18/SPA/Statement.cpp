@@ -49,3 +49,11 @@ string Statement::getStmt() {
 int Statement::getLevel() {
 	return _level;
 }
+
+void Statement::setEntity(string entity) {
+	_entity = entity;
+}
+
+string Statement::getEntity() {
+	return _entity;
+}

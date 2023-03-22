@@ -19,7 +19,7 @@ CFG* CFGBuilder::buildCFG(Container* procedure) {
 		}
 		if (!(node->_stmtPtr->_containerHead || node->_stmtPtr->_containerTail)) { // if node is body, just set sJump to next statement
 			node->_sJump = stmts.at(i + 1);
-			//cout << "node " << node->_stmtPtr->getStmtNum() << " sJump : " << node->_sJump->_stmtPtr->getStmtNum() << endl;
+			cout << "node " << node->_stmtPtr->getStmtNum() << " sJump : " << node->_sJump->_stmtPtr->getStmtNum() << endl;
 			continue;
 		}
 		if (node->_stmtPtr->_container->_type == "procedure") {
@@ -74,8 +74,8 @@ CFG* CFGBuilder::buildCFG(Container* procedure) {
 			}
 
 		}
-		//if(node->_sJump){ cout << "node " << node->_stmtPtr->getStmtNum() << " sJump : " << node->_sJump->_stmtPtr->getStmtNum() << endl; }
-		//if (node->_fJump) { cout << "node " << node->_stmtPtr->getStmtNum() << " fJump : " << node->_fJump->_stmtPtr->getStmtNum() << endl; }
+		if(node->_sJump){ cout << "node " << node->_stmtPtr->getStmtNum() << " sJump : " << node->_sJump->_stmtPtr->getStmtNum() << endl; }
+		if (node->_fJump) { cout << "node " << node->_stmtPtr->getStmtNum() << " fJump : " << node->_fJump->_stmtPtr->getStmtNum() << endl; }
 	}
 	return cfg;
 }
@@ -137,27 +137,25 @@ CFGNode* CFGBuilder::_findNextStmt(stack<Container*> parentStack, int startStmtN
 }
 
 void CFGBuilder::_printStmt(map<int, CFGNode*> stmts) {
-	cout << "   | H | T | " << endl;
+	cout << "procedure ";
+	//cout << "   | H | T | " << endl;
 	int startIndex = stmts.begin()->first;
 	for (map<int, CFGNode*>::iterator it = stmts.begin(); it != stmts.end(); it++) {
 		CFGNode* node = it->second;
-		cout << setfill('0') << setw(2) << node->_stmtPtr->getStmtNum() << " |";
+		//cout << setfill('0') << setw(2) << node->_stmtPtr->getStmtNum() << " |";
 		if (node->_stmtPtr->_containerHead) {
-			cout << " Y |";
+			//cout << " Y |";
 		}
 		else {
-			cout << "   |";
+			//cout << "   |";
 		}
 		if (node->_stmtPtr->_containerTail) {
-			cout << " Y | ";
+			//cout << " Y | ";
 		}
 		else {
-			cout << "   | ";
+			//cout << "   | ";
 		}
 		for (int i = 0; i < node->_stmtPtr->getLevel(); i++) { cout << "  "; }
-		if (node->_stmtPtr->_containerHead) {
-			cout << node->_stmtPtr->_container->_type << " ";
-		}
-		cout << node->_stmtPtr->getStmt() << endl;
+		cout << node->_stmtPtr->getEntity() << " " << node->_stmtPtr->getStmt() << endl;
 	}
 }
