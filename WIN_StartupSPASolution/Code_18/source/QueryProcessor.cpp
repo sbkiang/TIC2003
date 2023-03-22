@@ -177,35 +177,38 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	Database::SelectPql(select, sqlResultStore);
 
 	// need to determine if the input to such that is generic or specific
-	//	generic when it's (a synonym and not part of select)
-	//  specific when it's (a synonym and part of select) or (it's not a synonym)
+	//	generic when it's (a synonym and not part of select) or (wildcard)
+	//  specific when it's (a synonym and part of select) or ((not a synonym) and (not wildcard))
 	while (!suchThatStack.empty()) {
 		SuchThat suchThatTemp = suchThatStack.top();
-		bool suchThatInput1IsSynonym = (synonymEntityMap.find(suchThatTemp.input1) != synonymEntityMap.end()); // first input is a synonym
-		bool suchThatInput2IsSynonym = (synonymEntityMap.find(suchThatTemp.input2) != synonymEntityMap.end()); // second input is a synonym
-		bool suchThatInput1InSelect = (find(select.synonym.begin(), select.synonym.end(), suchThatTemp.input1) != select.synonym.end()); // first input is part of select
-		bool suchThatInput2InSelect = (find(select.synonym.begin(), select.synonym.end(), suchThatTemp.input2) != select.synonym.end()); // second input is part of select
-		bool input1IsSpecific = (!suchThatInput1IsSynonym || suchThatInput1InSelect); // generic when it's a synonym and not part of select, specific when it's part of select or it's not a synonym
-		bool input2IsSpecific = (!suchThatInput2IsSynonym || suchThatInput2InSelect); // generic when it's a synonym and not part of select, specific when it's part of select or it's not a synonym  
+		bool input1IsWildcard = (suchThatTemp.input1 == "_");
+		bool input2IsWildcard = (suchThatTemp.input2 == "_");
+		bool input1IsSynonym = (synonymEntityMap.find(suchThatTemp.input1) != synonymEntityMap.end()) && !input1IsWildcard; // first input is a synonym
+		bool input2IsSynonym = (synonymEntityMap.find(suchThatTemp.input2) != synonymEntityMap.end()) && !input2IsWildcard; // second input is a synonym
+		bool input1InSelect = (find(select.synonym.begin(), select.synonym.end(), suchThatTemp.input1) != select.synonym.end()) && !input1IsWildcard; // first input is part of select
+		bool input2InSelect = (find(select.synonym.begin(), select.synonym.end(), suchThatTemp.input2) != select.synonym.end()) && !input2IsWildcard; // second input is part of select
+		bool input1IsSpecific = ((input1IsSynonym && input1InSelect) || (!input1IsSynonym && !input1IsWildcard));
+		bool input2IsSpecific = ((input2IsSynonym && input2InSelect) || (!input2IsSynonym && !input2IsWildcard));
 		
 		string entityInput1 = "", entityInput2 = "", first = suchThatTemp.input1, second = suchThatTemp.input2;
-		if (suchThatInput1IsSynonym) { // if input1 is part of declared synonym, we get the entity that it belongs
+		if (input1IsSynonym) { // if input1 is part of declared synonym, we get the entity that it belongs
 			entityInput1 = synonymEntityMap.at(suchThatTemp.input1);
 		}
-		if (suchThatInput2IsSynonym) { // if input1 is part of declared synonym, we get the entity that it belongs
+		if (input2IsSynonym) { // if input1 is part of declared synonym, we get the entity that it belongs
 			entityInput2 = synonymEntityMap.at(suchThatTemp.input2);
 		}
 		for (int i = 0; i < sqlResultStore.sqlResult.size(); i++) {
 			SqlResult sqlResulTemp = sqlResultStore.sqlResult.at(i);
 			bool pass = false;
 			string relationship = suchThatTemp.relationship;
-			if (suchThatInput1InSelect) { // if the first input is a synonym, and is part of select, get the input 
+			if (input1InSelect) { // if the first input is a synonym, and is part of select, get the input 
 				first = sqlResulTemp.row.at(suchThatTemp.input1);
 			}
-			if (suchThatInput2InSelect) { // if the second input is a synonym, and is part of select, get the input 
+			if (input2InSelect) { // if the second input is a synonym, and is part of select, get the input 
 				second = sqlResulTemp.row.at(suchThatTemp.input2);
 			}
 			if (relationship == "Uses") { // input1 is Stmt Num or Name, input2 is Name
+				if(entityInput1 == "_")
 				if (entityInput1 == "assign") { pass = Database::GetUsesForAssign(first, second, input1IsSpecific, input2IsSpecific); }
 				else if (entityInput1 == "print") { pass = Database::GetUsesForPrint(first, second, input1IsSpecific, input2IsSpecific); }
 				else if (entityInput1 == "while") { pass = Database::GetUsesForWhile(first, second, input1IsSpecific, input2IsSpecific); }
@@ -215,7 +218,8 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 				else { pass = Database::GetUsesForUnknownInput1(first, second, input1IsSpecific, input2IsSpecific); } // e.g., uses(10,v) or uses("main",v). just pass in here even
 				// add in code to check if synonym used in query. If not, then just need to test once for first row, and result applies to all row
 			}
-			else if (relationship == "Modifies") { // input1 is Stmt Num or Name, input2 is Name
+			else if (relationship == "Modifies") { // input1 is Stmt Num or Name, input2 is Name or Wildcard
+				//modifies(stmtRef/entRef, entRef)
 				if (entityInput1 == "assign") { pass = Database::GetModifiesForAssign(first, second, input1IsSpecific, input2IsSpecific); }
 				else if (entityInput1 == "read") { pass = Database::GetModifiesForRead(first, second, input1IsSpecific, input2IsSpecific); }
 				else if (entityInput1 == "while") { pass = Database::GetModifiesForWhile(first, second, input1IsSpecific, input2IsSpecific); }
