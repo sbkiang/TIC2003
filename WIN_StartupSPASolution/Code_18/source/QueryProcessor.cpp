@@ -208,7 +208,6 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 				second = sqlResulTemp.row.at(suchThatTemp.input2);
 			}
 			if (relationship == "Uses") { // input1 is Stmt Num or Name, input2 is Name
-				if(entityInput1 == "_")
 				if (entityInput1 == "assign") { pass = Database::GetUsesForAssign(first, second, input1IsSpecific, input2IsSpecific); }
 				else if (entityInput1 == "print") { pass = Database::GetUsesForPrint(first, second, input1IsSpecific, input2IsSpecific); }
 				else if (entityInput1 == "while") { pass = Database::GetUsesForWhile(first, second, input1IsSpecific, input2IsSpecific); }
@@ -219,7 +218,6 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 				// add in code to check if synonym used in query. If not, then just need to test once for first row, and result applies to all row
 			}
 			else if (relationship == "Modifies") { // input1 is Stmt Num or Name, input2 is Name or Wildcard
-				//modifies(stmtRef/entRef, entRef)
 				if (entityInput1 == "assign") { pass = Database::GetModifiesForAssign(first, second, input1IsSpecific, input2IsSpecific); }
 				else if (entityInput1 == "read") { pass = Database::GetModifiesForRead(first, second, input1IsSpecific, input2IsSpecific); }
 				else if (entityInput1 == "while") { pass = Database::GetModifiesForWhile(first, second, input1IsSpecific, input2IsSpecific); }
