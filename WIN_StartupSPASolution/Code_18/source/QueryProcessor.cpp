@@ -259,7 +259,8 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	while (!patternStack.empty()) {
 		Pattern patternTemp = patternStack.top();
 		bool patternInput1IsSynonym = (synonymEntityMap.find(patternTemp.input1) != synonymEntityMap.end()); // first input is a synonym
-		bool patternInput2IsSynonym = (synonymEntityMap.find(patternTemp.input2) != synonymEntityMap.end()); // second input is a synonym
+		//bool patternInput2IsSynonym = (synonymEntityMap.find(patternTemp.input2) != synonymEntityMap.end()); // second input is a synonym
+		bool input2IsWildcard = (patternTemp.input2 == "_");
 		string entity = synonymEntityMap.at(patternTemp.synonym), first = patternTemp.input1, second = patternTemp.input2, lineNum = "";
 
 		if (second != "_") { second = infixToPostfix(second); }
@@ -269,7 +270,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			bool pass = false;
 			if (entity == "assign") { 
 				lineNum = sqlResulTemp.row.at(patternTemp.synonym);
-				pass = Database::GetPattern(first, second, patternInput1IsSynonym, patternInput2IsSynonym, lineNum); 
+				pass = Database::GetPattern(first, second, patternInput1IsSynonym, input2IsWildcard, lineNum);
 			}
 			if (pass) { sqlResultPass.push_back(sqlResulTemp); }
 		}
