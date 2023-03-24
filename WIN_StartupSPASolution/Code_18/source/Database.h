@@ -66,7 +66,7 @@ public:
 
 	//method to insert pattern into the database
 	static void insertPattern(int stmtNum, string LHS, string RHS, string experssion);
-	static bool GetPattern(string stmtNum1, string stmtNum2, bool input1IsSynonym, bool input2IsSynonym);
+	static bool GetPattern(string stmtNum1, string stmtNum2, bool input1IsSynonym, bool input2IsSynonym, string lineNum);
 
 
 	static void SelectPql(Select& st, SqlResultStore& sqlResultStore);
