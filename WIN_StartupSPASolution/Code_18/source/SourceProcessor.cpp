@@ -189,7 +189,9 @@ void SourceProcessor::process(string program) {
 			parentStack.top()->_statements.push_back(stmt);
 			modifiesStore.push_back(Statement(stmtNum, LHS, stmtNumSubtract)); //Store LHS variable
 
+
 			Database::insertStatement(stmt->getAdjustedStmtNum(), "assign", stmt->getStmt());
+			
 			for (int i = 0; i < variableStore.size(); i++) {
 				Database::insertVariable(variableStore.at(i).getStmt(), variableStore.at(i).getAdjustedStmtNum());
 			}

@@ -778,12 +778,13 @@ bool Database::GetPattern(string stmtNum1, string stmtNum2, bool input1IsSynonym
 
 	//pattern a(("synonym ",_) //Multiple Causes
 	else if (input1IsSynonym && input2IsSynonym) {
-		sprintf_s(sqlBuf, "select 1 from pattern p where p.LHS_var = '%s' and p.line_num = '%s';", stmtNum1.c_str(), lineNum.c_str());
+		sprintf_s(sqlBuf, "select 1 from pattern p where p.LHS_var = '%s';", lineNum.c_str());
 	}
 
 	//pattern a(("synonym ","_expression_") //Multiple Causes
 	else if (input1IsSynonym && !input2IsSynonym) {
-		sprintf_s(sqlBuf, "select 1 from pattern p where p.LHS_var = '%s' and p.expression like '%%%s%%' and p.line_num = '%s';", stmtNum1.c_str(), stmtNum2.c_str(), lineNum.c_str());
+		//sprintf_s(sqlBuf, "select 1 from pattern p where p.LHS_var = '%s' and p.expression like '%%%s%%' and p.line_num = '%s';", stmtNum1.c_str(), stmtNum2.c_str(), lineNum.c_str());
+		sprintf_s(sqlBuf, "select 1 from pattern p where p.LHS_var = '%s' and p.expression like '%%%s%%';", lineNum.c_str(), stmtNum2.c_str());
 	}
 
 	//pattern a(_,"_expression_")
