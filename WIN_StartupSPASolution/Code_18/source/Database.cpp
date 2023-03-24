@@ -770,6 +770,39 @@ bool Database::GetModifiesForUnknownInput1(string input1, string input2, bool in
 bool Database::GetPattern(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific) {
 	// (input is synonym and synonym not in select) or (input is "_") is considered generic input
 	char sqlBuf[512] = {};
+<<<<<<< Updated upstream
+	//cout << lineNum << endl;
+
+	//pattern a("variable",_) (variable name between double quotes, unrestricted)
+	if ((!input1IsSynonym && stmtNum1 != "_") && input2IsSynonym) {
+		sprintf_s(sqlBuf, "select 1 from pattern p where p.LHS_var = '%s' and p.line_num = '%s';", stmtNum1.c_str(), lineNum.c_str());
+	}
+
+	//pattern a(("variable","_expression_")
+	else if ((!input1IsSynonym && stmtNum1 != "_") && !input2IsSynonym) {
+		sprintf_s(sqlBuf, "select 1 from pattern p where p.LHS_var = '%s' and p.expression like '%%%s%%' and p.line_num = '%s';", stmtNum1.c_str(), stmtNum2.c_str(), lineNum.c_str());
+	}
+
+	//pattern a(("synonym ",_) //Multiple Causes
+	else if (input1IsSynonym && input2IsSynonym) {
+		sprintf_s(sqlBuf, "select 1 from pattern p where p.LHS_var = '%s';", lineNum.c_str());
+	}
+
+	//pattern a(("synonym ","_expression_") //Multiple Causes
+	else if (input1IsSynonym && !input2IsSynonym) {
+		//sprintf_s(sqlBuf, "select 1 from pattern p where p.LHS_var = '%s' and p.expression like '%%%s%%' and p.line_num = '%s';", stmtNum1.c_str(), stmtNum2.c_str(), lineNum.c_str());
+		sprintf_s(sqlBuf, "select 1 from pattern p where p.LHS_var = '%s' and p.expression like '%%%s%%';", lineNum.c_str(), stmtNum2.c_str());
+	}
+
+	//pattern a(_,"_expression_")
+	else if (stmtNum1 == "_" && !input2IsSynonym) {
+		cout << "5";
+		sprintf_s(sqlBuf, "select 1 from pattern p where p.expression like '%%%s%%' and p.line_num = '%s';", stmtNum2.c_str(), lineNum.c_str());
+	}
+
+	else { //pattern a(_,_)
+		sprintf_s(sqlBuf, "select 1 from pattern p where p.line_num = '%s';", lineNum.c_str()); //everything in pattern table
+=======
 	
 	//pattern a(specific_var,_) or pattern a(_exp_,_)
 	if (input1IsSpecific && !input2IsSpecific) {
@@ -789,6 +822,7 @@ bool Database::GetPattern(string input1, string input2, bool input1IsSpecific, b
 	//pattern a(generic_var,_exp_) or pattern(_,specific_var) or pattern(_,_exp_)
 	else if (!input1IsSpecific && input2IsSpecific) {
 		sprintf_s(sqlBuf, "select 1 from pattern p where p.expression like '%%%s%%';", input2.c_str());
+>>>>>>> Stashed changes
 	}
 
 	SqlResultStore rs;
