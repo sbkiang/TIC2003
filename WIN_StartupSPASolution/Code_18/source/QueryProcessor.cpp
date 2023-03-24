@@ -258,13 +258,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	while (!patternStack.empty()) {
 		vector<SqlResult> sqlResultPass;
 		Pattern patternTemp = patternStack.top();
-<<<<<<< Updated upstream
-		bool patternInput1IsSynonym = (synonymEntityMap.find(patternTemp.input1) != synonymEntityMap.end()); // first input is a synonym
-		bool input2IsWildcard = (patternTemp.input2 == "_");
 		string entity = synonymEntityMap.at(patternTemp.synonym), first = patternTemp.input1, second = patternTemp.input2, line = "";
-=======
->>>>>>> Stashed changes
-
 		bool input1IsWildcard = (patternTemp.input1 == "_") ? true : false;
 		bool input2IsWildcard = (patternTemp.input2 == "_") ? true : false;
 		bool input1IsSynonym = (synonymEntityMap.find(patternTemp.input1) != synonymEntityMap.end()) && !input1IsWildcard; // first input is a synonym
@@ -274,26 +268,11 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		bool input1IsSpecific = ((input1IsSynonym && input1InSelect) || (!input1IsSynonym && !input1IsWildcard));
 		bool input2IsSpecific = ((input2IsSynonym && input2InSelect) || (!input2IsSynonym && !input2IsWildcard));
 
-
-		//bool patternInput1IsSynonym = (synonymEntityMap.find(patternTemp.input1) != synonymEntityMap.end()); // first input is a synonym
-		//bool patternInput2IsSynonym = (synonymEntityMap.find(patternTemp.input2) != synonymEntityMap.end()); // second input is a synonym
-		string entity = synonymEntityMap.at(patternTemp.synonym), first = patternTemp.input1, second = patternTemp.input2;
 		if (second != "_") { second = infixToPostfix(second); }
 		for (int i = 0; i < sqlResultStore.sqlResult.size(); i++) {
 			SqlResult sqlResulTemp = sqlResultStore.sqlResult.at(i);
-<<<<<<< Updated upstream
-			bool pass = false;
-			if (entity == "assign") {
-				if (!patternInput1IsSynonym) //first input is not a synonym
-					line = sqlResulTemp.row.at(patternTemp.synonym);
-				else //first input is a synonym
-					line = sqlResulTemp.row.at(patternTemp.input1);
-
-				pass = Database::GetPattern(first, second, patternInput1IsSynonym, input2IsWildcard, line);
-=======
 			if (input1InSelect) { // if the first input is a synonym, and is part of select, get the input 
 				first = sqlResulTemp.row.at(patternTemp.input1);
->>>>>>> Stashed changes
 			}
 			if (input2InSelect) { // if the second input is a synonym, and is part of select, get the input 
 				second = sqlResulTemp.row.at(patternTemp.input2);
