@@ -95,18 +95,16 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			i += 2;
 			SuchThat st;
 			st.relationship = tokens.at(i);
-			i++;
-			if (tokens.at(i) == "*") {
-				st.relationship += tokens.at(i);
+			if (tokens.at(i+1) == "*") {
 				i++;
+				st.relationship += tokens.at(i);
 			}
 			int brackets = 0;
 			string word = "";
 			do {
+				i++;
 				if (tokens.at(i) == "(") { // starting bracket
 					brackets++;
-					i++;
-					continue;
 				}
 				else if (tokens.at(i) == ")") { // closing bracket
 					brackets--;
@@ -115,7 +113,6 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 				else if (!regex_match(tokens.at(i), regex(regexQuote))) {
 					word += tokens.at(i);
 				}
-				i++;
 			} while (brackets > 0);
 			int comma = word.find(",");
 			st.input1 = word.substr(0, comma);
@@ -173,20 +170,22 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	}
 	SqlResultStore sqlResultStore;
 	EvaluateSelect(select, synonymEntityMap);
-	vector<SqlResult> sqlResultPass;
+	//vector<SqlResult> sqlResultPass;
 	Database::SelectPql(select, sqlResultStore);
 
 	// need to determine if the input to such that is generic or specific
 	//	generic when it's (a synonym and not part of select) or (wildcard)
 	//  specific when it's (a synonym and part of select) or ((not a synonym) and (not wildcard))
+	vector<SqlResult> sqlResultPass;
 	while (!suchThatStack.empty()) {
 		SuchThat suchThatTemp = suchThatStack.top();
-		bool input1IsWildcard = (suchThatTemp.input1 == "_");
-		bool input2IsWildcard = (suchThatTemp.input2 == "_");
+		bool input1IsWildcard = (suchThatTemp.input1 == "_") ? true : false;
+		bool input2IsWildcard = (suchThatTemp.input2 == "_") ? true : false;
 		bool input1IsSynonym = (synonymEntityMap.find(suchThatTemp.input1) != synonymEntityMap.end()) && !input1IsWildcard; // first input is a synonym
 		bool input2IsSynonym = (synonymEntityMap.find(suchThatTemp.input2) != synonymEntityMap.end()) && !input2IsWildcard; // second input is a synonym
 		bool input1InSelect = (find(select.synonym.begin(), select.synonym.end(), suchThatTemp.input1) != select.synonym.end()) && !input1IsWildcard; // first input is part of select
 		bool input2InSelect = (find(select.synonym.begin(), select.synonym.end(), suchThatTemp.input2) != select.synonym.end()) && !input2IsWildcard; // second input is part of select
+		
 		bool input1IsSpecific = ((input1IsSynonym && input1InSelect) || (!input1IsSynonym && !input1IsWildcard));
 		bool input2IsSpecific = ((input2IsSynonym && input2InSelect) || (!input2IsSynonym && !input2IsWildcard));
 		
@@ -257,15 +256,32 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	}
 
 	while (!patternStack.empty()) {
+		vector<SqlResult> sqlResultPass;
 		Pattern patternTemp = patternStack.top();
+<<<<<<< Updated upstream
 		bool patternInput1IsSynonym = (synonymEntityMap.find(patternTemp.input1) != synonymEntityMap.end()); // first input is a synonym
 		bool input2IsWildcard = (patternTemp.input2 == "_");
 		string entity = synonymEntityMap.at(patternTemp.synonym), first = patternTemp.input1, second = patternTemp.input2, line = "";
+=======
+>>>>>>> Stashed changes
 
+		bool input1IsWildcard = (patternTemp.input1 == "_") ? true : false;
+		bool input2IsWildcard = (patternTemp.input2 == "_") ? true : false;
+		bool input1IsSynonym = (synonymEntityMap.find(patternTemp.input1) != synonymEntityMap.end()) && !input1IsWildcard; // first input is a synonym
+		bool input2IsSynonym = (synonymEntityMap.find(patternTemp.input2) != synonymEntityMap.end()) && !input2IsWildcard; // second input is a synonym
+		bool input1InSelect = (find(select.synonym.begin(), select.synonym.end(), patternTemp.input1) != select.synonym.end()) && !input1IsWildcard; // first input is part of select
+		bool input2InSelect = (find(select.synonym.begin(), select.synonym.end(), patternTemp.input2) != select.synonym.end()) && !input2IsWildcard; // second input is part of select
+		bool input1IsSpecific = ((input1IsSynonym && input1InSelect) || (!input1IsSynonym && !input1IsWildcard));
+		bool input2IsSpecific = ((input2IsSynonym && input2InSelect) || (!input2IsSynonym && !input2IsWildcard));
+
+
+		//bool patternInput1IsSynonym = (synonymEntityMap.find(patternTemp.input1) != synonymEntityMap.end()); // first input is a synonym
+		//bool patternInput2IsSynonym = (synonymEntityMap.find(patternTemp.input2) != synonymEntityMap.end()); // second input is a synonym
+		string entity = synonymEntityMap.at(patternTemp.synonym), first = patternTemp.input1, second = patternTemp.input2;
 		if (second != "_") { second = infixToPostfix(second); }
-
 		for (int i = 0; i < sqlResultStore.sqlResult.size(); i++) {
 			SqlResult sqlResulTemp = sqlResultStore.sqlResult.at(i);
+<<<<<<< Updated upstream
 			bool pass = false;
 			if (entity == "assign") {
 				if (!patternInput1IsSynonym) //first input is not a synonym
@@ -274,10 +290,18 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 					line = sqlResulTemp.row.at(patternTemp.input1);
 
 				pass = Database::GetPattern(first, second, patternInput1IsSynonym, input2IsWildcard, line);
+=======
+			if (input1InSelect) { // if the first input is a synonym, and is part of select, get the input 
+				first = sqlResulTemp.row.at(patternTemp.input1);
+>>>>>>> Stashed changes
 			}
+			if (input2InSelect) { // if the second input is a synonym, and is part of select, get the input 
+				second = sqlResulTemp.row.at(patternTemp.input2);
+			}
+			bool pass = false;
+			pass = Database::GetPattern(first, second, input1IsSpecific, input2IsSpecific);
 			if (pass) { sqlResultPass.push_back(sqlResulTemp); }
 		}
-
 		sqlResultStore.sqlResult = sqlResultPass;
 		patternStack.pop();
 	}

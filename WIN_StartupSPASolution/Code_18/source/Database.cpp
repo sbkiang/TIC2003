@@ -542,11 +542,16 @@ bool Database::GetUsesForUnknownInput1(string input1, string input2, bool input1
 		string text = rs.sqlResult.at(0).row.at("text");
 
 		// e.g., use(10, v), and stmt 10 is "x = a + b" or "print x". We just need to select from use table with the correct stmtNum to get the variables
-		if (entity == "assign") { ret = Database::GetUsesForAssign(input1, input2, input1IsSpecific, input2IsSpecific); }
-		else if (entity == "print") { ret = Database::GetUsesForPrint(input1, input2, input1IsSpecific, input2IsSpecific); }
-		else if (entity == "call") { ret = Database::GetUsesForCall(text, input2, input1IsSpecific, input2IsSpecific); }
-		else if (entity == "while") { ret = Database::GetUsesForWhile(input1, input2, input1IsSpecific, input2IsSpecific); }
-		else if (entity == "if") { ret = Database::GetUsesForIf(input1, input2, input1IsSpecific, input2IsSpecific); }
+		if (entity == "assign") { 
+			ret = Database::GetUsesForAssign(input1, input2, input1IsSpecific, input2IsSpecific); }
+		else if (entity == "print") { 
+			ret = Database::GetUsesForPrint(input1, input2, input1IsSpecific, input2IsSpecific); }
+		else if (entity == "call") { 
+			ret = Database::GetUsesForCall(text, input2, input1IsSpecific, input2IsSpecific); }
+		else if (entity == "while") { 
+			ret = Database::GetUsesForWhile(input1, input2, input1IsSpecific, input2IsSpecific); }
+		else if (entity == "if") { 
+			ret = Database::GetUsesForIf(input1, input2, input1IsSpecific, input2IsSpecific); }
 	}
 	else { // input first char is not a digit = a name
 		ret = Database::GetUsesForProcedure(input1, input2, input1IsSpecific, input2IsSpecific);
@@ -762,8 +767,10 @@ bool Database::GetModifiesForUnknownInput1(string input1, string input2, bool in
 	return ret;
 }
 
-bool Database::GetPattern(string stmtNum1, string stmtNum2, bool input1IsSynonym, bool input2IsSynonym, string lineNum) {
+bool Database::GetPattern(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific) {
+	// (input is synonym and synonym not in select) or (input is "_") is considered generic input
 	char sqlBuf[512] = {};
+<<<<<<< Updated upstream
 	//cout << lineNum << endl;
 
 	//pattern a("variable",_) (variable name between double quotes, unrestricted)
@@ -795,6 +802,27 @@ bool Database::GetPattern(string stmtNum1, string stmtNum2, bool input1IsSynonym
 
 	else { //pattern a(_,_)
 		sprintf_s(sqlBuf, "select 1 from pattern p where p.line_num = '%s';", lineNum.c_str()); //everything in pattern table
+=======
+	
+	//pattern a(specific_var,_) or pattern a(_exp_,_)
+	if (input1IsSpecific && !input2IsSpecific) {
+		sprintf_s(sqlBuf, "select 1 from pattern p where p.LHS_var = '%%%s%%';", input1.c_str());
+	}
+
+	//pattern a(specific_var,_exp_) or pattern a(_exp_,_exp_) or pattern a(_exp_,specific_var)
+	else if (input1IsSpecific && input2IsSpecific) {
+		sprintf_s(sqlBuf, "select 1 from pattern p where p.LHS_var = '%s' and p.expression like '%%%s%%';", input1.c_str(), input2.c_str());
+	}
+
+	//pattern a(generic_var,_) or pattern a(_,_) or pattern a(_,generic_var)
+	else if (!input1IsSpecific && !input2IsSpecific) {
+		sprintf_s(sqlBuf, "select 1 from pattern p;");
+	}
+
+	//pattern a(generic_var,_exp_) or pattern(_,specific_var) or pattern(_,_exp_)
+	else if (!input1IsSpecific && input2IsSpecific) {
+		sprintf_s(sqlBuf, "select 1 from pattern p where p.expression like '%%%s%%';", input2.c_str());
+>>>>>>> Stashed changes
 	}
 
 	SqlResultStore rs;
@@ -807,7 +835,6 @@ bool Database::GetPattern(string stmtNum1, string stmtNum2, bool input1IsSynonym
 // get all the columns of PQL select block
 //void Database::select(Select& st, SqlResultSet* sqlResultSet) {
 void Database::SelectPql(Select& st, SqlResultStore& sqlResultStore) {
-	
 	sqlResultStoreForCallback = &sqlResultStore;
 	char sqlBuf[1024] = {};
 	string selectFromTable = "";
