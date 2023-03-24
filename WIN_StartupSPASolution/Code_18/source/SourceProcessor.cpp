@@ -307,7 +307,7 @@ void SourceProcessor::process(string program) {
 int SourceProcessor::prec(char c) {
 	if (c == '^')
 		return 3;
-	else if (c == '/' || c == '*')
+	else if (c == '/' || c == '*' || c == '%')
 		return 2;
 	else if (c == '+' || c == '-')
 		return 1;
@@ -351,3 +351,4 @@ string SourceProcessor::infixToPostfix(string s) {
 
 	return result;
 }
+
