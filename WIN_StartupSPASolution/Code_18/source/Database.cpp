@@ -789,7 +789,6 @@ bool Database::GetPattern(string stmtNum1, string stmtNum2, bool input1IsSynonym
 
 	//pattern a(_,"_expression_")
 	else if (stmtNum1 == "_" && !input2IsSynonym) {
-		cout << "5";
 		sprintf_s(sqlBuf, "select 1 from pattern p where p.expression like '%%%s%%' and p.line_num = '%s';", stmtNum2.c_str(), lineNum.c_str());
 	}
 
