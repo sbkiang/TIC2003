@@ -72,6 +72,8 @@ public:
 	static bool GetPattern(string stmtNum1, string stmtNum2, bool input1IsSynonym, bool input2IsSynonym, string lineNum);
 
 
+	static bool GetCalls(string stmtNum1, string stmtNum2, bool input1IsSpecific, bool input2IsSpecific);
+	static bool GetCallsT(string stmtNum1, string stmtNum2, bool input1IsSpecific, bool input2IsSpecific);
 
 	static void SelectPql(Select& st, SqlResultStore& sqlResultStore);
 

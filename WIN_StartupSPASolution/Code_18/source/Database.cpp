@@ -95,8 +95,6 @@ void Database::initialize() {
 	string createPatternTableSQL = "CREATE TABLE pattern (line_num INT REFERENCES statement(line_num), LHS_var VARCHAR(50), RHS_var VARCHAR(50), expression VARCHAR(50));";
 	sqlite3_exec(dbConnection, createPatternTableSQL.c_str(), NULL, 0, &errorMessage);
 
-
-	
 	//error message output
 	if (errorMessage) { cout << "insertStatement SQL Error: " << errorMessage << endl; return; }
 
@@ -188,7 +186,6 @@ void Database::insertNext(int stmtNum1, int stmtNum2) {
 
 void Database::insertCall(int stmtNum, string procedureName, string variablename, int directCall) {
 	char sqlBuf[256];
-	cout << "!!";
 	sprintf(sqlBuf, "INSERT INTO call ('line_num','procedure_name','variable_name', 'direct_call') VALUES ('%i','%s','%s','%i');", stmtNum, procedureName.c_str(), variablename.c_str(), directCall);
 	sqlite3_exec(dbConnection, sqlBuf, NULL, 0, &errorMessage);
 	if (errorMessage) { cout << "insertCall SQL Error: " << errorMessage << endl; }
@@ -815,6 +812,38 @@ bool Database::GetPattern(string stmtNum1, string stmtNum2, bool input1IsSynonym
 	sqlResultStoreForCallback = &rs;
 	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
 	if (errorMessage) { cout << "GetPattern SQL Error: " << errorMessage << endl; }
+	return (!(sqlResultStoreForCallback->sqlResult.empty()));
+}
+
+bool Database::GetCalls (string input1, string input2, bool input1IsSpecific, bool input2IsSpecific) {
+	
+	cout << input1 << "@" << input2 << "@" << input1IsSpecific << "@" << input2IsSpecific << endl;
+
+	char sqlBuf[512];
+
+	if (input1IsSpecific && !input2IsSpecific) {
+		if (input2 == "_") { // if second input is "_"
+			sprintf_s(sqlBuf, "select 1 from call c where c.procedure_name = '%s' and c.direct_call = 1", input1.c_str());
+		}
+		else {
+			sprintf_s(sqlBuf, "select 1 from call c where c.procedure_name = '%s' and c.variable_name = '%s' and c.direct_call = 1", input1.c_str(), input2.c_str());
+		}
+	}
+	else if (input1IsSpecific && input2IsSpecific) {
+		sprintf_s(sqlBuf, "select 1 from call c where c.procedure_name = '%s' and c.variable_name = '%s' and c.direct_call = 1", input1.c_str(), input2.c_str());
+	}
+	else if (!input1IsSpecific && input2IsSpecific) {
+
+	}
+	else if (!input1IsSpecific && !input2IsSpecific) {
+
+	}
+	
+
+	SqlResultStore rs;
+	sqlResultStoreForCallback = &rs;
+	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
+	if (errorMessage) { cout << "getCalls SQL Error: " << errorMessage; exit(0); }
 	return (!(sqlResultStoreForCallback->sqlResult.empty()));
 }
 

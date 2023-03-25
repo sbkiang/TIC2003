@@ -1,13 +1,15 @@
-1 - Variable
+1 - Call
 procedure p, q;
 Select p such that Calls (p, _) 
 First, Second
 5000
-
-
-
-
-
-
-
-
+2 - Call
+procedure p, q;
+Select <p, q> such that Calls (p, q)
+First Second, Second Third
+5000
+2 - Call
+procedure p;
+Select p such that Calls (p, "Second")
+First
+5000
