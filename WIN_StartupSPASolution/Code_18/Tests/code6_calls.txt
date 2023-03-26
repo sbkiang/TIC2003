@@ -8,7 +8,12 @@ procedure p, q;
 Select <p, q> such that Calls (p, q)
 First Second, Second Third
 5000
-2 - Call
+3 - Call
+procedure p;
+Select p such that Calls (p, "Second")
+First
+5000
+4 - Call
 procedure p;
 Select p such that Calls (p, "Second")
 First
