@@ -1,0 +1,5 @@
+1059 - Pattern syn exact match
+assign a; variable v;
+Select v pattern a(v, _"c"_)
+a,test001,test002,test02
+5000

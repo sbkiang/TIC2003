@@ -64,10 +64,18 @@ public:
 	static void GetUsesForAssignVar(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs);
 	static void GetUsesForPrintVar(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs);
 	static void GetUsesForWhileVar(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs);
-	//static void GetUsesForIfVar(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs);
-	//static void GetUsesForCallVar(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs);
-	//static void GetUsesForProcedureVar(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs);
+	static void GetUsesForIfVar(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs);
+	static void GetUsesForCallVar(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs);
+	static void GetUsesForProcedureVar(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs);
 	static void GetUsesForUnknownInput1Var(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs);
+
+	static void GetModifiesForAssignVar(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs);
+	static void GetModifiesForPrintVar(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs);
+	static void GetModifiesForWhileVar(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs);
+	static void GetModifiesForIfVar(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs);
+	static void GetModifiesForCallVar(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs);
+	static void GetModifiesForProcedureVar(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs);
+	static void GetModifiesForUnknownInput1Var(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs);
 
 	// method to insert/get a next into the database
 	static void insertNext(int stmtNum1, int stmtNum2);
@@ -78,6 +86,8 @@ public:
 	static void insertPattern(int stmtNum, string LHS, string RHS, string expression);
 	static void GetPatternLike(string input1, string input2, SqlResultStore& rs);
 	static void GetPatternIn(string input1, string input2, SqlResultStore& rs);
+
+	static void GetAssignPattern(SqlResultStore& rs);
 
 	static void SelectPql(Select& st, SqlResultStore& sqlResultStore);
 

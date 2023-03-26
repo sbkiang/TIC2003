@@ -210,7 +210,6 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		bool input2IsSynonym = (synonymEntityMap.find(suchThatTemp.input2) != synonymEntityMap.end()); // second input is a synonym
 		bool input1InSelect = (find(select.synonym.begin(), select.synonym.end(), suchThatTemp.input1) != select.synonym.end()) && !input1IsWildcard; // first input is part of select
 		bool input2InSelect = (find(select.synonym.begin(), select.synonym.end(), suchThatTemp.input2) != select.synonym.end()) && !input2IsWildcard; // second input is part of select
-		
 		bool input1IsSpecific = ((input1IsSynonym && input1InSelect) || (!input1IsSynonym && !input1IsWildcard));
 		bool input2IsSpecific = ((input2IsSynonym && input2InSelect) || (!input2IsSynonym && !input2IsWildcard));
 		
@@ -222,41 +221,70 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		if (input2IsSynonym) { // if input1 is part of declared synonym, we get the entity that it belongs
 			entityInput2 = synonymEntityMap.at(suchThatTemp.input2);
 		}
-		set<string> setVariableName;
+		set<string> assignVariableName;
 		SqlResultStore resultStoreVariableName;
 		string relationship = suchThatTemp.relationship;
-		if (relationship == "Uses") {
+
+		// This step is to get the variables if we have a Uses or Modifies relationship
+		if (relationship == "Uses") {			
 			if (entityInput1 == "assign") {
 				Database::GetUsesForAssignVar(suchThatTemp.input1, suchThatTemp.input2, input1IsSynonym, input2IsSynonym, resultStoreVariableName);
-				setVariableName = SqlResultStoreToSet(resultStoreVariableName, "variable_name");
+				assignVariableName = SqlResultStoreToSet(resultStoreVariableName, "variable_name");
 			}
 			else if (entityInput1 == "print") {
 				Database::GetUsesForPrintVar(suchThatTemp.input1, suchThatTemp.input2, input1IsSynonym, input2IsSynonym, resultStoreVariableName);
-				setVariableName = SqlResultStoreToSet(resultStoreVariableName, "variable_name");
+				assignVariableName = SqlResultStoreToSet(resultStoreVariableName, "variable_name");
 			}
 			else if (entityInput1 == "while") {
 				Database::GetUsesForWhileVar(suchThatTemp.input1, suchThatTemp.input2, input1IsSynonym, input2IsSynonym, resultStoreVariableName);
-				setVariableName = SqlResultStoreToSet(resultStoreVariableName, "variable_name");
+				assignVariableName = SqlResultStoreToSet(resultStoreVariableName, "variable_name");
 			}
 			else if (entityInput1 == "if") {
 				Database::GetUsesForIfVar(suchThatTemp.input1, suchThatTemp.input2, input1IsSynonym, input2IsSynonym, resultStoreVariableName);
-				setVariableName = SqlResultStoreToSet(resultStoreVariableName, "variable_name");
+				assignVariableName = SqlResultStoreToSet(resultStoreVariableName, "variable_name");
 			}
 			else if (entityInput1 == "call") {
-				//Database::GetUsesForCallVar(suchThatTemp.input1, suchThatTemp.input2, input1IsSynonym, input2IsSynonym, resultStoreVariableName);
-				setVariableName = SqlResultStoreToSet(resultStoreVariableName, "variable_name");
+				Database::GetUsesForCallVar(suchThatTemp.input1, suchThatTemp.input2, input1IsSynonym, input2IsSynonym, resultStoreVariableName);
+				assignVariableName = SqlResultStoreToSet(resultStoreVariableName, "variable_name");
 			}
 			else if (entityInput1 == "procedure") {
-				//Database::GetUsesForProcedureVar(suchThatTemp.input1, suchThatTemp.input2, input1IsSynonym, input2IsSynonym, resultStoreVariableName);
-				setVariableName = SqlResultStoreToSet(resultStoreVariableName, "variable_name");
+				Database::GetUsesForProcedureVar(suchThatTemp.input1, suchThatTemp.input2, input1IsSynonym, input2IsSynonym, resultStoreVariableName);
+				assignVariableName = SqlResultStoreToSet(resultStoreVariableName, "variable_name");
 			}
 			else {
 				Database::GetUsesForUnknownInput1Var(suchThatTemp.input1, suchThatTemp.input2, input1IsSynonym, input2IsSynonym, resultStoreVariableName);
-				setVariableName = SqlResultStoreToSet(resultStoreVariableName, "variable_name");
+				assignVariableName = SqlResultStoreToSet(resultStoreVariableName, "variable_name");
 			}
 		}
 		else if (relationship == "Modifies") {
-			// do this tmr
+			if (entityInput1 == "assign") {
+				Database::GetModifiesForAssignVar(suchThatTemp.input1, suchThatTemp.input2, input1IsSynonym, input2IsSynonym, resultStoreVariableName);
+				assignVariableName = SqlResultStoreToSet(resultStoreVariableName, "variable_name");
+			}
+			else if (entityInput1 == "print") {
+				Database::GetModifiesForPrintVar(suchThatTemp.input1, suchThatTemp.input2, input1IsSynonym, input2IsSynonym, resultStoreVariableName);
+				assignVariableName = SqlResultStoreToSet(resultStoreVariableName, "variable_name");
+			}
+			else if (entityInput1 == "while") {
+				Database::GetModifiesForWhileVar(suchThatTemp.input1, suchThatTemp.input2, input1IsSynonym, input2IsSynonym, resultStoreVariableName);
+				assignVariableName = SqlResultStoreToSet(resultStoreVariableName, "variable_name");
+			}
+			else if (entityInput1 == "if") {
+				Database::GetModifiesForIfVar(suchThatTemp.input1, suchThatTemp.input2, input1IsSynonym, input2IsSynonym, resultStoreVariableName);
+				assignVariableName = SqlResultStoreToSet(resultStoreVariableName, "variable_name");
+			}
+			else if (entityInput1 == "call") {
+				Database::GetModifiesForCallVar(suchThatTemp.input1, suchThatTemp.input2, input1IsSynonym, input2IsSynonym, resultStoreVariableName);
+				assignVariableName = SqlResultStoreToSet(resultStoreVariableName, "variable_name");
+			}
+			else if (entityInput1 == "procedure") {
+				//Database::GetModifiesForProcedureVar(suchThatTemp.input1, suchThatTemp.input2, input1IsSynonym, input2IsSynonym, resultStoreVariableName);
+				assignVariableName = SqlResultStoreToSet(resultStoreVariableName, "variable_name");
+			}
+			else {
+				Database::GetModifiesForUnknownInput1Var(suchThatTemp.input1, suchThatTemp.input2, input1IsSynonym, input2IsSynonym, resultStoreVariableName);
+				assignVariableName = SqlResultStoreToSet(resultStoreVariableName, "variable_name");
+			}
 		}
 		for(SqlResult sqlResult : sqlResultStore.sqlResult){
 		//for (int i = 0; i < sqlResultStore.sqlResult.size(); i++) {
@@ -328,7 +356,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		if (input2IsSynonym && (relationship == "Modifies" || relationship == "Uses")) {
 			set<string> synonymVariable = variableSynonymSetMap.at(suchThatTemp.input2);
 			set<string> intersect;
-			set_intersection(setVariableName.begin(), setVariableName.end(), synonymVariable.begin(), synonymVariable.end(), inserter(intersect, intersect.begin()));
+			set_intersection(assignVariableName.begin(), assignVariableName.end(), synonymVariable.begin(), synonymVariable.end(), inserter(intersect, intersect.begin()));
 			variableSynonymSetMap.at(suchThatTemp.input2) = intersect;
 		}
 	}
@@ -343,7 +371,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		if (!input2IsWildcard) {
 			second = patternTemp.input2;
 			bool startWildCard = (second[0] == '_');
-			bool endWildCard = (second[second.length()-1] == '_');
+			bool endWildCard = (second[second.length() - 1] == '_');
 			second = (startWildCard) ? second.substr(1, second.length()) : second;
 			second = (endWildCard) ? second.substr(0, second.length() - 1) : second;
 			second = infixToPostfix(second);
@@ -353,11 +381,6 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 
 		// if input1 synonym, get from synoynm. else, it'll be wildcard or specific variable name
 		SqlResultStore patternResult;
-		int pos = 0;
-		do {
-			pos = second.find("_");
-			if (pos > -1) { second.replace(pos, 1, "%"); }
-		} while (pos > -1);
 
 		// get input from variable storage that's linked to assign synonym
 		if (input1IsSynonym) {
@@ -368,18 +391,14 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 				sprintf_s(varNameSql, "\'%s\',", string(*it).c_str());
 				first += string(varNameSql);
 			}
-			first.pop_back(); // remove last comma
+			if (first.length() > 0) { first.pop_back(); } // remove last comma 
 			Database::GetPatternIn(first, second, patternResult);
 		}
 		else {
 			string first = patternTemp.input1;
-			pos = 0;
-			do {
-				pos = first.find("_");
-				if (pos > -1) { first.replace(pos, 1, "%"); }
-			} while (pos > -1);
 			Database::GetPatternLike(first, second, patternResult);
 		}
+
 		// patternResult contains line_num and LHS
 		// LHS to update the variableSynonymSetMap. line_num is to update the sqlResultSet, if it's a line_num entity
 		set<string> patternLhsSet;
@@ -388,30 +407,72 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			patternLhsSet.insert(patternResult.sqlResult.at(i).row.at("lhs"));
 			patternLineNum.push_back(patternResult.sqlResult.at(i).row.at("line_num"));
 		}
-		if (input1IsSynonym) {
+
+		// this is to update the variables that passed the pattern check in variableSynonymSetMap
+		if (input1IsSynonym) { // what is input1 is fixed? means no update
 			set<string> intersect;
 			set<string> variableSynonymSet = variableSynonymSetMap.at(patternTemp.input1);
 			set_intersection(variableSynonymSet.begin(), variableSynonymSet.end(), patternLhsSet.begin(), patternLhsSet.end(), inserter(intersect, intersect.begin()));
 			variableSynonymSetMap.at(patternTemp.input1) = intersect;
 		}
-		set<string> sqlResultLineNumSet;
 
+		// ** For assign entity only **
 		// this step is to update the sqlResultStore if the pattern entity is part of select
-		
+		// we do this because the pattern clause returns result instead of true/false
+		// so, we need to find the common variables or line_num between the sqlResultStore and pattern clause return value
+		// quite messy way to do this
+
 		vector<SqlResult> sqlResultPass;
-		if (find(select.synonym.begin(), select.synonym.end(), patternTemp.synonym) != select.synonym.end()) {
-			for (string lineNum : patternLineNum) {
-				for (SqlResult sqlResult : sqlResultStore.sqlResult) {
-					for (auto it = sqlResult.row.begin(); it != sqlResult.row.end(); it++) {
-						string entity = synonymEntityMap.at(it->first);
-						if(entity == "assign" && lineNum == it->second) {
-							sqlResultPass.push_back(sqlResult);
-						}
+		for (string lineNum : patternLineNum) {
+			for (SqlResult sqlResult : sqlResultStore.sqlResult) {
+				for (auto it = sqlResult.row.begin(); it != sqlResult.row.end(); it++) {
+					string entity = synonymEntityMap.at(it->first);
+					if (entity == "assign" && lineNum == it->second) {
+						sqlResultPass.push_back(sqlResult);
 					}
 				}
 			}
 		}
 		sqlResultStore.sqlResult = sqlResultPass;
+
+		vector<SqlResult> sqlResultPass;
+		bool selectSynonymIsAssignOrStmt = false;
+		bool selectSynonymIsVariable = false;
+		for (string synonym : select.synonym) {
+			if (synonymEntityMap.at(synonym) == "assign") { selectSynonymIsAssignOrStmt = true; break; }
+			else if (synonymEntityMap.at(synonym) == "stmt") { selectSynonymIsAssignOrStmt = true; break; }
+			else if (synonymEntityMap.at(synonym) == "variable") { selectSynonymIsVariable = true; break; }
+		}
+		if (selectSynonymIsAssignOrStmt) {
+			for (SqlResult sqlResult : sqlResultStore.sqlResult) { // loop thru each row
+				for (auto it = sqlResult.row.begin(); it != sqlResult.row.end(); it++) { // loop thru each row's column
+					if (synonymEntityMap.at(it->first) == "assign" || synonymEntityMap.at(it->first) == "stmt") {
+
+					}
+				}
+			}
+		}
+		bool patternInput1InSelect = (find(select.synonym.begin(), select.synonym.end(), patternTemp.input1) != select.synonym.end());
+		//string linkingEntitySynonym = patternSynonymInSelect ? synonymEntityMap.at(patternTemp.synonym) : "";
+		//string linkingEntityInput1 = patternInput1InSelect ? synonymEntityMap.at(patternTemp.input1) : "";
+		// if valid query, then pattern will always be tied to assign entity. Then, the sqlResultStore will have "line_num" column
+		if (patternSynonymInSelect) { 
+
+		}
+
+		for (string lineNum : patternLineNum) {
+			
+			if(!patternSynonymInSelect || !patternInput1InSelect) { break; } // exit if pattern not related to select
+			for (SqlResult sqlResult : sqlResultStore.sqlResult) {
+				for (auto it = sqlResult.row.begin(); it != sqlResult.row.end(); it++) {
+					
+					if (linkingEntity == "assign" && lineNum == it->second) {
+						sqlResultPass.push_back(sqlResult);
+					}
+					else if(linkingEntity == "variable" && )
+				}
+			}
+		}
 		patternStack.pop();
 	}
 

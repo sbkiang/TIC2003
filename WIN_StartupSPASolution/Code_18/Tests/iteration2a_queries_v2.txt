@@ -1,15 +1,5 @@
-1062-  comment
+1060-  comment
 variable v; assign a, a1;
-Select v such that Modifies(a, v) pattern a1("z", _)
-i, x, y, z, bx
-5000
-1064-  comment
-stmt s; assign a;
-Select s such that Parent(s, _) pattern a(_, _"y"_)
-none
-5000
-1067-  comment
-print pn; variable v; assign a;
-Select v such that Uses(pn, v) pattern a("i", _"y"_)
-i
+Select v such that Modifies(a, v) pattern a1(v, _"i"_)
+i, y, z
 5000

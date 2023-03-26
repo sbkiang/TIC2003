@@ -600,7 +600,7 @@ void Database::GetUsesForAssignVar(string input1, string input2, bool input1IsSy
 void Database::GetUsesForPrintVar(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs) {
 	char sqlBuf[512] = {};
 	if (input1IsSynonym && input2IsSynonym) {
-		sprintf_s(sqlBuf, "select variable_name from use u join statement s on s.line_num = u.line_num ans s.entity = 'print';");
+		sprintf_s(sqlBuf, "select variable_name from use u join statement s on s.line_num = u.line_num and s.entity = 'print';");
 	}
 	else if (input1IsSynonym && !input2IsSynonym) {
 		sprintf_s(sqlBuf, "select variable_name from use u join statement s on s.line_num = u.line_num and variable_name = '%s' and s.entity = 'print';", input2.c_str());
@@ -613,16 +613,16 @@ void Database::GetUsesForPrintVar(string input1, string input2, bool input1IsSyn
 	};
 	sqlResultStoreForCallback = &rs;
 	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
-	if (errorMessage) { cout << "GetUsesForAssignVar SQL Error: " << errorMessage; exit(1); }
+	if (errorMessage) { cout << "GetUsesForPrintVar SQL Error: " << errorMessage; exit(1); }
 }
 
 void Database::GetUsesForWhileVar(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs) {
 	char sqlBuf[512] = {};
 	if (input1IsSynonym && input2IsSynonym) {
-		sprintf_s(sqlBuf, "select variable_name from use u join statement s on s.line_num = u.line_num ans s.entity = 'while';");
+		sprintf_s(sqlBuf, "select variable_name from use u join statement s on s.line_num = u.line_num and s.entity = 'while';");
 	}
 	else if (input1IsSynonym && !input2IsSynonym) {
-		sprintf_s(sqlBuf, "select variable_name from use u join statement s on s.line_num = u.line_num and variable_name = '%s' and s.entity = 'whil';", input2.c_str());
+		sprintf_s(sqlBuf, "select variable_name from use u join statement s on s.line_num = u.line_num and variable_name = '%s' and s.entity = 'while';", input2.c_str());
 	}
 	else if (!input1IsSynonym && input2IsSynonym) {
 		sprintf_s(sqlBuf, "select variable_name from use u where u.line_num = %s;", input1.c_str());
@@ -632,7 +632,65 @@ void Database::GetUsesForWhileVar(string input1, string input2, bool input1IsSyn
 	};
 	sqlResultStoreForCallback = &rs;
 	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
-	if (errorMessage) { cout << "GetUsesForAssignVar SQL Error: " << errorMessage; exit(1); }
+	if (errorMessage) { cout << "GetUsesForWhileVar SQL Error: " << errorMessage; exit(1); }
+}
+
+void Database::GetUsesForIfVar(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs) {
+	char sqlBuf[512] = {};
+	if (input1IsSynonym && input2IsSynonym) {
+		sprintf_s(sqlBuf, "select variable_name from use u join statement s on s.line_num = u.line_num and s.entity = 'if';");
+	}
+	else if (input1IsSynonym && !input2IsSynonym) {
+		sprintf_s(sqlBuf, "select variable_name from use u join statement s on s.line_num = u.line_num and variable_name = '%s' and s.entity = 'if';", input2.c_str());
+	}
+	else if (!input1IsSynonym && input2IsSynonym) {
+		sprintf_s(sqlBuf, "select variable_name from use u where u.line_num = %s;", input1.c_str());
+	}
+	else if (!input1IsSynonym && !input2IsSynonym) {
+		sprintf_s(sqlBuf, "select variable_name from use u where u.line_num = %s and u.variable_name = '%s';", input1.c_str(), input2.c_str());
+	};
+	sqlResultStoreForCallback = &rs;
+	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
+	if (errorMessage) { cout << "GetUsesForWhileVar SQL Error: " << errorMessage; exit(1); }
+}
+
+void Database::GetUsesForCallVar(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs) {
+	char sqlBuf[512] = {};
+	if (input1IsSynonym && input2IsSynonym) {
+		sprintf_s(sqlBuf, "select variable_name from use u join statement s on s.line_num = u.line_num and s.entity = 'call';");
+	}
+	else if (input1IsSynonym && !input2IsSynonym) {
+		sprintf_s(sqlBuf, "select variable_name from use u join statement s on s.line_num = u.line_num and variable_name = '%s' and s.entity = 'call';", input2.c_str());
+	}
+	else if (!input1IsSynonym && input2IsSynonym) {
+		sprintf_s(sqlBuf, "select variable_name from use u where u.line_num = %s;", input1.c_str());
+	}
+	else if (!input1IsSynonym && !input2IsSynonym) {
+		sprintf_s(sqlBuf, "select variable_name from use u where u.line_num = %s and u.variable_name = '%s';", input1.c_str(), input2.c_str());
+	};
+	sqlResultStoreForCallback = &rs;
+	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
+	if (errorMessage) { cout << "GetUsesForCallVar SQL Error: " << errorMessage; exit(1); }
+}
+
+void Database::GetUsesForProcedureVar(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs) {
+	char sqlBuf[512] = {};
+
+	if (input1IsSynonym && input2IsSynonym) {
+		sprintf_s(sqlBuf, "select variable_name from use u where exists (select 1 from procedure p where u.line_num between p.start and p.end);");
+	}
+	else if (input1IsSynonym && !input2IsSynonym) {
+		sprintf_s(sqlBuf, "select variable_name from use u where exists (select 1 from procedure p where p.name = '%s' and u.line_num between p.start and p.end);", input2.c_str());
+	}
+	else if (!input1IsSynonym && input2IsSynonym) {
+		sprintf_s(sqlBuf, "select variable_name from use u where u.variable_name = '%s' and exists (select 1 from procedure p where u.line_num between p.start and p.end);", input1.c_str());
+	}
+	else if (!input1IsSynonym && !input2IsSynonym) {
+		sprintf_s(sqlBuf, "select variable_name from use u where u.variable_name = '%s' and exists (select 1 from procedure p where p.name = '%s' and u.line_num between p.start and p.end);", input1.c_str(), input2.c_str());
+	};
+	sqlResultStoreForCallback = &rs;
+	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
+	if (errorMessage) { cout << "GetUsesForProcedureVar SQL Error: " << errorMessage; exit(1); }
 }
 
 void Database::GetUsesForUnknownInput1Var(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs) {
@@ -668,6 +726,160 @@ void Database::GetUsesForUnknownInput1Var(string input1, string input2, bool inp
 		//Database::GetUsesForProcedure(input1, input2, input1IsSpecific, input2IsSpecific, rs);
 	}
 }
+
+
+
+void Database::GetModifiesForAssignVar(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs) {
+	char sqlBuf[512] = {};
+	if (input1IsSynonym && input2IsSynonym) {
+		sprintf_s(sqlBuf, "select variable_name from modify m join statement s on s.line_num = m.line_num and s.entity = 'assign';");
+	}
+	else if (input1IsSynonym && !input2IsSynonym) {
+		sprintf_s(sqlBuf, "select variable_name from modify m join statement s on s.line_num = m.line_num and variable_name = '%s' and s.entity = 'assign';", input2.c_str());
+	}
+	else if (!input1IsSynonym && input2IsSynonym) {
+		sprintf_s(sqlBuf, "select variable_name from modify m where m.line_num = %s;", input1.c_str());
+	}
+	else if (!input1IsSynonym && !input2IsSynonym) {
+		sprintf_s(sqlBuf, "select variable_name from modify m where m.line_num = %s and m.variable_name = '%s';", input1.c_str(), input2.c_str());
+	}
+	sqlResultStoreForCallback = &rs;
+	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
+	if (errorMessage) { cout << "GetUsesForAssignVar SQL Error: " << errorMessage; exit(1); }
+}
+
+void Database::GetModifiesForPrintVar(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs) {
+	char sqlBuf[512] = {};
+	if (input1IsSynonym && input2IsSynonym) {
+		sprintf_s(sqlBuf, "select variable_name from modify m join statement s on s.line_num = m.line_num and s.entity = 'print';");
+	}
+	else if (input1IsSynonym && !input2IsSynonym) {
+		sprintf_s(sqlBuf, "select variable_name from modify m join statement s on s.line_num = m.line_num and variable_name = '%s' and s.entity = 'print';", input2.c_str());
+	}
+	else if (!input1IsSynonym && input2IsSynonym) {
+		sprintf_s(sqlBuf, "select variable_name from modify m where m.line_num = %s;", input1.c_str());
+	}
+	else if (!input1IsSynonym && !input2IsSynonym) {
+		sprintf_s(sqlBuf, "select variable_name from modify m where m.line_num = %s and m.variable_name = '%s';", input1.c_str(), input2.c_str());
+	};
+	sqlResultStoreForCallback = &rs;
+	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
+	if (errorMessage) { cout << "GetUsesForPrintVar SQL Error: " << errorMessage; exit(1); }
+}
+
+void Database::GetModifiesForWhileVar(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs) {
+	char sqlBuf[512] = {};
+	if (input1IsSynonym && input2IsSynonym) {
+		sprintf_s(sqlBuf, "select variable_name from modify m join statement s on s.line_num = m.line_num and s.entity = 'while';");
+	}
+	else if (input1IsSynonym && !input2IsSynonym) {
+		sprintf_s(sqlBuf, "select variable_name from modify m join statement s on s.line_num = m.line_num and variable_name = '%s' and s.entity = 'while';", input2.c_str());
+	}
+	else if (!input1IsSynonym && input2IsSynonym) {
+		sprintf_s(sqlBuf, "select variable_name from modify m where m.line_num = %s;", input1.c_str());
+	}
+	else if (!input1IsSynonym && !input2IsSynonym) {
+		sprintf_s(sqlBuf, "select variable_name from modify m where m.line_num = %s and m.variable_name = '%s';", input1.c_str(), input2.c_str());
+	};
+	sqlResultStoreForCallback = &rs;
+	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
+	if (errorMessage) { cout << "GetUsesForWhileVar SQL Error: " << errorMessage; exit(1); }
+}
+
+void Database::GetModifiesForIfVar(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs) {
+	char sqlBuf[512] = {};
+	if (input1IsSynonym && input2IsSynonym) {
+		sprintf_s(sqlBuf, "select variable_name from modify m join statement s on s.line_num = m.line_num and s.entity = 'if';");
+	}
+	else if (input1IsSynonym && !input2IsSynonym) {
+		sprintf_s(sqlBuf, "select variable_name from modify m join statement s on s.line_num = m.line_num and variable_name = '%s' and s.entity = 'if';", input2.c_str());
+	}
+	else if (!input1IsSynonym && input2IsSynonym) {
+		sprintf_s(sqlBuf, "select variable_name from modify m where m.line_num = %s;", input1.c_str());
+	}
+	else if (!input1IsSynonym && !input2IsSynonym) {
+		sprintf_s(sqlBuf, "select variable_name from modify m where m.line_num = %s and m.variable_name = '%s';", input1.c_str(), input2.c_str());
+	};
+	sqlResultStoreForCallback = &rs;
+	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
+	if (errorMessage) { cout << "GetUsesForWhileVar SQL Error: " << errorMessage; exit(1); }
+}
+
+void Database::GetModifiesForCallVar(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs) {
+	char sqlBuf[512] = {};
+	if (input1IsSynonym && input2IsSynonym) {
+		sprintf_s(sqlBuf, "select variable_name from modify m join statement s on s.line_num = m.line_num and s.entity = 'call';");
+	}
+	else if (input1IsSynonym && !input2IsSynonym) {
+		sprintf_s(sqlBuf, "select variable_name from modify m join statement s on s.line_num = m.line_num and variable_name = '%s' and s.entity = 'call';", input2.c_str());
+	}
+	else if (!input1IsSynonym && input2IsSynonym) {
+		sprintf_s(sqlBuf, "select variable_name from modify m where m.line_num = %s;", input1.c_str());
+	}
+	else if (!input1IsSynonym && !input2IsSynonym) {
+		sprintf_s(sqlBuf, "select variable_name from modify m where m.line_num = %s and m.variable_name = '%s';", input1.c_str(), input2.c_str());
+	};
+	sqlResultStoreForCallback = &rs;
+	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
+	if (errorMessage) { cout << "GetUsesForCallVar SQL Error: " << errorMessage; exit(1); }
+}
+
+void Database::GetModifiesForProcedureVar(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs) {
+	char sqlBuf[512] = {};
+
+	if (input1IsSynonym && input2IsSynonym) {
+		sprintf_s(sqlBuf, "select variable_name from modify m where exists (select 1 from procedure p where m.line_num between p.start and p.end);");
+	}
+	else if (input1IsSynonym && !input2IsSynonym) {
+		sprintf_s(sqlBuf, "select variable_name from modify m where exists (select 1 from procedure p where p.name = '%s' and m.line_num between p.start and p.end);", input2.c_str());
+	}
+	else if (!input1IsSynonym && input2IsSynonym) {
+		sprintf_s(sqlBuf, "select variable_name from modify m where m.variable_name = '%s' and exists (select 1 from procedure p where m.line_num between p.start and p.end);", input1.c_str());
+	}
+	else if (!input1IsSynonym && !input2IsSynonym) {
+		sprintf_s(sqlBuf, "select variable_name from modify m where m.variable_name = '%s' and exists (select 1 from procedure p where p.name = '%s' and m.line_num between p.start and p.end);", input1.c_str(), input2.c_str());
+	};
+	sqlResultStoreForCallback = &rs;
+	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
+	if (errorMessage) { cout << "GetUsesForProcedureVar SQL Error: " << errorMessage; exit(1); }
+}
+
+void Database::GetModifiesForUnknownInput1Var(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs) {
+	SqlResultStore temp;
+	sqlResultStoreForCallback = &temp;
+	char sqlBuf[512] = {};
+	if (isdigit(input1[0])) { // input first char is a digit = statement number
+		sprintf_s(sqlBuf, "SELECT entity FROM statement WHERE line_num = %s;", input1.c_str());
+		sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
+		if (errorMessage) { cout << "GetUsesForUnknownInput1 SQL Error: " << errorMessage; }
+		string entity = temp.sqlResult.at(0).row.at("entity");
+
+		// e.g., use(10, v), and stmt 10 is "x = a + b" or "print x". We just need to select from use table with the correct stmtNum to get the variables
+		if (entity == "assign") {
+			Database::GetUsesForAssignVar(input1, input2, input1IsSynonym, input2IsSynonym, rs);
+		}
+		/*
+		else if (entity == "print") {
+			ret = Database::GetUsesForPrintVar(input1, input2, input1IsSynonym, input2IsSynonym, rs);
+		}
+		else if (entity == "call") {
+			ret = Database::GetUsesForCallVar(text, input2, input1IsSynonym, input2IsSynonym, rs);
+		}
+		else if (entity == "while") {
+			ret = Database::GetUsesForWhileVar(input1, input2, input1IsSynonym, input2IsSynonym, rs);
+		}
+		else if (entity == "if") {
+			ret = Database::GetUsesForIfVar(input1, input2, input1IsSynonym, input2IsSynonym, rs);
+		}
+		*/
+	}
+	else { // input first char is not a digit = a name
+		//Database::GetUsesForProcedure(input1, input2, input1IsSpecific, input2IsSpecific, rs);
+	}
+}
+
+
+
 
 bool Database::GetModifiesForAssign(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific) {
 	// select 1 from modify m where m.variable_name = '%s' and m.line_num in (select s.line_num from statement s where entity = 'assign' and s.line_num = '%s');
@@ -884,6 +1096,15 @@ bool Database::GetModifiesForUnknownInput1(string input1, string input2, bool in
 
 void Database::GetPatternIn(string input1, string input2, SqlResultStore& rs) {
 	// reconstruct the variable set to be SQL statement using "where var_name IN (...)"
+	int pos = -1;
+	do {
+		pos = input1.find("_");
+		input1 = (pos > -1) ? input1.replace(pos, 1, "%") : input1;
+	} while (pos > -1);
+	do {
+		pos = input2.find("_");
+		input2 = (pos > -1) ? input2.replace(pos, 1, "%") : input2;
+	} while (pos > -1);
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select line_num, lhs from pattern p where p.lhs in (%s) and p.rhs like '%s';", input1.c_str(), input2.c_str());
 	sqlResultStoreForCallback = &rs;
@@ -892,11 +1113,30 @@ void Database::GetPatternIn(string input1, string input2, SqlResultStore& rs) {
 }
 void Database::GetPatternLike(string input1, string input2, SqlResultStore& rs) {
 	// (input is synonym and synonym not in select) or (input is "_") is considered generic input
+	int pos = -1;
+	do {
+		pos = input1.find("_");
+		input1 = (pos > -1) ? input1.replace(pos, 1, "%") : input1;
+
+	} while (pos > -1);
+	do {
+		pos = input2.find("_");
+		input2 = (pos > -1) ? input2.replace(pos, 1, "%") : input2;
+
+	} while (pos > -1);
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select line_num, lhs from pattern p where p.lhs like '%s' and p.rhs like '%s';", input1.c_str(), input2.c_str());
 	sqlResultStoreForCallback = &rs;
 	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
 	if (errorMessage) { cout << "GetPattern SQL Error: " << errorMessage << endl; exit(1); }
+}
+
+void Database::GetAssignPattern(SqlResultStore& rs) {
+	char sqlBuf[512] = {};
+	sprintf_s(sqlBuf, "select line_num, lhs from pattern p join statement s on p.line_num = s.line_num where s.entity ='assign';");
+	sqlResultStoreForCallback = &rs;
+	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
+	if (errorMessage) { cout << "GetAssignPattern SQL Error: " << errorMessage << endl; exit(1); }
 }
 
 // get all the columns of PQL select block
