@@ -822,24 +822,40 @@ bool Database::GetCalls (string input1, string input2, bool input1IsSpecific, bo
 	char sqlBuf[512];
 
 	if (input1IsSpecific && !input2IsSpecific) {
-		if (input2 == "_") { // if second input is "_"
+		if (input2 == "_") { //E.g (p, _)
 			sprintf_s(sqlBuf, "select 1 from call c where c.procedure_name = '%s' and c.direct_call = 1", input1.c_str());
 		}
-		else {
+		else { //E.g (p, "Second")
 			sprintf_s(sqlBuf, "select 1 from call c where c.procedure_name = '%s' and c.variable_name = '%s' and c.direct_call = 1", input1.c_str(), input2.c_str());
 		}
 	}
-	else if (input1IsSpecific && input2IsSpecific) {
+	else if (input1IsSpecific && input2IsSpecific) { //E.g (p, q)
 		sprintf_s(sqlBuf, "select 1 from call c where c.procedure_name = '%s' and c.variable_name = '%s' and c.direct_call = 1", input1.c_str(), input2.c_str());
 	}
-	else if (!input1IsSpecific && input2IsSpecific) {
-
+	else if (!input1IsSpecific && input2IsSpecific) { 
+		if (input2 == "_") { //E.g (_ , q)
+			sprintf_s(sqlBuf, "select 1 from call c where c.variable_name = '%s' and c.direct_call = 1", input2.c_str());
+		}
+		else { //E.g ("First", q)
+			sprintf_s(sqlBuf, "select 1 from call c where c.procedure_name = '%s' and c.variable_name = '%s' and c.direct_call = 1", input1.c_str(), input2.c_str());
+		}
 	}
-	else if (!input1IsSpecific && !input2IsSpecific) {
-
+	else if (!input1IsSpecific && !input2IsSpecific) { 
+		if (input1 == "_" && input2 == "_") { //E.g (_ , _)
+			sprintf_s(sqlBuf, "select 1 from call c where c.direct_call = 1");
+		}
+		else if (input1 == "_") { //E.g (_ , "Second")
+			cout << ":";
+			sprintf_s(sqlBuf, "select 1 from call c where c.variable_name = '%s' and c.direct_call = 1", input2.c_str());
+		}
+		else if (input2 == "_") { //E.g ("First" , "_")
+			sprintf_s(sqlBuf, "select 1 from call c where c.procedure_name = '%s' and c.direct_call = 1", input1.c_str());
+		}
+		else { //E.g ("First", "Second")
+			sprintf_s(sqlBuf, "select 1 from call c where c.procedure_name = '%s' and c.variable_name = '%s' and c.direct_call = 1", input1.c_str(), input2.c_str());
+		}
 	}
 	
-
 	SqlResultStore rs;
 	sqlResultStoreForCallback = &rs;
 	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);

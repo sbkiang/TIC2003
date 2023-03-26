@@ -1,0 +1,6 @@
+49 - such that calls(_,'readPoint')
+procedure p;
+Select p such that Calls(_,"readPoint")
+computeCentroid
+5000
+
