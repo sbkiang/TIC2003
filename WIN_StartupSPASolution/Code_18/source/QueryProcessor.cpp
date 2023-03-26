@@ -239,10 +239,10 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 
 			}
 			else if (relationship == "Calls") {
-				pass = Database::GetCalls(first, second, input1IsSpecific, input2IsSpecific);
+				pass = Database::GetCalls(first, second, input1IsSynonym, input2IsSynonym);
 			}
 			else if (relationship == "Calls*") {
-
+				pass = Database::GetCallsT(first, second, input1IsSynonym, input2IsSynonym);
 			}
 			
 			if (pass) { sqlResultPass.push_back(sqlResulTemp); }

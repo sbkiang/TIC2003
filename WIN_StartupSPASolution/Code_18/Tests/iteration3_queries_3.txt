@@ -1,6 +1,60 @@
-49 - such that calls(_,'readPoint')
+48 - such that Calls(p, readPoint)
+procedure p;
+Select p such that Calls(p, "readPoint")
+computeCentroid
+5000
+49 - such that Calls(_,readPoint)
 procedure p;
 Select p such that Calls(_,"readPoint")
 computeCentroid
 5000
+50 - such that Calls(readPoint,_)
+procedure p;
+Select p such that Calls("readPoint",_)
 
+5000
+51 - such that Calls(computeCentroid,p)
+procedure p;
+Select p such that Calls("computeCentroid",p)
+readPoint
+5000
+52 - such that Calls(p,_)
+procedure p;
+Select p such that Calls(p,_)
+main, computeCentroid
+5000
+53 - such that Calls(_,p)
+procedure p;
+Select p such that Calls(_,p)
+computeCentroid, printResults, readPoint
+5000
+54 - such that Calls*(p,readPoint)
+procedure p, q;
+Select p such that Calls*(p,"readPoint")
+main, computeCentroid
+5000
+55 - such that Calls*(_,printResults)
+procedure p, q;
+Select p such that Calls*(_,"printResults")
+main
+5000
+56 - such that Calls*(main,_)
+procedure p, q;
+Select p such that Calls*("main",_)
+computeCentroid, printResults, readPoint 
+5000
+57 - such that Calls*(main,p)
+procedure p, q;
+Select p such that Calls*("main",p)
+computeCentroid, printResults, readPoint 
+5000
+75 - tuple such that Calls(p,q)
+procedure p, q;
+Select <p,q> such that Calls(p,q)
+main computeCentroid, computeCentroid readPoint, main printResults
+5000
+76 - tuple such that Calls*(p,q)
+procedure p, q;
+Select <p,q> such that Calls*(p,q)
+main computeCentroid, computeCentroid readPoint, main readPoint, main printResults
+5000

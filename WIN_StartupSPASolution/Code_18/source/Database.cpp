@@ -817,7 +817,7 @@ bool Database::GetPattern(string stmtNum1, string stmtNum2, bool input1IsSynonym
 
 bool Database::GetCalls (string input1, string input2, bool input1IsSpecific, bool input2IsSpecific) {
 	
-	cout << input1 << "@" << input2 << "@" << input1IsSpecific << "@" << input2IsSpecific << endl;
+	//cout << input1 << "@" << input2 << "@" << input1IsSpecific << "@" << input2IsSpecific << endl;
 
 	char sqlBuf[512];
 
@@ -856,6 +856,56 @@ bool Database::GetCalls (string input1, string input2, bool input1IsSpecific, bo
 		}
 	}
 	
+	SqlResultStore rs;
+	sqlResultStoreForCallback = &rs;
+	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
+	if (errorMessage) { cout << "getCalls SQL Error: " << errorMessage; exit(0); }
+	return (!(sqlResultStoreForCallback->sqlResult.empty()));
+}
+
+bool Database::GetCallsT(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific) {
+
+	cout << input1 << "@" << input2 << "@" << input1IsSpecific << "@" << input2IsSpecific << endl;
+
+	char sqlBuf[512];
+
+	if (input1IsSpecific && !input2IsSpecific) {
+		if (input2 == "_") { //E.g (p, _)
+			sprintf_s(sqlBuf, "select 1 from call c where c.procedure_name = '%s'", input1.c_str());
+		}
+		else { //E.g (p, "Second")
+			sprintf_s(sqlBuf, "select 1 from call c where c.procedure_name = '%s' and c.variable_name = '%s'", input1.c_str(), input2.c_str());
+		}
+	}
+	else if (input1IsSpecific && input2IsSpecific) { //E.g (p, q)
+		cout << "$$";
+		sprintf_s(sqlBuf, "select 1 from call c where c.procedure_name = '%s' and c.variable_name = '%s'", input1.c_str(), input2.c_str());
+	}
+	else if (!input1IsSpecific && input2IsSpecific) {
+		if (input2 == "_") { //E.g (_ , q)
+			sprintf_s(sqlBuf, "select 1 from call c where c.variable_name = '%s'", input2.c_str());
+		}
+		else { //E.g ("First", q)
+			sprintf_s(sqlBuf, "select 1 from call c where c.procedure_name = '%s' and c.variable_name = '%s'", input1.c_str(), input2.c_str());
+		}
+	}
+	else if (!input1IsSpecific && !input2IsSpecific) {
+		if (input1 == "_" && input2 == "_") { //E.g (_ , _)
+			sprintf_s(sqlBuf, "select 1 from call c");
+		}
+		else if (input1 == "_") { //E.g (_ , "Second")
+			cout << ":";
+			sprintf_s(sqlBuf, "select 1 from call c where c.variable_name = '%s'", input2.c_str());
+		}
+		else if (input2 == "_") { //E.g ("First" , "_")
+			sprintf_s(sqlBuf, "select 1 from call c where c.procedure_name = '%s'", input1.c_str());
+		}
+		else { //E.g ("First", "Second")
+			
+			sprintf_s(sqlBuf, "select 1 from call c where c.procedure_name = '%s' and c.variable_name = '%s'", input1.c_str(), input2.c_str());
+		}
+	}
+
 	SqlResultStore rs;
 	sqlResultStoreForCallback = &rs;
 	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
