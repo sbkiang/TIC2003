@@ -1,10 +1,15 @@
-1061-  comment
-variable v; assign a;
-Select a such that Uses(3, v) pattern a(v, _"i"_)
-6, 14, 24, 31, 19, 9
+1062-  comment
+variable v; assign a, a1;
+Select v such that Modifies(a, v) pattern a1("z", _)
+i, x, y, z, bx
 5000
-
-Select a such that Uses(3, v) . Uses(3,v) is true. So, all assign statement passes
-pattern a(v,_"i"_)
-	v is generic, _"i"_ is specific
-		shud only return variables that appear in Uses(3,v)
+1064-  comment
+stmt s; assign a;
+Select s such that Parent(s, _) pattern a(_, _"y"_)
+none
+5000
+1067-  comment
+print pn; variable v; assign a;
+Select v such that Uses(pn, v) pattern a("i", _"y"_)
+i
+5000

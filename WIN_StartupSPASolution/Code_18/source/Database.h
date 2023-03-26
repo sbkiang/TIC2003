@@ -5,6 +5,7 @@
 #include "sqlite3.h"
 #include <format>
 #include "../SPA/Struct.h"
+#include <set>
 
 using namespace std;
 
@@ -27,6 +28,7 @@ public:
 
 	// method to insert a variable into the database
 	static void insertVariable(string variablename, int statementNumber);
+	static void GetVariable(set<string>& result);
 	// method to insert a constant into the database
 	static void insertConstant(string value);
 	static void getConstant(vector<string>& results);
@@ -59,15 +61,23 @@ public:
 	static bool GetModifiesForProcedure(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
 	static bool GetModifiesForUnknownInput1(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific); // E.g., Uses(10,v). We don't know what's the entity at statement 10
 
+	static void GetUsesForAssignVar(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs);
+	static void GetUsesForPrintVar(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs);
+	static void GetUsesForWhileVar(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs);
+	//static void GetUsesForIfVar(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs);
+	//static void GetUsesForCallVar(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs);
+	//static void GetUsesForProcedureVar(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs);
+	static void GetUsesForUnknownInput1Var(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs);
+
 	// method to insert/get a next into the database
 	static void insertNext(int stmtNum1, int stmtNum2);
 	static bool getNext(int stmtNum1, int stmtNum2);
 	static bool getNextT(int stmtNum1, int stmtNum2);
 
 	//method to insert pattern into the database
-	static void insertPattern(int stmtNum, string LHS, string RHS, string experssion);
-	static bool GetPattern(string stmtNum1, string stmtNum2, bool input1IsSynonym, bool input2IsSynonym);
-
+	static void insertPattern(int stmtNum, string LHS, string RHS, string expression);
+	static void GetPatternLike(string input1, string input2, SqlResultStore& rs);
+	static void GetPatternIn(string input1, string input2, SqlResultStore& rs);
 
 	static void SelectPql(Select& st, SqlResultStore& sqlResultStore);
 

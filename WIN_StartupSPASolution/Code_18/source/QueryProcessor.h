@@ -20,6 +20,7 @@ public:
 	// method for evaluating a query
 	void evaluate(string query, vector<string>& results);
 	void EvaluateSelect(Select& st, map<string,string> synEntMap);
+	set<string> SqlResultStoreToSet(SqlResultStore rs, string col);
 
 	//Check for number or string
 	bool isNumber(string text) {

@@ -15,13 +15,13 @@ struct CFGNode {
 	CFGNode* _fJump = NULL; //For non-condition statement, _fJump points to NULL. For condition statement, _fJump points to first statement in the fail condition block
 };
 
-struct SqlResultStore {
-	vector<SqlResult> sqlResult;
+
+struct SqlResult {
+	map<string, string> row; // store mapping of column name to value	
 };
 
-
-struct SqlResult : SqlResultStore {
-	map<string, string> row; // store mapping of column name to value	
+struct SqlResultStore {
+	vector<SqlResult> sqlResult;
 };
 
 struct SuchThat {
@@ -43,3 +43,4 @@ struct Select {
 	vector<string> columnSql;
 	vector<string> asSql;
 };
+
