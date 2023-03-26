@@ -817,7 +817,7 @@ bool Database::GetPattern(string stmtNum1, string stmtNum2, bool input1IsSynonym
 
 bool Database::GetCalls (string input1, string input2, bool input1IsSpecific, bool input2IsSpecific) {
 	
-	//cout << input1 << "@" << input2 << "@" << input1IsSpecific << "@" << input2IsSpecific << endl;
+	cout << input1 << "@" << input2 << "@" << input1IsSpecific << "@" << input2IsSpecific << endl;
 
 	char sqlBuf[512];
 
@@ -833,7 +833,7 @@ bool Database::GetCalls (string input1, string input2, bool input1IsSpecific, bo
 		sprintf_s(sqlBuf, "select 1 from call c where c.procedure_name = '%s' and c.variable_name = '%s' and c.direct_call = 1", input1.c_str(), input2.c_str());
 	}
 	else if (!input1IsSpecific && input2IsSpecific) { 
-		if (input2 == "_") { //E.g (_ , q)
+		if (input1 == "_") { //E.g (_ , q)
 			sprintf_s(sqlBuf, "select 1 from call c where c.variable_name = '%s' and c.direct_call = 1", input2.c_str());
 		}
 		else { //E.g ("First", q)
@@ -878,11 +878,10 @@ bool Database::GetCallsT(string input1, string input2, bool input1IsSpecific, bo
 		}
 	}
 	else if (input1IsSpecific && input2IsSpecific) { //E.g (p, q)
-		cout << "$$";
 		sprintf_s(sqlBuf, "select 1 from call c where c.procedure_name = '%s' and c.variable_name = '%s'", input1.c_str(), input2.c_str());
 	}
 	else if (!input1IsSpecific && input2IsSpecific) {
-		if (input2 == "_") { //E.g (_ , q)
+		if (input1 == "_") { //E.g (_ , q)
 			sprintf_s(sqlBuf, "select 1 from call c where c.variable_name = '%s'", input2.c_str());
 		}
 		else { //E.g ("First", q)
@@ -901,7 +900,6 @@ bool Database::GetCallsT(string input1, string input2, bool input1IsSpecific, bo
 			sprintf_s(sqlBuf, "select 1 from call c where c.procedure_name = '%s'", input1.c_str());
 		}
 		else { //E.g ("First", "Second")
-			
 			sprintf_s(sqlBuf, "select 1 from call c where c.procedure_name = '%s' and c.variable_name = '%s'", input1.c_str(), input2.c_str());
 		}
 	}
