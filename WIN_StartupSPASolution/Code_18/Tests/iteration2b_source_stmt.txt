@@ -1,0 +1,30 @@
+	procedure NonNesting01 {
+1    read a;
+2    test001 =  a + b + c + d;
+3    print code9;
+
+4    while (10 < a) {
+5        read a;
+6        test02 = 20 + (a - b) * (c % d);
+7        print b;
+    }
+
+8    if (10 > a) then {
+9        print coding7;
+10        a = b + c + d;
+11        read coding7;
+    } else {
+12        print test001;
+13        a = b + c + d;
+14        a = b + c + d;
+15        read b;
+    }
+
+16   while (a > c) {
+17        read a;
+18        print b;
+19        test002 = (c / 30 % d);
+20        read b;
+21        print a;
+    }
+}

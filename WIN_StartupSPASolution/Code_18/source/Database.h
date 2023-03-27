@@ -21,7 +21,7 @@ public:
 
 	// method to insert a procedure into the database
 	static void insertProcedure(string procedureName, int start, int end);
-	static void getProcedures(vector<string>& results);
+	static void GetProcedures(vector<string>& results);
 
 	// method to insert a statement into the database
 	static void insertStatement(int stmtNum, string entity, string text);
@@ -31,13 +31,15 @@ public:
 	static void GetVariable(set<string>& result);
 	// method to insert a constant into the database
 	static void insertConstant(string value);
-	static void getConstant(vector<string>& results);
+	static void GetConstant(vector<string>& results);
 
 	// method to insert a parent into the database
 	static void insertParent(int parentStmt, int childStart, int childEnd);
 	//static bool GetParent(string stmtNum1, string stmtNum2, bool input1IsSpecific, bool input2IsSpecific, entity);
-	static bool GetParent(string stmtNum1, string stmtNum2, bool input1IsSpecific, bool input2IsSpecific, string parentEntity, string childEntity);
-	static bool GetParentT(string stmtNum1, string stmtNum2, bool input1IsSpecific, bool input2IsSpecific, string parentEntity, string childEntity);	
+
+	static string GetParentConstruct(string stmtNum1, bool input1IsSpecific);
+	static bool GetParent(string stmtNum1, string stmtNum2, bool input1IsSpecific, bool input2IsSpecific, string parentEntity, string childEntity, SqlResultStore& rs);
+	static bool GetParentT(string stmtNum1, string stmtNum2, bool input1IsSpecific, bool input2IsSpecific, string parentEntity, string childEntity, SqlResultStore& rs);
 	// method to insert/get a modify into the database
 	static void insertModifies(int stmtNum, string variablename);
 
@@ -45,34 +47,28 @@ public:
 	static void insertUses(int stmtNum, string variablename);
 
 	// isSpecific is false if the input is not part of select synonym, and can be found on synonymEntityMap
-	static bool GetUsesForAssign(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
-	static bool GetUsesForPrint(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
-	static bool GetUsesForWhile(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
-	static bool GetUsesForIf(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
-	static bool GetUsesForCall(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
-	static bool GetUsesForProcedure(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
-	static bool GetUsesForUnknownInput1(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific); // E.g., Uses(10,v). We don't know what's the entity at statement 10
+	static string GetUsesConstruct(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
+	static bool GetUsesForAssign(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, SqlResultStore& rs);
+	static bool GetUsesForPrint(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, SqlResultStore& rs);
+	static bool GetUsesForWhile(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, SqlResultStore& rs);
+	static bool GetUsesForIf(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, SqlResultStore& rs);
+	static bool GetUsesForCall(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, SqlResultStore& rs);
+	static bool GetUsesForProcedure(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, SqlResultStore& rs);
+	static bool GetUsesForUnknownInput1(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, SqlResultStore& rs); // E.g., Uses(10,v). We don't know what's the entity at statement 10
 
-	static bool GetModifiesForAssign(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
-	static bool GetModifiesForRead(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
-	static bool GetModifiesForWhile(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
-	static bool GetModifiesForIf(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
-	static bool GetModifiesForCall(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
-	static bool GetModifiesForProcedure(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
-	static bool GetModifiesForUnknownInput1(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific); // E.g., Uses(10,v). We don't know what's the entity at statement 10
-
-	static void GetUsesForAssignVar(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs);
-	static void GetUsesForPrintVar(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs);
-	static void GetUsesForWhileVar(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs);
-	//static void GetUsesForIfVar(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs);
-	//static void GetUsesForCallVar(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs);
-	//static void GetUsesForProcedureVar(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs);
-	static void GetUsesForUnknownInput1Var(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym, SqlResultStore& rs);
+	static string GetModifiesConstruct(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
+	static bool GetModifiesForAssign(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, SqlResultStore& rs);
+	static bool GetModifiesForRead(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, SqlResultStore& rs);
+	static bool GetModifiesForWhile(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, SqlResultStore& rs);
+	static bool GetModifiesForIf(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, SqlResultStore& rs);
+	static bool GetModifiesForCall(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, SqlResultStore& rs);
+	static bool GetModifiesForProcedure(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, SqlResultStore& rs);
+	static bool GetModifiesForUnknownInput1(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, SqlResultStore& rs); // E.g., Uses(10,v). We don't know what's the entity at statement 10
 
 	// method to insert/get a next into the database
 	static void insertNext(int stmtNum1, int stmtNum2);
-	static bool getNext(int stmtNum1, int stmtNum2);
-	static bool getNextT(int stmtNum1, int stmtNum2);
+	static bool GetNext(int stmtNum1, int stmtNum2);
+	static bool GetNextT(int stmtNum1, int stmtNum2);
 
 	//method to insert pattern into the database
 	static void insertPattern(int stmtNum, string LHS, string RHS, string expression);
