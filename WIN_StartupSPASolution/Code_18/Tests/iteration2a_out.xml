@@ -1,8 +1,13 @@
 <?xml-stylesheet type="text/xsl" href="analysis.xsl"?>
 <test_results>
 <info>
-<name>AutoTester</name><parsing_time_taken>2144.000000</parsing_time_taken>
+<name>AutoTester</name><parsing_time_taken>2336.000000</parsing_time_taken>
 </info>
 <queries>
 <query>
 <id ReturnTuple="1" Modifies="1" UnnamedVar="1" Pattern="1" SuchThat="1" CondNum="5" RelNum="1" comment="comment">1062</id><querystr><![CDATA[variable v; assign a, a1; Select v such that Modifies(a, v) pattern a1("z", _)]]></querystr>
+<exception/>
+<timeout/>
+</query>
+<query>
+<id ReturnTuple="1" Parent="1" UnnamedVar="3" Pattern="1" SuchThat="1" CondNum="7" RelNum="1" comment="comment">1064</id><querystr><![CDATA[stmt s; assign a; Select s such that Parent(s, _) pattern a(_, _"y"_)]]></querystr>
