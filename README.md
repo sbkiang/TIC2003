@@ -20,3 +20,4 @@ https://docs.google.com/document/d/141C-LXEx03YDosne7JGE2cusOxzt1lSE_h9qrDzEezg/
 https://docs.google.com/document/d/1bB7gx59PT1cquWKBUzD9juEPpny-NN8-ot8tc_9lC9Q/edit?usp=sharing
 
 # Slides
+https://docs.google.com/presentation/d/1OZFwLfkbB36I15nr7uWU3YnMSX3Fls0ho7z0D_mQ7iM/edit?usp=sharing
