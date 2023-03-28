@@ -224,40 +224,8 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		}
 		set<string> setVariableName;
 		SqlResultStore resultStoreVariableName;
+		SqlResultStore rs;
 		string relationship = suchThatTemp.relationship;
-		if (relationship == "Uses") {
-			if (entityInput1 == "assign") {
-				Database::GetUsesForAssignVar(suchThatTemp.input1, suchThatTemp.input2, input1IsSynonym, input2IsSynonym, resultStoreVariableName);
-				setVariableName = SqlResultStoreToSet(resultStoreVariableName, "variable_name");
-			}
-			else if (entityInput1 == "print") {
-				Database::GetUsesForPrintVar(suchThatTemp.input1, suchThatTemp.input2, input1IsSynonym, input2IsSynonym, resultStoreVariableName);
-				setVariableName = SqlResultStoreToSet(resultStoreVariableName, "variable_name");
-			}
-			else if (entityInput1 == "while") {
-				Database::GetUsesForWhileVar(suchThatTemp.input1, suchThatTemp.input2, input1IsSynonym, input2IsSynonym, resultStoreVariableName);
-				setVariableName = SqlResultStoreToSet(resultStoreVariableName, "variable_name");
-			}
-			else if (entityInput1 == "if") {
-				Database::GetUsesForIfVar(suchThatTemp.input1, suchThatTemp.input2, input1IsSynonym, input2IsSynonym, resultStoreVariableName);
-				setVariableName = SqlResultStoreToSet(resultStoreVariableName, "variable_name");
-			}
-			else if (entityInput1 == "call") {
-				//Database::GetUsesForCallVar(suchThatTemp.input1, suchThatTemp.input2, input1IsSynonym, input2IsSynonym, resultStoreVariableName);
-				setVariableName = SqlResultStoreToSet(resultStoreVariableName, "variable_name");
-			}
-			else if (entityInput1 == "procedure") {
-				//Database::GetUsesForProcedureVar(suchThatTemp.input1, suchThatTemp.input2, input1IsSynonym, input2IsSynonym, resultStoreVariableName);
-				setVariableName = SqlResultStoreToSet(resultStoreVariableName, "variable_name");
-			}
-			else {
-				Database::GetUsesForUnknownInput1Var(suchThatTemp.input1, suchThatTemp.input2, input1IsSynonym, input2IsSynonym, resultStoreVariableName);
-				setVariableName = SqlResultStoreToSet(resultStoreVariableName, "variable_name");
-			}
-		}
-		else if (relationship == "Modifies") {
-			// do this tmr
-		}
 		for(SqlResult sqlResult : sqlResultStore.sqlResult){
 		//for (int i = 0; i < sqlResultStore.sqlResult.size(); i++) {
 			//SqlResult sqlResulTemp = sqlResultStore.sqlResult.at(i);
@@ -270,42 +238,42 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			}
 			if (relationship == "Uses") { // input1 is Stmt Num or Name, input2 is Name
 				if (entityInput1 == "assign") { 
-					pass = Database::GetUsesForAssign(first, second, input1IsSpecific, input2IsSpecific); }
+					pass = Database::GetUsesForAssign(first, second, input1IsSpecific, input2IsSpecific, rs); }
 				else if (entityInput1 == "print") { 
-					pass = Database::GetUsesForPrint(first, second, input1IsSpecific, input2IsSpecific); }
+					pass = Database::GetUsesForPrint(first, second, input1IsSpecific, input2IsSpecific, rs); }
 				else if (entityInput1 == "while") { 
-					pass = Database::GetUsesForWhile(first, second, input1IsSpecific, input2IsSpecific); }
+					pass = Database::GetUsesForWhile(first, second, input1IsSpecific, input2IsSpecific, rs); }
 				else if (entityInput1 == "if") { 
-					pass = Database::GetUsesForIf(first, second, input1IsSpecific, input2IsSpecific); }
+					pass = Database::GetUsesForIf(first, second, input1IsSpecific, input2IsSpecific, rs); }
 				else if (entityInput1 == "call") { 
-					pass = Database::GetUsesForCall(first, second, input1IsSpecific, input2IsSpecific); }
+					pass = Database::GetUsesForCall(first, second, input1IsSpecific, input2IsSpecific, rs); }
 				else if (entityInput1 == "procedure") { 
-					pass = Database::GetUsesForProcedure(first, second, input1IsSpecific, input2IsSpecific); }
+					pass = Database::GetUsesForProcedure(first, second, input1IsSpecific, input2IsSpecific, rs); }
 				else { 
-					pass = Database::GetUsesForUnknownInput1(first, second, input1IsSpecific, input2IsSpecific); } // e.g., uses(10,v) or uses("main",v). just pass in here even
+					pass = Database::GetUsesForUnknownInput1(first, second, input1IsSpecific, input2IsSpecific, rs); } // e.g., uses(10,v) or uses("main",v). just pass in here even
 				// add in code to check if synonym used in query. If not, then just need to test once for first row, and result applies to all row
 			}
 			else if (relationship == "Modifies") { // input1 is Stmt Num or Name, input2 is Name or Wildcard
 				if (entityInput1 == "assign") { 
-					pass = Database::GetModifiesForAssign(first, second, input1IsSpecific, input2IsSpecific); }
+					pass = Database::GetModifiesForAssign(first, second, input1IsSpecific, input2IsSpecific, rs); }
 				else if (entityInput1 == "read") { 
-					pass = Database::GetModifiesForRead(first, second, input1IsSpecific, input2IsSpecific); }
+					pass = Database::GetModifiesForRead(first, second, input1IsSpecific, input2IsSpecific, rs); }
 				else if (entityInput1 == "while") { 
-					pass = Database::GetModifiesForWhile(first, second, input1IsSpecific, input2IsSpecific); }
+					pass = Database::GetModifiesForWhile(first, second, input1IsSpecific, input2IsSpecific, rs); }
 				else if (entityInput1 == "if") { 
-					pass = Database::GetModifiesForIf(first, second, input1IsSpecific, input2IsSpecific); }
+					pass = Database::GetModifiesForIf(first, second, input1IsSpecific, input2IsSpecific, rs); }
 				else if (entityInput1 == "call") { 
-					pass = Database::GetModifiesForCall(first, second, input1IsSpecific, input2IsSpecific); }
+					pass = Database::GetModifiesForCall(first, second, input1IsSpecific, input2IsSpecific, rs); }
 				else if (entityInput1 == "procedure") { 
-					pass = Database::GetModifiesForProcedure(first, second, input1IsSpecific, input2IsSpecific); }
+					pass = Database::GetModifiesForProcedure(first, second, input1IsSpecific, input2IsSpecific, rs); }
 				else { 
-					pass = Database::GetModifiesForUnknownInput1(first, second, input1IsSpecific, input2IsSpecific); } // e.g., uses(10,v) or uses("main",v). just pass in here even
+					pass = Database::GetModifiesForUnknownInput1(first, second, input1IsSpecific, input2IsSpecific, rs); } // e.g., uses(10,v) or uses("main",v). just pass in here even
 			}
 			else if (relationship == "Parent") { // input1 is Stmt Num, input2 is Stmt Num
-				pass = Database::GetParent(first, second, input1IsSpecific, input2IsSpecific, entityInput1, entityInput2);
+				pass = Database::GetParent(first, second, input1IsSpecific, input2IsSpecific, entityInput1, entityInput2, rs);
 			}
 			else if (relationship == "Parent*") { // input1 is Stmt Num, input2 is Stmt Num
-				pass = Database::GetParentT(first, second, input1IsSpecific, input2IsSpecific, entityInput1, entityInput2);
+				pass = Database::GetParentT(first, second, input1IsSpecific, input2IsSpecific, entityInput1, entityInput2, rs);
 			}
 			else if (relationship == "Next") {
 
@@ -383,11 +351,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		// patternResult contains line_num and LHS
 		// LHS to update the variableSynonymSetMap. line_num is to update the sqlResultSet, if it's a line_num entity
 		set<string> patternLhsSet;
-		vector<string> patternLineNum;
-		for (int i = 0; i < patternResult.sqlResult.size(); i++) {
-			patternLhsSet.insert(patternResult.sqlResult.at(i).row.at("lhs"));
-			patternLineNum.push_back(patternResult.sqlResult.at(i).row.at("line_num"));
-		}
+
 		if (input1IsSynonym) {
 			set<string> intersect;
 			set<string> variableSynonymSet = variableSynonymSetMap.at(patternTemp.input1);
@@ -398,19 +362,6 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 
 		// this step is to update the sqlResultStore if the pattern entity is part of select
 		
-		vector<SqlResult> sqlResultPass;
-		if (find(select.synonym.begin(), select.synonym.end(), patternTemp.synonym) != select.synonym.end()) {
-			for (string lineNum : patternLineNum) {
-				for (SqlResult sqlResult : sqlResultStore.sqlResult) {
-					for (auto it = sqlResult.row.begin(); it != sqlResult.row.end(); it++) {
-						string entity = synonymEntityMap.at(it->first);
-						if(entity == "assign" && lineNum == it->second) {
-							sqlResultPass.push_back(sqlResult);
-						}
-					}
-				}
-			}
-		}
 		sqlResultStore.sqlResult = sqlResultPass;
 		patternStack.pop();
 	}

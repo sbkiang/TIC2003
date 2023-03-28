@@ -37,9 +37,33 @@ public:
 	static void insertParent(int parentStmt, int childStart, int childEnd);
 	//static bool GetParent(string stmtNum1, string stmtNum2, bool input1IsSpecific, bool input2IsSpecific, entity);
 
-	static string GetParentConstruct(string stmtNum1, bool input1IsSpecific);
+	static string GetParentConstruct(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym);
+	static string GetDirectParent(string input1);
+
 	static bool GetParent(string stmtNum1, string stmtNum2, bool input1IsSpecific, bool input2IsSpecific, string parentEntity, string childEntity, SqlResultStore& rs);
-	static bool GetParentT(string stmtNum1, string stmtNum2, bool input1IsSpecific, bool input2IsSpecific, string parentEntity, string childEntity, SqlResultStore& rs);
+	static bool GetParentAnyAny(string frontSql, SqlResultStore& rs); // Parent(stmt/_ , stmt/_) 
+	static bool GetParentAnySynonym(string frontSql, string input2, SqlResultStore& rs); // Parent(stmt/_, read/print/assign/while/if/call)
+	static bool GetParentAnySpecific(string frontSql, string input2, SqlResultStore& rs); // Parent(stmt/_, 10)
+	static bool GetParentSynonymAny(string frontSql, string input1, SqlResultStore& rs); // Parent(while/if, stmt/_)
+	static bool GetParentSynonymSynonym(string frontSql, string input1, string input2, SqlResultStore& rs); // Parent(while/if, read/print/assign/while/if/call)
+	static bool GetParentSynonymSpecific(string frontSql, string input1, string input2, SqlResultStore& rs); // Parent(while/if, 10)
+	static bool GetParentSpecificAny(string frontSql, string input1, SqlResultStore& rs); // Parent(10, stmt/_)
+	static bool GetParentSpecificSynonym(string frontSql, string input1, string input2, SqlResultStore& rs); // Parent(10, read/print/assign/while/if/call)
+	static bool GetParentSpecificSpecific(string frontSql, string input1, string input2, SqlResultStore& rs); // // Parent(10, 10)
+	
+	static bool GetParentT(string stmtNum1, string stmtNum2, bool input1IsSpecific, bool input2IsSpecific, string parentEntity, string childEntity, SqlResultStore& rs);	static bool GetParentAnyAnyT(string frontSql, SqlResultStore& rs); // Parent(stmt/_ , stmt/_) 
+	static bool GetParentTAnyAny(string frontSql, SqlResultStore& rs); // Parent(stmt/_ , stmt/_) 
+	static bool GetParentTAnySynonym(string frontSql, string input2, SqlResultStore& rs); // Parent(stmt/_, read/print/assign/while/if/call)
+	static bool GetParentTAnySpecific(string frontSql, string input2, SqlResultStore& rs); // Parent(stmt/_, 10)
+	static bool GetParentTSynonymAny(string frontSql, string input1, SqlResultStore& rs); // Parent(while/if, stmt/_)
+	static bool GetParentTSynonymSynonym(string frontSql, string input1, string input2, SqlResultStore& rs); // Parent(while/if, read/print/assign/while/if/call)
+	static bool GetParentTSynonymSpecific(string frontSql, string input1, string input2, SqlResultStore& rs); // Parent(while/if, 10)
+	static bool GetParentTSpecificAny(string frontSql, string input1, SqlResultStore& rs); // Parent(10, stmt/_)
+	static bool GetParentTSpecificSynonym(string frontSql, string input1, string input2, SqlResultStore& rs); // Parent(10, read/print/assign/while/if/call)
+	static bool GetParentTSpecificSpecific(string frontSql, string input1, string input2, SqlResultStore& rs); // // Parent(10, 10)
+	
+	static bool ExecuteSql(string sql, SqlResultStore& rs);
+	
 	// method to insert/get a modify into the database
 	static void insertModifies(int stmtNum, string variablename);
 
@@ -47,14 +71,28 @@ public:
 	static void insertUses(int stmtNum, string variablename);
 
 	// isSpecific is false if the input is not part of select synonym, and can be found on synonymEntityMap
-	static string GetUsesConstruct(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
+	static string GetUsesConstructProcedure(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym);
+	static string GetUsesConstructStmt(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym);
 	static bool GetUsesForAssign(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, SqlResultStore& rs);
+	static bool GetUsesForAssignAnyAny(string frontSql, SqlResultStore& rs);
+	static bool GetUsesForAssignAnySynonym(string frontSql, string input2, SqlResultStore& rs);
+	static bool GetUsesForAssignAnySpecific(string frontSql, string input2, SqlResultStore& rs);
+	static bool GetUsesForAssignSynonymAny(string frontSql, string input1, SqlResultStore& rs);
+	static bool GetUsesForAssignSynonymSynonym(string frontSql, string input1, string input2, SqlResultStore& rs);
+	static bool GetUsesForAssignSynonymSpecific(string frontSql, string input1, string input2, SqlResultStore& rs);
+
 	static bool GetUsesForPrint(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, SqlResultStore& rs);
+
 	static bool GetUsesForWhile(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, SqlResultStore& rs);
+
 	static bool GetUsesForIf(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, SqlResultStore& rs);
+
 	static bool GetUsesForCall(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, SqlResultStore& rs);
+
 	static bool GetUsesForProcedure(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, SqlResultStore& rs);
-	static bool GetUsesForUnknownInput1(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, SqlResultStore& rs); // E.g., Uses(10,v). We don't know what's the entity at statement 10
+
+	static bool GetUsesForUnknownInput1(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, SqlResultStore& rs);
+ // E.g., Uses(10,v). We don't know what's the entity at statement 10
 
 	static string GetModifiesConstruct(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
 	static bool GetModifiesForAssign(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, SqlResultStore& rs);

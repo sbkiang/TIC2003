@@ -8,6 +8,8 @@ vector<vector<string>> Database::dbResults;
 char* Database::errorMessage;
 SqlResultStore* sqlResultStoreForCallback;
 string regexDigit = "^\\d+";
+string regexStmtNumEntity = "(stmt|read|print|assign|while|if|call)";
+string regexNameEntity = "(variable|procedure)";
 
 // method to connect to the database and initialize tables in the database
 void Database::initialize() {
@@ -260,16 +262,96 @@ void Database::GetVariable(set<string>& result) {
 	}
 }
 
-string Database::GetParentConstruct(string stmtNum1, bool input1IsSpecific) {
+string Database::GetParentConstruct(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym) {
+	//Parent(parent_line, child_line)
+
 	char sqlBuf[512] = {};
-	if (!input1IsSpecific && stmtNum1 != "_") { // input1 is synonym
-		sprintf_s(sqlBuf, "select %s", stmtNum1.c_str());
+	// if input1 is a stmtNum entity, replace column name as synonym
+	if(input1IsSynonym){
+		sprintf_s(sqlBuf, "select p.line_num as %s", input1.c_str());
 	}
+
+	// if input1 is not a stmtNum entity, select normal col name
 	else {
-		sprintf_s(sqlBuf, "select line_num"); // input1 not synonym
+		sprintf_s(sqlBuf, "select p.line_num", input1.c_str());
+	}
+
+	// if input2 is a stmtNum entity, replace column name as synonym
+	if (input2IsSynonym){
+		sprintf_s(sqlBuf, "%s, c.line_num as %s", sqlBuf, input1.c_str());
+	}
+
+	// if input2 is not a stmtNum entity, select normal col name
+	else {
+		sprintf_s(sqlBuf, "%s, c.line_num", sqlBuf, input1.c_str());
 	}
 	return string(sqlBuf);
 }
+
+string Database::GetDirectParent(string input1) {
+	char sqlBuf[100];
+	sprintf_s(sqlBuf, "select p.line_num from parent p where %s between p.child_start and p.child_end order by p.line_num desc limit 1)", input1.c_str());
+	SqlResultStore rs;
+	sqlResultStoreForCallback = &rs;
+	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
+	if (errorMessage) { cout << "GetDirectParent SQL Error: " << errorMessage; exit(1); }
+	return "test";
+}
+
+// Parent(stmt/_ , stmt/_)
+bool Database::GetParentAnyAny(string frontSql, SqlResultStore& rs) {
+	char sqlBuf[512] = {};
+	sprintf_s(sqlBuf, "select p.line_num  as parent, s.line_num as child from parent p join statement s on s.line_num between p.child_start and p.child_end where p.line_num = (select p.line_num from parent p where s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1)", frontSql.c_str());
+}
+
+// Parent(stmt/_, read/print/assign/while/if/call)
+bool Database::GetParentAnySynonym(string frontSql, string input2, SqlResultStore& rs) {
+	char sqlBuf[512] = {};
+	sprintf_s(sqlBuf, "%s from statement s join parent p on s.line_num between p.child_start and p.child_end and s.entity = '%s' and p.line_num = (select p.line_num from parent p where s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1)", frontSql.c_str(), input2.c_str());
+}
+
+// Parent(stmt/_, 10)
+bool Database::GetParentAnySpecific(string frontSql, string input2, SqlResultStore& rs) {
+	char sqlBuf[512] = {};
+	sprintf_s(sqlBuf, "%s from statement s join parent p on s.line_num between p.child_start and p.child_end and s.line_num = %s order by p.line_num desc limit 1", frontSql.c_str(), input2.c_str());
+}
+
+// Parent(while/if, stmt/_)
+bool Database::GetParentSynonymAny(string frontSql, string input1, SqlResultStore& rs) {
+	char sqlBuf[512] = {};
+	sprintf_s(sqlBuf, "%s from parent p join statement s on s.line_num between p.child_start and p.child_end where p.line_num in (select line_num from statement where entity = '%s') and p.line_num = (select p.line_num from parent p where s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1)", frontSql.c_str(), input1.c_str());
+}
+
+// Parent(while/if, read/print/assign/while/if/call)
+bool Database::GetParentSynonymSynonym(string frontSql, string input1, string input2, SqlResultStore& rs) {
+	char sqlBuf[512] = {};
+	sprintf_s(sqlBuf, "select p.line_num  as parent, s.line_num as child from parent p join statement s on s.line_num between p.child_start and p.child_end where s.entity = '%s' and p.line_num in (select line_num from statement where entity = '%s') and p.line_num = (select p.line_num from parent p where s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1)", frontSql.c_str(), input2.c_str(), input1.c_str());
+}
+
+// Parent(while/if, 10)
+bool Database::GetParentSynonymSpecific(string frontSql, string input1, string input2, SqlResultStore& rs) {
+	char sqlBuf[512] = {};
+	sprintf_s(sqlBuf, "select p.line_num  as parent, s.line_num as child from parent p join statement s on s.line_num between p.child_start and p.child_end where s.line_num = %s and p.line_num in (select line_num from statement where entity = '%s') and p.line_num = (select p.line_num from parent p where s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1)", frontSql.c_str(), input2.c_str(), input1.c_str());
+}
+
+// Parent(10, stmt/_)
+bool Database::GetParentSpecificAny(string frontSql, string input1, SqlResultStore& rs) {
+	char sqlBuf[512] = {};
+	sprintf_s(sqlBuf, "select p.line_num  as parent, s.line_num as child from parent p join statement s on s.line_num between p.child_start and p.child_end where p.line_num = %s and p.line_num = (select p.line_num from parent p where s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1)", frontSql.c_str(), input1.c_str());
+}
+
+// Parent(10, read/print/assign/while/if/call)
+bool Database::GetParentSpecificSynonym(string frontSql, string input1, string input2, SqlResultStore& rs) {
+	char sqlBuf[512] = {};
+	sprintf_s(sqlBuf, "select p.line_num  as parent, s.line_num as child from parent p join statement s on s.line_num between p.child_start and p.child_end where p.line_num = %s and s.entity = '%s' and p.line_num = (select p.line_num from parent p where s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1)", frontSql.c_str(), input1.c_str(), input2.c_str());
+}
+
+// Parent(10, 10)
+bool Database::GetParentSpecificSpecific(string frontSql, string input1, string input2, SqlResultStore& rs) {
+	char sqlBuf[512] = {};
+	sprintf_s(sqlBuf, "select p.line_num  as parent, s.line_num as child from parent p join statement s on s.line_num between p.child_start and p.child_end and p.line_num = %s and s.line_num = %s", frontSql.c_str(), input1.c_str(), input2.c_str());
+}
+
 
 bool Database::GetParent(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, string parentEntity, string childEntity, SqlResultStore& rs) {
 	/*	select 1 from statement s where s.entity = '%s' and ((select p.line_num from parent p where p.line_num = %s and s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1) = (select p.line_num from parent p join statement s2 where s2.entity = '%s' and s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1))
@@ -283,16 +365,50 @@ bool Database::GetParent(string input1, string input2, bool input1IsSpecific, bo
 	*/
 
 	char sqlBuf[512] = {};
-	string first = Database::GetParentConstruct(input1, input1IsSpecific);
-	sprintf_s(sqlBuf, "%s", first.c_str());
+	string sqlPart = Database::GetParentConstruct(input1, input2, (!input1IsSpecific && input1 != "_"), (!input2IsSpecific && input2 != "_"));
+	sprintf_s(sqlBuf, "%s", sqlPart.c_str());
+	//string directParent = Database::GetDirectParent()
+	//parent(stmt/while/if, stmt/read/print/assign/while/if/call)
+	if (input1IsSpecific && input2IsSpecific) { // parent(10,12)
+		sprintf_s(sqlBuf, "%s from statement s join parent p on s.line_num between p.child_start and p.child_end where p.line_num = %s and s.line_num = %s and ((select p.line_num from parent p where p.line_num = %s and s.line_num between p.child_start and p.child_end) = (select p.line_num from parent p where s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1))", sqlBuf, input2.c_str(), input1.c_str());
+	}
 
-	// Parent(s1,10) or Parent(s1,s2), only "s2" present in select. "s1' is either "while w" or "if i" = generic
-	if (!input1IsSpecific && input2IsSpecific) {
-		if (parentEntity == "stmt") { // if parentEntity is stmt, then it's any container
-			sprintf_s(sqlBuf, "%s from statement s where s.line_num = %s and exists (select 1 from parent p join statement s2 on p.line_num = s2.line_num where s.line_num between p.child_start and p.child_end)", sqlBuf, input2.c_str());
+	if (input1IsSpecific && !input2IsSpecific) { //parent(10, stmt/read/print/assign/while/if/call/_)
+		if (childEntity == "stmt" || input2 == "_") { // if childEntity is stmt, then it's any statement nested in a container
+			sprintf_s(sqlBuf, "%s from statement s join parent p on s.line_num between p.child_start and p.child_end and p.line_num = %s and p.line_num = (select p.line_num from parent p where s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1)", sqlBuf, input1.c_str());
 		}
-		else {
-			sprintf_s(sqlBuf, "%s from statement s where s.line_num = %s and ((select p.line_num from parent p join statement s2 on p.line_num = s2.line_num where s2.entity = '%s' and s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1) = (select p.line_num from parent p where s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1))", sqlBuf, input2.c_str(), parentEntity.c_str());
+		else { //parent(10, read/print/assign/while/if/call/)
+			sprintf_s(sqlBuf, "%s from statement s join parent p on s.line_num between p.child_start and p.child_end and p.line_num = %s where s.entity = '%s' and p.line_num = (select p.line_num from parent p where s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1)", sqlBuf, input1.c_str(), childEntity.c_str());
+		}
+	}
+
+	if (!input1IsSpecific && input2IsSpecific) { // parent(stmt/while/if/_, 10)
+		if (parentEntity == "stmt" || input1 == "_") { // any parent container entity
+			sprintf_s(sqlBuf, "%s from statement s join parent p on s.line_num between p.child_start and p.child_end and s.line_num = %s order by p.line_num desc limit 1", sqlBuf, input2.c_str());
+		}
+		else { // parent(while/if, 10)
+			string parentLineNum = Database::GetDirectParent(input2);
+			sprintf_s(sqlBuf, "%s from statement s join parent p on s.line_num between p.child_start and p.child_end and s.line_num = %s and %s in (select p.line_num from parent p join statement s on p.line_num = s.line_num and s.entity = '%s') order by p.line_num desc limit 1", sqlBuf, input2.c_str(), input2.c_str(), parentEntity.c_str());
+		}
+	}
+
+	if (!input1IsSpecific && !input2IsSpecific) { // parent(stmt/while/if/_, stmt/read/print/assign/while/if/call/_)
+		if (parentEntity == "stmt" || input1 == "_"){ // any parent container entity
+			sprintf_s(sqlBuf, "%s from statement s join parent p on s.line_num between p.child_start and p.child_end", sqlBuf );
+		}
+	}
+
+
+
+
+
+	// Parent(s1,10). "s1' is either "while w" or "if i" = generic
+	if (!input1IsSpecific && input2IsSpecific) {
+		if (parentEntity == "stmt") { // if parentEntity is stmt, then it's any container. So if the stmt is within a container, we want it
+			sprintf_s(sqlBuf, "%s from statement s join parent p on s.line_num between p.child_start and p.child_end where s.line_num = %s and exists (select 1 from parent p join statement s2 on p.line_num = s2.line_num where s.line_num between p.child_start and p.child_end)", sqlBuf, input2.c_str());
+		}
+		else { // if parentEntity is not stmt, then it's the specific container
+			sprintf_s(sqlBuf, "%s from statement s join parent p on s.line_num between p.child_start and p.child_end where s.line_num = %s and ((select p.line_num from parent p join statement s2 on p.line_num = s2.line_num where s2.entity = '%s' and s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1) = (select p.line_num from parent p where s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1))", sqlBuf, input2.c_str(), parentEntity.c_str());
 		}
 	}
 
@@ -330,7 +446,7 @@ bool Database::GetParent(string input1, string input2, bool input1IsSpecific, bo
 
 bool Database::GetParentT(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, string parentEntity, string childEntity, SqlResultStore& rs) {
 	char sqlBuf[512] = {};
-	string first = Database::GetParentConstruct(input1, input1IsSpecific);
+	string first = Database::GetParentConstruct(input1, input2, input1IsSpecific, input2IsSpecific);
 	sprintf_s(sqlBuf, "%s", first.c_str());
 
 	// Parent(s1,10) or Parent(s1,s2), only "s2" present in select. "s1' is either "while w" or "if i" = generic
@@ -375,19 +491,113 @@ bool Database::GetParentT(string input1, string input2, bool input1IsSpecific, b
 	return (!(sqlResultStoreForCallback->sqlResult.empty()));
 }
 
-string Database::GetUsesConstruct(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific) {
+bool Database::GetParentTAnyAny(string frontSql, SqlResultStore& rs)
+{
 	char sqlBuf[512] = {};
-	if (!input1IsSpecific && input1 != "_") { // input1 is synonym
-		sprintf_s(sqlBuf, "select %s", input1.c_str());
+	sprintf_s(sqlBuf, "select p.line_num  as parent, s.line_num as child from parent p join statement s on s.line_num between p.child_start and p.child_end", frontSql.c_str());
+	return ExecuteSql(string(sqlBuf), rs);
+}
+
+bool Database::GetParentTAnySynonym(string frontSql, string input2, SqlResultStore& rs)
+{
+	char sqlBuf[512] = {};
+	sprintf_s(sqlBuf, "%s from statement s join parent p on s.line_num between p.child_start and p.child_end and s.entity = '%s'", frontSql.c_str(), input2.c_str());
+	return ExecuteSql(string(sqlBuf), rs);
+}
+
+bool Database::GetParentTAnySpecific(string frontSql, string input2, SqlResultStore& rs)
+{
+	char sqlBuf[512] = {};
+	sprintf_s(sqlBuf, "%s from statement s join parent p on s.line_num between p.child_start and p.child_end and s.line_num = %s", frontSql.c_str(), input2.c_str());
+	return ExecuteSql(string(sqlBuf), rs);
+}
+
+bool Database::GetParentTSynonymAny(string frontSql, string input1, SqlResultStore& rs)
+{
+	char sqlBuf[512] = {};
+	sprintf_s(sqlBuf, "%s from parent p join statement s on s.line_num between p.child_start and p.child_end where p.line_num in (select line_num from statement where entity = '%s')", frontSql.c_str(), input1.c_str());
+	return ExecuteSql(string(sqlBuf), rs);
+}
+
+bool Database::GetParentTSynonymSynonym(string frontSql, string input1, string input2, SqlResultStore& rs)
+{
+	char sqlBuf[512] = {};
+	sprintf_s(sqlBuf, "select p.line_num  as parent, s.line_num as child from parent p join statement s on s.line_num between p.child_start and p.child_end where s.entity = '%s' and p.line_num in (select line_num from statement where entity = '%s')", frontSql.c_str(), input2.c_str(), input1.c_str());
+	return ExecuteSql(string(sqlBuf), rs);
+}
+
+bool Database::GetParentTSynonymSpecific(string frontSql, string input1, string input2, SqlResultStore& rs)
+{
+	char sqlBuf[512] = {};
+	sprintf_s(sqlBuf, "select p.line_num  as parent, s.line_num as child from parent p join statement s on s.line_num between p.child_start and p.child_end where s.line_num = %s and p.line_num in (select line_num from statement where entity = '%s')", frontSql.c_str(), input2.c_str(), input1.c_str());
+	return ExecuteSql(string(sqlBuf), rs);
+}
+
+bool Database::GetParentTSpecificAny(string frontSql, string input1, SqlResultStore& rs)
+{
+	char sqlBuf[512] = {};
+	sprintf_s(sqlBuf, "select p.line_num  as parent, s.line_num as child from parent p join statement s on s.line_num between p.child_start and p.child_end where p.line_num = %s", frontSql.c_str(), input1.c_str());
+	return ExecuteSql(string(sqlBuf), rs);
+}
+
+bool Database::GetParentTSpecificSynonym(string frontSql, string input1, string input2, SqlResultStore& rs)
+{
+	char sqlBuf[512] = {};
+	sprintf_s(sqlBuf, "select p.line_num  as parent, s.line_num as child from parent p join statement s on s.line_num between p.child_start and p.child_end where p.line_num = %s and s.entity = '%s'", frontSql.c_str(), input1.c_str(), input2.c_str());
+	return ExecuteSql(string(sqlBuf), rs);
+}
+
+bool Database::GetParentTSpecificSpecific(string frontSql, string input1, string input2, SqlResultStore& rs)
+{
+	char sqlBuf[512] = {};
+	sprintf_s(sqlBuf, "select p.line_num  as parent, s.line_num as child from parent p join statement s on s.line_num between p.child_start and p.child_end and p.line_num = %s and s.line_num = %s", frontSql.c_str(), input1.c_str(), input2.c_str());
+	return ExecuteSql(string(sqlBuf), rs);
+}
+
+bool Database::ExecuteSql(string sql, SqlResultStore& rs)
+{
+	sqlResultStoreForCallback = &rs;
+	sqlite3_exec(dbConnection, sql.c_str(), callback, 0, &errorMessage);
+	if (errorMessage) {
+		cout << errorMessage; return false;
+	}
+	return true;
+}
+
+
+
+string Database::GetUsesConstructProcedure(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym) {
+	char sqlBuf[512] = {};
+	if(input1IsSynonym){
+		sprintf_s(sqlBuf, "select p.name as %s", input1.c_str());
 	}
 	else {
-		sprintf_s(sqlBuf, "select line_num"); // input1 not synonym
+		sprintf_s(sqlBuf, "select p.name", input1.c_str());
 	}
-	if (!input2IsSpecific && input2 != "_") {
-		sprintf_s(sqlBuf, "%s ,%s", sqlBuf, input2.c_str()); // select v1,v2
+
+	if (input2IsSynonym) {
+		sprintf_s(sqlBuf, "%s, v.name as %s", sqlBuf, input1.c_str());
+	}
+	else{
+		sprintf_s(sqlBuf, "%s, v.name", sqlBuf);
+	}
+	return string(sqlBuf);
+}
+
+string Database::GetUsesConstructStmt(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym) {
+	char sqlBuf[512] = {};
+	if (input1IsSynonym) {
+		sprintf_s(sqlBuf, "select u.line_num as %s", input1.c_str());
 	}
 	else {
-		sprintf_s(sqlBuf, "%s, variable_name"); // select line_num, variable_name
+		sprintf_s(sqlBuf, "select u.line_num", input1.c_str());
+	}
+
+	if (input2IsSynonym) {
+		sprintf_s(sqlBuf, "%s, v.name as %s", sqlBuf, input1.c_str());
+	}
+	else {
+		sprintf_s(sqlBuf, "%s, v.name", sqlBuf);
 	}
 	return string(sqlBuf);
 }
@@ -413,7 +623,7 @@ bool Database::GetUsesForAssign(string input1, string input2, bool input1IsSpeci
 	// select 1 from use u where u.variable_name = '%s' and u.line_num in (select s.line_num from statement s where entity = 'assign' and s.line_num = '%s');
 
 	char sqlBuf[512] = {};
-	string first = Database::GetUsesConstruct(input1, input2, input1IsSpecific, input2IsSpecific);
+	string first = Database::GetUsesConstructStmt(input1, input2, input1IsSpecific, input2IsSpecific);
 	sprintf_s(sqlBuf, "%s", input1.c_str());
 
 	// Uses(a,"cenX") or Uses(a,v) where "a" is "assign a", "v" is "variable v", "a" not present in select, "v" present in select
@@ -447,7 +657,7 @@ bool Database::GetUsesForPrint(string input1, string input2, bool input1IsSpecif
 	// select 1 from use u where u.variable_name = '%s' and u.line_num in (select s.line_num from statement s where entity = 'print' and s.line_num = '%s');
 
 	char sqlBuf[512] = {};
-	string first = Database::GetUsesConstruct(input1, input2, input1IsSpecific, input2IsSpecific);
+	string first = Database::GetUsesConstructStmt(input1, input2, input1IsSpecific, input2IsSpecific);
 	sprintf_s(sqlBuf, "%s", input1.c_str());
 
 	// Uses(p,"cenX") or Uses(p,v) where "p" is "print p", "v" is "variable v", "p" not present in select, "v" present in select
@@ -481,7 +691,7 @@ bool Database::GetUsesForWhile(string input1, string input2, bool input1IsSpecif
 	//select 1 from use u where u.variable_name = '%s' and exists (select 1 from parent p join statement s on p.line_num = s.line_num where s.entity = 'while' and u.line_num between p.line_num and p.child_end)
 	
 	char sqlBuf[512] = {};
-	string first = Database::GetUsesConstruct(input1, input2, input1IsSpecific, input2IsSpecific);
+	string first = Database::GetUsesConstructStmt(input1, input2, input1IsSpecific, input2IsSpecific);
 	sprintf_s(sqlBuf, "%s", input1.c_str());
 
 	// Uses(w,"cenX") or Uses(w,v) is true, where "w" is while w, "v" is variable v, "w" not present in select, "v" present in select
@@ -516,7 +726,7 @@ bool Database::GetUsesForIf(string input1, string input2, bool input1IsSpecific,
 	//select 1 from use u where u.variable_name = '%s' and exists (select 1 from parent p join statement s on p.line_num = s.line_num where s.entity = 'if' and u.line_num between p.line_num and p.child_end)
 	
 	char sqlBuf[512] = {};
-	string first = Database::GetUsesConstruct(input1, input2, input1IsSpecific, input2IsSpecific);
+	string first = Database::GetUsesConstructStmt(input1, input2, input1IsSpecific, input2IsSpecific);
 	sprintf_s(sqlBuf, "%s", input1.c_str());
 
 	// Uses(i,"cenX") or Uses(i,v) where "i" is "if i", "v" is "variable v", "i" not present in select, "v" present in select
@@ -550,7 +760,7 @@ bool Database::GetUsesForCall(string input1, string input2, bool input1IsSpecifi
 	//select 1 from use u where u.variable_name = '%s' and exists (select 1 from statement s where s.entity = 'call' and s.text = '%s' and s.line_num = u.line_num)
 	
 	char sqlBuf[512] = {};
-	string first = Database::GetUsesConstruct(input1, input2, input1IsSpecific, input2IsSpecific);
+	string first = Database::GetUsesConstructStmt(input1, input2, input1IsSpecific, input2IsSpecific);
 	sprintf_s(sqlBuf, "%s", input1.c_str());
 
 	// Uses(c,"cenX") or Uses(c,v) is true, where "c" is "call c", "v" is variable v, "c" not present in select, "v" present in select
@@ -584,7 +794,7 @@ bool Database::GetUsesForProcedure(string input1, string input2, bool input1IsSp
 	//select 1 from use u where u.variable_name = '%s' and exists (select 1 from procedure p where p.name = '%s' and u.line_num between p.start and p.end)
 
 	char sqlBuf[512] = {};
-	string first = Database::GetUsesConstruct(input1, input2, input1IsSpecific, input2IsSpecific);
+	string first = Database::GetUsesConstructStmt(input1, input2, input1IsSpecific, input2IsSpecific);
 	sprintf_s(sqlBuf, "%s", input1.c_str());
 
 	// Uses(p,"cenX") or Uses(p,v) is true, where "p" is "procedure p", "v" is variable v, "p" not present in select, "v" present in select

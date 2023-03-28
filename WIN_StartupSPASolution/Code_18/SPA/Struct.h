@@ -3,11 +3,11 @@
 #include "Container.h"
 #include <map>
 #include <algorithm>
-#include <unordered_map>
 
 using namespace std;
 
 struct SqlResult;
+//struct SqlResultSet;
 
 struct CFGNode {
 	Statement* _stmtPtr = NULL;
@@ -15,13 +15,18 @@ struct CFGNode {
 	CFGNode* _fJump = NULL; //For non-condition statement, _fJump points to NULL. For condition statement, _fJump points to first statement in the fail condition block
 };
 
-struct SqlResultStore {
+struct SqlResultStore{
 	vector<SqlResult> sqlResult;
-	set<SqlResult> sqlResult;
-	set<string> colName;
+	//set<SqlResultSet> sqlResultSet;
+	//set<string> colName;
 };
 
-struct SqlResult : SqlResultStore {
+struct SqlResult{
+	map<string, string> row; // store mapping of column name to value
+};
+
+/*
+struct SqlResultSet : SqlResultStore {
 	map<string, string> row; // store mapping of column name to value
 	bool operator< (const SqlResult& otherSqlRow) const
 	{
@@ -36,6 +41,7 @@ struct SqlResult : SqlResultStore {
 		}
 		return thisHashResult < otherHashResult;
 	}
+
 	bool operator==(const SqlResult& otherSqlRow) const
 	{
 		vector<string> intersect;
@@ -50,7 +56,7 @@ struct SqlResult : SqlResultStore {
 		return thisHashResult == otherHashResult;
 	}
 };
-
+*/
 
 struct SuchThat {
 	string relationship = "";
