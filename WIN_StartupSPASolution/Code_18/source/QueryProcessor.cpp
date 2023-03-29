@@ -21,7 +21,7 @@ set<string> QueryProcessor::SqlResultStoreToSet(SqlResultStore rs, string col) {
 }
 
 void QueryProcessor::EvaluateSelect(Select& select, map<string,string> synEntMap) {
-	string regexStmtNumEntity = "(stmt|read|print|assign|while|if|call)", regexNameEntity = "(variable|procedure|constant)", columnName = "", stmtTable = "statement";
+	string columnName = "", stmtTable = "statement";
 	map<string, int> tableCountMap;
 	int counter = 0;
 	char sqlBuf[1024] = {};
@@ -46,14 +46,14 @@ void QueryProcessor::EvaluateSelect(Select& select, map<string,string> synEntMap
 			tableAlias = sqlBuf;
 			sprintf_s(sqlBuf, "%s %s", entity.c_str(), tableAlias.c_str()); // E.g., procedure p0, variable v0, constant c0
 		}
-		/*else if (entity == "constant") {
+		else if (entity == "constant") {
 			if (tableCountMap.find(entity) == tableCountMap.end()) { tableCountMap.insert(pair<string, int>(entity, 0)); }
 			else { tableCountMap.at(entity)++; }
 			columnName = "value";
 			sprintf_s(sqlBuf, "c%s", to_string(tableCountMap.at(entity)).c_str());
 			tableAlias = sqlBuf;
 			sprintf_s(sqlBuf, "%s %s", entity.c_str(), tableAlias.c_str()); // E.g., constant c0, constant c1
-		}*/
+		}
 		select.tableSql.push_back(sqlBuf);
 		sprintf_s(sqlBuf, "%s.%s", tableAlias.c_str(), columnName.c_str()); // E.g., s0.line_num as a, s1.line_num as b, p0.name as p
 		select.columnSql.push_back(sqlBuf);
@@ -81,8 +81,6 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 
 	string regexWord = "\\w+";
 	string regexQuote = "\\\"";
-	string regexRelation = "(Parent|Next|Calls|Modifies|Uses)";
-	string regexEntity = "(procedure|variable|constant|call|assign|stmt|read|print|while|if)";
 	map<string, string> synonymEntityMap; // map the synonym to entity
 	map<string, set<string>> variableSynonymSetMap; // map the variable synonym to set of SQL data
 	stack<SuchThat> suchThatStack;

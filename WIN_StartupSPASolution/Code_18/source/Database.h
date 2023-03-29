@@ -5,6 +5,7 @@
 #include "sqlite3.h"
 #include <format>
 #include "../SPA/Struct.h"
+#include "../SPA/define.h"
 #include <set>
 
 using namespace std;
@@ -18,6 +19,8 @@ public:
 
 	// method to close the database connection
 	static void close();
+
+	static bool ExecuteSql(string sql, SqlResultStore& rs);
 
 	// method to insert a procedure into the database
 	static void insertProcedure(string procedureName, int start, int end);
@@ -37,7 +40,11 @@ public:
 	static void insertParent(int parentStmt, int childStart, int childEnd);
 	//static bool GetParent(string stmtNum1, string stmtNum2, bool input1IsSpecific, bool input2IsSpecific, entity);
 
-	static string GetParentConstruct(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym);
+	static string GetParentConstruct_Synonym_Synonym(string input1, string input2);
+	static string GetParentConstruct_Synonym_NotSynonym(string input1);
+	static string GetParentConstruct_NotSynonym_Synonym(string input2);
+	static string GetParentConstruct_NotSynonym_NotSynonym();
+
 	static string GetDirectParent(string input1);
 
 	static bool GetParent(string stmtNum1, string stmtNum2, bool input1IsSpecific, bool input2IsSpecific, string parentEntity, string childEntity, SqlResultStore& rs);
@@ -62,8 +69,6 @@ public:
 	static bool GetParentTSpecificSynonym(string frontSql, string input1, string input2, SqlResultStore& rs); // Parent(10, read/print/assign/while/if/call)
 	static bool GetParentTSpecificSpecific(string frontSql, string input1, string input2, SqlResultStore& rs); // // Parent(10, 10)
 	
-	static bool ExecuteSql(string sql, SqlResultStore& rs);
-	
 	// method to insert/get a modify into the database
 	static void insertModifies(int stmtNum, string variablename);
 
@@ -71,15 +76,66 @@ public:
 	static void insertUses(int stmtNum, string variablename);
 
 	// isSpecific is false if the input is not part of select synonym, and can be found on synonymEntityMap
-	static string GetUsesConstructProcedure(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym);
-	static string GetUsesConstructStmt(string input1, string input2, bool input1IsSynonym, bool input2IsSynonym);
+	// need select distinct both Uses()
+	static string GetUsesConstruct_StatementSynonym_Synonym(string input1, string input2);
+	static string GetUsesConstruct_StatementSynonym_NotSynonym(string input1);
+	static string GetUsesConstruct_NameSynonym_Synonym(string input1, string input2);
+	static string GetUsesConstruct_NameSynonym_NotSynonym(string input1);
+
+	static string GetUsesConstruct_StatementNotSynonym_Synonym(string input2);
+	static string GetUsesConstruct_StatementNotSynonym_NotSynonym();
+	static string GetUsesConstruct_NameNotSynonym_Synonym(string input2);
+	static string GetUsesConstruct_NameNotSynonym_NotSynonym();
+
 	static bool GetUsesForAssign(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, SqlResultStore& rs);
-	static bool GetUsesForAssignAnyAny(string frontSql, SqlResultStore& rs);
-	static bool GetUsesForAssignAnySynonym(string frontSql, string input2, SqlResultStore& rs);
-	static bool GetUsesForAssignAnySpecific(string frontSql, string input2, SqlResultStore& rs);
-	static bool GetUsesForAssignSynonymAny(string frontSql, string input1, SqlResultStore& rs);
-	static bool GetUsesForAssignSynonymSynonym(string frontSql, string input1, string input2, SqlResultStore& rs);
-	static bool GetUsesForAssignSynonymSpecific(string frontSql, string input1, string input2, SqlResultStore& rs);
+
+	// Uses(print/assign, var/_)
+	static bool GetUses_AnyPrintAssign_Any(string frontSql, string input1, SqlResultStore& rs); 
+
+	// Uses(call, var/_)
+	static bool GetUses_AnyCall_Any(string frontSql, SqlResultStore& rs); 
+
+	// Uses(procedure, var/_)
+	static bool GetUses_AnyProcedure_Any(string frontSql, SqlResultStore& rs); 
+
+	// Uses(while/if, var/_)
+	static bool GetUses_AnyWhileIf_Any(string frontSql, string input1, SqlResultStore& rs); 
+
+	// Uses(print/assign, "x")
+	static bool GetUses_AnyPrintAssign_Specific(string frontSql, string input1, string input2, SqlResultStore& rs); 
+
+	// Uses(call, "x")
+	static bool GetUses_AnyCall_Specific(string frontSql, string input2, SqlResultStore& rs); 
+
+	// Uses(procedure, "x")
+	static bool GetUses_AnyProcedure_Specific(string frontSql, string input2, SqlResultStore& rs); 
+
+	// Uses(while/if, "x")
+	static bool GetUses_AnyWhileIf_Specific(string frontSql, string input1, string input2, SqlResultStore& rs); 
+
+	// Uses(10, var/_) where 10 = print/assign
+	static bool GetUses_SpecificPrintAssign_Any(string frontSql, string input1, SqlResultStore& rs); 
+
+	// Uses(10, var/_) where 10 = call
+	static bool GetUses_SpecificCall_Any(string frontSql, string input1, SqlResultStore& rs); 
+
+	// Uses("main", var/_)
+	static bool GetUses_SpecificProcedure_Any(string frontSql, string input1, SqlResultStore& rs); 
+
+	// Uses("10", var/_) where 10 = while/if
+	static bool GetUses_SpecificWhileIf_Any(string frontSql, string input1, SqlResultStore& rs);
+
+	// Uses(10, "x") where 10 = print/assign
+	static bool GetUses_SpecificPrintAssign_Specific(string frontSql, string input1, string input2, SqlResultStore& rs);
+
+	// Uses(10, var/_) where 10 = call
+	static bool GetUses_SpecificCall_Specific(string frontSql, string input1, string input2, SqlResultStore& rs);
+
+	// Uses("main", var/_)
+	static bool GetUses_SpecificProcedure_Specific(string frontSql, string input1, string input2, SqlResultStore& rs);
+
+	// Uses("10", var/_) where 10 = while/if
+	static bool GetUses_SpecificWhileIf_Specific(string frontSql, string input1, string input2, SqlResultStore& rs);
 
 	static bool GetUsesForPrint(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, SqlResultStore& rs);
 

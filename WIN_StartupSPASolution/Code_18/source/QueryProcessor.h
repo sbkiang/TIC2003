@@ -1,11 +1,11 @@
 #pragma once
-
 #include <string>
 #include <vector>
 #include "Database.h"
 #include "Tokenizer.h"
 #include <regex>
 #include "../SPA/Struct.h"
+#include "../SPA/define.h"
 
 using namespace std;
 
