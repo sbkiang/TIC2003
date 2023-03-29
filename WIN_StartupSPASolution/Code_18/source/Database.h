@@ -38,12 +38,6 @@ public:
 
 	// method to insert a parent into the database
 	static void insertParent(int parentStmt, int childStart, int childEnd);
-	//static bool GetParent(string stmtNum1, string stmtNum2, bool input1IsSpecific, bool input2IsSpecific, entity);
-
-	static string GetParentConstruct_Synonym_Synonym(string input1, string input2);
-	static string GetParentConstruct_Synonym_NotSynonym(string input1);
-	static string GetParentConstruct_NotSynonym_Synonym(string input2);
-	static string GetParentConstruct_NotSynonym_NotSynonym();
 
 	static string GetDirectParent(string input1);
 

@@ -159,38 +159,6 @@ void Database::insertParent(int parent, int child_start, int child_end) {
 	if (errorMessage) { cout << "insertParent SQL Error: " << errorMessage << endl; }
 }
 
-// Parent((while|if), (stmt|read|print|assign|while|if|call))
-string Database::GetParentConstruct_Synonym_Synonym(string input1, string input2)
-{
-	char sql[100] = {};
-	sprintf_s(sql, "select p.line_num as %s, s.line_num as %s", input1.c_str(), input2.c_str());
-	return string(sql);
-}
-
-// Parent((while|if), 10)
-string Database::GetParentConstruct_Synonym_NotSynonym(string input1)
-{
-	char sql[100] = {};
-	sprintf_s(sql, "select p.line_num as %s, s.line_num", input1.c_str());
-	return string(sql);
-}
-
-// Parent(10, (stmt|read|print|assign|while|if|call))
-string Database::GetParentConstruct_NotSynonym_Synonym(string input2)
-{
-	char sql[100] = {};
-	sprintf_s(sql, "select p.line_num, s.line_num as %s", input2.c_str());
-	return string(sql);
-}
-
-// Parent(10, 12)
-string Database::GetParentConstruct_NotSynonym_NotSynonym()
-{
-	char sql[100] = {};
-	sprintf_s(sql, "select p.line_num, s.line_num");
-	return string(sql);
-}
-
 void Database::insertUses(int stmtNum, string variableName) {
 	char sqlBuf[256];
 	sprintf_s(sqlBuf, "INSERT INTO use ('line_num','variable_name' ) VALUES ('%i','%s');", stmtNum, variableName.c_str());
