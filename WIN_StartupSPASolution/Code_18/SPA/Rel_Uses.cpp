@@ -1,5 +1,5 @@
 #pragma once
-#include "Uses.h"
+#include "Rel_Uses.h"
 
 // Uses((stmt|print|assign|while|if|call), v)
 string Uses::GetUsesConstruct_StatementSynonym_Synonym(string input1, string input2)

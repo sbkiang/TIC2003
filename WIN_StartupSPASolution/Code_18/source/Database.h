@@ -48,26 +48,8 @@ public:
 	static string GetDirectParent(string input1);
 
 	static bool GetParent(string stmtNum1, string stmtNum2, bool input1IsSpecific, bool input2IsSpecific, string parentEntity, string childEntity, SqlResultStore& rs);
-	static bool GetParentAnyAny(string frontSql, SqlResultStore& rs); // Parent(stmt/_ , stmt/_) 
-	static bool GetParentAnySynonym(string frontSql, string input2, SqlResultStore& rs); // Parent(stmt/_, read/print/assign/while/if/call)
-	static bool GetParentAnySpecific(string frontSql, string input2, SqlResultStore& rs); // Parent(stmt/_, 10)
-	static bool GetParentSynonymAny(string frontSql, string input1, SqlResultStore& rs); // Parent(while/if, stmt/_)
-	static bool GetParentSynonymSynonym(string frontSql, string input1, string input2, SqlResultStore& rs); // Parent(while/if, read/print/assign/while/if/call)
-	static bool GetParentSynonymSpecific(string frontSql, string input1, string input2, SqlResultStore& rs); // Parent(while/if, 10)
-	static bool GetParentSpecificAny(string frontSql, string input1, SqlResultStore& rs); // Parent(10, stmt/_)
-	static bool GetParentSpecificSynonym(string frontSql, string input1, string input2, SqlResultStore& rs); // Parent(10, read/print/assign/while/if/call)
-	static bool GetParentSpecificSpecific(string frontSql, string input1, string input2, SqlResultStore& rs); // // Parent(10, 10)
 	
 	static bool GetParentT(string stmtNum1, string stmtNum2, bool input1IsSpecific, bool input2IsSpecific, string parentEntity, string childEntity, SqlResultStore& rs);	static bool GetParentAnyAnyT(string frontSql, SqlResultStore& rs); // Parent(stmt/_ , stmt/_) 
-	static bool GetParentTAnyAny(string frontSql, SqlResultStore& rs); // Parent(stmt/_ , stmt/_) 
-	static bool GetParentTAnySynonym(string frontSql, string input2, SqlResultStore& rs); // Parent(stmt/_, read/print/assign/while/if/call)
-	static bool GetParentTAnySpecific(string frontSql, string input2, SqlResultStore& rs); // Parent(stmt/_, 10)
-	static bool GetParentTSynonymAny(string frontSql, string input1, SqlResultStore& rs); // Parent(while/if, stmt/_)
-	static bool GetParentTSynonymSynonym(string frontSql, string input1, string input2, SqlResultStore& rs); // Parent(while/if, read/print/assign/while/if/call)
-	static bool GetParentTSynonymSpecific(string frontSql, string input1, string input2, SqlResultStore& rs); // Parent(while/if, 10)
-	static bool GetParentTSpecificAny(string frontSql, string input1, SqlResultStore& rs); // Parent(10, stmt/_)
-	static bool GetParentTSpecificSynonym(string frontSql, string input1, string input2, SqlResultStore& rs); // Parent(10, read/print/assign/while/if/call)
-	static bool GetParentTSpecificSpecific(string frontSql, string input1, string input2, SqlResultStore& rs); // // Parent(10, 10)
 	
 	// method to insert/get a modify into the database
 	static void insertModifies(int stmtNum, string variablename);
@@ -76,66 +58,8 @@ public:
 	static void insertUses(int stmtNum, string variablename);
 
 	// isSpecific is false if the input is not part of select synonym, and can be found on synonymEntityMap
-	// need select distinct both Uses()
-	static string GetUsesConstruct_StatementSynonym_Synonym(string input1, string input2);
-	static string GetUsesConstruct_StatementSynonym_NotSynonym(string input1);
-	static string GetUsesConstruct_NameSynonym_Synonym(string input1, string input2);
-	static string GetUsesConstruct_NameSynonym_NotSynonym(string input1);
-
-	static string GetUsesConstruct_StatementNotSynonym_Synonym(string input2);
-	static string GetUsesConstruct_StatementNotSynonym_NotSynonym();
-	static string GetUsesConstruct_NameNotSynonym_Synonym(string input2);
-	static string GetUsesConstruct_NameNotSynonym_NotSynonym();
 
 	static bool GetUsesForAssign(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, SqlResultStore& rs);
-
-	// Uses(print/assign, var/_)
-	static bool GetUses_AnyPrintAssign_Any(string frontSql, string input1, SqlResultStore& rs); 
-
-	// Uses(call, var/_)
-	static bool GetUses_AnyCall_Any(string frontSql, SqlResultStore& rs); 
-
-	// Uses(procedure, var/_)
-	static bool GetUses_AnyProcedure_Any(string frontSql, SqlResultStore& rs); 
-
-	// Uses(while/if, var/_)
-	static bool GetUses_AnyWhileIf_Any(string frontSql, string input1, SqlResultStore& rs); 
-
-	// Uses(print/assign, "x")
-	static bool GetUses_AnyPrintAssign_Specific(string frontSql, string input1, string input2, SqlResultStore& rs); 
-
-	// Uses(call, "x")
-	static bool GetUses_AnyCall_Specific(string frontSql, string input2, SqlResultStore& rs); 
-
-	// Uses(procedure, "x")
-	static bool GetUses_AnyProcedure_Specific(string frontSql, string input2, SqlResultStore& rs); 
-
-	// Uses(while/if, "x")
-	static bool GetUses_AnyWhileIf_Specific(string frontSql, string input1, string input2, SqlResultStore& rs); 
-
-	// Uses(10, var/_) where 10 = print/assign
-	static bool GetUses_SpecificPrintAssign_Any(string frontSql, string input1, SqlResultStore& rs); 
-
-	// Uses(10, var/_) where 10 = call
-	static bool GetUses_SpecificCall_Any(string frontSql, string input1, SqlResultStore& rs); 
-
-	// Uses("main", var/_)
-	static bool GetUses_SpecificProcedure_Any(string frontSql, string input1, SqlResultStore& rs); 
-
-	// Uses("10", var/_) where 10 = while/if
-	static bool GetUses_SpecificWhileIf_Any(string frontSql, string input1, SqlResultStore& rs);
-
-	// Uses(10, "x") where 10 = print/assign
-	static bool GetUses_SpecificPrintAssign_Specific(string frontSql, string input1, string input2, SqlResultStore& rs);
-
-	// Uses(10, var/_) where 10 = call
-	static bool GetUses_SpecificCall_Specific(string frontSql, string input1, string input2, SqlResultStore& rs);
-
-	// Uses("main", var/_)
-	static bool GetUses_SpecificProcedure_Specific(string frontSql, string input1, string input2, SqlResultStore& rs);
-
-	// Uses("10", var/_) where 10 = while/if
-	static bool GetUses_SpecificWhileIf_Specific(string frontSql, string input1, string input2, SqlResultStore& rs);
 
 	static bool GetUsesForPrint(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, SqlResultStore& rs);
 

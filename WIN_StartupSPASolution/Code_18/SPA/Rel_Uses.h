@@ -1,9 +1,7 @@
 #pragma once
 #include <string>
-#include "../SPA/Struct.h"
 #include "../source/Database.h"
 #include <format>
-
 
 using namespace std;
 
