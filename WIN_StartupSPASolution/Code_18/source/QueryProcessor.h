@@ -1,11 +1,16 @@
 #pragma once
 #include <string>
 #include <vector>
-#include "Database.h"
 #include "Tokenizer.h"
 #include <regex>
 #include "../SPA/Struct.h"
 #include "../SPA/define.h"
+#include "../SPA/ClauseModifies.h"
+#include "../SPA/ClauseUses.h"
+#include "../SPA/ClauseParent.h"
+#include "../SPA/ClausePattern.h"
+#include "Database.h"
+#include "../SPA/DatabaseHelper.h"
 
 using namespace std;
 
@@ -20,7 +25,6 @@ public:
 	// method for evaluating a query
 	void evaluate(string query, vector<string>& results);
 	void EvaluateSelect(Select& st, map<string,string> synEntMap);
-	set<string> SqlResultStoreToSet(SqlResultStore rs, string col);
 
 	//Check for number or string
 	bool isNumber(string text) {

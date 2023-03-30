@@ -11,15 +11,6 @@ QueryProcessor::QueryProcessor() {}
 // destructor
 QueryProcessor::~QueryProcessor() {}
 
-set<string> QueryProcessor::SqlResultStoreToSet(SqlResultStore rs, string col) {
-	set<string> setRes;
-	for (int i = 0; i < rs.sqlResult.size(); i++) {
-		SqlResult sqlRes = rs.sqlResult.at(i);
-		setRes.insert(sqlRes.row.at(col));
-	}
-	return setRes;
-}
-
 void QueryProcessor::EvaluateSelect(Select& select, map<string,string> synEntMap) {
 	string columnName = "", stmtTable = "statement";
 	map<string, int> tableCountMap;
@@ -82,7 +73,6 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	string regexWord = "\\w+";
 	string regexQuote = "\\\"";
 	map<string, string> synonymEntityMap; // map the synonym to entity
-	map<string, set<string>> variableSynonymSetMap; // map the variable synonym to set of SQL data
 	stack<SuchThat> suchThatStack;
 	stack<Pattern> patternStack;
 	Select select;	
@@ -93,11 +83,6 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			while (tokens.at(i) != ";") {
 				if (tokens.at(i) != ",") {  // skip the ","
 					synonymEntityMap.insert(pair<string, string>(tokens.at(i), entityType));
-					if (entityType == "variable") {
-						set<string> varSet;
-						Database::GetVariable(varSet);
-						variableSynonymSetMap.insert(pair<string,set<string>>(tokens.at(i), varSet));
-					}
 				}
 				i++;
 			}
@@ -185,118 +170,150 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	//vector<SqlResult> sqlResultPass;
 	Database::SelectPql(select, sqlResultStore);
 
-	// stores mapping of synonym to declared variable synoynms
-	// one variable can be mapped by multiple synonym. E.g., variable v. Uses(3,v) and parent(6,v). 
-	// correct: store variable synonym letter to variable set. variable set populated in uses, modifies
-	map<string, set<string>> synonymVariableMap;
-	for (auto it = synonymEntityMap.begin(); it != synonymEntityMap.end(); it++) {
-		if (it->second == "variable") {
-			set<string> varset;
-			synonymVariableMap.insert(pair<string, set<string>>(it->first, varset));
-		}
-	}
-
 	// need to determine if the input to such that is generic or specific
 	//	generic when it's (a synonym and not part of select) or (wildcard)
 	//  specific when it's (a synonym and part of select) or ((not a synonym) and (not wildcard))
 	vector<SqlResult> sqlResultPass;
 	while (!suchThatStack.empty()) {
 		SuchThat suchThatTemp = suchThatStack.top();
+		bool input1IsSynonym = (synonymEntityMap.find(suchThatTemp.input1) != synonymEntityMap.end()); // first input is a synonym
+		bool input2IsSynonym = (synonymEntityMap.find(suchThatTemp.input2) != synonymEntityMap.end()); // second input is a synonym		
 		bool input1IsWildcard = (suchThatTemp.input1 == "_") ? true : false;
 		bool input2IsWildcard = (suchThatTemp.input2 == "_") ? true : false;
-		bool input1IsSynonym = (synonymEntityMap.find(suchThatTemp.input1) != synonymEntityMap.end()); // first input is a synonym
-		bool input2IsSynonym = (synonymEntityMap.find(suchThatTemp.input2) != synonymEntityMap.end()); // second input is a synonym
-		bool input1InSelect = (find(select.synonym.begin(), select.synonym.end(), suchThatTemp.input1) != select.synonym.end()) && !input1IsWildcard; // first input is part of select
-		bool input2InSelect = (find(select.synonym.begin(), select.synonym.end(), suchThatTemp.input2) != select.synonym.end()) && !input2IsWildcard; // second input is part of select
-		
-		bool input1IsSpecific = ((input1IsSynonym && input1InSelect) || (!input1IsSynonym && !input1IsWildcard));
-		bool input2IsSpecific = ((input2IsSynonym && input2InSelect) || (!input2IsSynonym && !input2IsWildcard));
-		
+		bool input1IsAny = (input1IsSynonym || input1IsWildcard);
+		bool input2IsAny = (input2IsSynonym || input2IsWildcard);
 		string entityInput1 = "", entityInput2 = "", first = suchThatTemp.input1, second = suchThatTemp.input2;
 		if (input1IsSynonym) { // if input1 is part of declared synonym, we get the entity that it belongs
 			entityInput1 = synonymEntityMap.at(suchThatTemp.input1);
-
 		}
 		if (input2IsSynonym) { // if input1 is part of declared synonym, we get the entity that it belongs
 			entityInput2 = synonymEntityMap.at(suchThatTemp.input2);
-		}
-		set<string> setVariableName;
-		SqlResultStore resultStoreVariableName;
+		};
 		SqlResultStore rs;
 		string relationship = suchThatTemp.relationship;
-		for(SqlResult sqlResult : sqlResultStore.sqlResult){
-		//for (int i = 0; i < sqlResultStore.sqlResult.size(); i++) {
-			//SqlResult sqlResulTemp = sqlResultStore.sqlResult.at(i);
-			bool pass = false;
-			if (input1InSelect) { // if the first input is a synonym, and is part of select, get the input 
-				first = sqlResult.row.at(suchThatTemp.input1);
+		string frontSql = "";
+		if (relationship == "Uses") { // input1 is Stmt Num or Name, input2 is Name
+			if (input1IsSynonym && input2IsSynonym) {
+				if (regex_match(entityInput1, regex(regexStmtNumEntity))) {
+					frontSql = Uses::GetUsesConstruct_StatementSynonym_Synonym(suchThatTemp.input1, suchThatTemp.input2);
+				}
+				else if (entityInput1 == "procedure") {
+					frontSql = Uses::GetUsesConstruct_NameSynonym_Synonym(suchThatTemp.input1, suchThatTemp.input2);
+				}
 			}
-			if (input2InSelect) { // if the second input is a synonym, and is part of select, get the input 
-				second = sqlResult.row.at(suchThatTemp.input2);
+			else if (!input1IsSynonym && input2IsSynonym) {
+				if (isdigit(suchThatTemp.input1[0])) {
+					frontSql = Uses::GetUsesConstruct_StatementNotSynonym_Synonym(suchThatTemp.input2);
+				}
+				else {
+					frontSql = Uses::GetUsesConstruct_NameNotSynonym_Synonym(suchThatTemp.input2);
+				}
 			}
-			if (relationship == "Uses") { // input1 is Stmt Num or Name, input2 is Name
-				if (entityInput1 == "assign") { 
-					pass = Database::GetUsesForAssign(first, second, input1IsSpecific, input2IsSpecific, rs); }
-				else if (entityInput1 == "print") { 
-					pass = Database::GetUsesForPrint(first, second, input1IsSpecific, input2IsSpecific, rs); }
-				else if (entityInput1 == "while") { 
-					pass = Database::GetUsesForWhile(first, second, input1IsSpecific, input2IsSpecific, rs); }
-				else if (entityInput1 == "if") { 
-					pass = Database::GetUsesForIf(first, second, input1IsSpecific, input2IsSpecific, rs); }
-				else if (entityInput1 == "call") { 
-					pass = Database::GetUsesForCall(first, second, input1IsSpecific, input2IsSpecific, rs); }
-				else if (entityInput1 == "procedure") { 
-					pass = Database::GetUsesForProcedure(first, second, input1IsSpecific, input2IsSpecific, rs); }
-				else { 
-					pass = Database::GetUsesForUnknownInput1(first, second, input1IsSpecific, input2IsSpecific, rs); } // e.g., uses(10,v) or uses("main",v). just pass in here even
-				// add in code to check if synonym used in query. If not, then just need to test once for first row, and result applies to all row
+			else if (input1IsSynonym && !input2IsSynonym) {
+				if (regex_match(entityInput1, regex(regexStmtNumEntity))) {
+					frontSql = Uses::GetUsesConstruct_StatementSynonym_NotSynonym(suchThatTemp.input1);
+				}
+				else if (entityInput1 == "procedure") {
+					frontSql = Uses::GetUsesConstruct_NameSynonym_NotSynonym(suchThatTemp.input1);
+				}
 			}
-			else if (relationship == "Modifies") { // input1 is Stmt Num or Name, input2 is Name or Wildcard
-				if (entityInput1 == "assign") { 
-					pass = Database::GetModifiesForAssign(first, second, input1IsSpecific, input2IsSpecific, rs); }
-				else if (entityInput1 == "read") { 
-					pass = Database::GetModifiesForRead(first, second, input1IsSpecific, input2IsSpecific, rs); }
-				else if (entityInput1 == "while") { 
-					pass = Database::GetModifiesForWhile(first, second, input1IsSpecific, input2IsSpecific, rs); }
-				else if (entityInput1 == "if") { 
-					pass = Database::GetModifiesForIf(first, second, input1IsSpecific, input2IsSpecific, rs); }
-				else if (entityInput1 == "call") { 
-					pass = Database::GetModifiesForCall(first, second, input1IsSpecific, input2IsSpecific, rs); }
-				else if (entityInput1 == "procedure") { 
-					pass = Database::GetModifiesForProcedure(first, second, input1IsSpecific, input2IsSpecific, rs); }
-				else { 
-					pass = Database::GetModifiesForUnknownInput1(first, second, input1IsSpecific, input2IsSpecific, rs); } // e.g., uses(10,v) or uses("main",v). just pass in here even
+			else if (!input1IsSynonym && !input2IsSynonym) {
+				if (isdigit(suchThatTemp.input1[0])) {
+					frontSql = Uses::GetUsesConstruct_StatementNotSynonym_NotSynonym();
+				}
+				else {
+					frontSql = Uses::GetUsesConstruct_NameNotSynonym_NotSynonym();
+				}
 			}
-			else if (relationship == "Parent") { // input1 is Stmt Num, input2 is Stmt Num
-				pass = Database::GetParent(first, second, input1IsSpecific, input2IsSpecific, entityInput1, entityInput2, rs);
+			string sql = "";
+			if (!input1IsAny && input2IsAny) { // Pattern("main"/5, variable/_)
+				if (isdigit(suchThatTemp.input1[0])) { // for any stmt num, we need to get the entity first
+					entityInput1 = DatabaseHelper::GetEntityByStatement(suchThatTemp.input1);
+				}
+				else {
+					sql = Uses::GetUses_SpecificProcedure_Any(frontSql, suchThatTemp.input1);
+				}
 			}
-			else if (relationship == "Parent*") { // input1 is Stmt Num, input2 is Stmt Num
-				pass = Database::GetParentT(first, second, input1IsSpecific, input2IsSpecific, entityInput1, entityInput2, rs);
+			if (input1IsAny && input2IsAny) { // Pattern(entity/_, variable/_)
+				if (entityInput1 == "procedure") { // Pattern(procedure, variable/_)
+					sql = Uses::GetUses_AnyProcedure_Any(frontSql);
+				}
+				else if (regex_match(entityInput1, regex(regexAssignPrint))) { // Pattern(print/assign, variable/_)
+					sql = Uses::GetUses_AnyPrintAssign_Any(frontSql, entityInput1);
+				}
+				else if (regex_match(entityInput1, regex(regexWhileIf))) {
+					sql = Uses::GetUses_AnyWhileIf_Any(frontSql, entityInput1);
+				}
+				else if (entityInput1 == "call") {
+					sql = Uses::GetUses_AnyCall_Any(frontSql);
+				}
 			}
-			else if (relationship == "Next") {
-
+			else if (!input1IsAny && input2IsAny) {
+				if (entityInput1 == "procedure") { // Pattern(procedure, variable/_)
+					sql = Uses::GetUses_SpecificProcedure_Any(frontSql, suchThatTemp.input1);
+				}
+				else if (regex_match(entityInput1, regex(regexAssignPrint))) { // Pattern(print/assign, variable/_)
+					sql = Uses::GetUses_SpecificPrintAssign_Any(frontSql, suchThatTemp.input1);
+				}
+				else if (regex_match(entityInput1, regex(regexWhileIf))) {
+					sql = Uses::GetUses_SpecificWhileIf_Any(frontSql, suchThatTemp.input1);
+				}
+				else if (entityInput1 == "call") {
+					sql = Uses::GetUses_SpecificCall_Any(frontSql, suchThatTemp.input1);
+				}
 			}
-			else if (relationship == "Next*"){
-
+			else if (input1IsAny && !input2IsAny) {
+				if (entityInput1 == "procedure") { // Pattern(procedure, variable/_)
+					sql = Uses::GetUses_AnyProcedure_Specific(frontSql, suchThatTemp.input2);
+				}
+				else if (regex_match(entityInput1, regex(regexAssignPrint))) { // Pattern(print/assign, variable/_)
+					sql = Uses::GetUses_AnyPrintAssign_Specific(frontSql, entityInput1, suchThatTemp.input2);
+				}
+				else if (regex_match(entityInput1, regex(regexWhileIf))) {
+					sql = Uses::GetUses_AnyWhileIf_Specific(frontSql, entityInput1, suchThatTemp.input2);
+				}
+				else if (entityInput1 == "call") {
+					sql = Uses::GetUses_AnyCall_Specific(frontSql, suchThatTemp.input2);
+				}
 			}
-			else if (relationship == "Calls") {
-
-			}
-			else if (relationship == "Calls*") {
-
-			}
-			if (pass) {
-				sqlResultPass.push_back(sqlResult);
+			else if (!input1IsAny && !input2IsAny) {
+				if (entityInput1 == "procedure") { // Pattern(procedure, variable/_)
+					sql = Uses::GetUses_SpecificProcedure_Specific(frontSql, suchThatTemp.input1, suchThatTemp.input2);
+				}
+				else if (regex_match(entityInput1, regex(regexAssignPrint))) { // Pattern(print/assign, variable/_)
+					sql = Uses::GetUses_SpecificPrintAssign_Specific(frontSql, suchThatTemp.input1, suchThatTemp.input2);
+				}
+				else if (regex_match(entityInput1, regex(regexWhileIf))) {
+					sql = Uses::GetUses_SpecificWhileIf_Specific(frontSql, suchThatTemp.input1, suchThatTemp.input2);
+				}
+				else if (entityInput1 == "call") {
+					sql = Uses::GetUses_SpecificCall_Specific(frontSql, suchThatTemp.input1, suchThatTemp.input2);
+				}
 			}
 		}
+		else if (relationship == "Modifies") { // input1 is Stmt Num or Name, input2 is Name or Wildcard
+		}
+		else if (relationship == "Parent") { // input1 is Stmt Num, input2 is Stmt Num
+			//pass = Database::GetParent(first, second, input1IsSpecific, input2IsSpecific, entityInput1, entityInput2, rs);
+		}
+		else if (relationship == "Parent*") { // input1 is Stmt Num, input2 is Stmt Num
+			//pass = Database::GetParentT(first, second, input1IsSpecific, input2IsSpecific, entityInput1, entityInput2, rs);
+		}
+		else if (relationship == "Next") {
+
+		}
+		else if (relationship == "Next*"){
+
+		}
+		else if (relationship == "Calls") {
+
+		}
+		else if (relationship == "Calls*") {
+
+		}
+
 		sqlResultStore.sqlResult = sqlResultPass;
 		suchThatStack.pop();
-		if (input2IsSynonym && (relationship == "Modifies" || relationship == "Uses")) {
-			set<string> synonymVariable = variableSynonymSetMap.at(suchThatTemp.input2);
-			set<string> intersect;
-			set_intersection(setVariableName.begin(), setVariableName.end(), synonymVariable.begin(), synonymVariable.end(), inserter(intersect, intersect.begin()));
-			variableSynonymSetMap.at(suchThatTemp.input2) = intersect;
-		}
 	}
 
 	while (!patternStack.empty()) {
@@ -316,51 +333,12 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			second = (startWildCard) ? ("_" + second) : second;
 			second = (endWildCard) ? (second + "_") : second;
 		}
-
-		// if input1 synonym, get from synoynm. else, it'll be wildcard or specific variable name
+		string first = patternTemp.input1;
+		second = ClausePattern::ConvertPqlPatternOprtToSqlPatternOprt(second);
+		string sqlFront = input1IsSynonym ? ClausePattern::PatternConstruct_Synonym_NotSynonym(first) : ClausePattern::PatternConstruct_NotSynonym_NotSynonym();
+		string sqlFull = (input1IsSynonym || first == "_") ? ClausePattern::GetPattern_Any_Expr(sqlFront, second) : ClausePattern::GetPattern_NotAny_Expr(sqlFront, first, second);
 		SqlResultStore patternResult;
-		int pos = 0;
-		do {
-			pos = second.find("_");
-			if (pos > -1) { second.replace(pos, 1, "%"); }
-		} while (pos > -1);
-
-		// get input from variable storage that's linked to assign synonym
-		if (input1IsSynonym) {
-			set<string> varNameSet = variableSynonymSetMap.at(patternTemp.input1);
-			char varNameSql[128] = {};
-			string first = "";
-			for (auto it = varNameSet.begin(); it != varNameSet.end(); it++) {
-				sprintf_s(varNameSql, "\'%s\',", string(*it).c_str());
-				first += string(varNameSql);
-			}
-			first.pop_back(); // remove last comma
-			Database::GetPatternIn(first, second, patternResult);
-		}
-		else {
-			string first = patternTemp.input1;
-			pos = 0;
-			do {
-				pos = first.find("_");
-				if (pos > -1) { first.replace(pos, 1, "%"); }
-			} while (pos > -1);
-			Database::GetPatternLike(first, second, patternResult);
-		}
-		// patternResult contains line_num and LHS
-		// LHS to update the variableSynonymSetMap. line_num is to update the sqlResultSet, if it's a line_num entity
-		set<string> patternLhsSet;
-
-		if (input1IsSynonym) {
-			set<string> intersect;
-			set<string> variableSynonymSet = variableSynonymSetMap.at(patternTemp.input1);
-			set_intersection(variableSynonymSet.begin(), variableSynonymSet.end(), patternLhsSet.begin(), patternLhsSet.end(), inserter(intersect, intersect.begin()));
-			variableSynonymSetMap.at(patternTemp.input1) = intersect;
-		}
-		set<string> sqlResultLineNumSet;
-
-		// this step is to update the sqlResultStore if the pattern entity is part of select
-		
-		sqlResultStore.sqlResult = sqlResultPass;
+		Database::ExecuteSql(sqlFull, patternResult);
 		patternStack.pop();
 	}
 

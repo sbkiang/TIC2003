@@ -947,16 +947,20 @@ int Database::callback(void* NotUsed, int columnCount, char** columnValues, char
 	NotUsed = 0;
 	vector<string> dbRow;
 	SqlResult sqlResult;
+	SqlResultSet sqlResultSet;
 	// argc is the number of columns for this row of results
 	// argv contains the values for the columns
 	// Each value is pushed into a vector.
+	
 	for (int i = 0; i < columnCount; i++) {
 		dbRow.push_back(columnValues[i]);
 		sqlResult.row.insert(std::pair<string, string>(columnNames[i], string(columnValues[i])));
+		sqlResultSet.row.insert(std::pair<string, string>(columnNames[i], string(columnValues[i])));
 	}
 	// The row is pushed to the vector for storing all rows of results 
 	dbResults.push_back(dbRow);
 	sqlResultStoreForCallback->sqlResult.push_back(sqlResult);
+	sqlResultStoreForCallback->sqlResultSet.insert(sqlResultSet);
 
 	return 0;
 }

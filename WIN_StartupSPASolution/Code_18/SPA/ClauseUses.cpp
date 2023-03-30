@@ -1,5 +1,5 @@
 #pragma once
-#include "Rel_Uses.h"
+#include "ClauseUses.h"
 
 // Uses((stmt|print|assign|while|if|call), v)
 string Uses::GetUsesConstruct_StatementSynonym_Synonym(string input1, string input2)
@@ -65,115 +65,115 @@ string Uses::GetUsesConstruct_NameNotSynonym_NotSynonym()
 	return string(sql);
 }
 
-bool Uses::GetUses_AnyPrintAssign_Any(string frontSql, string input1, SqlResultStore& rs)
+string Uses::GetUses_AnyPrintAssign_Any(string frontSql, string input1)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "%s from use u join statement s on s.line_num = u.line_num where s.entity = %s;", frontSql.c_str(), input1.c_str());
-	return Database::ExecuteSql(string(sqlBuf), rs);
+	return string(sqlBuf);
 }
 
-bool Uses::GetUses_AnyCall_Any(string frontSql, SqlResultStore& rs)
+string Uses::GetUses_AnyCall_Any(string frontSql)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "%s from statement s join use u on u.line_num between (select start from procedure where name = s.text) and (select end from procedure where name = s.text) where s.entity = 'call';", frontSql.c_str());
-	return Database::ExecuteSql(string(sqlBuf), rs);
+	return string(sqlBuf);
 }
 
-bool Uses::GetUses_AnyProcedure_Any(string frontSql, SqlResultStore& rs)
+string Uses::GetUses_AnyProcedure_Any(string frontSql)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "%s from procedure p join use u on u.line_num between p.start and p.end;", frontSql.c_str());
-	return Database::ExecuteSql(string(sqlBuf), rs);
+	return string(sqlBuf);
 }
 
-bool Uses::GetUses_AnyWhileIf_Any(string frontSql, string input1, SqlResultStore& rs)
+string Uses::GetUses_AnyWhileIf_Any(string frontSql, string input1)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "%s from parent p join statement s on s.line_num = p.line_num join use u on u.line_num between p.line_num and p.child_end where s.entity = '%s'; ", frontSql.c_str(), input1.c_str());
-	return Database::ExecuteSql(string(sqlBuf), rs);
+	return string(sqlBuf);
 }
 
-bool Uses::GetUses_AnyPrintAssign_Specific(string frontSql, string input1, string input2, SqlResultStore& rs)
+string Uses::GetUses_AnyPrintAssign_Specific(string frontSql, string input1, string input2)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "%s from use u join statement s on s.line_num = u.line_num where s.entity = '%s' and u.variable_name = '%s'", frontSql.c_str(), input1.c_str(), input2.c_str());
-	return Database::ExecuteSql(string(sqlBuf), rs);
+	return string(sqlBuf);
 }
 
-bool Uses::GetUses_AnyCall_Specific(string frontSql, string input2, SqlResultStore& rs)
+string Uses::GetUses_AnyCall_Specific(string frontSql, string input2)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "%s from statement s join use u on u.line_num between (select start from procedure where name = s.text) and (select end from procedure where name = s.text) where s.entity = 'call' and u.variable_name = '%s'", frontSql.c_str(), input2.c_str());
-	return Database::ExecuteSql(string(sqlBuf), rs);
+	return string(sqlBuf);
 }
 
-bool Uses::GetUses_AnyProcedure_Specific(string frontSql, string input2, SqlResultStore& rs)
+string Uses::GetUses_AnyProcedure_Specific(string frontSql, string input2)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "%s from procedure p join use u on u.line_num between p.start and p.end where u.variable_name = '%s';", frontSql.c_str(), input2.c_str(), input2.c_str());
-	return Database::ExecuteSql(string(sqlBuf), rs);
+	return string(sqlBuf);
 }
 
-bool Uses::GetUses_AnyWhileIf_Specific(string frontSql, string input1, string input2, SqlResultStore& rs)
+string Uses::GetUses_AnyWhileIf_Specific(string frontSql, string input1, string input2)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "%s from parent p join statement s on s.line_num = p.line_num join use u on u.line_num between p.line_num and p.child_end where s.entity = '%s' and u.variable_name = '%s'", frontSql.c_str(), input1.c_str(), input2.c_str());
-	return Database::ExecuteSql(string(sqlBuf), rs);
+	return string(sqlBuf);
 }
 
-bool Uses::GetUses_SpecificPrintAssign_Any(string frontSql, string input1, SqlResultStore& rs)
+string Uses::GetUses_SpecificPrintAssign_Any(string frontSql, string input1)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "%s from use u join statement s on s.line_num = u.line_num where s.line_num = %s", frontSql.c_str(), input1.c_str());
-	return Database::ExecuteSql(string(sqlBuf), rs);
+	return string(sqlBuf);
 }
 
-bool Uses::GetUses_SpecificCall_Any(string frontSql, string input1, SqlResultStore& rs)
+string Uses::GetUses_SpecificCall_Any(string frontSql, string input1)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "%s from statement s join use u on u.line_num between (select start from procedure where name = s.text) and (select end from procedure where name = s.text) where s.line_num = %s", frontSql.c_str(), input1.c_str());
-	return Database::ExecuteSql(string(sqlBuf), rs);
+	return string(sqlBuf);
 }
 
-bool Uses::GetUses_SpecificProcedure_Any(string frontSql, string input1, SqlResultStore& rs)
+string Uses::GetUses_SpecificProcedure_Any(string frontSql, string input1)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "%s from procedure p join use u on u.line_num between p.start and p.end where p.name = '%s'", frontSql.c_str(), input1.c_str());
-	return Database::ExecuteSql(string(sqlBuf), rs);
+	return string(sqlBuf);
 }
 
-bool Uses::GetUses_SpecificWhileIf_Any(string frontSql, string input1, SqlResultStore& rs)
+string Uses::GetUses_SpecificWhileIf_Any(string frontSql, string input1)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "%s from parent p join use u on u.line_num between p.line_num where p.child_end and p.line_num = %s", frontSql.c_str(), input1.c_str());
-	return Database::ExecuteSql(string(sqlBuf), rs);
+	return string(sqlBuf);
 }
 
-bool Uses::GetUses_SpecificPrintAssign_Specific(string frontSql, string input1, string input2, SqlResultStore& rs)
+string Uses::GetUses_SpecificPrintAssign_Specific(string frontSql, string input1, string input2)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "%s from use u join statement s on s.line_num = u.line_num where s.line_num = %s and u.variable_name = '%s'", frontSql.c_str(), input1.c_str(), input2.c_str());
-	return Database::ExecuteSql(string(sqlBuf), rs);
+	return string(sqlBuf);
 }
 
-bool Uses::GetUses_SpecificCall_Specific(string frontSql, string input1, string input2, SqlResultStore& rs)
+string Uses::GetUses_SpecificCall_Specific(string frontSql, string input1, string input2)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "%s from statement s join use u on u.line_num between (select start from procedure where name = s.text) and (select end from procedure where name = s.text) where s.line_num = %s where u.variable_name = '%s'", frontSql.c_str(), input1.c_str(), input2.c_str());
-	return Database::ExecuteSql(string(sqlBuf), rs);
+	return string(sqlBuf);
 }
 
-bool Uses::GetUses_SpecificProcedure_Specific(string frontSql, string input1, string input2, SqlResultStore& rs)
+string Uses::GetUses_SpecificProcedure_Specific(string frontSql, string input1, string input2)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "%s from procedure p join use u on u.line_num between p.start and p.end where p.name = '%s' and u.variable_name = '%s'", frontSql.c_str(), input1.c_str(), input2.c_str());
-	return Database::ExecuteSql(string(sqlBuf), rs);
+	return string(sqlBuf);
 }
 
 
-bool Uses::GetUses_SpecificWhileIf_Specific(string frontSql, string input1, string input2, SqlResultStore& rs)
+string Uses::GetUses_SpecificWhileIf_Specific(string frontSql, string input1, string input2)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "%s from parent p join use u on u.line_num between p.line_num where p.child_end and p.line_num = %s and u.variable_name = '%s'", frontSql.c_str(), input1.c_str(), input2.c_str());
-	return Database::ExecuteSql(string(sqlBuf), rs);
+	return string(sqlBuf);
 }

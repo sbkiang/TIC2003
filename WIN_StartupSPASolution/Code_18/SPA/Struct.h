@@ -3,11 +3,9 @@
 #include "Container.h"
 #include <map>
 #include <algorithm>
+#include <set>
 
 using namespace std;
-
-struct SqlResult;
-//struct SqlResultSet;
 
 struct CFGNode {
 	Statement* _stmtPtr = NULL;
@@ -15,27 +13,30 @@ struct CFGNode {
 	CFGNode* _fJump = NULL; //For non-condition statement, _fJump points to NULL. For condition statement, _fJump points to first statement in the fail condition block
 };
 
-struct SqlResultStore{
-	vector<SqlResult> sqlResult;
-	//set<SqlResultSet> sqlResultSet;
-	//set<string> colName;
-};
 
-struct SqlResult{
+struct SqlResult {
 	map<string, string> row; // store mapping of column name to value
 };
 
-/*
-struct SqlResultSet : SqlResultStore {
+
+struct SqlResultSet {
 	map<string, string> row; // store mapping of column name to value
 	bool operator< (const SqlResult& otherSqlRow) const
 	{
-		vector<string> intersect;
-		set_intersection(colName.begin(), colName.end(), otherSqlRow.colName.begin(), otherSqlRow.colName.end(), inserter(intersect, intersect.begin()));
+		vector<string> commonColName;
+		set<string> thisColName;
+		set<string> otherColName;
+		for (auto it = row.begin(); it != row.end(); it++) {
+			thisColName.insert(it->first);
+		}
+		for (auto it = otherSqlRow.row.begin(); it != otherSqlRow.row.end(); it++) {
+			otherColName.insert(it->first);
+		}
+		set_intersection(thisColName.begin(), thisColName.end(), otherColName.begin(), otherColName.end(), inserter(commonColName, commonColName.begin()));
 		size_t thisHashResult = 0;
 		size_t otherHashResult = 0;
-		for (int i = 0; i < intersect.size(); i++) {
-			string col = intersect.at(i);
+		for (int i = 0; i < commonColName.size(); i++) {
+			string col = commonColName.at(i);
 			thisHashResult = thisHashResult ^ hash<string>{}(row.at(col));
 			otherHashResult = otherHashResult ^ hash<string>{}(otherSqlRow.row.at(col));
 		}
@@ -44,19 +45,32 @@ struct SqlResultSet : SqlResultStore {
 
 	bool operator==(const SqlResult& otherSqlRow) const
 	{
-		vector<string> intersect;
-		set_intersection(colName.begin(), colName.end(), otherSqlRow.colName.begin(), otherSqlRow.colName.end(), inserter(intersect, intersect.begin()));
+		vector<string> commonColName;
+		set<string> thisColName;
+		set<string> otherColName;
+		for (auto it = row.begin(); it != row.end(); it++) {
+			thisColName.insert(it->first);
+		}
+		for (auto it = otherSqlRow.row.begin(); it != otherSqlRow.row.end(); it++) {
+			otherColName.insert(it->first);
+		}
+		set_intersection(thisColName.begin(), thisColName.end(), otherColName.begin(), otherColName.end(), inserter(commonColName, commonColName.begin()));
 		size_t thisHashResult = 0;
 		size_t otherHashResult = 0;
-		for (int i = 0; i < intersect.size(); i++) {
-			string col = intersect.at(i);
+		for (int i = 0; i < commonColName.size(); i++) {
+			string col = commonColName.at(i);
 			thisHashResult = thisHashResult ^ hash<string>{}(row.at(col));
 			otherHashResult = otherHashResult ^ hash<string>{}(otherSqlRow.row.at(col));
 		}
 		return thisHashResult == otherHashResult;
 	}
 };
-*/
+
+struct SqlResultStore{
+	vector<SqlResult> sqlResult;
+	set<SqlResultSet> sqlResultSet;
+};
+
 
 struct SuchThat {
 	string relationship = "";
