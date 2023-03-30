@@ -6,6 +6,10 @@
 #include <format>
 #include "../SPA/Struct.h"
 #include "../SPA/define.h"
+#include "../SPA/Rel_Modifies.h"
+#include "../SPA/Rel_Uses.h"
+#include "../SPA/Rel_Parent.h"
+
 #include <set>
 
 using namespace std;
@@ -68,7 +72,6 @@ public:
 	static bool GetUsesForUnknownInput1(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, SqlResultStore& rs);
  // E.g., Uses(10,v). We don't know what's the entity at statement 10
 
-	static string GetModifiesConstruct(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific);
 	static bool GetModifiesForAssign(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, SqlResultStore& rs);
 	static bool GetModifiesForRead(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, SqlResultStore& rs);
 	static bool GetModifiesForWhile(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, SqlResultStore& rs);

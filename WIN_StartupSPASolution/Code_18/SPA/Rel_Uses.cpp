@@ -65,13 +65,6 @@ string Uses::GetUsesConstruct_NameNotSynonym_NotSynonym()
 	return string(sql);
 }
 
-string Uses::GetUsesConstruct_NameNotSynonym_Synonym(string input2)
-{
-	char sql[100] = {};
-	sprintf_s(sql, "select distinct s.line_num, u.variable_name");
-	return string(sql);
-}
-
 bool Uses::GetUses_AnyPrintAssign_Any(string frontSql, string input1, SqlResultStore& rs)
 {
 	char sqlBuf[512] = {};

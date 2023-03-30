@@ -660,7 +660,7 @@ bool Database::GetModifiesForAssign(string input1, string input2, bool input1IsS
 	// select 1 from modify m where m.variable_name = '%s' and m.line_num in (select s.line_num from statement s where entity = 'assign' and s.line_num = '%s');
 
 	char sqlBuf[512] = {};
-	string first = Database::GetModifiesConstruct(input1, input2, input1IsSpecific, input2IsSpecific);
+	string first = "";
 	sprintf_s(sqlBuf, "%s", input1.c_str());
 
 	// Modifies(a,"cenX") or Modifies(a,v) where "a" is "assign a", "v" is "variable v", "a" not present in select, "v" present in select
@@ -692,7 +692,7 @@ bool Database::GetModifiesForAssign(string input1, string input2, bool input1IsS
 bool Database::GetModifiesForRead(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, SqlResultStore& rs) {
 
 	char sqlBuf[512] = {};
-	string first = Database::GetModifiesConstruct(input1, input2, input1IsSpecific, input2IsSpecific);
+	string first = "";
 	sprintf_s(sqlBuf, "%s", input1.c_str());
 
 	// Modifies(p,"cenX") or Modifies(p,v) where "r" is "read r", "v" is "variable v", "r" not present in select, "v" present in select
@@ -724,7 +724,7 @@ bool Database::GetModifiesForRead(string input1, string input2, bool input1IsSpe
 bool Database::GetModifiesForWhile(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, SqlResultStore& rs) {
 
 	char sqlBuf[512] = {};
-	string first = Database::GetModifiesConstruct(input1, input2, input1IsSpecific, input2IsSpecific);
+	string first = "";
 	sprintf_s(sqlBuf, "%s", input1.c_str());
 
 	// Modifies(w,"cenX") or Modifies(w,v) is true, where "w" is while w, "v" is variable v, "w" not present in select, "v" present in select
@@ -756,7 +756,7 @@ bool Database::GetModifiesForWhile(string input1, string input2, bool input1IsSp
 bool Database::GetModifiesForIf(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, SqlResultStore& rs) {
 
 	char sqlBuf[512] = {};
-	string first = Database::GetModifiesConstruct(input1, input2, input1IsSpecific, input2IsSpecific);
+	string first = "";
 	sprintf_s(sqlBuf, "%s", input1.c_str());
 
 	// Modifies(i,"cenX") or Modifies(i,v) where "i" is "if i", "v" is "variable v", "i" not present in select, "v" present in select
@@ -789,7 +789,7 @@ bool Database::GetModifiesForCall(string input1, string input2, bool input1IsSpe
 	//%s from modify m where m.variable_name = '%s' and exists (%s from statement s where s.entity = 'call' and s.text = '%s' and s.line_num = m.line_num)
 
 	char sqlBuf[512] = {};
-	string first = Database::GetModifiesConstruct(input1, input2, input1IsSpecific, input2IsSpecific);
+	string first = "";
 	sprintf_s(sqlBuf, "%s", input1.c_str());
 
 	// Modifies(c,"cenX") or Modifies(c,v) is true, where "c" is "call c", "v" is variable v, "c" not present in select, "v" present in select
@@ -822,7 +822,7 @@ bool Database::GetModifiesForProcedure(string input1, string input2, bool input1
 	//%s from modify m where m.variable_name = '%s' and exists (%s from procedure p where p.name = '%s' and m.line_num between p.start and p.end)
 
 	char sqlBuf[512] = {};
-	string first = Database::GetModifiesConstruct(input1, input2, input1IsSpecific, input2IsSpecific);
+	string first = "";
 	sprintf_s(sqlBuf, "%s", input1.c_str());
 
 	// Modifies(p,"cenX") or Modifies(p,v) is true, where "r" is "procedure p", "v" is variable v, "r" not present in select, "v" present in select
