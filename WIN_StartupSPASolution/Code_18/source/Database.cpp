@@ -73,6 +73,14 @@ void Database::initialize() {
 	string createUseTableSQL = "CREATE TABLE use ( line_num INT REFERENCES statement(line_num), variable_name VARCHAR(50) REFERENCES variable(name), PRIMARY KEY(line_num, variable_name));";
 	sqlite3_exec(dbConnection, createUseTableSQL.c_str(), NULL, 0, &errorMessage);
 	
+	// drop the existing call table (if any)
+	string dropCallTableSQL = "DROP TABLE IF EXISTS call";
+	sqlite3_exec(dbConnection, dropCallTableSQL.c_str(), NULL, 0, &errorMessage);
+
+	// create a call table
+	string createCallTableSQL = "CREATE TABLE call ( line_num INT REFERENCES statement(line_num), procedure_name VARCHAR(50) REFERENCES procedure(name), variable_name VARCHAR(50) REFERENCES variable(name), direct_call INT(1));";
+	sqlite3_exec(dbConnection, createCallTableSQL.c_str(), NULL, 0, &errorMessage);
+
 	// drop the existing next table (if any)
 	string dropNextTableSQL = "DROP TABLE IF EXISTS next";
 	sqlite3_exec(dbConnection, dropNextTableSQL.c_str(), NULL, 0, &errorMessage);
@@ -191,6 +199,12 @@ void Database::insertNext(int stmtNum1, int stmtNum2) {
 	if (errorMessage) { cout << "insertNext SQL Error: " << errorMessage; }
 }
 
+void Database::insertCall(int stmtNum, string procedureName, string variablename, int directCall) {
+	char sqlBuf[256];
+	sprintf(sqlBuf, "INSERT INTO call ('line_num','procedure_name','variable_name', 'direct_call') VALUES ('%i','%s','%s','%i');", stmtNum, procedureName.c_str(), variablename.c_str(), directCall);
+	sqlite3_exec(dbConnection, sqlBuf, NULL, 0, &errorMessage);
+	if (errorMessage) { cout << "insertCall SQL Error: " << errorMessage << endl; }
+}
 
 bool Database::GetNext(int stmtNum1, int stmtNum2) {
 	dbResults.clear();
