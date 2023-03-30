@@ -20,7 +20,7 @@ namespace DatabaseTests
 			
 			// retrieve the procedures from the database
 			vector<string> dbResults;
-			Database::getProcedures(dbResults);
+			Database::GetProcedures(dbResults);
 		
 			// create the test output string from the procedures retrieved
 			string testOutput;
