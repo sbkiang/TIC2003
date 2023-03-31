@@ -28,6 +28,7 @@ void SourceProcessor::process(string program) {
 
 	vector<Procedure*> procedure;
 	stack<Container*> parentStack;
+	vector<string> caller, called;
 	vector<Statement*> callStatements;
 	int stmtNumSubtract = 0;
 	int stmtNum = 0;
@@ -237,6 +238,21 @@ void SourceProcessor::process(string program) {
 			}
 			else if (word == "call") {
 				callStatements.push_back(stmt);
+				vector<Statement> modifiesStore;
+
+				caller.push_back(procedure.back()->_name); //Which Procedure is caller
+				called.push_back(tokens.at(i)); //Call function
+
+				modifiesStore.push_back(Statement(stmtNum, tokens.at(i), stmtNumSubtract));
+				for (int i = 0; i < modifiesStore.size(); i++) { //direct Call
+					Database::insertCall(modifiesStore.at(i).getAdjustedStmtNum(), procedure.back()->_name, modifiesStore.at(i).getStmt(), 1);
+				}
+				for (int j = 0; j < called.size(); j++) {
+					if (called[j] == procedure.back()->_name) { //indirect Call
+						Database::insertCall(modifiesStore.at(j).getAdjustedStmtNum(), caller[j], tokens.at(i), 0);
+						break;
+					}
+				}
 			}
 		}
 	}

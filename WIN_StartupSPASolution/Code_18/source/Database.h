@@ -50,6 +50,9 @@ public:
 	// method to insert/get a use into the database
 	static void insertUses(int stmtNum, string variablename);
 
+	// method to insert/get a call into the database
+	static void insertCall(int statementNumber, string procedureName, string variablename, int directcall);
+
 	// isSpecific is false if the input is not part of select synonym, and can be found on synonymEntityMap
 
 	static bool GetUsesForAssign(string input1, string input2, bool input1IsSpecific, bool input2IsSpecific, SqlResultStore& rs);
