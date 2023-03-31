@@ -18,13 +18,15 @@
     <ClCompile Include="..\source\Tokenizer.cpp" />
     <ClCompile Include="CFG.cpp" />
     <ClCompile Include="CFGBuilder.cpp" />
+    <ClCompile Include="ClausePattern.cpp" />
     <ClCompile Include="Container.cpp" />
+    <ClCompile Include="DatabaseHelper.cpp" />
     <ClCompile Include="Procedure.cpp" />
-    <ClCompile Include="Rel_Modifies.cpp" />
-    <ClCompile Include="Rel_Parent.cpp" />
+    <ClCompile Include="ClauseModifies.cpp" />
+    <ClCompile Include="ClauseParent.cpp" />
     <ClCompile Include="Statement.cpp" />
     <ClCompile Include="Struct.cpp" />
-    <ClCompile Include="Rel_Uses.cpp" />
+    <ClCompile Include="ClauseUses.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\Database.h" />
@@ -34,14 +36,16 @@
     <ClInclude Include="..\source\Tokenizer.h" />
     <ClInclude Include="CFG.h" />
     <ClInclude Include="CFGBuilder.h" />
+    <ClInclude Include="ClausePattern.h" />
     <ClInclude Include="Container.h" />
+    <ClInclude Include="DatabaseHelper.h" />
     <ClInclude Include="define.h" />
-    <ClInclude Include="Rel_Modifies.h" />
-    <ClInclude Include="Rel_Parent.h" />
+    <ClInclude Include="ClauseModifies.h" />
+    <ClInclude Include="ClauseParent.h" />
     <ClInclude Include="Procedure.h" />
     <ClInclude Include="Statement.h" />
     <ClInclude Include="Struct.h" />
-    <ClInclude Include="Rel_Uses.h" />
+    <ClInclude Include="ClauseUses.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{DC21A1EA-D2C6-4D14-A2B4-E025B64BDE81}</ProjectGuid>

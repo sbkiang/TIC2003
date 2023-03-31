@@ -13,7 +13,8 @@ string Uses::GetUsesConstruct_StatementSynonym_Synonym(string input1, string inp
 string Uses::GetUsesConstruct_StatementSynonym_NotSynonym(string input1)
 {
 	char sql[100] = {};
-	sprintf_s(sql, "select distinct s.line_num as %s, u.variable_name", input1.c_str());
+	//sprintf_s(sql, "select distinct s.line_num as %s, u.variable_name", input1.c_str());
+	sprintf_s(sql, "select distinct s.line_num as %s", input1.c_str());
 	return string(sql);
 }
 
@@ -29,7 +30,8 @@ string Uses::GetUsesConstruct_NameSynonym_Synonym(string input1, string input2)
 string Uses::GetUsesConstruct_NameSynonym_NotSynonym(string input1)
 {
 	char sql[100] = {};
-	sprintf_s(sql, "select distinct p.name as %s, u.variable_name", input1.c_str());
+	//sprintf_s(sql, "select distinct p.name as %s, u.variable_name", input1.c_str());
+	sprintf_s(sql, "select distinct p.name as %s", input1.c_str());
 	return string(sql);
 }
 
@@ -37,7 +39,8 @@ string Uses::GetUsesConstruct_NameSynonym_NotSynonym(string input1)
 string Uses::GetUsesConstruct_StatementNotSynonym_Synonym(string input2)
 {
 	char sql[100] = {};
-	sprintf_s(sql, "select distinct s.line_num, u.variable_name as %s", input2.c_str());
+	//sprintf_s(sql, "select distinct s.line_num, u.variable_name as %s", input2.c_str());
+	sprintf_s(sql, "select distinct u.variable_name as %s", input2.c_str());
 	return string(sql);
 }
 
@@ -53,7 +56,8 @@ string Uses::GetUsesConstruct_StatementNotSynonym_NotSynonym()
 string Uses::GetUsesConstruct_NameNotSynonym_Synonym(string input2)
 {
 	char sql[100] = {};
-	sprintf_s(sql, "select distinct p.name, u.variable_name");
+	//sprintf_s(sql, "select distinct p.name, u.variable_name as %s", input2.c_str());
+	sprintf_s(sql, "u.variable_name as %s", input2.c_str());
 	return string(sql);
 }
 
@@ -61,7 +65,7 @@ string Uses::GetUsesConstruct_NameNotSynonym_Synonym(string input2)
 string Uses::GetUsesConstruct_NameNotSynonym_NotSynonym()
 {
 	char sql[100] = {};
-	sprintf_s(sql, "select distinct s.line_num, u.variable_name as %s");
+	sprintf_s(sql, "select distinct s.line_num, u.variable_name");
 	return string(sql);
 }
 

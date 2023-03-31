@@ -4,7 +4,8 @@
 string ClausePattern::PatternConstruct_Synonym_NotSynonym(string input1)
 {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, "select lhs as %s, rhs", input1.c_str());
+	//sprintf_s(sqlBuf, "select lhs as %s, rhs", input1.c_str());
+	sprintf_s(sqlBuf, "select lhs as %s", input1.c_str());
 	return string(sqlBuf);
 }
 
@@ -28,6 +29,7 @@ string ClausePattern::ConvertPqlPatternOprtToSqlPatternOprt(string input)
 
 string ClausePattern::insertPattern(int stmtNum, string LHS, string RHS, string expression)
 {
+	return "";
 }
 
 // Pattern("x", _/_"x+1"_/"x+1")

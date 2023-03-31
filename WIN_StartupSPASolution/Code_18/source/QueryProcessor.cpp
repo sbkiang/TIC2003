@@ -165,80 +165,80 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			}
 		}
 	}
-	SqlResultStore sqlResultStore;
+	SqlResultStore selectResultStore;
 	EvaluateSelect(select, synonymEntityMap);
 	//vector<SqlResult> sqlResultPass;
-	Database::SelectPql(select, sqlResultStore);
+	Database::SelectPql(select, selectResultStore);
 
 	// need to determine if the input to such that is generic or specific
 	//	generic when it's (a synonym and not part of select) or (wildcard)
 	//  specific when it's (a synonym and part of select) or ((not a synonym) and (not wildcard))
-	vector<SqlResult> sqlResultPass;
+	vector<Row> sqlResultPass;
 	while (!suchThatStack.empty()) {
 		SuchThat suchThatTemp = suchThatStack.top();
-		bool input1IsSynonym = (synonymEntityMap.find(suchThatTemp.input1) != synonymEntityMap.end()); // first input is a synonym
-		bool input2IsSynonym = (synonymEntityMap.find(suchThatTemp.input2) != synonymEntityMap.end()); // second input is a synonym		
-		bool input1IsWildcard = (suchThatTemp.input1 == "_") ? true : false;
-		bool input2IsWildcard = (suchThatTemp.input2 == "_") ? true : false;
-		bool input1IsAny = (input1IsSynonym || input1IsWildcard);
-		bool input2IsAny = (input2IsSynonym || input2IsWildcard);
-		string entityInput1 = "", entityInput2 = "", first = suchThatTemp.input1, second = suchThatTemp.input2;
+		string entityInput1 = "", entityInput2 = "", input1 = suchThatTemp.input1, input2 = suchThatTemp.input2;
+		bool input1IsSynonym = (synonymEntityMap.find(input1) != synonymEntityMap.end()); // input1 input is a synonym
+		bool input2IsSynonym = (synonymEntityMap.find(input2) != synonymEntityMap.end()); // input2 input is a synonym		
+		bool input1IsWildcard = (input1 == "_") ? true : false;
+		bool input2IsWildcard = (input2 == "_") ? true : false;
+		
 		if (input1IsSynonym) { // if input1 is part of declared synonym, we get the entity that it belongs
-			entityInput1 = synonymEntityMap.at(suchThatTemp.input1);
+			entityInput1 = synonymEntityMap.at(input1);
 		}
 		if (input2IsSynonym) { // if input1 is part of declared synonym, we get the entity that it belongs
-			entityInput2 = synonymEntityMap.at(suchThatTemp.input2);
+			entityInput2 = synonymEntityMap.at(input2);
 		};
-		SqlResultStore rs;
 		string relationship = suchThatTemp.relationship;
 		string frontSql = "";
+		string sql = "";
 		if (relationship == "Uses") { // input1 is Stmt Num or Name, input2 is Name
 			if (input1IsSynonym && input2IsSynonym) {
 				if (regex_match(entityInput1, regex(regexStmtNumEntity))) {
-					frontSql = Uses::GetUsesConstruct_StatementSynonym_Synonym(suchThatTemp.input1, suchThatTemp.input2);
+					frontSql = Uses::GetUsesConstruct_StatementSynonym_Synonym(input1, input2);
 				}
 				else if (entityInput1 == "procedure") {
-					frontSql = Uses::GetUsesConstruct_NameSynonym_Synonym(suchThatTemp.input1, suchThatTemp.input2);
+					frontSql = Uses::GetUsesConstruct_NameSynonym_Synonym(input1, input2);
 				}
 			}
 			else if (!input1IsSynonym && input2IsSynonym) {
-				if (isdigit(suchThatTemp.input1[0])) {
-					frontSql = Uses::GetUsesConstruct_StatementNotSynonym_Synonym(suchThatTemp.input2);
+				if (isdigit(input1[0])) {
+					frontSql = Uses::GetUsesConstruct_StatementNotSynonym_Synonym(input2);
 				}
 				else {
-					frontSql = Uses::GetUsesConstruct_NameNotSynonym_Synonym(suchThatTemp.input2);
+					frontSql = Uses::GetUsesConstruct_NameNotSynonym_Synonym(input2);
 				}
 			}
 			else if (input1IsSynonym && !input2IsSynonym) {
 				if (regex_match(entityInput1, regex(regexStmtNumEntity))) {
-					frontSql = Uses::GetUsesConstruct_StatementSynonym_NotSynonym(suchThatTemp.input1);
+					frontSql = Uses::GetUsesConstruct_StatementSynonym_NotSynonym(input1);
 				}
 				else if (entityInput1 == "procedure") {
-					frontSql = Uses::GetUsesConstruct_NameSynonym_NotSynonym(suchThatTemp.input1);
+					frontSql = Uses::GetUsesConstruct_NameSynonym_NotSynonym(input1);
 				}
 			}
 			else if (!input1IsSynonym && !input2IsSynonym) {
-				if (isdigit(suchThatTemp.input1[0])) {
+				if (isdigit(input1[0])) {
 					frontSql = Uses::GetUsesConstruct_StatementNotSynonym_NotSynonym();
 				}
 				else {
 					frontSql = Uses::GetUsesConstruct_NameNotSynonym_NotSynonym();
 				}
 			}
-			string sql = "";
-			if (!input1IsAny && input2IsAny) { // Pattern("main"/5, variable/_)
-				if (isdigit(suchThatTemp.input1[0])) { // for any stmt num, we need to get the entity first
-					entityInput1 = DatabaseHelper::GetEntityByStatement(suchThatTemp.input1);
+			bool input1IsAny = (input1IsSynonym || input1IsWildcard);
+			bool input2IsAny = (input2IsSynonym || input2IsWildcard);
+			if (!input1IsAny && input2IsAny) { // Uses("main"/5, variable/_)
+				if (isdigit(input1[0])) { // for stmt num, we need to get the entity input1
+					entityInput1 = DatabaseHelper::GetEntityByStatement(input1);
 				}
 				else {
-					sql = Uses::GetUses_SpecificProcedure_Any(frontSql, suchThatTemp.input1);
+					sql = Uses::GetUses_SpecificProcedure_Any(frontSql, input1);
 				}
 			}
-			if (input1IsAny && input2IsAny) { // Pattern(entity/_, variable/_)
-				if (entityInput1 == "procedure") { // Pattern(procedure, variable/_)
+			if (input1IsAny && input2IsAny) { // Uses(entity, variable/_)
+				if (entityInput1 == "procedure") { // Uses(procedure, variable/_)
 					sql = Uses::GetUses_AnyProcedure_Any(frontSql);
 				}
-				else if (regex_match(entityInput1, regex(regexAssignPrint))) { // Pattern(print/assign, variable/_)
+				else if (regex_match(entityInput1, regex(regexAssignPrint))) { // Uses(print/assign, variable/_)
 					sql = Uses::GetUses_AnyPrintAssign_Any(frontSql, entityInput1);
 				}
 				else if (regex_match(entityInput1, regex(regexWhileIf))) {
@@ -248,57 +248,257 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 					sql = Uses::GetUses_AnyCall_Any(frontSql);
 				}
 			}
-			else if (!input1IsAny && input2IsAny) {
-				if (entityInput1 == "procedure") { // Pattern(procedure, variable/_)
-					sql = Uses::GetUses_SpecificProcedure_Any(frontSql, suchThatTemp.input1);
+			else if (!input1IsAny && input2IsAny) { // entityInput1 here is already determine at the top
+				if (entityInput1 == "procedure") { // Uses(procedure, variable/_)
+					sql = Uses::GetUses_SpecificProcedure_Any(frontSql, input1);
 				}
-				else if (regex_match(entityInput1, regex(regexAssignPrint))) { // Pattern(print/assign, variable/_)
-					sql = Uses::GetUses_SpecificPrintAssign_Any(frontSql, suchThatTemp.input1);
+				else if (regex_match(entityInput1, regex(regexAssignPrint))) { // Uses(print/assign, variable/_)
+					sql = Uses::GetUses_SpecificPrintAssign_Any(frontSql, input1);
 				}
 				else if (regex_match(entityInput1, regex(regexWhileIf))) {
-					sql = Uses::GetUses_SpecificWhileIf_Any(frontSql, suchThatTemp.input1);
+					sql = Uses::GetUses_SpecificWhileIf_Any(frontSql, input1);
 				}
 				else if (entityInput1 == "call") {
-					sql = Uses::GetUses_SpecificCall_Any(frontSql, suchThatTemp.input1);
+					sql = Uses::GetUses_SpecificCall_Any(frontSql, input1);
 				}
 			}
 			else if (input1IsAny && !input2IsAny) {
-				if (entityInput1 == "procedure") { // Pattern(procedure, variable/_)
-					sql = Uses::GetUses_AnyProcedure_Specific(frontSql, suchThatTemp.input2);
+				if (entityInput1 == "procedure") { // Uses(procedure, variable/_)
+					sql = Uses::GetUses_AnyProcedure_Specific(frontSql, input2);
 				}
-				else if (regex_match(entityInput1, regex(regexAssignPrint))) { // Pattern(print/assign, variable/_)
-					sql = Uses::GetUses_AnyPrintAssign_Specific(frontSql, entityInput1, suchThatTemp.input2);
+				else if (regex_match(entityInput1, regex(regexAssignPrint))) { // Uses(print/assign, variable/_)
+					sql = Uses::GetUses_AnyPrintAssign_Specific(frontSql, entityInput1, input2);
 				}
 				else if (regex_match(entityInput1, regex(regexWhileIf))) {
-					sql = Uses::GetUses_AnyWhileIf_Specific(frontSql, entityInput1, suchThatTemp.input2);
+					sql = Uses::GetUses_AnyWhileIf_Specific(frontSql, entityInput1, input2);
 				}
 				else if (entityInput1 == "call") {
-					sql = Uses::GetUses_AnyCall_Specific(frontSql, suchThatTemp.input2);
+					sql = Uses::GetUses_AnyCall_Specific(frontSql, input2);
 				}
 			}
-			else if (!input1IsAny && !input2IsAny) {
-				if (entityInput1 == "procedure") { // Pattern(procedure, variable/_)
-					sql = Uses::GetUses_SpecificProcedure_Specific(frontSql, suchThatTemp.input1, suchThatTemp.input2);
+			else if (!input1IsAny && !input2IsAny) { // entityInput1 here is already determine at the top
+				if (entityInput1 == "procedure") { // Uses(procedure, variable/_)
+					sql = Uses::GetUses_SpecificProcedure_Specific(frontSql, input1, input2);
 				}
-				else if (regex_match(entityInput1, regex(regexAssignPrint))) { // Pattern(print/assign, variable/_)
-					sql = Uses::GetUses_SpecificPrintAssign_Specific(frontSql, suchThatTemp.input1, suchThatTemp.input2);
+				else if (regex_match(entityInput1, regex(regexAssignPrint))) { // Uses(print/assign, variable/_)
+					sql = Uses::GetUses_SpecificPrintAssign_Specific(frontSql, input1, input2);
 				}
 				else if (regex_match(entityInput1, regex(regexWhileIf))) {
-					sql = Uses::GetUses_SpecificWhileIf_Specific(frontSql, suchThatTemp.input1, suchThatTemp.input2);
+					sql = Uses::GetUses_SpecificWhileIf_Specific(frontSql, input1, input2);
 				}
 				else if (entityInput1 == "call") {
-					sql = Uses::GetUses_SpecificCall_Specific(frontSql, suchThatTemp.input1, suchThatTemp.input2);
+					sql = Uses::GetUses_SpecificCall_Specific(frontSql, input1, input2);
 				}
 			}
 		}
+
 		else if (relationship == "Modifies") { // input1 is Stmt Num or Name, input2 is Name or Wildcard
+			if (input1IsSynonym && input2IsSynonym) {
+				if (regex_match(entityInput1, regex(regexStmtNumEntity))) {
+					frontSql = Modifies::GetModifiesConstruct_StatementSynonym_Synonym(input1, input2);
+				}
+				else if (entityInput1 == "procedure") {
+					frontSql = Modifies::GetModifiesConstruct_NameSynonym_Synonym(input1, input2);
+				}
+			}
+			else if (!input1IsSynonym && input2IsSynonym) {
+				if (isdigit(input1[0])) {
+					frontSql = Modifies::GetModifiesConstruct_StatementNotSynonym_Synonym(input2);
+				}
+				else {
+					frontSql = Modifies::GetModifiesConstruct_NameNotSynonym_Synonym(input2);
+				}
+			}
+			else if (input1IsSynonym && !input2IsSynonym) {
+				if (regex_match(entityInput1, regex(regexStmtNumEntity))) {
+					frontSql = Modifies::GetModifiesConstruct_StatementSynonym_NotSynonym(input1);
+				}
+				else if (entityInput1 == "procedure") {
+					frontSql = Modifies::GetModifiesConstruct_NameSynonym_NotSynonym(input1);
+				}
+			}
+			else if (!input1IsSynonym && !input2IsSynonym) {
+				if (isdigit(input1[0])) {
+					frontSql = Modifies::GetModifiesConstruct_StatementNotSynonym_NotSynonym();
+				}
+				else {
+					frontSql = Modifies::GetModifiesConstruct_NameNotSynonym_NotSynonym();
+				}
+			}
+			bool input1IsAny = (input1IsSynonym || input1IsWildcard);
+			bool input2IsAny = (input2IsSynonym || input2IsWildcard);
+			if (!input1IsAny && input2IsAny) { // Modifies("main"/5, variable/_)
+				if (isdigit(input1[0])) { // for stmt num, we need to get the entity input1
+					entityInput1 = DatabaseHelper::GetEntityByStatement(input1);
+				}
+				else {
+					sql = Modifies::GetModifies_SpecificProcedure_Any(frontSql, input1);
+				}
+			}
+			if (input1IsAny && input2IsAny) { // Modifies(entity, variable/_)
+				if (entityInput1 == "procedure") { // Modifies(procedure, variable/_)
+					sql = Modifies::GetModifies_AnyProcedure_Any(frontSql);
+				}
+				else if (regex_match(entityInput1, regex(regexAssignPrint))) { // Modifies(print/assign, variable/_)
+					sql = Modifies::GetModifies_AnyReadAssign_Any(frontSql, entityInput1);
+				}
+				else if (regex_match(entityInput1, regex(regexWhileIf))) {
+					sql = Modifies::GetModifies_AnyWhileIf_Any(frontSql, entityInput1);
+				}
+				else if (entityInput1 == "call") {
+					sql = Modifies::GetModifies_AnyCall_Any(frontSql);
+				}
+			}
+			else if (!input1IsAny && input2IsAny) { // entityInput1 here is already determine at the top
+				if (entityInput1 == "procedure") { // Modifies(procedure, variable/_)
+					sql = Modifies::GetModifies_SpecificProcedure_Any(frontSql, input1);
+				}
+				else if (regex_match(entityInput1, regex(regexAssignPrint))) { // Modifies(print/assign, variable/_)
+					sql = Modifies::GetModifies_SpecificReadAssign_Any(frontSql, input1);
+				}
+				else if (regex_match(entityInput1, regex(regexWhileIf))) {
+					sql = Modifies::GetModifies_SpecificWhileIf_Any(frontSql, input1);
+				}
+				else if (entityInput1 == "call") {
+					sql = Modifies::GetModifies_SpecificCall_Any(frontSql, input1);
+				}
+			}
+			else if (input1IsAny && !input2IsAny) {
+				if (entityInput1 == "procedure") { // Modifies(procedure, variable/_)
+					sql = Modifies::GetModifies_AnyProcedure_Specific(frontSql, input2);
+				}
+				else if (regex_match(entityInput1, regex(regexAssignPrint))) { // Modifies(print/assign, variable/_)
+					sql = Modifies::GetModifies_AnyReadAssign_Specific(frontSql, entityInput1, input2);
+				}
+				else if (regex_match(entityInput1, regex(regexWhileIf))) {
+					sql = Modifies::GetModifies_AnyWhileIf_Specific(frontSql, entityInput1, input2);
+				}
+				else if (entityInput1 == "call") {
+					sql = Modifies::GetModifies_AnyCall_Specific(frontSql, input2);
+				}
+			}
+			else if (!input1IsAny && !input2IsAny) { // entityInput1 here is already determine at the top
+				if (entityInput1 == "procedure") { // Modifies(procedure, variable/_)
+					sql = Modifies::GetModifies_SpecificProcedure_Specific(frontSql, input1, input2);
+				}
+				else if (regex_match(entityInput1, regex(regexAssignPrint))) { // Modifies(print/assign, variable/_)
+					sql = Modifies::GetModifies_SpecificReadAssign_Specific(frontSql, input1, input2);
+				}
+				else if (regex_match(entityInput1, regex(regexWhileIf))) {
+					sql = Modifies::GetModifies_SpecificWhileIf_Specific(frontSql, input1, input2);
+				}
+				else if (entityInput1 == "call") {
+					sql = Modifies::GetModifies_SpecificCall_Specific(frontSql, input1, input2);
+				}
+			}
 		}
-		else if (relationship == "Parent") { // input1 is Stmt Num, input2 is Stmt Num
-			//pass = Database::GetParent(first, second, input1IsSpecific, input2IsSpecific, entityInput1, entityInput2, rs);
+
+		else if (relationship == "Parent") {
+			bool input1IsStmtOrWildCard = (entityInput1 == "stmt" || input1IsWildcard);
+			bool input2IsStmtOrWildCard = (entityInput1 == "stmt" || input2IsWildcard);
+			bool input1IsGeneric = (input1IsStmtOrWildCard || input1IsSynonym);
+			bool input2IsGeneric = (input2IsStmtOrWildCard || input2IsSynonym);
+
+			if (input1IsSynonym && input2IsSynonym) { // Parent(entity, entity)
+				frontSql = Parent::GetParentConstruct_Synonym_Synonym(input1, input2);
+			}
+			else if (!input1IsSynonym && input2IsSynonym) { // Parent(10, entity)
+				frontSql = Parent::GetParentConstruct_NotSynonym_Synonym(input2);
+			}
+			else if (input1IsSynonym && !input2IsSynonym) { // Parent(entity, 10)
+				frontSql = Parent::GetParentConstruct_Synonym_NotSynonym(input1);
+			}
+			else if (!input1IsSynonym && !input2IsSynonym) { // Parent(10, 11)
+				frontSql = Parent::GetParentConstruct_NotSynonym_NotSynonym();
+			}
+			if (input1IsGeneric && input2IsGeneric) { // Parent(entity/_, entity/_)
+				if (input1IsStmtOrWildCard && input2IsStmtOrWildCard) { // Parent(stmt/_, stmt/_)
+					sql = Parent::GetParent_Any_Any(frontSql);
+				}
+				else if (input1IsStmtOrWildCard && !input2IsStmtOrWildCard) { // Parent(stmt/_, entity_excld_stmt)
+					sql = Parent::GetParent_Any_Synonym(frontSql, entityInput2);
+				}
+				else if (!input1IsStmtOrWildCard && input2IsStmtOrWildCard) { // Parent(entity_excld_stmt, stmt/_)
+					sql = Parent::GetParent_Synonym_Any(frontSql, entityInput1);
+				}
+				else if (!input1IsStmtOrWildCard && !input2IsStmtOrWildCard) { // Parent(entity_excld_stmt, entity_excld_stmt)
+					sql = Parent::GetParent_Synonym_Synonym(frontSql, entityInput1, entityInput2);
+				}
+			}
+			else if (input1IsGeneric && !input2IsGeneric) { // Parent(entity/_, 10)
+				if (input1IsStmtOrWildCard) { // Parent(stmt/_, 10)
+					sql = Parent::GetParent_Any_Specific(frontSql, input2);
+				}
+				else if (!input1IsStmtOrWildCard) { // Parent(entity_excld_stmt, 10)
+					sql = Parent::GetParent_Synonym_Specific(frontSql, entityInput2, input2);
+				}
+			}
+			else if (!input1IsGeneric && input2IsGeneric) { // Parent(10, entity/_)
+				if (input2IsStmtOrWildCard) { // Parent(10, stmt/_)
+					sql = Parent::GetParent_Specific_Any(frontSql, input1);
+				}
+				else if (!input2IsStmtOrWildCard) { // Parent(10, entity_excld_stmt)
+					sql = Parent::GetParent_Specific_Synonym(frontSql, input1, entityInput2);
+				}
+			}
+			else if (!input1IsGeneric && !input2IsGeneric) {// Parent(10,11)
+				sql = Parent::GetParent_Specific_Specific(frontSql, input1, input2);
+			}
 		}
+
 		else if (relationship == "Parent*") { // input1 is Stmt Num, input2 is Stmt Num
-			//pass = Database::GetParentT(first, second, input1IsSpecific, input2IsSpecific, entityInput1, entityInput2, rs);
+			bool input1IsStmtOrWildCard = (entityInput1 == "stmt" || input1IsWildcard);
+			bool input2IsStmtOrWildCard = (entityInput1 == "stmt" || input2IsWildcard);
+			bool input1IsGeneric = (input1IsStmtOrWildCard || input1IsSynonym);
+			bool input2IsGeneric = (input2IsStmtOrWildCard || input1IsSynonym);
+
+			if (input1IsSynonym && input2IsSynonym) { // Parent(stmt, stmt)
+				frontSql = Parent::GetParentConstruct_Synonym_Synonym(input1, input2);
+			}
+			else if (!input1IsSynonym && input2IsSynonym) { // Parent(10, stmt)
+				frontSql = Parent::GetParentConstruct_NotSynonym_Synonym(input2);
+			}
+			else if (input1IsSynonym && !input2IsSynonym) { // Parent(stmt, 10)
+				frontSql = Parent::GetParentConstruct_Synonym_NotSynonym(input1);
+			}
+			else if (!input1IsSynonym && !input2IsSynonym) { // Parent(10, 11)
+				frontSql = Parent::GetParentConstruct_NotSynonym_NotSynonym();
+			}
+			if (input1IsGeneric && input2IsGeneric) { // Parent(entity/_, entity/_)
+				if (input1IsStmtOrWildCard && input2IsStmtOrWildCard) { // Parent(stmt/_, stmt/_)
+					sql = Parent::GetParentT_Any_Any(frontSql);
+				}
+				else if (input1IsStmtOrWildCard && !input2IsStmtOrWildCard) { // Parent(stmt/_, entity_excld_stmt)
+					sql = Parent::GetParentT_Any_Synonym(frontSql, entityInput2);
+				}
+				else if (!input1IsStmtOrWildCard && input2IsStmtOrWildCard) { // Parent(entity_excld_stmt, stmt/_)
+					sql = Parent::GetParentT_Synonym_Any(frontSql, entityInput1);
+				}
+				else if (!input1IsStmtOrWildCard && !input2IsStmtOrWildCard) { // Parent(entity_excld_stmt, entity_excld_stmt)
+					sql = Parent::GetParentT_Synonym_Synonym(frontSql, entityInput1, entityInput2);
+				}
+			}
+			else if (input1IsGeneric && !input2IsGeneric) { // Parent(entity/_, 10)
+				if (input1IsStmtOrWildCard) { // Parent(stmt/_, 10)
+					sql = Parent::GetParentT_Any_Specific(frontSql, input2);
+				}
+				else if (!input1IsStmtOrWildCard) { // Parent(entity_excld_stmt, 10)
+					sql = Parent::GetParentT_Synonym_Specific(frontSql, entityInput1, input2);
+				}
+			}
+			else if (!input1IsGeneric && input2IsGeneric) { // Parent(10, entity/_)
+				if (input2IsStmtOrWildCard) { // Parent(10, stmt/_)
+					sql = Parent::GetParentT_Specific_Any(frontSql, input1);
+				}
+				else if (!input2IsStmtOrWildCard) { // Parent(10, entity_excld_stmt)
+					sql = Parent::GetParentT_Specific_Synonym(frontSql, input1, entityInput2);
+				}
+			}
+			else if (!input1IsGeneric && !input2IsGeneric) {// Parent(10,11)
+				sql = Parent::GetParentT_Specific_Specific(frontSql, input1, input2);
+			}
 		}
+			
 		else if (relationship == "Next") {
 
 		}
@@ -312,13 +512,30 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 
 		}
 
-		sqlResultStore.sqlResult = sqlResultPass;
+		SqlResultStore suchThatResultStore;
+		Database::ExecuteSql(sql, suchThatResultStore);
+
+		//if there's common synonym between the table, perform intersect
+		bool SuchThatInputInSelect = (find(select.synonym.begin(), select.synonym.end(), input1) != select.synonym.end()) || (find(select.synonym.begin(), select.synonym.end(), input2) != select.synonym.end());
+		if (SuchThatInputInSelect) {
+			set<RowSet> selectResultSet = selectResultStore.sqlResultSet;
+			set<RowSet> suchThatResultSet = suchThatResultStore.sqlResultSet;
+			set<RowSet> intersection;
+			set_intersection(selectResultSet.begin(), selectResultSet.end(), suchThatResultSet.begin(), suchThatResultSet.end(), inserter(intersection, intersection.begin()));
+			selectResultStore.sqlResultSet = intersection;
+		}
+		else {
+			if (suchThatResultStore.sqlResultSet.empty()) {
+
+			}
+		}
+
 		suchThatStack.pop();
 	}
 
 	while (!patternStack.empty()) {
 		Pattern patternTemp = patternStack.top();
-		string entity = synonymEntityMap.at(patternTemp.synonym), first = patternTemp.input1, second = patternTemp.input2, line = "";
+		string entity = synonymEntityMap.at(patternTemp.synonym), first = patternTemp.input1, second = patternTemp.input2;
 		bool input2IsWildcard = (patternTemp.input2 == "_") ? true : false;
 		bool input1IsSynonym = (synonymEntityMap.find(patternTemp.input1) != synonymEntityMap.end());
 
@@ -333,7 +550,6 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			second = (startWildCard) ? ("_" + second) : second;
 			second = (endWildCard) ? (second + "_") : second;
 		}
-		string first = patternTemp.input1;
 		second = ClausePattern::ConvertPqlPatternOprtToSqlPatternOprt(second);
 		string sqlFront = input1IsSynonym ? ClausePattern::PatternConstruct_Synonym_NotSynonym(first) : ClausePattern::PatternConstruct_NotSynonym_NotSynonym();
 		string sqlFull = (input1IsSynonym || first == "_") ? ClausePattern::GetPattern_Any_Expr(sqlFront, second) : ClausePattern::GetPattern_NotAny_Expr(sqlFront, first, second);
@@ -343,14 +559,14 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	}
 
 	// post process the results to fill in the output vector
-	for (SqlResult sqlResult : sqlResultStore.sqlResult) {
-		string result;
-		for (auto it = sqlResult.row.begin(); it != sqlResult.row.end(); it++) {
-			result += (*it).second + " ";
+	string result;
+	for (auto rowSet : selectResultStore.sqlResultSet) {
+		for (auto row : rowSet.row) {
+			result += row.second + " ";
 		}
-		while (result.back() == ' ') { result.pop_back(); }
-		output.push_back(result);
 	}
+	while (result.back() == ' ') { result.pop_back(); }
+	output.push_back(result);
 	
 	cout << "MY OUTPUT: ";
 	for (int i = 0; i < output.size(); i++) {

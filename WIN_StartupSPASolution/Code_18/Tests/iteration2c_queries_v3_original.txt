@@ -1,3 +1,63 @@
+1001 - stmt entity no clause
+stmt s;
+Select s
+1,10,11,12,13,14,15,16,17,18,19,2,3,4,5,6,7,8,9
+5000
+1002 - read entity no clause
+read r;
+Select r
+1
+5000
+1003 - print entity no clause
+print pr;
+Select pr
+13,16,18,19,3
+5000
+1004 - while entity no clause
+while w;
+Select w
+12,4,6
+5000
+1005 - if entity no clause
+if ifs;
+Select ifs
+17,8,9
+5000
+1006 - assign entity no clause
+assign a;
+Select a
+10,11,14,15,2,5,7
+5000
+1007 - variable entity no clause
+variable v;
+Select v
+a,add,b,c,d,negative,positive
+5000
+1008 - constant entity no clause
+constant c;
+Select c
+0,10,20,30
+5000
+1009 - procedure entity no clause
+procedure p;
+Select p
+NestedWhileIf
+5000
+1030 - Parent 2 wildcards
+read r;
+Select r such that Parent(_, _)
+1
+5000
+1031 - Parent left wildcard with stmtNo
+while w;
+Select w such that Parent(_, 19)
+12,4,6
+5000
+1032 - Parent right wildcard with stmtNo
+if ifs;
+Select ifs such that Parent(12, _)
+17,8,9
+5000
 1033 - Parent left wildcard with syn
 assign a;
 Select a such that Parent(_, a)

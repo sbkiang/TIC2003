@@ -32,10 +32,8 @@ public:
 
 	// method to insert a variable into the database
 	static void insertVariable(string variablename, int statementNumber);
-	static void GetVariable(set<string>& result);
 	// method to insert a constant into the database
 	static void insertConstant(string value);
-	static void GetConstant(vector<string>& results);
 
 	// method to insert a parent into the database
 	static void insertParent(int parentStmt, int childStart, int childEnd);

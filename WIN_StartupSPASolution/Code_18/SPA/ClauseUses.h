@@ -16,8 +16,6 @@ public:
 	static string GetUsesConstruct_NameNotSynonym_Synonym(string input2);
 	static string GetUsesConstruct_NameNotSynonym_NotSynonym();
 
-	static string GetEntityForStatement(string input);
-
 	// Uses(print/assign, var/_)
 	static string GetUses_AnyPrintAssign_Any(string frontSql, string input1);
 
@@ -57,12 +55,12 @@ public:
 	// Uses(10, "x") where 10 = print/assign
 	static string GetUses_SpecificPrintAssign_Specific(string frontSql, string input1, string input2);
 
-	// Uses(10, var/_) where 10 = call
+	// Uses(10, "x") where 10 = call
 	static string GetUses_SpecificCall_Specific(string frontSql, string input1, string input2);
 
-	// Uses("main", var/_)
+	// Uses("main", "x")
 	static string GetUses_SpecificProcedure_Specific(string frontSql, string input1, string input2);
 
-	// Uses("10", var/_) where 10 = while/if
+	// Uses("10", "x") where 10 = while/if
 	static string GetUses_SpecificWhileIf_Specific(string frontSql, string input1, string input2);
 };
