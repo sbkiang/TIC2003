@@ -8,6 +8,7 @@
 #include "../SPA/ClauseModifies.h"
 #include "../SPA/ClauseUses.h"
 #include "../SPA/ClauseParent.h"
+#include "../SPA/ClauseCall.h"
 #include "../SPA/ClausePattern.h"
 #include "Database.h"
 #include "../SPA/DatabaseHelper.h"

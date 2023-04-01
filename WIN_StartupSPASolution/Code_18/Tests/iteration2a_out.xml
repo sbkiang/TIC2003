@@ -1,17 +1,17 @@
 <?xml-stylesheet type="text/xsl" href="analysis.xsl"?>
 <test_results>
 <info>
-<name>AutoTester</name><parsing_time_taken>1148.000000</parsing_time_taken>
+<name>AutoTester</name><parsing_time_taken>832.000000</parsing_time_taken>
 </info>
 <queries>
 <query>
 <id ReturnTuple="1" Parent="1" UnnamedVar="1" SuchThat="1" CondNum="4" RelNum="1" comment="Parent left wildcard with syn">1033</id><querystr><![CDATA[assign a; Select a such that Parent(_, a)]]></querystr>
-<stuans>15 16 17 21 20 22</stuans>
+<stuans>14 10 11 5 7</stuans>
 <correct>10,11,14,5,7</correct>
-<time_taken>12.000000</time_taken>
+<time_taken>23.000000</time_taken>
 <failed>
 <missing>10,11,14,5,7</missing>
-<additional>15 16 17 21 20 22</additional>
+<additional>14 10 11 5 7</additional>
 <summary>
 <expected>5</expected>
 <matched>0</matched>
@@ -22,12 +22,12 @@
 </query>
 <query>
 <id ReturnTuple="1" Parent="1" UnnamedVar="1" SuchThat="1" CondNum="4" RelNum="1" comment="Parent right wildcard with syn">1034</id><querystr><![CDATA[stmt s; Select s such that Parent(s, _)]]></querystr>
-<stuans>19 14</stuans>
+<stuans>17 12 4 6 9 8</stuans>
 <correct>12,17,4,6,8,9</correct>
 <time_taken>12.000000</time_taken>
 <failed>
 <missing>12,17,4,6,8,9</missing>
-<additional>19 14</additional>
+<additional>17 12 4 6 9 8</additional>
 <summary>
 <expected>6</expected>
 <matched>0</matched>
