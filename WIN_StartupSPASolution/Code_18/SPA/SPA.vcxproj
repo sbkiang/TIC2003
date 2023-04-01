@@ -20,7 +20,7 @@
     <ClCompile Include="CFGBuilder.cpp" />
     <ClCompile Include="ClausePattern.cpp" />
     <ClCompile Include="Container.cpp" />
-    <ClCompile Include="DatabaseHelper.cpp" />
+    <ClCompile Include="HelperFunction.cpp" />
     <ClCompile Include="Procedure.cpp" />
     <ClCompile Include="ClauseModifies.cpp" />
     <ClCompile Include="ClauseParent.cpp" />
@@ -38,7 +38,7 @@
     <ClInclude Include="CFGBuilder.h" />
     <ClInclude Include="ClausePattern.h" />
     <ClInclude Include="Container.h" />
-    <ClInclude Include="DatabaseHelper.h" />
+    <ClInclude Include="HelperFunction.h" />
     <ClInclude Include="define.h" />
     <ClInclude Include="ClauseModifies.h" />
     <ClInclude Include="ClauseParent.h" />

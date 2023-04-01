@@ -60,7 +60,7 @@
     <ClCompile Include="ClausePattern.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DatabaseHelper.cpp">
+    <ClCompile Include="HelperFunction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -113,7 +113,7 @@
     <ClInclude Include="ClausePattern.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DatabaseHelper.h">
+    <ClInclude Include="HelperFunction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

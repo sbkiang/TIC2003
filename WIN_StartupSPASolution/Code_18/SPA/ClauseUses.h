@@ -28,6 +28,9 @@ public:
 	// Uses(while/if, var/_)
 	static string GetUses_AnyWhileIf_Any(string frontSql, string input1);
 
+	// Uses(stmt/_, var/_)
+	static string GetUses_Any_Any(string frontSql);
+
 	// Uses(print/assign, "x")
 	static string GetUses_AnyPrintAssign_Specific(string frontSql, string input1, string input2);
 
@@ -39,6 +42,9 @@ public:
 
 	// Uses(while/if, "x")
 	static string GetUses_AnyWhileIf_Specific(string frontSql, string input1, string input2);
+
+	// Uses(stmt/_, "x")
+	static string GetUses_Any_Specific(string frontSql, string input2);
 
 	// Uses(10, var/_) where 10 = print/assign
 	static string GetUses_SpecificPrintAssign_Any(string frontSql, string input1);

@@ -10,7 +10,7 @@
 #include "../SPA/ClauseParent.h"
 #include "../SPA/ClausePattern.h"
 #include "Database.h"
-#include "../SPA/DatabaseHelper.h"
+#include "../SPA/HelperFunction.h"
 
 using namespace std;
 
@@ -37,8 +37,4 @@ public:
 		}
 		return isNum;
 	}
-
-	int prec(char c);
-	string infixToPostfix(string s);
-
 };
