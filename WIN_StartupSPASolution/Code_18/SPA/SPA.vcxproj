@@ -18,6 +18,7 @@
     <ClCompile Include="..\source\Tokenizer.cpp" />
     <ClCompile Include="CFG.cpp" />
     <ClCompile Include="CFGBuilder.cpp" />
+    <ClCompile Include="ClauseCall.cpp" />
     <ClCompile Include="ClausePattern.cpp" />
     <ClCompile Include="Container.cpp" />
     <ClCompile Include="DatabaseHelper.cpp" />

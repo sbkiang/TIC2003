@@ -36,7 +36,7 @@ string ClausePattern::insertPattern(int stmtNum, string LHS, string RHS, string 
 string ClausePattern::GetPattern_NotAny_Expr(string frontSql, string input1, string input2)
 {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, "%s from pattern p where p.lhs = '%s' and p.rhs like '%s';", frontSql.c_str(), input1.c_str(), input2.c_str());
+	sprintf_s(sqlBuf, "%s from pattern p where p.lhs = '%s' and p.expression like '%s';", frontSql.c_str(), input1.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
 
@@ -44,6 +44,6 @@ string ClausePattern::GetPattern_NotAny_Expr(string frontSql, string input1, str
 string ClausePattern::GetPattern_Any_Expr(string frontSql, string input2)
 {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, "%s from pattern p where p.rhs like '%s';", frontSql.c_str(), input2.c_str());
+	sprintf_s(sqlBuf, "%s from pattern p where p.expression like '%s';", frontSql.c_str(), input2.c_str());
 	return string(sqlBuf);
 }

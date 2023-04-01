@@ -577,7 +577,6 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			result += row.second + " ";
 		}
 	}
-
 	while (result.back() == ' ') { result.pop_back(); }
 	output.push_back(result);
 	

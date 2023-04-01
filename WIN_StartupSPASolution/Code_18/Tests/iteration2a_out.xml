@@ -1,40 +1,72 @@
 <?xml-stylesheet type="text/xsl" href="analysis.xsl"?>
 <test_results>
 <info>
-<name>AutoTester</name><parsing_time_taken>939.000000</parsing_time_taken>
+<name>AutoTester</name><parsing_time_taken>1389.000000</parsing_time_taken>
 </info>
 <queries>
 <query>
-<id ReturnTuple="1" Parent="1" UnnamedVar="1" SuchThat="1" CondNum="4" RelNum="1" comment="Parent left wildcard with syn">1033</id><querystr><![CDATA[assign a; Select a such that Parent(_, a)]]></querystr>
-<stuans>14 10 11 5 7</stuans>
-<correct>10,11,14,5,7</correct>
-<time_taken>14.000000</time_taken>
+<id ReturnTuple="1" UnnamedVar="1" Pattern="1" CondNum="3" RelNum="0" comment="Find cenX">1</id><querystr><![CDATA[assign a; Select a pattern a ("cenX", _) ]]></querystr>
+<stuans>15 16 17 10 11 12 1 21 20 23 22</stuans>
+<correct>11,16,21</correct>
+<time_taken>11.000000</time_taken>
 <failed>
-<missing>10,11,14,5,7</missing>
-<additional>14 10 11 5 7</additional>
+<missing>11,16,21</missing>
+<additional>15 16 17 10 11 12 1 21 20 23 22</additional>
 <summary>
-<expected>5</expected>
+<expected>3</expected>
 <matched>0</matched>
-<missing>5</missing>
+<missing>3</missing>
 <additional>1</additional>
 </summary>
 </failed>
 </query>
 <query>
-<id ReturnTuple="1" Parent="1" UnnamedVar="1" SuchThat="1" CondNum="4" RelNum="1" comment="Parent right wildcard with syn">1034</id><querystr><![CDATA[stmt s; Select s such that Parent(s, _)]]></querystr>
-<stuans>17 12 4 6 9 8</stuans>
-<correct>12,17,4,6,8,9</correct>
+<id ReturnTuple="1" UnnamedVar="3" Pattern="1" CondNum="5" RelNum="0" comment="Find LHS of count + 1">2</id><querystr><![CDATA[assign a; Select a pattern a ( _ , _"count + 1"_)]]></querystr>
+<stuans>15 16 17 10 11 12 1 21 20 23 22</stuans>
+<correct>15</correct>
+<time_taken>10.000000</time_taken>
+<failed>
+<missing>15</missing>
+<additional>15 16 17 10 11 12 1 21 20 23 22</additional>
+<summary>
+<expected>1</expected>
+<matched>0</matched>
+<missing>1</missing>
+<additional>1</additional>
+</summary>
+</failed>
+</query>
+<query>
+<id ReturnTuple="1" UnnamedVar="2" Pattern="1" CondNum="4" RelNum="0" comment="Find normSq stmt with cenX * cenX">3</id><querystr><![CDATA[assign a; Select a pattern a ( "normSq" , _"cenX * cenX"_)]]></querystr>
+<stuans>15 16 17 10 11 12 1 21 20 23 22</stuans>
+<correct>23</correct>
 <time_taken>17.000000</time_taken>
 <failed>
-<missing>12,17,4,6,8,9</missing>
-<additional>17 12 4 6 9 8</additional>
+<missing>23</missing>
+<additional>15 16 17 10 11 12 1 21 20 23 22</additional>
 <summary>
-<expected>6</expected>
+<expected>1</expected>
 <matched>0</matched>
-<missing>6</missing>
+<missing>1</missing>
 <additional>1</additional>
 </summary>
 </failed>
 </query>
 <query>
-<id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Parent both stmtNo">1035</id><querystr><![CDATA[constant c; Select c such that Parent(4, 7)]]></querystr>
+<id ReturnTuple="1" UnnamedVar="2" Pattern="1" CondNum="4" RelNum="0" comment="Find normSq stmt with cenX * cenX">4</id><querystr><![CDATA[assign newa; Select newa pattern newa ( "normSq" , _"cenX * cenX"_) ]]></querystr>
+<stuans>15 16 17 10 11 12 1 21 20 23 22</stuans>
+<correct>23</correct>
+<time_taken>14.000000</time_taken>
+<failed>
+<missing>23</missing>
+<additional>15 16 17 10 11 12 1 21 20 23 22</additional>
+<summary>
+<expected>1</expected>
+<matched>0</matched>
+<missing>1</missing>
+<additional>1</additional>
+</summary>
+</failed>
+</query>
+</queries>
+</test_results>
