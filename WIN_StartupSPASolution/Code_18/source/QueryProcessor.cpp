@@ -507,16 +507,16 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		}
 		else if (relationship == "Calls") {
 			if (input1IsSynonym && input2IsSynonym) { // Call(entity, entity)
-				frontSql = Call::GetCallConstruct_Synonym_Synonym(input1, input2);
+				//frontSql = Call::GetCallConstruct_Synonym_Synonym(input1, input2);
 			}
 			else if (!input1IsSynonym && input2IsSynonym) { // Call("First", entity)
-				frontSql = Call::GetCallConstruct_NotSynonym_Synonym(input2);
+				//frontSql = Call::GetCallConstruct_NotSynonym_Synonym(input2);
 			}
 			else if (input1IsSynonym && !input2IsSynonym) { // Call(entity, "Second")
-				frontSql = Call::GetCallConstruct_Synonym_NotSynonym(input1);
+				//frontSql = Call::GetCallConstruct_Synonym_NotSynonym(input1);
 			}
 			else if (!input1IsSynonym && !input2IsSynonym) { // Call("First", "Second")
-				frontSql = Call::GetCallConstruct_NotSynonym_NotSynonym();
+				//frontSql = Call::GetCallConstruct_NotSynonym_NotSynonym();
 			}
 
 		}

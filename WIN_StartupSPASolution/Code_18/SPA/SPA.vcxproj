@@ -36,6 +36,7 @@
     <ClInclude Include="..\source\Tokenizer.h" />
     <ClInclude Include="CFG.h" />
     <ClInclude Include="CFGBuilder.h" />
+    <ClInclude Include="ClauseCall.h" />
     <ClInclude Include="ClausePattern.h" />
     <ClInclude Include="Container.h" />
     <ClInclude Include="DatabaseHelper.h" />

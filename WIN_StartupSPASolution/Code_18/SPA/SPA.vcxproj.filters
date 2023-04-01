@@ -116,5 +116,8 @@
     <ClInclude Include="DatabaseHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ClauseCall.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
