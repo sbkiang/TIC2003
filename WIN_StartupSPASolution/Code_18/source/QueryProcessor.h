@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include "Tokenizer.h"
+#include "Database.h"
 #include <regex>
 #include "../SPA/Struct.h"
 #include "../SPA/define.h"
@@ -10,8 +11,8 @@
 #include "../SPA/ClauseParent.h"
 #include "../SPA/ClauseCall.h"
 #include "../SPA/ClausePattern.h"
-#include "Database.h"
 #include "../SPA/HelperFunction.h"
+#include "../SPA/ClauseNext.h"
 
 using namespace std;
 

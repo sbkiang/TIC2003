@@ -12,6 +12,8 @@ QueryProcessor::QueryProcessor() {}
 // destructor
 QueryProcessor::~QueryProcessor() {}
 
+using namespace std;
+
 void QueryProcessor::EvaluateSelect(Select& select, map<string,string> synEntMap) {
 	string columnName = "", stmtTable = "statement";
 	map<string, int> tableCountMap;
@@ -461,9 +463,6 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		}
 
 		else if (relationship == "Parent*") { // input1 is Stmt Num, input2 is Stmt Num
-			bool input1IsGeneric = (input1IsStmtOrWildCard || input1IsSynonym);
-			bool input2IsGeneric = (input2IsStmtOrWildCard || input2IsSynonym);
-
 			if (input1IsSynonym && input2IsSynonym) { // Parent(stmt, stmt)
 				sql = Parent::GetParentConstruct_Synonym_Synonym(input1, input2);
 			}
@@ -476,6 +475,9 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			else if (!input1IsSynonym && !input2IsSynonym) { // Parent(10, 11)
 				sql = Parent::GetParentConstruct_NotSynonym_NotSynonym();
 			}
+
+			bool input1IsGeneric = (input1IsStmtOrWildCard || input1IsSynonym);
+			bool input2IsGeneric = (input2IsStmtOrWildCard || input2IsSynonym);
 			if (input1IsGeneric && input2IsGeneric) { // Parent(entity/_, entity/_)
 				if (input1IsStmtOrWildCard && input2IsStmtOrWildCard) { // Parent(stmt/_, stmt/_)
 					sql = Parent::GetParentT_Any_Any(sql);
@@ -512,10 +514,104 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		}
 			
 		else if (relationship == "Next") {
-
+			if (input1IsSynonym && input2IsSynonym) {
+				sql = Next::NextConstructSelect_Synonym_Synonym(input1, input2);
+			}
+			else if (input1IsSynonym && !input2IsSynonym) {
+				sql = Next::NextConstructSelect_Synonym_NotSynonym(input1);
+			}
+			else if (!input1IsSynonym && input2IsSynonym) {
+				sql = Next::NextConstructSelect_NotSynonym_Synonym(input2);
+			}
+			else if (!input1IsSynonym && !input2IsSynonym){
+				sql = Next::NextConstructSelect_NotSynonym_NotSynonym();
+			}
+			
+			bool input1IsGeneric = (input1IsStmtOrWildCard || input1IsSynonym);
+			bool input2IsGeneric = (input2IsStmtOrWildCard || input2IsSynonym);
+			if (input1IsGeneric && input2IsGeneric) { // Next(entity/_, entity/_)
+				if (input1IsStmtOrWildCard && input2IsStmtOrWildCard) { // Next(stmt/_, stmt/_)
+					sql = Next::NextConstructQuery_Any_Any(sql);
+				}
+				else if (input1IsStmtOrWildCard && !input2IsStmtOrWildCard) { // Next(stmt/_, stmtRef_excld_stmt)
+					sql = Next::NextConstructQuery_Any_Synonym(sql, input2);
+				}
+				else if (!input1IsStmtOrWildCard && input2IsStmtOrWildCard) { // Next(stmtRef_excld_stmt, stmt/_)
+					sql = Next::NextConstructQuery_Synonym_Any(sql, input1);
+				}
+				else if (!input1IsStmtOrWildCard && !input2IsStmtOrWildCard) { // Next(stmtRef_excld_stmt, stmtRef_excld_stmt)
+					sql = Next::NextConstructQuery_Synonym_Synonym(sql, input1, input2);
+				}
+			}
+			else if (input1IsGeneric && !input2IsGeneric) { // Next(entity/_, 10)
+				if (input1IsStmtOrWildCard) { // Next(stmt/_, 10)
+					sql = Next::NextConstructQuery_Any_Specific(sql, input2);
+				}
+				else { // Next(stmtRef_excld_stmt, 10)
+					sql = Next::NextConstructQuery_Synonym_Specific(sql, input1, input2);
+				}
+			}
+			else if (!input1IsGeneric && input2IsGeneric) { // Next(10, entity/_)
+				if (input2IsStmtOrWildCard) { // Next(10, stmt/_)
+					sql = Next::NextConstructQuery_Specific_Any(sql, input1);
+				}
+				else { // Next(10, stmtRef_excld_stmt)
+					sql = Next::NextConstructQuery_Specific_Synonym(sql, input1, input2);
+				}
+			}
+			else if (!input1IsGeneric && !input2IsGeneric) { // Next(10, 11)
+				sql = Next::NextConstructQuery_Specific_Specific(sql, input1, input2);
+			}
 		}
 		else if (relationship == "Next*"){
+			if (input1IsSynonym && input2IsSynonym) {
+				sql = Next::NextConstructSelect_Synonym_Synonym(input1, input2);
+			}
+			else if (input1IsSynonym && !input2IsSynonym) {
+				sql = Next::NextConstructSelect_Synonym_NotSynonym(input1);
+			}
+			else if (!input1IsSynonym && input2IsSynonym) {
+				sql = Next::NextConstructSelect_NotSynonym_Synonym(input2);
+			}
+			else if (!input1IsSynonym && !input2IsSynonym) {
+				sql = Next::NextConstructSelect_NotSynonym_NotSynonym();
+			}
 
+			bool input1IsGeneric = (input1IsStmtOrWildCard || input1IsSynonym);
+			bool input2IsGeneric = (input2IsStmtOrWildCard || input2IsSynonym);
+			if (input1IsGeneric && input2IsGeneric) { // Next(entity/_, entity/_)
+				if (input1IsStmtOrWildCard && input2IsStmtOrWildCard) { // Next(stmt/_, stmt/_)
+					sql = Next::NextTConstructQuery_Any_Any(sql);
+				}
+				else if (input1IsStmtOrWildCard && !input2IsStmtOrWildCard) { // Next(stmt/_, stmtRef_excld_stmt)
+					sql = Next::NextTConstructQuery_Any_Synonym(sql, input2);
+				}
+				else if (!input1IsStmtOrWildCard && input2IsStmtOrWildCard) { // Next(stmtRef_excld_stmt, stmt/_)
+					sql = Next::NextTConstructQuery_Synonym_Any(sql, input1);
+				}
+				else if (!input1IsStmtOrWildCard && !input2IsStmtOrWildCard) { // Next(stmtRef_excld_stmt, stmtRef_excld_stmt)
+					sql = Next::NextTConstructQuery_Synonym_Synonym(sql, input1, input2);
+				}
+			}
+			else if (input1IsGeneric && !input2IsGeneric) { // Next(entity/_, 10)
+				if (input1IsStmtOrWildCard) { // Next(stmt/_, 10)
+					sql = Next::NextTConstructQuery_Any_Specific(sql, input2);
+				}
+				else { // Next(stmtRef_excld_stmt, 10)
+					sql = Next::NextTConstructQuery_Synonym_Specific(sql, input1, input2);
+				}
+			}
+			else if (!input1IsGeneric && input2IsGeneric) { // Next(10, entity/_)
+				if (input2IsStmtOrWildCard) { // Next(10, stmt/_)
+					sql = Next::NextTConstructQuery_Specific_Any(sql, input1);
+				}
+				else { // Next(10, stmtRef_excld_stmt)
+					sql = Next::NextTConstructQuery_Specific_Synonym(sql, input1, input2);
+				}
+			}
+			else if (!input1IsGeneric && !input2IsGeneric) { // Next(10, 11)
+				sql = Next::NextTConstructQuery_Specific_Specific(sql, input1, input2);
+			}
 		}
 		else if (relationship == "Calls") {
 			if (input1IsSynonym && input2IsSynonym) { // Call(entity, entity)

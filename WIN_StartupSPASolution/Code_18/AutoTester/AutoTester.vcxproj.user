@@ -2,7 +2,7 @@
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LocalDebuggerCommandArguments>..\Tests\iteration2b_source.txt ..\Tests\iteration2b_queries_v2.txt ..\Tests\iteration1_out.xml</LocalDebuggerCommandArguments>
-    <LocalDebuggerCommandArguments>..\Tests\iteration2c_source.txt ..\Tests\iteration2c_queries.txt ..\Tests\iteration2a_out.xml</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>..\Tests\Next_Any_Synonym.txt ..\Tests\iteration2c_queries.txt ..\Tests\iteration2a_out.xml</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
