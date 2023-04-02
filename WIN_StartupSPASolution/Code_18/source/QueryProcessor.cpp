@@ -619,7 +619,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			bool input2IsGeneric = (input2IsStmtOrWildCard || input2IsSynonym);
 
 			if (input1IsSynonym && input2IsSynonym) { // Call(procedure, procedure)
-				//sql = Call::GetCallConstruct_Synonym_Synonym(input1, input2)
+				//sql = Call::GetCallConstruct_Synonym_Synonym(input1, input2);
 			}
 			else if (!input1IsSynonym && input2IsSynonym) { // Call("First"/_, procedure)
 				//sql = Call::GetCallConstruct_NotSynonym_Synonym(input2);
@@ -630,6 +630,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			else if (!input1IsSynonym && !input2IsSynonym) { // Call("First"/_,"Second"/_)
 				//sql = Call::GetCallConstruct_NotSynonym_NotSynonym();
 			}
+
 
 
 
