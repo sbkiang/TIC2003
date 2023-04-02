@@ -2,10 +2,10 @@
 #include "ClauseCall.h"
 
 // Call(procedure, procedure)
-string Call::GetCallConstruct_Synonym_Synonym(string input1)
+string Call::GetCallConstruct_Synonym_Synonym(string input1, string input2)
 {
 	char sql[100] = {};
-	sprintf_s(sql, "select c.line_num as %s", input1.c_str());
+	sprintf_s(sql, "select c.procedure_name as %s, variable_name as %s", input1.c_str(), input2.c_str());
 	return string(sql);
 }
 
@@ -13,7 +13,7 @@ string Call::GetCallConstruct_Synonym_Synonym(string input1)
 string Call::GetCallConstruct_Synonym_NotSynonym(string input1)
 {
 	char sql[100] = {};
-	sprintf_s(sql, "select c.line_num as %s", input1.c_str());
+	sprintf_s(sql, "select c.procedure_name as %s", input1.c_str());
 	return string(sql);
 }
 
@@ -21,7 +21,7 @@ string Call::GetCallConstruct_Synonym_NotSynonym(string input1)
 string Call::GetCallConstruct_NotSynonym_Synonym(string input2)
 {
 	char sql[100] = {};
-	sprintf_s(sql, "select c.line_num as %s", input2.c_str());
+	sprintf_s(sql, "select c.variable_name as %s", input2.c_str());
 	return string(sql);
 }
 
@@ -29,7 +29,7 @@ string Call::GetCallConstruct_NotSynonym_Synonym(string input2)
 string Call::GetCallConstruct_NotSynonym_NotSynonym()
 {
 	char sql[100] = {};
-	sprintf_s(sql, "select c.line_num");
+	sprintf_s(sql, "select c.procedure_name, c.variable_name");
 	return string(sql);
 }
 

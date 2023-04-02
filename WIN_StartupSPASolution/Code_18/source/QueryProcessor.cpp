@@ -618,18 +618,20 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			bool input1IsGeneric = (input1IsStmtOrWildCard || input1IsSynonym);
 			bool input2IsGeneric = (input2IsStmtOrWildCard || input2IsSynonym);
 
-			if (input1IsSynonym && input2IsSynonym) { // Call(entity, entity)
-				//sql = Call::GetCallConstruct_Synonym_Synonym(input1);
+			if (input1IsSynonym && input2IsSynonym) { // Call(procedure, procedure)
+				//sql = Call::GetCallConstruct_Synonym_Synonym(input1, input2)
 			}
-			else if (!input1IsSynonym && input2IsSynonym) { // Call("First", entity)
+			else if (!input1IsSynonym && input2IsSynonym) { // Call("First"/_, procedure)
 				//sql = Call::GetCallConstruct_NotSynonym_Synonym(input2);
 			}
-			else if (input1IsSynonym && !input2IsSynonym) { // Call(entity, "Second")
+			else if (input1IsSynonym && !input2IsSynonym) { // Call(procedure, "Second"/_)
 				//sql = Call::GetCallConstruct_Synonym_NotSynonym(input1);
 			}
-			else if (!input1IsSynonym && !input2IsSynonym) { // Call("First", "Second")
+			else if (!input1IsSynonym && !input2IsSynonym) { // Call("First"/_,"Second"/_)
 				//sql = Call::GetCallConstruct_NotSynonym_NotSynonym();
 			}
+
+
 
 		}
 		else if (relationship == "Calls*") {

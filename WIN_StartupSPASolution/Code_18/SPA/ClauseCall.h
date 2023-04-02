@@ -7,7 +7,7 @@ using namespace std;
 
 class Call {
 public:
-	static string GetCallConstruct_Synonym_Synonym(string input1); // Call(procedure, procedure)
+	static string GetCallConstruct_Synonym_Synonym(string input1, string input2); // Call(procedure, procedure)
 	static string GetCallConstruct_Synonym_NotSynonym(string input1); // Call(procedure, "Second"/_)
 	static string GetCallConstruct_NotSynonym_Synonym(string input2); // Call("First"/_, procedure)
 	static string GetCallConstruct_NotSynonym_NotSynonym(); // Call("First"/_, "Second"/_)
