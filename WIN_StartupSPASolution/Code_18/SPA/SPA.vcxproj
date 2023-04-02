@@ -19,6 +19,7 @@
     <ClCompile Include="CFG.cpp" />
     <ClCompile Include="CFGBuilder.cpp" />
     <ClCompile Include="ClauseCall.cpp" />
+    <ClCompile Include="ClauseNext.cpp" />
     <ClCompile Include="ClausePattern.cpp" />
     <ClCompile Include="Container.cpp" />
     <ClCompile Include="HelperFunction.cpp" />
@@ -38,6 +39,7 @@
     <ClInclude Include="CFG.h" />
     <ClInclude Include="CFGBuilder.h" />
     <ClInclude Include="ClauseCall.h" />
+    <ClInclude Include="ClauseNext.h" />
     <ClInclude Include="ClausePattern.h" />
     <ClInclude Include="Container.h" />
     <ClInclude Include="HelperFunction.h" />

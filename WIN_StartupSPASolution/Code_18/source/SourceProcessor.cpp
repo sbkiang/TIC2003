@@ -300,8 +300,9 @@ void SourceProcessor::process(string program) {
 
 	vector<CFG*> CFGs;
 	for (int i = 0; i < procedure.size(); i++) {
-		CFG* cfg = CFGBuilder::buildCFG(procedure.at(i));
-		vector<CFGNode*> nodes = cfg->getAllCFGNodes();
+		//CFG* cfg = CFGBuilder::BuildCFG(procedure.at(i));
+		CFG cfg = CFGBuilder::BuildCFG(procedure.at(i));
+		vector<CFGNode*> nodes = cfg.GetAllCFGNodes();
 		for (int j = 0; j < nodes.size(); j++) {
 			CFGNode* node = nodes.at(j);
 			int nodeStmtNum = node->_stmtPtr->getAdjustedStmtNum();

@@ -12,24 +12,24 @@ procedure NestedWhileIf {
 09            if (c < 30) then {
 10                d = b;
               } 
-			  else {
-11                c = a + b;
+11			  else {
+12                c = a + b;
               }
           }
-		  else {
-12            while (a < 10) {
-13                print c;
+13		  else {
+14            while (a < 10) {
+15                print c;
               }
-14            c = a + b;
+16            c = a + b;
           }
       }
 
-15    add = a * b * c;                
-16    print add;
-17    if (add < 0) then {
-18        print negative;
+17    add = a * b * c;                
+18    print add;
+19    if (add < 0) then {
+20        print negative;
       } 
-	  else {
-19        print positive;
+21	  else {
+22        print positive;
       }
 }

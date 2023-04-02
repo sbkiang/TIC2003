@@ -86,7 +86,7 @@ void Database::initialize() {
 	sqlite3_exec(dbConnection, dropNextTableSQL.c_str(), NULL, 0, &errorMessage);
 
 	//create a next table
-	string createNextTableSQL = "CREATE TABLE next (line_num_1 INT REFERENCES statement(line_num), line_num_2 INT REFERENCES statement(line_num), CONSTRAINT line_num_not_equal check(line_num_1 <> line_num_2));";
+	string createNextTableSQL = "CREATE TABLE next (from_line INT REFERENCES statement(line_num), to_line INT REFERENCES statement(line_num), CONSTRAINT line_num_not_equal check(from_line <> to_line));";
 	sqlite3_exec(dbConnection, createNextTableSQL.c_str(), NULL, 0, &errorMessage);
 
 	//drop the existing pattern table (if any)
@@ -192,10 +192,9 @@ void Database::insertPattern(int stmtNum, string lhs, string rhs, string express
 	if (errorMessage) { cout << "insertPattern SQL Error: " << errorMessage; }
 }
 
-void Database::insertNext(int stmtNum1, int stmtNum2) {
+void Database::insertNext(int from, int to) {
 	char sqlBuf[256];
-	sprintf_s(sqlBuf, "INSERT INTO next ('line_num_1','line_num_2') VALUES ('%i','%i');", stmtNum1, stmtNum2);
-	//string sql = "INSERT INTO next ('line_num_1', 'line_num_2') VALUES ('" + to_string(stmtNum1) + "', '" + to_string(stmtNum2) + "');";
+	sprintf_s(sqlBuf, "INSERT INTO next ('from_line','to_line') VALUES (%i,%i);", from, to);
 	sqlite3_exec(dbConnection, sqlBuf, NULL, 0, &errorMessage);
 	if (errorMessage) { cout << "insertNext SQL Error: " << errorMessage; }
 }
@@ -236,50 +235,8 @@ bool Database::GetNextT(int stmtNum1, int stmtNum2) {
 	return (!(sqlResultStoreForCallback->sqlResult.empty()));
 }
 
-// method to get all the procedure from the database
-void Database::GetProcedures(vector<string>& results) {
-	// clear the existing results
-	dbResults.clear();
-
-	// retrieve the procedure from the procedure table
-	// The callback method is only used when there are results to be returned.
-	string sql = "SELECT name FROM procedure;";
-	sqlite3_exec(dbConnection, sql.c_str(), callback, 0, &errorMessage);
-	
-	if (errorMessage) {
-		cout << "SQL Error: " << errorMessage;
-		return;
-	}
-	
-	// Add output from database to vector for return
-	for (vector<string> dbRow : dbResults) {
-		string result;
-		result = dbRow.at(0);
-		results.push_back(result);
-	}
-}
-
-void Database::GetPatternIn(string input1, string input2, SqlResultStore& rs) {
-	// reconstruct the variable set to be SQL statement using "where var_name IN (...)"
-	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, "select line_num, lhs from pattern p where p.lhs in (%s) and p.rhs like '%s';", input1.c_str(), input2.c_str());
-	sqlResultStoreForCallback = &rs;
-	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
-	if (errorMessage) { cout << "GetPattern SQL Error: " << errorMessage << endl; exit(1); }
-}
-void Database::GetPatternLike(string input1, string input2, SqlResultStore& rs) {
-	// (input is synonym and synonym not in select) or (input is "_") is considered generic input
-	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, "select line_num, lhs from pattern p where p.lhs like '%s' and p.rhs like '%s';", input1.c_str(), input2.c_str());
-	sqlResultStoreForCallback = &rs;
-	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
-	if (errorMessage) { cout << "GetPattern SQL Error: " << errorMessage << endl; exit(1); }
-}
-
 // get all the columns of PQL select block
-//void Database::select(Select& st, SqlResultSet* sqlResultSet) {
 void Database::SelectPql(Select& st, SqlResultStore& sqlResultStore) {
-	//sqlResultStoreForCallback = &sqlResultStore;
 	char sqlBuf[1024] = {};
 	string selectFromTable = "";
 	string selectColumnName = "";
