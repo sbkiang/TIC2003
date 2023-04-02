@@ -1,7 +1,7 @@
 <?xml-stylesheet type="text/xsl" href="analysis.xsl"?>
 <test_results>
 <info>
-<name>AutoTester</name><parsing_time_taken>892.000000</parsing_time_taken>
+<name>AutoTester</name><parsing_time_taken>925.000000</parsing_time_taken>
 </info>
 <queries>
 <query>
@@ -40,7 +40,7 @@
 <id ReturnTuple="1" Calls="1" SuchThat="1" CondNum="3" RelNum="1" comment="Call">3</id><querystr><![CDATA[procedure p; Select p such that Calls (p, "Second")]]></querystr>
 <stuans></stuans>
 <correct>First</correct>
-<time_taken>8.000000</time_taken>
+<time_taken>16.000000</time_taken>
 <failed>
 <missing>First</missing>
 <additional></additional>
