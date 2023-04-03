@@ -606,7 +606,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 					sql = Next::NextTConstructQuery_Specific_Any(sql, input1);
 				}
 				else { // Next(10, stmtRef_excld_stmt)
-					sql = Next::NextTConstructQuery_Specific_Synonym(sql, input1, input2);
+					sql = Next::NextTConstructQuery_Specific_Synonym(sql, input1, entityInput2);
 				}
 			}
 			else if (!input1IsGeneric && !input2IsGeneric) { // Next(10, 11)
@@ -713,7 +713,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		}
 		else if (!input1IsGeneric && !input2IsGeneric) { // Call("First", "Second")
 			sql = Call::GetCallT_Specific_Specific(sql, input1, input2);
-		}
+			}
 		}
 
 		SqlResultStore suchThatResultStore;

@@ -3,7 +3,6 @@ procedure main{
 	a = v;
 	call p1;
 	print c;
-
 	a = b + c;
 	if(x < 10) then{
 		print c;
@@ -13,13 +12,9 @@ procedure main{
 		read p;
 		x = 10;
 	}
-	d = 10;
-	c = 10;
-	
-	call p1;
+	d = 10;	
 	while(x < 10){
 		x = 10;
-		print c;
 		if(c > 10)then{
 			read a;
 		}
@@ -28,12 +23,11 @@ procedure main{
 		}
 	}
 	call p1;
-	
-	if(x = 10)then{
-		if(x = 11)then{
+	if(x > 10)then{
+		if(x < 11)then{
 			b = c;
 			while(x > 10){
-				call c;
+				call p1;
 			}
 		}
 		else{

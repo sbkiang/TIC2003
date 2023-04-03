@@ -281,6 +281,7 @@ void SourceProcessor::process(string program) {
 	for (auto it = stmtProcMap.begin(); it != stmtProcMap.end(); it++) {
 		Statement* stmt = (*it).first;
 		Procedure* proc = (*it).second;
+		if (!proc) { cout << "**ERROR** Procedure not found"; }
 		vector<string> allUses = proc->GetAllUses();
 		vector<string> allModifies = proc->GetAllModifies();
 		for (int i = 0; i < allUses.size(); i++) { Database::insertUses(stmt->getAdjustedStmtNum(), allUses.at(i));	}

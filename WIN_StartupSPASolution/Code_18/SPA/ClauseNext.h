@@ -50,27 +50,27 @@ public:
 	static string NextTConstructQuery_Any_Any(string frontSql);
 
 	// next*(stmt/_, 10)
-	static string NextTConstructQuery_Any_Specific(string frontSql, string input2);
+	static string NextTConstructQuery_Any_Specific(string frontSql, string line_num);
 
 	// next*(stmt/_, stmtRef_excld_stmt)
-	static string NextTConstructQuery_Any_Synonym(string frontSql, string input2);
+	static string NextTConstructQuery_Any_Synonym(string frontSql, string entity);
 
 	// next*(stmtRef_excld_stmt, stmt/_)
-	static string NextTConstructQuery_Synonym_Any(string frontSql, string input1);
+	static string NextTConstructQuery_Synonym_Any(string frontSql, string entity);
 
 	// next*(stmtRef_excld_stmt, stmtRef_excld_stmt)
-	static string NextTConstructQuery_Synonym_Synonym(string frontSql, string input1, string input2);
+	static string NextTConstructQuery_Synonym_Synonym(string frontSql, string entity1, string entity2);
 
 	// next*(stmtRef_excld_stmt, 10)
-	static string NextTConstructQuery_Synonym_Specific(string frontSql, string input1, string input2);
+	static string NextTConstructQuery_Synonym_Specific(string frontSql, string entity, string line_num);
 
 	// next*(10, stmt/_)
-	static string NextTConstructQuery_Specific_Any(string frontSql, string input1);
+	static string NextTConstructQuery_Specific_Any(string frontSql, string line_num);
 
 	// next*(10, 11)
-	static string NextTConstructQuery_Specific_Specific(string frontSql, string input1, string input2);
+	static string NextTConstructQuery_Specific_Specific(string frontSql, string line_num1, string line_num2);
 
 	// next*(10, stmtRef_excld_stmt)
-	static string NextTConstructQuery_Specific_Synonym(string frontSql, string input1, string input2);
+	static string NextTConstructQuery_Specific_Synonym(string frontSql, string line_num, string entity);
 
 };
