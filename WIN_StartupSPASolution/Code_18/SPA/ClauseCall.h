@@ -11,6 +11,8 @@ public:
 	static string GetCallConstruct_Synonym_NotSynonym(string input1); // Call(procedure, "Second"/_)
 	static string GetCallConstruct_NotSynonym_Synonym(string input2); // Call("First"/_, procedure)
 	static string GetCallConstruct_NotSynonym_NotSynonym(); // Call("First"/_, "Second"/_)
+	static string GetCallConstruct_Any_Specific(); //Call(_, "Second")
+	static string GetCallConstruct_Specific_Any(); //Call("First", _)
 
 	static string GetCall_Synonym_Synonym(string frontSql); // Call(procedure, procedure)
 	static string GetCall_Any_Any(string frontSql); // Call(_,_) 
