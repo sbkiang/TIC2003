@@ -47,6 +47,8 @@
     <ClInclude Include="ClauseModifies.h" />
     <ClInclude Include="ClauseParent.h" />
     <ClInclude Include="Procedure.h" />
+    <ClInclude Include="I_relRefQueryBuilder.h" />
+    <ClInclude Include="I_relRefSelectBuilder.h" />
     <ClInclude Include="Statement.h" />
     <ClInclude Include="Struct.h" />
     <ClInclude Include="ClauseUses.h" />

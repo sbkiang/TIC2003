@@ -7,6 +7,8 @@ using namespace std;
 class ClausePattern {
 public:
 
+	static void insertPattern(int stmtNum, string LHS, string RHS, string expression);
+
 	// Pattern a(v, expr)
 	static string PatternConstruct_Synonym(string selectSynonym, string input1Synonym);
 

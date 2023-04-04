@@ -172,7 +172,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	SqlResultStore selectResultStore;
 	EvaluateSelect(select, synonymEntityMap);
 	Database::SelectPql(select, selectResultStore);
-	set<string> commonSynonym(select.synonym.begin(),select.synonym.end());
+	set<string> currentResultSetSynonym(select.synonym.begin(), select.synonym.end());
 	while (!suchThatStack.empty()) {
 		SuchThat suchThatTemp = suchThatStack.top();
 		string entityInput1 = "", entityInput2 = "", input1 = suchThatTemp.input1, input2 = suchThatTemp.input2;
@@ -534,13 +534,13 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 					sql = Next::NextConstructQuery_Any_Any(sql);
 				}
 				else if (input1IsStmtOrWildCard && !input2IsStmtOrWildCard) { // Next(stmt/_, stmtRef_excld_stmt)
-					sql = Next::NextConstructQuery_Any_Synonym(sql, input2);
+					sql = Next::NextConstructQuery_Any_Synonym(sql, entityInput2);
 				}
 				else if (!input1IsStmtOrWildCard && input2IsStmtOrWildCard) { // Next(stmtRef_excld_stmt, stmt/_)
-					sql = Next::NextConstructQuery_Synonym_Any(sql, input1);
+					sql = Next::NextConstructQuery_Synonym_Any(sql, entityInput1);
 				}
 				else if (!input1IsStmtOrWildCard && !input2IsStmtOrWildCard) { // Next(stmtRef_excld_stmt, stmtRef_excld_stmt)
-					sql = Next::NextConstructQuery_Synonym_Synonym(sql, input1, input2);
+					sql = Next::NextConstructQuery_Synonym_Synonym(sql, entityInput1, entityInput2);
 				}
 			}
 			else if (input1IsGeneric && !input2IsGeneric) { // Next(entity/_, 10)
@@ -548,7 +548,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 					sql = Next::NextConstructQuery_Any_Specific(sql, input2);
 				}
 				else { // Next(stmtRef_excld_stmt, 10)
-					sql = Next::NextConstructQuery_Synonym_Specific(sql, input1, input2);
+					sql = Next::NextConstructQuery_Synonym_Specific(sql, entityInput1, input2);
 				}
 			}
 			else if (!input1IsGeneric && input2IsGeneric) { // Next(10, entity/_)
@@ -556,7 +556,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 					sql = Next::NextConstructQuery_Specific_Any(sql, input1);
 				}
 				else { // Next(10, stmtRef_excld_stmt)
-					sql = Next::NextConstructQuery_Specific_Synonym(sql, input1, input2);
+					sql = Next::NextConstructQuery_Specific_Synonym(sql, input1, entityInput2);
 				}
 			}
 			else if (!input1IsGeneric && !input2IsGeneric) { // Next(10, 11)
@@ -584,13 +584,13 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 					sql = Next::NextTConstructQuery_Any_Any(sql);
 				}
 				else if (input1IsStmtOrWildCard && !input2IsStmtOrWildCard) { // Next(stmt/_, stmtRef_excld_stmt)
-					sql = Next::NextTConstructQuery_Any_Synonym(sql, input2);
+					sql = Next::NextTConstructQuery_Any_Synonym(sql, entityInput2);
 				}
 				else if (!input1IsStmtOrWildCard && input2IsStmtOrWildCard) { // Next(stmtRef_excld_stmt, stmt/_)
-					sql = Next::NextTConstructQuery_Synonym_Any(sql, input1);
+					sql = Next::NextTConstructQuery_Synonym_Any(sql, entityInput1);
 				}
 				else if (!input1IsStmtOrWildCard && !input2IsStmtOrWildCard) { // Next(stmtRef_excld_stmt, stmtRef_excld_stmt)
-					sql = Next::NextTConstructQuery_Synonym_Synonym(sql, input1, input2);
+					sql = Next::NextTConstructQuery_Synonym_Synonym(sql, entityInput1, entityInput2);
 				}
 			}
 			else if (input1IsGeneric && !input2IsGeneric) { // Next(entity/_, 10)
@@ -598,7 +598,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 					sql = Next::NextTConstructQuery_Any_Specific(sql, input2);
 				}
 				else { // Next(stmtRef_excld_stmt, 10)
-					sql = Next::NextTConstructQuery_Synonym_Specific(sql, input1, input2);
+					sql = Next::NextTConstructQuery_Synonym_Specific(sql, entityInput1, input2);
 				}
 			}
 			else if (!input1IsGeneric && input2IsGeneric) { // Next(10, entity/_)
@@ -718,23 +718,26 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 
 		SqlResultStore suchThatResultStore;
 		Database::ExecuteSql(sql, suchThatResultStore);
+		//HelperFunction::PrintRowSet(suchThatResultStore.sqlResultSet);
 
 		//if there's common synonym between the table, perform intersect
-		bool SuchThatInputInSelect = (find(select.synonym.begin(), select.synonym.end(), input1) != select.synonym.end()) || (find(select.synonym.begin(), select.synonym.end(), input2) != select.synonym.end());
 		set<RowSet> selectResultSet = selectResultStore.sqlResultSet;
 		set<RowSet> suchThatResultSet = suchThatResultStore.sqlResultSet;
-		set_intersection(commonSynonym.begin(), commonSynonym.end(), stSynonym.begin(), stSynonym.end(), inserter(commonSynonym, commonSynonym.begin()));
-		//if (SuchThatInputInSelect) {
-		if(!commonSynonym.empty()){
+		set<string> intersectSynonym;
+		set_intersection(currentResultSetSynonym.begin(), currentResultSetSynonym.end(), stSynonym.begin(), stSynonym.end(), inserter(intersectSynonym, intersectSynonym.begin()));
+		if(!intersectSynonym.empty()){
 			selectResultStore.sqlResultSet = HelperFunction::CommonColumnIntersect(selectResultSet, suchThatResultSet);
+			currentResultSetSynonym = intersectSynonym;
 		}
 		else {
 			if (suchThatResultSet.empty()) {
 				set<RowSet> empty;
 				selectResultStore.sqlResultSet = empty;
+				currentResultSetSynonym.clear();
 			}
 			else {
 				selectResultStore.sqlResultSet = HelperFunction::CartesianProduct(selectResultSet, suchThatResultSet);
+				currentResultSetSynonym.insert(stSynonym.begin(), stSynonym.end());
 			}
 		}
 		//HelperFunction::PrintRowSet(selectResultStore.sqlResultSet);
@@ -784,21 +787,23 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		Database::ExecuteSql(sql, patternResultStore);
 		set<RowSet> selectResultSet = selectResultStore.sqlResultSet;
 		set<RowSet> patternResultSet = patternResultStore.sqlResultSet;
+		set<string> intersectSynonym;
 		bool patternInput1InSelect = (find(select.synonym.begin(), select.synonym.end(), input1) != select.synonym.end());
-		//if (patternSynonymInSelect || patternInput1InSelect) {
-		set_intersection(commonSynonym.begin(), commonSynonym.end(), ptSynonym.begin(), ptSynonym.end(), inserter(commonSynonym, commonSynonym.begin()));
-		if(!commonSynonym.empty()){
+		set_intersection(currentResultSetSynonym.begin(), currentResultSetSynonym.end(), ptSynonym.begin(), ptSynonym.end(), inserter(intersectSynonym, intersectSynonym.begin()));
+		if(!intersectSynonym.empty()){
 			set<RowSet> intersection;
-			//set_intersection(selectResultSet.begin(), selectResultSet.end(), patternResultSet.begin(), patternResultSet.end(), inserter(intersection, intersection.begin()), CommonColumnComparator{});
 			selectResultStore.sqlResultSet = HelperFunction::CommonColumnIntersect(selectResultSet, patternResultSet);
+			currentResultSetSynonym = intersectSynonym;
 		}
 		else {
 			if (patternResultStore.sqlResultSet.empty()) {
 				set<RowSet> empty;
 				selectResultStore.sqlResultSet = empty;
+				currentResultSetSynonym.clear();
 			}
 			else {
 				selectResultStore.sqlResultSet = HelperFunction::CartesianProduct(selectResultSet, patternResultSet);
+				currentResultSetSynonym.insert(ptSynonym.begin(), ptSynonym.end());
 			}
 		}
 		//HelperFunction::PrintRowSet(patternResultSet);

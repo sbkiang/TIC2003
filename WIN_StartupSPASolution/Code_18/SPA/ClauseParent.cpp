@@ -5,7 +5,7 @@
 string Parent::GetParentConstruct_Synonym_Synonym(string input1, string input2)
 {
 	char sql[100] = {};
-	sprintf_s(sql, "select p.line_num as %s, s.line_num as %s", input1.c_str(), input2.c_str());
+	sprintf_s(sql, "select distinct p.line_num as %s, s.line_num as %s", input1.c_str(), input2.c_str());
 	return string(sql);
 }
 
@@ -13,8 +13,7 @@ string Parent::GetParentConstruct_Synonym_Synonym(string input1, string input2)
 string Parent::GetParentConstruct_Synonym_NotSynonym(string input1)
 {
 	char sql[100] = {};
-	//sprintf_s(sql, "select p.line_num as %s, s.line_num", input1.c_str());
-	sprintf_s(sql, "select p.line_num as %s", input1.c_str());
+	sprintf_s(sql, "select distinct p.line_num as %s", input1.c_str());
 	return string(sql);
 }
 
@@ -22,8 +21,7 @@ string Parent::GetParentConstruct_Synonym_NotSynonym(string input1)
 string Parent::GetParentConstruct_NotSynonym_Synonym(string input2)
 {
 	char sql[100] = {};
-	//sprintf_s(sql, "select p.line_num, s.line_num as %s", input2.c_str());
-	sprintf_s(sql, "select s.line_num as %s", input2.c_str());
+	sprintf_s(sql, "select distinct s.line_num as %s", input2.c_str());
 	return string(sql);
 }
 
@@ -31,7 +29,7 @@ string Parent::GetParentConstruct_NotSynonym_Synonym(string input2)
 string Parent::GetParentConstruct_NotSynonym_NotSynonym()
 {
 	char sql[100] = {};
-	sprintf_s(sql, "select p.line_num, s.line_num");
+	sprintf_s(sql, "select distinct p.line_num, s.line_num");
 	return string(sql);
 }
 

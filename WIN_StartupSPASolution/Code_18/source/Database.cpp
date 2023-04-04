@@ -206,35 +206,6 @@ void Database::insertCall(int stmtNum, string procedureName, string variablename
 	if (errorMessage) { cout << "insertCall SQL Error: " << errorMessage << endl; }
 }
 
-bool Database::GetNext(int stmtNum1, int stmtNum2) {
-	dbResults.clear();
-	char sqlBuf[256];
-	sprintf_s(sqlBuf, "SELECT 1 FROM next WHERE line_num_1 = '%i' AND line_num_2 = '%i';", stmtNum1, stmtNum2);
-	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
-	SqlResultStore rs;
-	sqlResultStoreForCallback = &rs;
-	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
-	if (errorMessage) { cout << "getNext SQL Error: " << errorMessage; exit(1); }
-	return (!(sqlResultStoreForCallback->sqlResult.empty()));
-}
-
-bool Database::GetNextT(int stmtNum1, int stmtNum2) {
-	dbResults.clear();
-	char sqlBuf[256];
-	vector<string> resultStore;
-	sprintf_s(sqlBuf, "with recursive nextStmt as ("
-					"select n.line_num_1, n.line_num_2 from next n where line_num_1 = %i"
-					" union "
-					"select n.line_num_1, n.line_num_2 from next n join nextStmt ns where n.line_num_1 = ns.line_num_2 and n.line_num_2 <= %i"
-					")"
-					"select * from nextStmt;", stmtNum1, stmtNum2);
-	SqlResultStore rs;
-	sqlResultStoreForCallback = &rs;
-	sqlite3_exec(dbConnection, sqlBuf, callback, 0, &errorMessage);
-	if (errorMessage) { cout << "getNextT SQL Error: " << errorMessage; exit(1); }
-	return (!(sqlResultStoreForCallback->sqlResult.empty()));
-}
-
 // get all the columns of PQL select block
 void Database::SelectPql(Select& st, SqlResultStore& sqlResultStore) {
 	char sqlBuf[1024] = {};
@@ -288,12 +259,12 @@ int Database::callback(void* NotUsed, int columnCount, char** columnValues, char
 	
 	for (int i = 0; i < columnCount; i++) {
 		dbRow.push_back(columnValues[i]);
-		row.row.insert(std::pair<string, string>(columnNames[i], string(columnValues[i])));
+		//row.row.insert(std::pair<string, string>(columnNames[i], string(columnValues[i])));
 		rowSet.row.insert(std::pair<string, string>(columnNames[i], string(columnValues[i])));
 	}
 	// The row is pushed to the vector for storing all rows of results 
 	dbResults.push_back(dbRow);
-	sqlResultStoreForCallback->sqlResult.push_back(row);
+	//sqlResultStoreForCallback->sqlResult.push_back(row);
 	sqlResultStoreForCallback->sqlResultSet.insert(rowSet);
 
 	return 0;

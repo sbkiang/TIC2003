@@ -3,28 +3,28 @@
 string Next::NextConstructSelect_Synonym_Synonym(string synonym1, string synonym2)
 {
 	char sqlBuf[512];
-	sprintf_s(sqlBuf, "select from_line as %s, to_line as %s", synonym1.c_str(), synonym2.c_str());
+	sprintf_s(sqlBuf, "select distinct from_line as %s, to_line as %s", synonym1.c_str(), synonym2.c_str());
 	return string(sqlBuf);
 }
 
 string Next::NextConstructSelect_Synonym_NotSynonym(string synonym1)
 {
 	char sqlBuf[512];
-	sprintf_s(sqlBuf, "select from_line as %s", synonym1.c_str());
+	sprintf_s(sqlBuf, "select distinct from_line as %s", synonym1.c_str());
 	return string(sqlBuf);
 }
 
 string Next::NextConstructSelect_NotSynonym_Synonym(string synonym2)
 {
 	char sqlBuf[512];
-	sprintf_s(sqlBuf, "select to_line as %s", synonym2.c_str());
+	sprintf_s(sqlBuf, "select distinct to_line as %s", synonym2.c_str());
 	return string(sqlBuf);
 }
 
 string Next::NextConstructSelect_NotSynonym_NotSynonym()
 {
 	char sqlBuf[512];
-	sprintf_s(sqlBuf, "select from_line, to_line");
+	sprintf_s(sqlBuf, "select distinct from_line, to_line");
 	return string(sqlBuf);
 }
 
@@ -124,18 +124,20 @@ string Next::NextTConstructQuery_Any_Synonym(string frontSql, string input2)
 		" union "
 		"select n.from_line, n.to_line from next n join nextT nt on n.to_line = nt.from_line)"
 		" select * from nextT)", frontSql.c_str(), input2.c_str());
+		//" select * from nextT where to_line in (select line_num from statement where entity = '%s'))", frontSql.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
-
+	
 string Next::NextTConstructQuery_Synonym_Any(string frontSql, string input1)
 {
 	char sqlBuf[512];
 	sprintf_s(sqlBuf, "%s from ("
-		"with recursive nextT as("
+		"with recursive nextT as ("
 		"select from_line, to_line from next where from_line in (select line_num from statement where entity = '%s')"
 		" union "
 		"select n.from_line, n.to_line from next n join nextT nT on n.from_line = nT.to_line)"
 		" select * from nextT)", frontSql.c_str(), input1.c_str());
+		//" select * from nextT from_line in (select line_num from statement where entity = '%s'))", frontSql.c_str(), input1.c_str());
 	return string(sqlBuf);
 }
 
@@ -155,7 +157,7 @@ string Next::NextTConstructQuery_Synonym_Synonym(string frontSql, string input1,
 		"select from_line, to_line from next where to_line in (select line_num from statement where entity = '%s')"
 		" union "
 		"select n.from_line, n.to_line from next n join nextT nt on n.to_line = nt.from_line)"
-		" select * from nextT)", frontSql.c_str(), input1.c_str(), input2.c_str());
+		" select * from nextT))", frontSql.c_str(), input1.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
 

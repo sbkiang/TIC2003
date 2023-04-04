@@ -6,6 +6,9 @@ using namespace std;
 
 class Parent {
 public:
+
+	static void insertParent(int parentStmt, int childStart, int childEnd);
+
 	static string GetParentConstruct_Synonym_Synonym(string input1, string input2); // Parent(stmt,stmt)
 	static string GetParentConstruct_Synonym_NotSynonym(string input1); // Parent(stmt, 10/_)
 	static string GetParentConstruct_NotSynonym_Synonym(string input2); // Parent(10/_, stmt)

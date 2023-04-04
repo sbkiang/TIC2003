@@ -128,5 +128,11 @@
     <ClInclude Include="ClauseNext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="I_relRefSelectBuilder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="I_relRefQueryBuilder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

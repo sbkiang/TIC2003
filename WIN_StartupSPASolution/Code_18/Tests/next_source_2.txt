@@ -1,0 +1,30 @@
+procedure main{
+	read p;
+	while(b > 0){
+		c = d;
+		if(c > 0) then{
+			print p1;
+		}
+		else{
+			read p2;
+		}
+	}
+	a = b;
+	c = d;
+	if(c = 5)then{
+		if(c = 6)then{
+			call p1;
+		}
+		else{
+			read px;
+		}
+	}
+	else{
+		read px;
+	}
+	read re;
+}
+
+procedure p1{
+	b = c;
+}

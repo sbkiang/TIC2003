@@ -100,6 +100,19 @@ set<RowSet> HelperFunction::CartesianProduct(set<RowSet> set1, set<RowSet> set2)
 	return cpSet;
 }
 
+vector<RowSet> HelperFunction::CartesianProduct(vector<RowSet> set1, vector<RowSet> set2) {
+	vector<RowSet> cpSet;
+	for (RowSet rs1 : set1) {
+		for (RowSet rs2 : set2) {
+			RowSet nrs = rs1;
+			nrs.row.insert(rs2.row.begin(), rs2.row.end());
+			cpSet.push_back(nrs);
+		}
+	}
+	return cpSet;
+}
+
+
 set<string> HelperFunction::GetColName(set<RowSet> set1) {
 	set<string> colName;
 	for (RowSet rs1 : set1) {
@@ -116,7 +129,7 @@ set<RowSet> HelperFunction::CommonColumnIntersect(set<RowSet> set1, set<RowSet> 
 	for (RowSet rs1 : set1) {
 		for (RowSet rs2 : set2) {
 			if (!(rs1 < rs2) && !(rs2 < rs1)) {
-				RowSet tempRs;
+					RowSet tempRs;
 				for (pair<string, string> p : rs2.row) {
 					tempRs.row.insert(p);
 				}
@@ -128,6 +141,26 @@ set<RowSet> HelperFunction::CommonColumnIntersect(set<RowSet> set1, set<RowSet> 
 		}
 	}
 	return newSet;
+}
+
+vector<RowSet> HelperFunction::CommonColumnIntersect(vector<RowSet> set1, vector<RowSet> set2)
+{
+	vector<RowSet> newRowSet;
+	for (RowSet rs1 : set1) {
+		for (RowSet rs2 : set2) {
+			if (!(rs1 < rs2) && !(rs2 < rs1)) {
+				RowSet tempRs;
+				for (pair<string, string> p : rs2.row) {
+					tempRs.row.insert(p);
+				}
+				for (pair<string, string> p : rs1.row) {
+					tempRs.row.insert(p);
+				}
+				newRowSet.push_back(tempRs);
+			}
+		}
+	}
+	return newRowSet;
 }
 
 void HelperFunction::PrintRowSet(set<RowSet> setrs)

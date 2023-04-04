@@ -6,6 +6,9 @@ using namespace std;
 
 class Uses {
 public:
+
+	static void insertUses(int stmtNum, string variablename);
+
 	static string GetUsesConstruct_StatementSynonym_Synonym(string input1, string input2);
 	static string GetUsesConstruct_StatementSynonym_NotSynonym(string input1);
 	static string GetUsesConstruct_NameSynonym_Synonym(string input1, string input2);

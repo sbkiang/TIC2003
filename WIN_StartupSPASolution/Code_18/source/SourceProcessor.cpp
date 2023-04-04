@@ -93,7 +93,7 @@ void SourceProcessor::process(string program) {
 
 			for (int i = 0; i < useStore.size(); i++) {
 				// database PK constraint will trigger for duplicate variables with same line_num to prevent duplicate insertion
-				Database::insertUses(useStore.at(i).getAdjustedStmtNum(), useStore.at(i).getStmt());
+				Uses::insertUses(useStore.at(i).getAdjustedStmtNum(), useStore.at(i).getStmt());
 				procedure.back()->_uses.push_back(useStore.at(i).getStmt());
 			}
 		}
@@ -139,7 +139,7 @@ void SourceProcessor::process(string program) {
 
 			for (int i = 0; i < useStore.size(); i++) {
 				// database PK constraint will trigger for duplicate variables with same line_num to prevent duplicate insertion
-				Database::insertUses(useStore.at(i).getAdjustedStmtNum(), useStore.at(i).getStmt());
+				Uses::insertUses(useStore.at(i).getAdjustedStmtNum(), useStore.at(i).getStmt());
 				procedure.back()->_uses.push_back((useStore.at(i).getStmt()));
 				//container->_uses.push_back((useStore.at(i)._stmt));
 			}
@@ -199,13 +199,13 @@ void SourceProcessor::process(string program) {
 
 			for (int i = 0; i < useStore.size(); i++) {
 				// database PK constraint will trigger for duplicate variables with same line_num to prevent duplicate insertion
-				Database::insertUses(useStore.at(i).getAdjustedStmtNum(), useStore.at(i).getStmt());
+				Uses::insertUses(useStore.at(i).getAdjustedStmtNum(), useStore.at(i).getStmt());
 				procedure.back()->_uses.push_back(useStore.at(i).getStmt());
 				//parentStack.top()->_uses.push_back((useStore.at(i)._stmt));
 			}
 
 			for (int i = 0; i < modifiesStore.size(); i++) {
-				Database::insertModifies(modifiesStore.at(i).getAdjustedStmtNum(), modifiesStore.at(i).getStmt());
+				Modifies::insertModifies(modifiesStore.at(i).getAdjustedStmtNum(), modifiesStore.at(i).getStmt());
 				procedure.back()->_modifies.push_back(modifiesStore.at(i).getStmt());
 				//parentStack.top()->_modifies.push_back((modifiesStore.at(i)._stmt));
 			}
@@ -213,7 +213,7 @@ void SourceProcessor::process(string program) {
 			size_t equal_pos = (stmt->getStmt()).find("="); // Find position of the equal sign
 			string RHS = (stmt->getStmt()).substr(equal_pos + 1); //RHS expression
 	
-			Database::insertPattern(stmt->getAdjustedStmtNum(), LHS, RHS, infixToPostfix(RHS));
+			ClausePattern::insertPattern(stmt->getAdjustedStmtNum(), LHS, RHS, infixToPostfix(RHS));
 			
 		
 		}
@@ -228,12 +228,12 @@ void SourceProcessor::process(string program) {
 			stmt->setEntity(word);
 			if (word == "read") {
 				Database::insertVariable(stmt->getStmt(), stmt->getAdjustedStmtNum());
-				Database::insertModifies(stmt->getAdjustedStmtNum(), stmt->getStmt());
+				Modifies::insertModifies(stmt->getAdjustedStmtNum(), stmt->getStmt());
 				procedure.back()->_modifies.push_back(stmt->getStmt());
 			} 
 			else if(word == "print") {
 				Database::insertVariable(stmt->getStmt(), stmt->getAdjustedStmtNum());
-				Database::insertUses(stmt->getAdjustedStmtNum(), stmt->getStmt());
+				Uses::insertUses(stmt->getAdjustedStmtNum(), stmt->getStmt());
 				procedure.back()->_uses.push_back(stmt->getStmt());
 			}
 			else if (word == "call") {
@@ -284,8 +284,8 @@ void SourceProcessor::process(string program) {
 		if (!proc) { cout << "**ERROR** Procedure not found"; }
 		vector<string> allUses = proc->GetAllUses();
 		vector<string> allModifies = proc->GetAllModifies();
-		for (int i = 0; i < allUses.size(); i++) { Database::insertUses(stmt->getAdjustedStmtNum(), allUses.at(i));	}
-		for (int i = 0; i < allModifies.size(); i++) { Database::insertModifies(stmt->getAdjustedStmtNum(), allModifies.at(i)); }
+		for (int i = 0; i < allUses.size(); i++) { Uses::insertUses(stmt->getAdjustedStmtNum(), allUses.at(i));	}
+		for (int i = 0; i < allModifies.size(); i++) { Modifies::insertModifies(stmt->getAdjustedStmtNum(), allModifies.at(i)); }
 	}
 
 	for (int i = 0; i < procedure.size(); i++) {
@@ -295,7 +295,7 @@ void SourceProcessor::process(string program) {
 	for (int i = 0; i < procedure.size(); i++) {
 		vector<Container> containers = procedure.at(i)->getAllContainers(); // get all the if and while containers
 		for (int j = 0; j < containers.size(); j++) {
-			Database::insertParent(containers.at(j)._adjustedStartStmtNum, containers.at(j)._adjustedStartStmtNum + 1, containers.at(j)._adjustedEndStmtNum);
+			Parent::insertParent(containers.at(j)._adjustedStartStmtNum, containers.at(j)._adjustedStartStmtNum + 1, containers.at(j)._adjustedEndStmtNum);
 		}
 	}
 
@@ -312,11 +312,11 @@ void SourceProcessor::process(string program) {
 			}
 			if (node->_sJump) {
 				int nextStmtNum = node->_sJump->_stmtPtr->getAdjustedStmtNum();
-				Database::insertNext(nodeStmtNum, nextStmtNum);
+				Next::insertNext(nodeStmtNum, nextStmtNum);
 			}
 			if (node->_fJump) {
 				int nextStmtNum = node->_fJump->_stmtPtr->getAdjustedStmtNum();
-				Database::insertNext(nodeStmtNum, nextStmtNum);
+				Next::insertNext(nodeStmtNum, nextStmtNum);
 			}
 		}
 		//procedure.at(i)->printContainerTree(0);

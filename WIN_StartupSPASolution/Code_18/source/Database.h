@@ -31,6 +31,7 @@ public:
 
 	// method to insert a variable into the database
 	static void insertVariable(string variablename, int statementNumber);
+
 	// method to insert a constant into the database
 	static void insertConstant(string value);
 
@@ -50,8 +51,6 @@ public:
 
 	// method to insert/get a next into the database
 	static void insertNext(int from, int to);
-	static bool GetNext(int from, int to);
-	static bool GetNextT(int from, int to);
 
 	//method to insert pattern into the database
 	static void insertPattern(int stmtNum, string LHS, string RHS, string expression);
