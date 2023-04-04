@@ -5,7 +5,7 @@
 string Call::GetCallConstruct_Synonym_Synonym(string input1, string input2)
 {
 	char sql[100] = {};
-	sprintf_s(sql, "select c.procedure_name as %s, c.variable_name as %s", input1.c_str(), input2.c_str());
+	sprintf_s(sql, "select distinct c.procedure_name as %s, c.variable_name as %s", input1.c_str(), input2.c_str());
 	return string(sql);
 }
 
@@ -13,7 +13,7 @@ string Call::GetCallConstruct_Synonym_Synonym(string input1, string input2)
 string Call::GetCallConstruct_Synonym_NotSynonym(string input1)
 {
 	char sql[100] = {};
-	sprintf_s(sql, "select c.procedure_name as %s", input1.c_str());
+	sprintf_s(sql, "select distinct c.procedure_name as %s", input1.c_str());
 	return string(sql);
 }
 
@@ -21,7 +21,23 @@ string Call::GetCallConstruct_Synonym_NotSynonym(string input1)
 string Call::GetCallConstruct_NotSynonym_Synonym(string input2)
 {
 	char sql[100] = {};
-	sprintf_s(sql, "select c.variable_name as %s", input2.c_str());
+	sprintf_s(sql, "select distinct c.variable_name as %s", input2.c_str());
+	return string(sql);
+}
+
+//Call(_, "Second")
+string Call::GetCallConstruct_Any_Specific()
+{
+	char sql[100] = {};
+	sprintf_s(sql, "select distinct c.procedure_name as p");
+	return string(sql);
+}
+
+//Call("First", _)
+string Call::GetCallConstruct_Specific_Any()
+{
+	char sql[100] = {};
+	sprintf_s(sql, "select distinct c.variable_name as p");
 	return string(sql);
 }
 
@@ -29,7 +45,7 @@ string Call::GetCallConstruct_NotSynonym_Synonym(string input2)
 string Call::GetCallConstruct_NotSynonym_NotSynonym()
 {
 	char sql[100] = {};
-	sprintf_s(sql, "select c.procedure_name, c.variable_name");
+	sprintf_s(sql, "select distinct c.procedure_name, c.variable_name");
 	return string(sql);
 }
 

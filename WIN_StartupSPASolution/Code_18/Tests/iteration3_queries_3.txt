@@ -1,0 +1,5 @@
+76 - tuple such that Calls*(p,q)
+procedure p, q;
+Select <p,q> such that Calls*(p,q)
+main computeCentroid, computeCentroid readPoint, main readPoint, main printResults
+5000

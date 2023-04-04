@@ -624,7 +624,15 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 				sql = Call::GetCallConstruct_Synonym_NotSynonym(input1);
 			}
 			else if (!input1IsSynonym && !input2IsSynonym) { // Call("First"/_,"Second"/_)
-				sql = Call::GetCallConstruct_NotSynonym_NotSynonym();
+				if (input1IsStmtOrWildCard) { // Call(_,"Second") 
+					sql = Call::GetCallConstruct_Any_Specific();
+				}
+				else if (input2IsStmtOrWildCard) { // Call("First", _) 
+					sql = Call::GetCallConstruct_Specific_Any();
+				}
+				else { // Call("First","Second") 
+					sql = Call::GetCallConstruct_NotSynonym_NotSynonym();
+				}
 			}
 
 			bool input1IsGeneric = (input1IsStmtOrWildCard || input1IsSynonym);
@@ -675,7 +683,15 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			sql = Call::GetCallConstruct_Synonym_NotSynonym(input1);
 		}
 		else if (!input1IsSynonym && !input2IsSynonym) { // Call("First"/_,"Second"/_)
-			sql = Call::GetCallConstruct_NotSynonym_NotSynonym();
+			if (input1IsStmtOrWildCard) { // Call(_,"Second") 
+				sql = Call::GetCallConstruct_Any_Specific();
+			}
+			else if (input2IsStmtOrWildCard) { // Call("First", _) 
+				sql = Call::GetCallConstruct_Specific_Any();
+			}
+			else { // Call("First","Second") 
+				sql = Call::GetCallConstruct_NotSynonym_NotSynonym();
+			}
 		}
 
 		bool input1IsGeneric = (input1IsStmtOrWildCard || input1IsSynonym);
