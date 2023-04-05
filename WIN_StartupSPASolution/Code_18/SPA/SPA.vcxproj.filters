@@ -69,6 +69,27 @@
     <ClCompile Include="ClauseNext.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ColumnBuilderSqlParent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RelEnt.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Pattern.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ColumnBuilderSqlUses.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ColumnBuilderSqlModifies.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ColumnBuilderSqlNext.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ColumnBuilderSqlCall.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\Database.h">
@@ -128,10 +149,40 @@
     <ClInclude Include="ClauseNext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="I_relRefSelectBuilder.h">
+    <ClInclude Include="IColumnBuilderSqlRelRefStmtStmt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="I_relRefQueryBuilder.h">
+    <ClInclude Include="IRelRefSqlQueryBuilder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ColumnBuilderSqlParent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RelEnt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Pattern.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ColumnBuilderSqlUses.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IColumnBuilderSqlRelRefNameName.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IColumnBuilderSqlRelRefNameStmt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IColumnBuilderSqlRelRefStmtName.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ColumnBuilderSqlModifies.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ColumnBuilderSqlNext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ColumnBuilderSqlCall.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
