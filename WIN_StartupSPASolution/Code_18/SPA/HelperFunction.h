@@ -16,13 +16,12 @@ public:
 	static string RemoveQuote(string input);
 	static set<string> GetColName(set<RowSet> set1);
 	static set<RowSet> CartesianProduct(set<RowSet> set1, set<RowSet> set2);
-	static vector<RowSet> HelperFunction::CartesianProduct(vector<RowSet> set1, vector<RowSet> set2);
-
+	static vector<RowSet> CartesianProduct(vector<RowSet> set1, vector<RowSet> set2);
+	static bool inputIsSynonym(map<string, string>SynEntMap, string input);
 
 	// this function is to compare each set1 with set2 and return set same column values instead of relying on set_intersection
 	static set<RowSet> CommonColumnIntersect(set<RowSet> set1, set<RowSet> set2);
-	static vector<RowSet> HelperFunction::CommonColumnIntersect(vector<RowSet> set1, vector<RowSet> set2);
-
+	static vector<RowSet> CommonColumnIntersect(vector<RowSet> set1, vector<RowSet> set2);
 
 	static void PrintRowSet(set<RowSet> rs);
 

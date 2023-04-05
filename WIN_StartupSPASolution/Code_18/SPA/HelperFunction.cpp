@@ -183,3 +183,8 @@ void HelperFunction::PrintRowSet(set<RowSet> setrs)
 		cout << body << endl;
 	}
 }
+
+bool HelperFunction::inputIsSynonym(map<string, string> SynEntMap, string input)
+{
+	return false;
+}
