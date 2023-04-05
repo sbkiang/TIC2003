@@ -13,6 +13,8 @@
 #include "../SPA/ClausePattern.h"
 #include "../SPA/HelperFunction.h"
 #include "../SPA/ClauseNext.h"
+#include "../SPA/RelEnt.h"
+#include "../SPA/Pattern.h"
 
 using namespace std;
 

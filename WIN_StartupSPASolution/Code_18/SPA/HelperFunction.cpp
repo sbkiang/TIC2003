@@ -79,13 +79,8 @@ string HelperFunction::ConvertPqlPatternOprtToSqlPatternOprt(string input)
 }
 
 string HelperFunction::RemoveQuote(string input) {
-	string ret;
-	for (char c : input) {
-		if (c != '"') {
-			ret += c;
-		}
-	}
-	return ret;
+	input.erase(remove(input.begin(), input.end(), '\"'), input.end());
+	return input;
 }
 
 set<RowSet> HelperFunction::CartesianProduct(set<RowSet> set1, set<RowSet> set2) {

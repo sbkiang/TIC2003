@@ -52,7 +52,7 @@ string Uses::GetUsesConstruct_StatementNotSynonym_NotSynonym()
 	return string(sql);
 }
 
-// Uses("10", v) where stmt 10 is (stmt|print|assign|while|if|call)
+// Uses("main", v)
 string Uses::GetUsesConstruct_NameNotSynonym_Synonym(string input2)
 {
 	char sql[100] = {};
@@ -60,7 +60,7 @@ string Uses::GetUsesConstruct_NameNotSynonym_Synonym(string input2)
 	return string(sql);
 }
 
-// Uses("10", "x") where stmt 10 is (stmt|print|assign|while|if|call)
+// Uses("main", "x")
 string Uses::GetUsesConstruct_NameNotSynonym_NotSynonym()
 {
 	char sql[100] = {};

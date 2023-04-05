@@ -6,6 +6,7 @@
 #include <set>
 #include <ranges>
 
+
 // constructor
 QueryProcessor::QueryProcessor() {}
 
@@ -74,7 +75,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	vector<string> tokens;
 	tk.tokenize(query, tokens);
 	map<string, string> synonymEntityMap; // map the synonym to entity
-	stack<SuchThat> suchThatStack;
+	stack<RelEnt> relEntStack;
 	stack<Pattern> patternStack;
 	Select select;	
 	for (int i = 0; i < tokens.size(); i++) {
@@ -91,11 +92,10 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		}
 		else if (tokens[i] == "such" && tokens[i + 1] == "that") { // such that relationship(x,y)
 			i += 2;
-			SuchThat st;
-			st.relationship = tokens.at(i);
+			string relationship = tokens.at(i);
 			if (tokens.at(i+1) == "*") {
 				i++;
-				st.relationship += tokens.at(i);
+				relationship += tokens.at(i);
 			}
 			int brackets = 0;
 			string word = "";
@@ -113,18 +113,14 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 				}
 			} while (brackets > 0);
 			int comma = word.find(",");
-			st.input1 = word.substr(0, comma);
-			st.input2 = word.substr(comma + 1, word.length());
-			st.input1Quoted = st.input1[0] == '"';
-			st.input2Quoted = st.input2[0] == '"';
-			st.input1 = HelperFunction::RemoveQuote(st.input1);
-			st.input2 = HelperFunction::RemoveQuote(st.input2);
-			suchThatStack.push(st);
+			string input1 = word.substr(0, comma);
+			string input2 = word.substr(comma + 1, word.length());
+			RelEnt re = RelEnt(relationship, input1, input2);
+			RelEnt.push(re);
 		}
 		else if (tokens[i] == "pattern") {
-			Pattern pt;
 			i++;
-			pt.synonym = tokens.at(i);
+			string synonym = tokens.at(i);
 			i++;
 			int brackets = 0;
 			string word = "";
@@ -146,11 +142,9 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			} while (brackets > 0);
 
 			int comma = word.find(",");
-			pt.input1 = word.substr(0, comma);
-			pt.input2 = word.substr(comma + 1, word.length());
-			pt.input1Quoted = pt.input1[0] == '"';
-			pt.input1 = HelperFunction::RemoveQuote(pt.input1);
-			pt.input2 = HelperFunction::RemoveQuote(pt.input2);
+			string input1 = word.substr(0, comma);
+			string input2 = word.substr(comma + 1, word.length());
+			Pattern pt = Pattern(synonym, input1, input2);
 			patternStack.push(pt);
 		}
 		else if (tokens[i] == "Select") {
@@ -173,8 +167,8 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	EvaluateSelect(select, synonymEntityMap);
 	Database::SelectPql(select, selectResultStore);
 	set<string> currentResultSetSynonym(select.synonym.begin(), select.synonym.end());
-	while (!suchThatStack.empty()) {
-		SuchThat suchThatTemp = suchThatStack.top();
+	while (!relEntStack.empty()) {
+		RelEnt suchThatTemp = relEntStack.top();
 		string entityInput1 = "", entityInput2 = "", input1 = suchThatTemp.input1, input2 = suchThatTemp.input2;
 		bool input1IsSynonym = (synonymEntityMap.find(input1) != synonymEntityMap.end() && !suchThatTemp.input1Quoted);
 		bool input2IsSynonym = (synonymEntityMap.find(input2) != synonymEntityMap.end() && !suchThatTemp.input2Quoted);		

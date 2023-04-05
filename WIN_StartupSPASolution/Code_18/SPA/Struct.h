@@ -112,13 +112,21 @@ struct SqlResultStore{
 	set<RowSet> sqlResultSet;
 };
 
+
 struct SuchThat {
-	string relationship = "";
-	string input1 = "";
-	string input2 = "";
+	string _relationship = "";
+	string _input1 = "";
+	string _input2 = "";
+	string GetInput1() {
+		return _input1;
+	}
+	string GetInput1Unquoted() {
+		return HelperFunction::RemoveQuote(_input1);
+	}
 	bool input1Quoted = false;
 	bool input2Quoted = false;
 };
+
 
 struct Pattern {
 	string synonym = "";
@@ -126,6 +134,7 @@ struct Pattern {
 	string input2 = "";
 	bool input1Quoted = false;
 };
+
 
 struct Select {
 	vector<string> synonym;
