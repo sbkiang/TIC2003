@@ -16,5 +16,5 @@ public:
 	string GetInput1();
 	string GetInput2();
 	string GetInput1Unquoted();
-	bool input1Quoted = false;
+	string GetInput2Unquoted();
 };

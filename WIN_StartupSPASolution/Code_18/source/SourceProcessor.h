@@ -23,10 +23,11 @@ public:
 	// method for processing the source program
 	void process(string program);
 
+	/*
 	bool is_operator(char c);
 	int prec(char c);
 	string infixToPostfix(string s);
-
+	*/
 };
 
 

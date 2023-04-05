@@ -2,15 +2,16 @@
 #include "QueryProcessor.h"
 #include <unordered_map>
 
-
 // method for processing the source program
 // This method currently only inserts the procedure name into the database
 // using some highly simplified logic.
 // You should modify this method to complete the logic for handling all the required syntax.
 
+/*
 bool SourceProcessor::is_operator(char c) {
 	return (c == '+' || c == '-' || c == '*' || c == '/');
 }
+*/
 
 void SourceProcessor::process(string program) {
 	// initialize the database
@@ -212,8 +213,7 @@ void SourceProcessor::process(string program) {
 
 			size_t equal_pos = (stmt->getStmt()).find("="); // Find position of the equal sign
 			string RHS = (stmt->getStmt()).substr(equal_pos + 1); //RHS expression
-	
-			ClausePattern::insertPattern(stmt->getAdjustedStmtNum(), LHS, RHS, infixToPostfix(RHS));
+			ClausePattern::insertPattern(stmt->getAdjustedStmtNum(), LHS, RHS, HelperFunction::InfixToPostfix(RHS));
 			
 		
 		}
@@ -324,6 +324,7 @@ void SourceProcessor::process(string program) {
 	
 }
 
+/*
 int SourceProcessor::prec(char c) {
 	if (c == '^')
 		return 3;
@@ -371,4 +372,4 @@ string SourceProcessor::infixToPostfix(string s) {
 
 	return result;
 }
-
+*/

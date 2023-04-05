@@ -116,7 +116,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			string input1 = word.substr(0, comma);
 			string input2 = word.substr(comma + 1, word.length());
 			RelEnt re = RelEnt(relationship, input1, input2);
-			RelEnt.push(re);
+			relEntStack.push(re);
 		}
 		else if (tokens[i] == "pattern") {
 			i++;
@@ -168,10 +168,12 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	Database::SelectPql(select, selectResultStore);
 	set<string> currentResultSetSynonym(select.synonym.begin(), select.synonym.end());
 	while (!relEntStack.empty()) {
-		RelEnt suchThatTemp = relEntStack.top();
-		string entityInput1 = "", entityInput2 = "", input1 = suchThatTemp.input1, input2 = suchThatTemp.input2;
-		bool input1IsSynonym = (synonymEntityMap.find(input1) != synonymEntityMap.end() && !suchThatTemp.input1Quoted);
-		bool input2IsSynonym = (synonymEntityMap.find(input2) != synonymEntityMap.end() && !suchThatTemp.input2Quoted);		
+		RelEnt relEntTemp = relEntStack.top();
+		string entityInput1 = "", entityInput2 = "", input1 = relEntTemp.GetInput1Unquoted(), input2 = relEntTemp.GetInput2Unquoted();
+		bool input1Quoted = (relEntTemp.GetInput1()[0] == '"');
+		bool input2Quoted = (relEntTemp.GetInput2()[0] == '"');
+		bool input1IsSynonym = (synonymEntityMap.find(input1) != synonymEntityMap.end() && !input1Quoted);
+		bool input2IsSynonym = (synonymEntityMap.find(input2) != synonymEntityMap.end() && !input2Quoted);		
 		bool input1IsWildcard = (input1 == "_") ? true : false;
 		bool input2IsWildcard = (input2 == "_") ? true : false;
 		bool input1InSelect = find(select.synonym.begin(), select.synonym.end(), input1) != select.synonym.end();
@@ -187,7 +189,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		}
  		bool input1IsStmtOrWildCard = (entityInput1 == "stmt" || input1IsWildcard);
 		bool input2IsStmtOrWildCard = (entityInput2 == "stmt" || input2IsWildcard);
-		string relationship = suchThatTemp.relationship;
+		string relationship = relEntTemp.GetRelationship();
 		string sql = "";
 		if (relationship == "Uses") { // input1 is Stmt Num or Name, input2 is Name
 			if (input1IsSynonym && input2IsSynonym) {
@@ -751,14 +753,15 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			}
 		}
 		//HelperFunction::PrintRowSet(selectResultStore.sqlResultSet);
-		suchThatStack.pop();
+		relEntStack.pop();
 	}
 
 	while (!patternStack.empty()) {
 		Pattern patternTemp = patternStack.top();
-		string synonym = patternTemp.synonym, input1 = patternTemp.input1, input2 = patternTemp.input2;
-		bool input1IsSynonym = (synonymEntityMap.find(input1) != synonymEntityMap.end() && !patternTemp.input1Quoted);
-		bool patternSynonymInSelect = (find(select.synonym.begin(), select.synonym.end(), patternTemp.synonym) != select.synonym.end());
+		string synonym = patternTemp.GetSynonym(), input1 = patternTemp.GetInput1Unquoted(), input2 = patternTemp.GetInput2Unquoted();
+		bool input1Quoted = (patternTemp.GetInput1()[0] == '"');
+		bool input1IsSynonym = (synonymEntityMap.find(input1) != synonymEntityMap.end() && !input1Quoted);
+		bool patternSynonymInSelect = (find(select.synonym.begin(), select.synonym.end(), patternTemp.GetSynonym()) != select.synonym.end());
 		string sql;
 		/*
 		if (patternSynonymInSelect && input1IsSynonym) {

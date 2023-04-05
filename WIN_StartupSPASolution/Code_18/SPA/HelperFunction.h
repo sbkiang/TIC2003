@@ -12,6 +12,7 @@ class HelperFunction {
 public:
 	static string GetEntityByStatement(string input);
 	static string PatternExprToPostFix(string input);
+	static string InfixToPostfix(string s);
 	static string ConvertPqlPatternOprtToSqlPatternOprt(string input);
 	static string RemoveQuote(string input);
 	static set<string> GetColName(set<RowSet> set1);
@@ -27,5 +28,4 @@ public:
 
 private:
 	static int Prec(char c);
-	static string InfixToPostfix(string s);
 };

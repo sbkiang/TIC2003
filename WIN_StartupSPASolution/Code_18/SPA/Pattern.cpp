@@ -26,3 +26,8 @@ string Pattern::GetInput1Unquoted()
 {
 	return HelperFunction::RemoveQuote(_input1);
 }
+
+string Pattern::GetInput2Unquoted()
+{
+	return HelperFunction::RemoveQuote(_input2);
+}
