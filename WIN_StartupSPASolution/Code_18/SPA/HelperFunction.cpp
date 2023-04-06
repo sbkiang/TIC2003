@@ -28,13 +28,14 @@ string HelperFunction::PatternExprToPostFix(string input) {
 int HelperFunction::Prec(char c) {
 	if (c == '^')
 		return 3;
-	else if (c == '/' || c == '*')
+	else if (c == '/' || c == '*' || c == '%')
 		return 2;
 	else if (c == '+' || c == '-')
 		return 1;
 	else
 		return -1;
 }
+
 
 string HelperFunction::InfixToPostfix(string s) {
 	stack<char> st;

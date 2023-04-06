@@ -1,0 +1,8 @@
+<?xml-stylesheet type="text/xsl" href="analysis.xsl"?>
+<test_results>
+<info>
+<name>AutoTester</name><parsing_time_taken>6584.000000</parsing_time_taken>
+</info>
+<queries>
+<query>
+<id ReturnTuple="1" Uses="1" SuchThat="1" CondNum="3" RelNum="1" comment="Uses stmtNo and syn">1055</id><querystr><![CDATA[variable v; Select v such that Uses(8, v)]]></querystr>

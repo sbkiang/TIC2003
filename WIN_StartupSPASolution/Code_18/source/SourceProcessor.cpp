@@ -95,7 +95,7 @@ void SourceProcessor::process(string program) {
 
 			for (int i = 0; i < useStore.size(); i++) {
 				// database PK constraint will trigger for duplicate variables with same line_num to prevent duplicate insertion
-				Uses::insertUses(useStore.at(i).getAdjustedStmtNum(), useStore.at(i).getStmt());
+				Database::insertUses(useStore.at(i).getAdjustedStmtNum(), useStore.at(i).getStmt());
 				procedure.back()->_uses.push_back(useStore.at(i).getStmt());
 			}
 		}
@@ -141,7 +141,7 @@ void SourceProcessor::process(string program) {
 
 			for (int i = 0; i < useStore.size(); i++) {
 				// database PK constraint will trigger for duplicate variables with same line_num to prevent duplicate insertion
-				Uses::insertUses(useStore.at(i).getAdjustedStmtNum(), useStore.at(i).getStmt());
+				Database::insertUses(useStore.at(i).getAdjustedStmtNum(), useStore.at(i).getStmt());
 				procedure.back()->_uses.push_back((useStore.at(i).getStmt()));
 				//container->_uses.push_back((useStore.at(i)._stmt));
 			}
