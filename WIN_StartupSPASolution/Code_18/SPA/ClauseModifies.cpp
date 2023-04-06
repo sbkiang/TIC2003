@@ -1,6 +1,13 @@
 #pragma once
 #include "ClauseModifies.h"
 
+string Modifies::insertModifies(int stmtNum, string variablename)
+{
+	char sqlBuf[256];
+	sprintf_s(sqlBuf, "INSERT INTO modify ('line_num','variable_name' ) VALUES ('%i','%s');", stmtNum, variablename.c_str());
+	return string(sqlBuf);
+}
+
 // Modifies((stmt|read|assign|while|if|call), v)
 string Modifies::GetModifiesConstruct_StatementSynonym_Synonym(string input1, string input2)
 {

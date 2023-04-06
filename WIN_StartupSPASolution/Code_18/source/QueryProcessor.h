@@ -1,9 +1,14 @@
 #pragma once
 #include <string>
 #include <vector>
-#include "Tokenizer.h"
-#include "Database.h"
 #include <regex>
+#include <iostream>
+#include <algorithm>
+#include <stack>
+#include <map>
+#include <set>
+#include <ranges>
+
 #include "../SPA/Struct.h"
 #include "../SPA/define.h"
 #include "../SPA/ClauseModifies.h"
@@ -15,6 +20,13 @@
 #include "../SPA/ClauseNext.h"
 #include "../SPA/RelEnt.h"
 #include "../SPA/Pattern.h"
+#include "../SPA/ColumnBuilderSqlCall.h"
+#include "../SPA/ColumnBuilderSqlModifies.h"
+#include "../SPA/ColumnBuilderSqlUses.h"
+#include "../SPA/ColumnBuilderSqlNext.h"
+#include "../SPA/ColumnBuilderSqlParent.h"
+#include "Tokenizer.h"
+#include "Database.h"
 
 using namespace std;
 

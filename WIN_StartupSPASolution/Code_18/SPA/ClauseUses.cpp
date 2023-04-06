@@ -1,6 +1,13 @@
 #pragma once
 #include "ClauseUses.h"
 
+string Uses::insertUses(int stmtNum, string variableName)
+{
+	char sqlBuf[256];
+	sprintf_s(sqlBuf, "INSERT INTO use ('line_num','variable_name' ) VALUES ('%i','%s');", stmtNum, variableName.c_str());
+	return string(sqlBuf);
+}
+
 // Uses((stmt|print|assign|while|if|call), v)
 string Uses::GetUsesConstruct_StatementSynonym_Synonym(string input1, string input2)
 {

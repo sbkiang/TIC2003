@@ -1,6 +1,5 @@
 #include "CFGBuilder.h"
 
-//CFG* CFGBuilder::BuildCFG(Container* procedure) {
 CFG CFGBuilder::BuildCFG(Container* procedure) {
 	stack<Container*> parentStack;
 	Container* tempContainer = procedure;

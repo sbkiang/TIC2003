@@ -1,11 +1,4 @@
 #include "QueryProcessor.h"
-#include <iostream>
-#include <algorithm>
-#include <stack>
-#include <map>
-#include <set>
-#include <ranges>
-
 
 // constructor
 QueryProcessor::QueryProcessor() {}
@@ -192,6 +185,8 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		string relationship = relEntTemp.GetRelationship();
 		string sql = "";
 		if (relationship == "Uses") { // input1 is Stmt Num or Name, input2 is Name
+			sql = ColumnBuilderSqlUses::GetSqlColumnQuery(relEntTemp, synonymEntityMap);
+			/*
 			if (input1IsSynonym && input2IsSynonym) {
 				if (regex_match(entityInput1, regex(regexStmtNumEntity))) {
 					sql = Uses::GetUsesConstruct_StatementSynonym_Synonym(input1, input2);
@@ -224,6 +219,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 					sql = Uses::GetUsesConstruct_NameNotSynonym_NotSynonym();
 				}
 			}
+			*/
 			bool input1IsAny = (input1IsSynonym || input1IsWildcard);
 			bool input2IsAny = (input2IsSynonym || input2IsWildcard);
 
@@ -300,6 +296,8 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		}
 
  		else if (relationship == "Modifies") { // input1 is Stmt Num or Name, input2 is Name or Wildcard
+			sql = ColumnBuilderSqlModifies::GetSqlColumnQuery(relEntTemp, synonymEntityMap);
+			/*
 			if (input1IsSynonym && input2IsSynonym) {
 				if (regex_match(entityInput1, regex(regexStmtNumEntity))) {
 					sql = Modifies::GetModifiesConstruct_StatementSynonym_Synonym(input1, input2);
@@ -332,6 +330,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 					sql = Modifies::GetModifiesConstruct_NameNotSynonym_NotSynonym();
 				}
 			}
+			*/
 			bool input1IsAny = (input1IsSynonym || input1IsWildcard);
 			bool input2IsAny = (input2IsSynonym || input2IsWildcard);
 
@@ -408,9 +407,8 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		}
 
 		else if (relationship == "Parent") {
-			bool input1IsGeneric = (input1IsStmtOrWildCard || input1IsSynonym);
-			bool input2IsGeneric = (input2IsStmtOrWildCard || input2IsSynonym);
-
+			sql = ColumnBuilderSqlParent::GetSqlColumnQuery(relEntTemp, synonymEntityMap);
+			/*
 			if (input1IsSynonym && input2IsSynonym) { // Parent(entity, entity)
 				sql = Parent::GetParentConstruct_Synonym_Synonym(input1, input2);
 			}
@@ -423,6 +421,10 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			else if (!input1IsSynonym && !input2IsSynonym) { // Parent(10, 11)
 				sql = Parent::GetParentConstruct_NotSynonym_NotSynonym();
 			}
+			*/
+
+			bool input1IsGeneric = (input1IsStmtOrWildCard || input1IsSynonym);
+			bool input2IsGeneric = (input2IsStmtOrWildCard || input2IsSynonym);
 			if (input1IsGeneric && input2IsGeneric) { // Parent(entity/_, entity/_)
 				if (input1IsStmtOrWildCard && input2IsStmtOrWildCard) { // Parent(stmt/_, stmt/_)
 					sql = Parent::GetParent_Any_Any(sql);
@@ -459,6 +461,8 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		}
 
 		else if (relationship == "Parent*") { // input1 is Stmt Num, input2 is Stmt Num
+			sql = ColumnBuilderSqlParent::GetSqlColumnQuery(relEntTemp, synonymEntityMap);
+			/*
 			if (input1IsSynonym && input2IsSynonym) { // Parent(stmt, stmt)
 				sql = Parent::GetParentConstruct_Synonym_Synonym(input1, input2);
 			}
@@ -471,6 +475,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			else if (!input1IsSynonym && !input2IsSynonym) { // Parent(10, 11)
 				sql = Parent::GetParentConstruct_NotSynonym_NotSynonym();
 			}
+			*/
 
 			bool input1IsGeneric = (input1IsStmtOrWildCard || input1IsSynonym);
 			bool input2IsGeneric = (input2IsStmtOrWildCard || input2IsSynonym);
@@ -510,6 +515,8 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		}
 			
 		else if (relationship == "Next") {
+			sql = ColumnBuilderSqlNext::GetSqlColumnQuery(relEntTemp, synonymEntityMap);
+			/*
 			if (input1IsSynonym && input2IsSynonym) {
 				sql = Next::NextConstructSelect_Synonym_Synonym(input1, input2);
 			}
@@ -522,7 +529,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			else if (!input1IsSynonym && !input2IsSynonym){
 				sql = Next::NextConstructSelect_NotSynonym_NotSynonym();
 			}
-			
+			*/
 			bool input1IsGeneric = (input1IsStmtOrWildCard || input1IsSynonym);
 			bool input2IsGeneric = (input2IsStmtOrWildCard || input2IsSynonym);
 			if (input1IsGeneric && input2IsGeneric) { // Next(entity/_, entity/_)
@@ -560,6 +567,8 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			}
 		}
 		else if (relationship == "Next*"){
+			sql = ColumnBuilderSqlNext::GetSqlColumnQuery(relEntTemp, synonymEntityMap);
+			/*
 			if (input1IsSynonym && input2IsSynonym) {
 				sql = Next::NextConstructSelect_Synonym_Synonym(input1, input2);
 			}
@@ -572,7 +581,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			else if (!input1IsSynonym && !input2IsSynonym) {
 				sql = Next::NextConstructSelect_NotSynonym_NotSynonym();
 			}
-
+			*/
 			bool input1IsGeneric = (input1IsStmtOrWildCard || input1IsSynonym);
 			bool input2IsGeneric = (input2IsStmtOrWildCard || input2IsSynonym);
 			if (input1IsGeneric && input2IsGeneric) { // Next(entity/_, entity/_)
@@ -610,6 +619,8 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			}
 		}
 		else if (relationship == "Calls") {
+			sql = ColumnBuilderSqlCall::GetSqlColumnQuery(relEntTemp, synonymEntityMap);
+			/*
 			if (input1IsSynonym && input2IsSynonym) { // Call(procedure, procedure)
 				sql = Call::GetCallConstruct_Synonym_Synonym(input1, input2);
 			}
@@ -630,7 +641,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 					sql = Call::GetCallConstruct_NotSynonym_NotSynonym();
 				}
 			}
-
+			*/
 			bool input1IsGeneric = (input1IsStmtOrWildCard || input1IsSynonym);
 			bool input2IsGeneric = (input2IsStmtOrWildCard || input2IsSynonym);
 
@@ -669,62 +680,64 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			}
 		}
 		else if (relationship == "Calls*") {
-		if (input1IsSynonym && input2IsSynonym) { // Call(procedure, procedure)
-			sql = Call::GetCallConstruct_Synonym_Synonym(input1, input2);
-		}
-		else if (!input1IsSynonym && input2IsSynonym) { // Call("First"/_, procedure)
-			sql = Call::GetCallConstruct_NotSynonym_Synonym(input2);
-		}
-		else if (input1IsSynonym && !input2IsSynonym) { // Call(procedure, "Second"/_)
-			sql = Call::GetCallConstruct_Synonym_NotSynonym(input1);
-		}
-		else if (!input1IsSynonym && !input2IsSynonym) { // Call("First"/_,"Second"/_)
-			if (input1IsStmtOrWildCard) { // Call(_,"Second") 
-				sql = Call::GetCallConstruct_Any_Specific();
+			sql = ColumnBuilderSqlCall::GetSqlColumnQuery(relEntTemp, synonymEntityMap);
+			/*
+			if (input1IsSynonym && input2IsSynonym) { // Call(procedure, procedure)
+				sql = Call::GetCallConstruct_Synonym_Synonym(input1, input2);
 			}
-			else if (input2IsStmtOrWildCard) { // Call("First", _) 
-				sql = Call::GetCallConstruct_Specific_Any();
+			else if (!input1IsSynonym && input2IsSynonym) { // Call("First"/_, procedure)
+				sql = Call::GetCallConstruct_NotSynonym_Synonym(input2);
 			}
-			else { // Call("First","Second") 
-				sql = Call::GetCallConstruct_NotSynonym_NotSynonym();
+			else if (input1IsSynonym && !input2IsSynonym) { // Call(procedure, "Second"/_)
+				sql = Call::GetCallConstruct_Synonym_NotSynonym(input1);
 			}
-		}
+			else if (!input1IsSynonym && !input2IsSynonym) { // Call("First"/_,"Second"/_)
+				if (input1IsStmtOrWildCard) { // Call(_,"Second")
+					sql = Call::GetCallConstruct_Any_Specific();
+				}
+				else if (input2IsStmtOrWildCard) { // Call("First", _)
+					sql = Call::GetCallConstruct_Specific_Any();
+				}
+				else { // Call("First","Second")
+					sql = Call::GetCallConstruct_NotSynonym_NotSynonym();
+				}
+			}
+			*/
+			bool input1IsGeneric = (input1IsStmtOrWildCard || input1IsSynonym);
+			bool input2IsGeneric = (input2IsStmtOrWildCard || input2IsSynonym);
 
-		bool input1IsGeneric = (input1IsStmtOrWildCard || input1IsSynonym);
-		bool input2IsGeneric = (input2IsStmtOrWildCard || input2IsSynonym);
-
-		if (input1IsGeneric && input2IsGeneric) { // Call(procedure/_, procedure/_)
-			if (input1IsStmtOrWildCard && input2IsStmtOrWildCard) { // Call(_,_)
-				sql = Call::GetCallT_Any_Any(sql);
+			if (input1IsGeneric && input2IsGeneric) { // Call(procedure/_, procedure/_)
+				if (input1IsStmtOrWildCard && input2IsStmtOrWildCard) { // Call(_,_)
+					sql = Call::GetCallT_Any_Any(sql);
+				}
+				else if (input1IsStmtOrWildCard && !input2IsStmtOrWildCard) { // Call(_, procedure)
+					sql = Call::GetCallT_Any_Synonym(sql);
+				}
+				else if (!input1IsStmtOrWildCard && input2IsStmtOrWildCard) { // Call(procedure, _)
+					sql = Call::GetCallT_Synonym_Any(sql);
+				}
+				else if (!input1IsStmtOrWildCard && !input2IsStmtOrWildCard) { // Call(procedure, procedure)
+					sql = Call::GetCallT_Synonym_Synonym(sql);
+				}
 			}
-			else if (input1IsStmtOrWildCard && !input2IsStmtOrWildCard) { // Call(_, procedure)
-				sql = Call::GetCallT_Any_Synonym(sql);
+			else if (input1IsGeneric && !input2IsGeneric) { // Call(procedure/_, "Second")
+				if (input1IsStmtOrWildCard) { // Call(_, "Second")
+					sql = Call::GetCallT_Any_Specific(sql, input2);
+				}
+				else { // Call(procedure, "Second")
+					sql = Call::GetCallT_Synonym_Specific(sql, input2);
+				}
 			}
-			else if (!input1IsStmtOrWildCard && input2IsStmtOrWildCard) { // Call(procedure, _)
-				sql = Call::GetCallT_Synonym_Any(sql);
+			else if (!input1IsGeneric && input2IsGeneric) { // Call(10, procedure/_)
+				if (input2IsStmtOrWildCard) { // Call("First", _)
+					sql = Call::GetCallT_Specific_Any(sql, input1);
+				}
+				else { // Call("First", procedure)
+					sql = Call::GetCallT_Specific_Synonym(sql, input1);
+				}
 			}
-			else if (!input1IsStmtOrWildCard && !input2IsStmtOrWildCard) { // Call(procedure, procedure)
-				sql = Call::GetCallT_Synonym_Synonym(sql);
-			}
-		}
-		else if (input1IsGeneric && !input2IsGeneric) { // Call(procedure/_, "Second")
-			if (input1IsStmtOrWildCard) { // Call(_, "Second")
-				sql = Call::GetCallT_Any_Specific(sql, input2);
-			}
-			else { // Call(procedure, "Second")
-				sql = Call::GetCallT_Synonym_Specific(sql, input2);
-			}
-		}
-		else if (!input1IsGeneric && input2IsGeneric) { // Call(10, procedure/_)
-			if (input2IsStmtOrWildCard) { // Call("First", _)
-				sql = Call::GetCallT_Specific_Any(sql, input1);
-			}
-			else { // Call("First", procedure)
-				sql = Call::GetCallT_Specific_Synonym(sql, input1);
-			}
-		}
-		else if (!input1IsGeneric && !input2IsGeneric) { // Call("First", "Second")
-			sql = Call::GetCallT_Specific_Specific(sql, input1, input2);
+			else if (!input1IsGeneric && !input2IsGeneric) { // Call("First", "Second")
+				sql = Call::GetCallT_Specific_Specific(sql, input1, input2);
 			}
 		}
 
@@ -763,20 +776,6 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		bool input1IsSynonym = (synonymEntityMap.find(input1) != synonymEntityMap.end() && !input1Quoted);
 		bool patternSynonymInSelect = (find(select.synonym.begin(), select.synonym.end(), patternTemp.GetSynonym()) != select.synonym.end());
 		string sql;
-		/*
-		if (patternSynonymInSelect && input1IsSynonym) {
-			sql = ClausePattern::PatternConstruct_AssignInSelect_Synonym(synonym, input1);
-		}
-		else if (patternSynonymInSelect && !input1IsSynonym){
-			sql = ClausePattern::PatternConstruct_AssignInSelect_NotSynonym(synonym);
-		}
-		else if (!patternSynonymInSelect && input1IsSynonym) {
-			sql = ClausePattern::PatternConstruct_AssignNotInSelect_Synonym(input1);
-		}
-		else if (!patternSynonymInSelect && !input1IsSynonym) {
-			sql = ClausePattern::PatternConstruct_AssignNotInSelect_NotSynonym();
-		}
-		*/
 		set<string> ptSynonym;
 		ptSynonym.insert(synonym);
 		if (input1IsSynonym) {

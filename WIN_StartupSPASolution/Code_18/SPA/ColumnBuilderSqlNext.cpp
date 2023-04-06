@@ -1,10 +1,5 @@
 #include "ColumnBuilderSqlNext.h"
 
-ColumnBuilderSqlNext::ColumnBuilderSqlNext(RelEnt re)
-{
-	_re = re;
-}
-
 string ColumnBuilderSqlNext::Build_StmtSynonym_StmtSynonym(string synonym1, string synonym2)
 {
 	char sqlBuf[512];
@@ -33,10 +28,10 @@ string ColumnBuilderSqlNext::Build_StmtNotSynonym_StmtNotSynonym()
 	return string(sqlBuf);
 }
 
-string ColumnBuilderSqlNext::GetSqlColumnQuery(map<string,string> synEntMap)
+string ColumnBuilderSqlNext::GetSqlColumnQuery(RelEnt re, map<string,string> synEntMap)
 {
-	string input1 = _re.GetInput1();
-	string input2 = _re.GetInput2();
+	string input1 = re.GetInput1();
+	string input2 = re.GetInput2();
 	bool input1IsSyn = (synEntMap.find(input1) != synEntMap.end());
 	bool input2IsSyn = (synEntMap.find(input2) != synEntMap.end());
 	if (input1IsSyn && input2IsSyn) { // (entity, entity)

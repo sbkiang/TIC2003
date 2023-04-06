@@ -1,6 +1,13 @@
 #pragma once
 #include "ClauseParent.h"
 
+string Parent::insertParent(int parentStmt, int childStart, int childEnd)
+{
+	char sqlBuf[256];
+	sprintf_s(sqlBuf, "INSERT INTO parent ('line_num','child_start','child_end') VALUES (%i,%i,%i);", parentStmt, childStart, childEnd);
+	return string(sqlBuf);
+}
+
 // Parent((while | if), (stmt | read | print | assign | while | if | call))
 string Parent::GetParentConstruct_Synonym_Synonym(string input1, string input2)
 {

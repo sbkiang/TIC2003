@@ -201,7 +201,7 @@ void Database::insertNext(int from, int to) {
 
 void Database::insertCall(int stmtNum, string procedureName, string variablename, int directCall) {
 	char sqlBuf[256];
-	sprintf(sqlBuf, "INSERT INTO call ('line_num','procedure_name','variable_name', 'direct_call') VALUES ('%i','%s','%s','%i');", stmtNum, procedureName.c_str(), variablename.c_str(), directCall);
+	sprintf_s(sqlBuf, "INSERT INTO call ('line_num','procedure_name','variable_name', 'direct_call') VALUES ('%i','%s','%s','%i');", stmtNum, procedureName.c_str(), variablename.c_str(), directCall);
 	sqlite3_exec(dbConnection, sqlBuf, NULL, 0, &errorMessage);
 	if (errorMessage) { cout << "insertCall SQL Error: " << errorMessage << endl; }
 }

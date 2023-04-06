@@ -7,7 +7,7 @@ using namespace std;
 class Next{
 public:
 
-	static void insertNext(int from, int to);
+	static string insertNext(int from, int to);
 
 	// next(stmtRef, stmtRef)
 	static string NextConstructSelect_Synonym_Synonym(string synonym1, string synonym2);

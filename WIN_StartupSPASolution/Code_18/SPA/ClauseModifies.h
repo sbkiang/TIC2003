@@ -7,7 +7,7 @@ using namespace std;
 class Modifies {
 public:
 
-	static void insertModifies(int stmtNum, string variablename);
+	static string insertModifies(int stmtNum, string variablename);
 
 	static string GetModifiesConstruct_StatementSynonym_Synonym(string input1, string input2);
 	static string GetModifiesConstruct_StatementSynonym_NotSynonym(string input1);

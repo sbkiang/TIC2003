@@ -112,7 +112,7 @@ struct SqlResultStore{
 	set<RowSet> sqlResultSet;
 };
 
-
+/*
 struct SuchThat {
 	string _relationship = "";
 	string _input1 = "";
@@ -126,14 +126,16 @@ struct SuchThat {
 	bool input1Quoted = false;
 	bool input2Quoted = false;
 };
+*/
 
-
+/*
 struct Pattern {
 	string synonym = "";
 	string input1 = "";
 	string input2 = "";
 	bool input1Quoted = false;
 };
+*/
 
 
 struct Select {

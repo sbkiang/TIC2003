@@ -1,5 +1,12 @@
 #include "ClausePattern.h"
 
+string ClausePattern::insertPattern(int stmtNum, string LHS, string RHS, string expression)
+{
+	char sqlBuf[256];
+	sprintf_s(sqlBuf, "INSERT INTO pattern ('line_num','lhs','rhs','expression') VALUES (%i,'%s','%s','%s');", stmtNum, LHS.c_str(), RHS.c_str(), expression.c_str());
+	return string(sqlBuf);
+}
+
 string ClausePattern::PatternConstruct_Synonym(string selectSynonym, string input1Synonym)
 {
 	char sqlBuf[512] = {};
@@ -12,11 +19,6 @@ string ClausePattern::PatternConstruct_NotSynonym(string selectSynonym)
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select line_num as %s", selectSynonym.c_str());
 	return string(sqlBuf);
-}
-
-string ClausePattern::insertPattern(int stmtNum, string LHS, string RHS, string expression)
-{
-	return "";
 }
 
 // Pattern("x", _/_"x+1"_/"x+1")

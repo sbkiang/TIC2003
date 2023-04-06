@@ -7,7 +7,7 @@ using namespace std;
 class Uses {
 public:
 
-	static void insertUses(int stmtNum, string variablename);
+	static string insertUses(int stmtNum, string variableName);
 
 	static string GetUsesConstruct_StatementSynonym_Synonym(string input1, string input2);
 	static string GetUsesConstruct_StatementSynonym_NotSynonym(string input1);

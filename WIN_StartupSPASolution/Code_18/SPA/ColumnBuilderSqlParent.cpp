@@ -1,10 +1,5 @@
 #include "ColumnBuilderSqlParent.h"
 
-ColumnBuilderSqlParent::ColumnBuilderSqlParent(RelEnt re)
-{
-	_re = re;
-}
-
 string ColumnBuilderSqlParent::Build_StmtSynonym_StmtSynonym(string input1, string input2)
 {
 	char sql[100] = {};
@@ -36,10 +31,10 @@ string ColumnBuilderSqlParent::Build_StmtNotSynonym_StmtNotSynonym()
 	return string(sql);
 }
 
-string ColumnBuilderSqlParent::GetSqlColumnQuery(map<string,string> synEntMap)
+string ColumnBuilderSqlParent::GetSqlColumnQuery(RelEnt re, map<string,string> synEntMap)
 {
-	string input1 = _re.GetInput1();
-	string input2 = _re.GetInput2();
+	string input1 = re.GetInput1();
+	string input2 = re.GetInput2();
 	bool input1IsSyn = (synEntMap.find(input1) != synEntMap.end());
 	bool input2IsSyn = (synEntMap.find(input2) != synEntMap.end());
 	if (input1IsSyn && input2IsSyn) { // (entity, entity)

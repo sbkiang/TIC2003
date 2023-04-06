@@ -1,10 +1,5 @@
 #include "ColumnBuilderSqlModifies.h"
 
-ColumnBuilderSqlModifies::ColumnBuilderSqlModifies(RelEnt re)
-{
-	_re = re;
-}
-
 // Modifies((stmt | print | assign | while | if | call), v)
 string ColumnBuilderSqlModifies::Build_StmtSynonym_NameSynonym(string input1, string input2)
 {
@@ -69,10 +64,10 @@ string ColumnBuilderSqlModifies::Build_NameNotSynonym_NameNotSynonym()
 	return string(sql);
 }
 
-string ColumnBuilderSqlModifies::GetSqlColumnQuery(map<string, string> synEntMap)
+string ColumnBuilderSqlModifies::GetSqlColumnQuery(RelEnt re, map<string, string> synEntMap)
 {
-	string input1 = _re.GetInput1();
-	string input2 = _re.GetInput2();
+	string input1 = re.GetInput1();
+	string input2 = re.GetInput2();
 	bool input1IsSyn = (synEntMap.find(input1) != synEntMap.end());
 	bool input2IsSyn = (synEntMap.find(input2) != synEntMap.end());
 	if (input1IsSyn && input2IsSyn) {

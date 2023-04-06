@@ -1,5 +1,12 @@
 #include "ClauseNext.h"
 
+string Next::insertNext(int from, int to)
+{
+	char sqlBuf[256];
+	sprintf_s(sqlBuf, "INSERT INTO next ('from_line','to_line') VALUES (%i,%i);", from, to);
+	return string(sqlBuf);
+}
+
 string Next::NextConstructSelect_Synonym_Synonym(string synonym1, string synonym2)
 {
 	char sqlBuf[512];
