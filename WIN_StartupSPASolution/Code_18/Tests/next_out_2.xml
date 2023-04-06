@@ -1,35 +1,35 @@
 <?xml-stylesheet type="text/xsl" href="analysis.xsl"?>
 <test_results>
 <info>
-<name>AutoTester</name><parsing_time_taken>739.000000</parsing_time_taken>
+<name>AutoTester</name><parsing_time_taken>1562.000000</parsing_time_taken>
 </info>
 <queries>
 <query>
 <id ReturnTuple="1" Nextstar="2" SuchThat="2" CondNum="5" RelNum="2" comment="Test synonym to synonym, entity in while jump back, get stmt">40501</id><querystr><![CDATA[print pr; assign a; stmt s; Select pr such that Next*(pr,s) such that Next*(s,a)]]></querystr>
 <stuans>5</stuans>
 <correct>5</correct>
-<time_taken>166.000000</time_taken>
+<time_taken>82.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Nextstar="2" SuchThat="2" CondNum="5" RelNum="2" comment="Test synonym to synonym, entity in while jump back, get stmt">40502</id><querystr><![CDATA[print pr; assign a; stmt s; Select a such that Next*(pr,s) such that Next*(s,a)]]></querystr>
 <stuans>7,3,8</stuans>
 <correct>7,3,8</correct>
-<time_taken>476.000000</time_taken>
+<time_taken>165.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Nextstar="2" SuchThat="2" CondNum="5" RelNum="2" comment="Test synonym to synonym, same entity, get stmt">404</id><querystr><![CDATA[call c1,c2; stmt s; Select s such that Next*(c1,s) such that Next*(s,c2)]]></querystr>
 <stuans></stuans>
 <correct></correct>
-<time_taken>152.000000</time_taken>
+<time_taken>94.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Nextstar="1" SuchThat="1" CondNum="3" RelNum="1" comment="Test synonym to synonym, entity in if not jump to else">408</id><querystr><![CDATA[call c; read re; Select re such that Next*(c,re)]]></querystr>
 <stuans>14</stuans>
 <correct>14</correct>
-<time_taken>188.000000</time_taken>
+<time_taken>71.000000</time_taken>
 <passed/>
 </query>
 </queries>

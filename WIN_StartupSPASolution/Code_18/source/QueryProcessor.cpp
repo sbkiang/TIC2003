@@ -765,7 +765,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		set_intersection(currentResultSetSynonym.begin(), currentResultSetSynonym.end(), stSynonym.begin(), stSynonym.end(), inserter(intersectSynonym, intersectSynonym.begin()));
 		if(!intersectSynonym.empty()){
 			selectResultStore.sqlResultSet = HelperFunction::CommonColumnIntersect(selectResultSet, suchThatResultSet);
-			currentResultSetSynonym = intersectSynonym;
+			currentResultSetSynonym.insert(stSynonym.begin(), stSynonym.end());
 		}
 		else {
 			if (suchThatResultSet.empty()) {
@@ -818,7 +818,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		if(!intersectSynonym.empty()){
 			set<RowSet> intersection;
 			selectResultStore.sqlResultSet = HelperFunction::CommonColumnIntersect(selectResultSet, patternResultSet);
-			currentResultSetSynonym = intersectSynonym;
+			//currentResultSetSynonym = intersectSynonym;
 		}
 		else {
 			if (patternResultStore.sqlResultSet.empty()) {
