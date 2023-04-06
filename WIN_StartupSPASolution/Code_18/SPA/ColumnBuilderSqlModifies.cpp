@@ -60,7 +60,7 @@ string ColumnBuilderSqlModifies::Build_NameNotSynonym_NameSynonym(string input2)
 string ColumnBuilderSqlModifies::Build_NameNotSynonym_NameNotSynonym()
 {
 	char sql[100] = {};
-	sprintf_s(sql, "select distinct line_num, variable_name");
+	sprintf_s(sql, "select distinct name, variable_name");
 	return string(sql);
 }
 
@@ -70,6 +70,8 @@ string ColumnBuilderSqlModifies::GetSqlColumnQuery(RelEnt re, map<string, string
 	string input2 = re.GetInput2();
 	bool input1IsSyn = (synEntMap.find(input1) != synEntMap.end());
 	bool input2IsSyn = (synEntMap.find(input2) != synEntMap.end());
+	input1 = re.GetInput1Unquoted();
+	input2 = re.GetInput2Unquoted();
 	if (input1IsSyn && input2IsSyn) {
 		string entityInput1 = synEntMap.at(input1);
 		if (regex_match(entityInput1, regex(regexStmtNumEntity))) {

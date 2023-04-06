@@ -37,7 +37,6 @@ string Uses::GetUsesConstruct_NameSynonym_Synonym(string input1, string input2)
 string Uses::GetUsesConstruct_NameSynonym_NotSynonym(string input1)
 {
 	char sql[100] = {};
-	//sprintf_s(sql, "select distinct p.name as %s, u.variable_name", input1.c_str());
 	sprintf_s(sql, "select distinct name as %s", input1.c_str());
 	return string(sql);
 }

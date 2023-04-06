@@ -223,12 +223,19 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			bool input1IsAny = (input1IsSynonym || input1IsWildcard);
 			bool input2IsAny = (input2IsSynonym || input2IsWildcard);
 
+			/*
 			if (!input1IsAny && input2IsAny) { // Uses("main"/5, variable/_)
 				if (isdigit(input1[0])) { // for stmt num, we need to get the entity input1
 					entityInput1 = HelperFunction::GetEntityByStatement(input1);
 				}
 				else {
 					sql = Uses::GetUses_SpecificProcedure_Any(sql, input1);
+				}
+			}
+			*/
+			if (!input1IsAny) { // Uses("main"/5, variable/_)
+				if (isdigit(input1[0])) { // for stmt num, we need to get the entity input1
+					entityInput1 = HelperFunction::GetEntityByStatement(input1);
 				}
 			}
 			if (input1IsAny && input2IsAny) { // Uses(entity, variable/_)
@@ -280,16 +287,16 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 				}
 			}
 			else if (!input1IsAny && !input2IsAny) { // entityInput1 here is already determine at the top
-				if (entityInput1 == "procedure") { // Uses(procedure, variable/_)
+				if (isalpha(input1[0])) { // Uses("main", "x")
 					sql = Uses::GetUses_SpecificProcedure_Specific(sql, input1, input2);
 				}
-				else if (regex_match(entityInput1, regex(regexAssignPrint))) { // Uses(print/assign, variable/_)
+				else if (regex_match(entityInput1, regex(regexAssignPrint))) { // Uses(print/assign stmt, "x")
 					sql = Uses::GetUses_SpecificPrintAssign_Specific(sql, input1, input2);
 				}
-				else if (regex_match(entityInput1, regex(regexWhileIf))) {
+				else if (regex_match(entityInput1, regex(regexWhileIf))) { // Uses(while/if stmt, "x")
 					sql = Uses::GetUses_SpecificWhileIf_Specific(sql, input1, input2);
-				}
-				else if (entityInput1 == "call") {
+				} 
+				else if (entityInput1 == "call") { // Uses(call stmt, "x")
 					sql = Uses::GetUses_SpecificCall_Specific(sql, input1, input2);
 				}
 			}
@@ -333,13 +340,19 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			*/
 			bool input1IsAny = (input1IsSynonym || input1IsWildcard);
 			bool input2IsAny = (input2IsSynonym || input2IsWildcard);
-
+			/*
 			if (!input1IsAny && input2IsAny) { // Modifies("main"/5, variable/_)
 				if (isdigit(input1[0])) { // for stmt num, we need to get the entity input1
 					entityInput1 = HelperFunction::GetEntityByStatement(input1);
 				}
 				else {
 					sql = Modifies::GetModifies_SpecificProcedure_Any(sql, input1);
+				}
+			}
+			*/
+			if (!input1IsAny) { // Modifies("main"/5, variable/_)
+				if (isdigit(input1[0])) { // for stmt num, we need to get the entity input1
+					entityInput1 = HelperFunction::GetEntityByStatement(input1);
 				}
 			}
 			if (input1IsAny && input2IsAny) { // Modifies(entity, variable/_)
@@ -391,16 +404,16 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 				}
 			}
 			else if (!input1IsAny && !input2IsAny) { // entityInput1 here is already determine at the top
-				if (entityInput1 == "procedure") { // Modifies(procedure, variable/_)
+				if (isalpha(input1[0])) { // Modifies("main", "x")
 					sql = Modifies::GetModifies_SpecificProcedure_Specific(sql, input1, input2);
 				}
-				else if (regex_match(entityInput1, regex(regexAssignPrint))) { // Modifies(print/assign, variable/_)
+				else if (regex_match(entityInput1, regex(regexAssignPrint))) { // Modifies(print/assign stmt, "x")
 					sql = Modifies::GetModifies_SpecificReadAssign_Specific(sql, input1, input2);
 				}
-				else if (regex_match(entityInput1, regex(regexWhileIf))) {
+				else if (regex_match(entityInput1, regex(regexWhileIf))) { // Modifies(while/if stmt, "x")
 					sql = Modifies::GetModifies_SpecificWhileIf_Specific(sql, input1, input2);
 				}
-				else if (entityInput1 == "call") {
+				else if (entityInput1 == "call") { // Modifies(call stmt, "x")
 					sql = Modifies::GetModifies_SpecificCall_Specific(sql, input1, input2);
 				}
 			}

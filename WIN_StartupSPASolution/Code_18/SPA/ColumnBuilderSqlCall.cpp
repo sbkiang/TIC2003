@@ -32,12 +32,14 @@ string ColumnBuilderSqlCall::Build_NameNotSynonym_NameNotSynonym()
 	return string(sql);
 }
 
-string ColumnBuilderSqlCall::GetSqlColumnQuery(RelEnt re, map<string, string> synEntMap)
+string ColumnBuilderSqlCall::GetSqlColumnQuery(RelEnt re, map<string,string> synEntMap)
 {
 	string input1 = re.GetInput1();
 	string input2 = re.GetInput2();
 	bool input1IsSyn = (synEntMap.find(input1) != synEntMap.end());
 	bool input2IsSyn = (synEntMap.find(input2) != synEntMap.end());
+	input1 = re.GetInput1Unquoted();
+	input2 = re.GetInput2Unquoted();
 	if (input1IsSyn && input2IsSyn) { // (entity, entity)
 		return Build_NameSynonym_NameSynonym(input1, input2);
 	}

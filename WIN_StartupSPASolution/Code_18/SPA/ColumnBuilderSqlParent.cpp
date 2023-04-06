@@ -37,6 +37,8 @@ string ColumnBuilderSqlParent::GetSqlColumnQuery(RelEnt re, map<string,string> s
 	string input2 = re.GetInput2();
 	bool input1IsSyn = (synEntMap.find(input1) != synEntMap.end());
 	bool input2IsSyn = (synEntMap.find(input2) != synEntMap.end());
+	input1 = re.GetInput1Unquoted();
+	input2 = re.GetInput2Unquoted();
 	if (input1IsSyn && input2IsSyn) { // (entity, entity)
 		return Build_StmtSynonym_StmtSynonym(input1, input2);
 	}
