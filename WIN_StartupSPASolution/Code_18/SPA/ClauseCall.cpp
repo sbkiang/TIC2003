@@ -52,125 +52,143 @@ string Call::GetCallConstruct_NotSynonym_NotSynonym()
 // Call(_,_)
 string Call::GetCall_Any_Any(string frontSql) {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, "%s from call c and direct_call = 1", frontSql.c_str());
+	//sprintf_s(sqlBuf, "%s from call c and direct_call = 1", frontSql.c_str());
+	sprintf_s(sqlBuf, "%s from (select caller, callee from call where direct_call = 1)", frontSql.c_str());
 	return string(sqlBuf);
 }
 
-// Call(_, procedure)
+// Call(_, procedure)  ** procedure is also a wildcard. so, can be treated as Call(_,_)
 string Call::GetCall_Any_Synonym(string frontSql) {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, " %s from call c where c.variable_name in (select name FROM procedure) and c.direct_call = 1", frontSql.c_str());
+	//sprintf_s(sqlBuf, " %s from call c where c.variable_name in (select name FROM procedure) and c.direct_call = 1", frontSql.c_str());
+	sprintf_s(sqlBuf, " %s from (select caller, callee from call where direct_call = 1)", frontSql.c_str());
 	return string(sqlBuf);
 }
 
 // Call(_, "Second")
 string Call::GetCall_Any_Specific(string frontSql, string input2) {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, " %s from call c where c.variable_name = '%s' and direct_call = 1", frontSql.c_str(), input2.c_str());
+	//sprintf_s(sqlBuf, " %s from call c where c.variable_name = '%s' and direct_call = 1", frontSql.c_str(), input2.c_str());
+	sprintf_s(sqlBuf, " %s from (select caller, callee from call where callee = '%s' and direct_call = 1)", frontSql.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
 
-// Call(procedure, _)
+// Call(procedure, _)  ** procedure is also a wildcard. so, can be treated as Call(_,_)
 string Call::GetCall_Synonym_Any(string frontSql) {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, " %s from call c where c.procedure_name in (select name FROM procedure) and c.direct_call = 1", frontSql.c_str());
+	//sprintf_s(sqlBuf, " %s from call c where c.procedure_name in (select name FROM procedure) and c.direct_call = 1", frontSql.c_str());
+	sprintf_s(sqlBuf, " %s from (select caller, callee from call where direct_call = 1)", frontSql.c_str());
 	return string(sqlBuf);
 }
 
 // Call("First", _)
 string Call::GetCall_Specific_Any(string frontSql, string input1) {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, " %s from call c where c.procedure_name = '%s' and direct_call = 1", frontSql.c_str(), input1.c_str());
+	//sprintf_s(sqlBuf, " %s from call c where c.procedure_name = '%s' and direct_call = 1", frontSql.c_str(), input1.c_str());
+	sprintf_s(sqlBuf, " %s from (select caller, callee from call where caller = '%s' and direct_call = 1)", frontSql.c_str(), input1.c_str());
 	return string(sqlBuf);
 }
 
-// Call(procedure, procedure)
+// Call(procedure, procedure)  ** procedure = any. So, same as Call(_,_)
 string Call::GetCall_Synonym_Synonym(string frontSql) {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, " %s from call c where c.procedure_name in (select name from procedure) and c.direct_call = 1", frontSql.c_str());
+	//sprintf_s(sqlBuf, " %s from call c where c.procedure_name in (select name from procedure) and c.direct_call = 1", frontSql.c_str());
+	sprintf_s(sqlBuf, " %s from (select caller, callee from call where direct_call = 1)", frontSql.c_str());
 	return string(sqlBuf);
 }
 
 // Call(procedure, "Second")
 string Call::GetCall_Synonym_Specific(string frontSql, string input2) {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, " %s from call c where c.procedure_name in (select name from procedure) and c.variable_name = '%s' and direct_call = 1", frontSql.c_str(), input2.c_str());
+	//sprintf_s(sqlBuf, " %s from call c where c.procedure_name in (select name from procedure) and c.variable_name = '%s' and direct_call = 1", frontSql.c_str(), input2.c_str());
+	sprintf_s(sqlBuf, " %s from (select caller, callee from call where callee = '%s' and direct_call = 1)", frontSql.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
 
 // Call("First", procedure)
 string Call::GetCall_Specific_Synonym(string frontSql, string input1) {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, " %s from call c where c.procedure_name = '%s' and c.variable_name in (select name from procedure) and direct_call = 1", frontSql.c_str(), input1.c_str());
+	//sprintf_s(sqlBuf, " %s from call c where c.procedure_name = '%s' and c.variable_name in (select name from procedure) and direct_call = 1", frontSql.c_str(), input1.c_str());
+	sprintf_s(sqlBuf, " %s from (select caller, callee from call where caller = '%s' and direct_call = 1)", frontSql.c_str(), input1.c_str());
 	return string(sqlBuf);
 }
 
 // Call("First", "Second")
 string Call::GetCall_Specific_Specific(string frontSql, string input1, string input2) {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, " %s from call c where c.procedure_name = '%s' and c.variable_name = '%s' and direct_call = 1", frontSql.c_str(), input1.c_str(), input2.c_str());
+	//sprintf_s(sqlBuf, " %s from call c where c.procedure_name = '%s' and c.variable_name = '%s' and direct_call = 1", frontSql.c_str(), input1.c_str(), input2.c_str());
+	sprintf_s(sqlBuf, " %s from (select caller, callee from call where caller = '%s' and callee = '%s' and direct_call = 1)", frontSql.c_str(), input1.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
 
 // Call*(_,_)
 string Call::GetCallT_Any_Any(string frontSql) {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, "%s from call c", frontSql.c_str());
+	//sprintf_s(sqlBuf, "%s from call c", frontSql.c_str());
+	sprintf_s(sqlBuf, "%s from (select caller, callee from call)", frontSql.c_str());
 	return string(sqlBuf);
 }
 
 // Call*(_, procedure)
 string Call::GetCallT_Any_Synonym(string frontSql) {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, " %s from call c where c.variable_name in (select name FROM procedure)", frontSql.c_str());
+	//sprintf_s(sqlBuf, " %s from call c where c.variable_name in (select name FROM procedure)", frontSql.c_str());
+	sprintf_s(sqlBuf, " %s from (select caller, callee from call)", frontSql.c_str());
 	return string(sqlBuf);
 }
 
 // Call*(_, "Second")
 string Call::GetCallT_Any_Specific(string frontSql, string input2) {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, " %s from call c where c.variable_name = '%s'", frontSql.c_str(), input2.c_str());
+	//sprintf_s(sqlBuf, " %s from call c where c.variable_name = '%s'", frontSql.c_str(), input2.c_str());
+	sprintf_s(sqlBuf, " %s from (select caller, callee from call where calleee = '%s')", frontSql.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
 
 // Call*(procedure, _)
 string Call::GetCallT_Synonym_Any(string frontSql) {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, " %s from call c where c.procedure_name in (select name FROM procedure)", frontSql.c_str());
+	//sprintf_s(sqlBuf, " %s from call c where c.procedure_name in (select name FROM procedure)", frontSql.c_str());
+	sprintf_s(sqlBuf, " %s from (select caller, callee from call)", frontSql.c_str());
 	return string(sqlBuf);
 }
 
 // Call*("First", _)
 string Call::GetCallT_Specific_Any(string frontSql, string input1) {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, " %s from call c where c.procedure_name = '%s'", frontSql.c_str(), input1.c_str());
+	//sprintf_s(sqlBuf, " %s from call c where c.procedure_name = '%s'", frontSql.c_str(), input1.c_str());
+	sprintf_s(sqlBuf, " %s from (select caller, callee from call where caller = '%s')", frontSql.c_str(), input1.c_str());
 	return string(sqlBuf);
 }
 
 // Call*(procedure, procedure)
 string Call::GetCallT_Synonym_Synonym(string frontSql) {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, " %s from call c where c.procedure_name in (select name from procedure)", frontSql.c_str());
+	//sprintf_s(sqlBuf, " %s from call c where c.procedure_name in (select name from procedure)", frontSql.c_str());
+	sprintf_s(sqlBuf, " %s from (select caller, callee from call)", frontSql.c_str());
 	return string(sqlBuf);
 }
 
 // Call*(procedure, "Second")
 string Call::GetCallT_Synonym_Specific(string frontSql, string input2) {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, " %s from call c where c.procedure_name in (select name from procedure) and c.variable_name = '%s'", frontSql.c_str(), input2.c_str());
+	//sprintf_s(sqlBuf, " %s from call c where c.procedure_name in (select name from procedure) and c.variable_name = '%s'", frontSql.c_str(), input2.c_str());
+	sprintf_s(sqlBuf, " %s from (select caller, callee from call where caller = '%s'", frontSql.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
 
 // Call*("First", procedure)
 string Call::GetCallT_Specific_Synonym(string frontSql, string input1) {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, " %s from call c where c.procedure_name = '%s' and c.variable_name in (select name from procedure)", frontSql.c_str(), input1.c_str());
+	//sprintf_s(sqlBuf, " %s from call c where c.procedure_name = '%s' and c.variable_name in (select name from procedure)", frontSql.c_str(), input1.c_str());
+	sprintf_s(sqlBuf, " %s from (select caller, callee from call where callee = '%s')", frontSql.c_str(), input1.c_str());
 	return string(sqlBuf);
 }
 
 // Call*("First", "Second")
 string Call::GetCallT_Specific_Specific(string frontSql, string input1, string input2) {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, " %s from call c where c.procedure_name = '%s' and c.variable_name = '%s'", frontSql.c_str(), input1.c_str(), input2.c_str());
+	//sprintf_s(sqlBuf, " %s from call c where c.procedure_name = '%s' and c.variable_name = '%s'", frontSql.c_str(), input1.c_str(), input2.c_str());
+	sprintf_s(sqlBuf, " %s from (select caller, callee from from call where caller = '%s' and callee = '%s'", frontSql.c_str(), input1.c_str(), input2.c_str());
 	return string(sqlBuf);
 }

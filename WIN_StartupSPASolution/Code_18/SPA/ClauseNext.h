@@ -9,6 +9,7 @@ public:
 
 	static string insertNext(int from, int to);
 
+	/*
 	// next(stmtRef, stmtRef)
 	static string NextConstructSelect_Synonym_Synonym(string synonym1, string synonym2);
 
@@ -20,6 +21,7 @@ public:
 
 	// next(10, 11)
 	static string NextConstructSelect_NotSynonym_NotSynonym();
+	*/
 
 	// next(stmt/_, stmt/_)
 	static string NextConstructQuery_Any_Any(string frontSql);

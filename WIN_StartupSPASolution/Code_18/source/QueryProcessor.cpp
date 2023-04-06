@@ -845,12 +845,24 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		}
 		final.insert(ins);
 	}
+	/*
 	for (RowSet rs : final) {
 		for (string synonym : select.synonym) {
 			output.push_back(rs.row.at(synonym));
 		}
 	}
-	
+	*/
+	for (RowSet rs : final) {
+		string result = "";
+		for (string synonym : select.synonym) {
+			result += (rs.row.at(synonym) + " ");
+		}
+		while (result.back() == ' ') {
+			result.pop_back();
+		}
+		output.push_back(result);
+	}
+
 	cout << "MY OUTPUT: ";
 	for (int i = 0; i < output.size(); i++) {
 		cout << output.at(i) << ",";

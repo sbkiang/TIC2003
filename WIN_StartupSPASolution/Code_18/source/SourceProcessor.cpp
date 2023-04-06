@@ -29,7 +29,7 @@ void SourceProcessor::process(string program) {
 
 	vector<Procedure*> procedure;
 	stack<Container*> parentStack;
-	vector<string> caller, called;
+	vector<string> caller, callee;
 	vector<Statement*> callStatements;
 	int stmtNumSubtract = 0;
 	int stmtNum = 0;
@@ -241,16 +241,16 @@ void SourceProcessor::process(string program) {
 				callStatements.push_back(stmt);
 				vector<Statement> modifiesStore;
 
-				caller.push_back(procedure.back()->_name); //Which Procedure is caller
-				called.push_back(tokens.at(i)); //Call function
+				caller.push_back(procedure.back()->_name);
+				callee.push_back(tokens.at(i));
 
 				modifiesStore.push_back(Statement(stmtNum, tokens.at(i), stmtNumSubtract));
-				for (int i = 0; i < modifiesStore.size(); i++) { //direct Call
-					Database::insertCall(modifiesStore.at(i).getAdjustedStmtNum(), procedure.back()->_name, modifiesStore.at(i).getStmt(), 1);
+				for (int i = 0; i < callStatements.size(); i++) { // direct Call
+					Database::insertCall(procedure.back()->_name, callStatements.at(i)->getStmt(), 1);
 				}
-				for (int j = 0; j < called.size(); j++) {
-					if (called[j] == procedure.back()->_name) { //indirect Call
-						Database::insertCall(modifiesStore.at(j).getAdjustedStmtNum(), caller[j], tokens.at(i), 0);
+				for (int j = 0; j < callee.size(); j++) {
+					if (callee[j] == procedure.back()->_name) { // indirect Call
+						Database::insertCall(caller[j], tokens.at(i), 0);
 						break;
 					}
 				}
