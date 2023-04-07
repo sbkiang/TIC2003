@@ -680,7 +680,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 					sql = Call::GetCall_Synonym_Specific(sql, input2);
 				}
 			}
-			else if (!input1IsGeneric && input2IsGeneric) { // Call(10, procedure/_)
+			else if (!input1IsGeneric && input2IsGeneric) { // Call("First", procedure/_)
 				if (input2IsStmtOrWildCard) { // Call("First", _)
 					sql = Call::GetCall_Specific_Any(sql, input1);
 				}
@@ -741,7 +741,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 					sql = Call::GetCallT_Synonym_Specific(sql, input2);
 				}
 			}
-			else if (!input1IsGeneric && input2IsGeneric) { // Call(10, procedure/_)
+			else if (!input1IsGeneric && input2IsGeneric) { // Call("First", procedure/_)
 				if (input2IsStmtOrWildCard) { // Call("First", _)
 					sql = Call::GetCallT_Specific_Any(sql, input1);
 				}

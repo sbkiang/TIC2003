@@ -1,28 +1,136 @@
 <?xml-stylesheet type="text/xsl" href="analysis.xsl"?>
 <test_results>
 <info>
-<name>AutoTester</name><parsing_time_taken>2086.000000</parsing_time_taken>
+<name>AutoTester</name><parsing_time_taken>1459.000000</parsing_time_taken>
 </info>
 <queries>
 <query>
-<id ReturnTuple="1" Calls="1" UnnamedVar="1" SuchThat="1" CondNum="4" RelNum="1" comment="Call">1</id><querystr><![CDATA[procedure p, q; Select p such that Calls (p, _) ]]></querystr>
-<stuans>First,Second</stuans>
-<correct>First,Second</correct>
-<time_taken>27.000000</time_taken>
+<id ReturnTuple="1" Calls="1" SuchThat="1" CondNum="3" RelNum="1" comment="such that Calls(p, readPoint)">48</id><querystr><![CDATA[procedure p; Select p such that Calls(p, "readPoint")]]></querystr>
+<stuans>computeCentroid</stuans>
+<correct>computeCentroid</correct>
+<time_taken>20.000000</time_taken>
 <passed/>
 </query>
 <query>
-<id ReturnTuple="1" Calls="1" SuchThat="1" CondNum="3" RelNum="1" comment="Call">2</id><querystr><![CDATA[procedure p, q; Select <p, q> such that Calls (p, q)]]></querystr>
-<stuans>First Second,Second Third</stuans>
-<correct>First Second,Second Third</correct>
-<time_taken>30.000000</time_taken>
+<id ReturnTuple="1" Calls="1" UnnamedVar="1" SuchThat="1" CondNum="4" RelNum="1" comment="such that Calls(_,readPoint)">49</id><querystr><![CDATA[procedure p; Select p such that Calls(_,"readPoint")]]></querystr>
+<stuans>readPoint,printResults,computeCentroid,main</stuans>
+<correct>computeCentroid</correct>
+<time_taken>9.000000</time_taken>
+<failed>
+<missing></missing>
+<additional>main,printResults,readPoint</additional>
+<summary>
+<expected>1</expected>
+<matched>1</matched>
+<missing>0</missing>
+<additional>3</additional>
+</summary>
+</failed>
+</query>
+<query>
+<id ReturnTuple="1" Calls="1" UnnamedVar="1" SuchThat="1" CondNum="4" RelNum="1" comment="such that Calls(readPoint,_)">50</id><querystr><![CDATA[procedure p; Select p such that Calls("readPoint",_)]]></querystr>
+<stuans></stuans>
+<correct></correct>
+<time_taken>8.000000</time_taken>
 <passed/>
 </query>
 <query>
-<id ReturnTuple="1" Calls="1" SuchThat="1" CondNum="3" RelNum="1" comment="Call">3</id><querystr><![CDATA[procedure p; Select p such that Calls (p, "Second")]]></querystr>
-<stuans>First</stuans>
-<correct>First</correct>
-<time_taken>21.000000</time_taken>
+<id ReturnTuple="1" Calls="1" SuchThat="1" CondNum="3" RelNum="1" comment="such that Calls(computeCentroid,p)">51</id><querystr><![CDATA[procedure p; Select p such that Calls("computeCentroid",p)]]></querystr>
+<stuans>readPoint,printResults</stuans>
+<correct>readPoint</correct>
+<time_taken>14.000000</time_taken>
+<failed>
+<missing></missing>
+<additional>printResults</additional>
+<summary>
+<expected>1</expected>
+<matched>1</matched>
+<missing>0</missing>
+<additional>1</additional>
+</summary>
+</failed>
+</query>
+<query>
+<id ReturnTuple="1" Calls="1" UnnamedVar="1" SuchThat="1" CondNum="4" RelNum="1" comment="such that Calls(p,_)">52</id><querystr><![CDATA[procedure p; Select p such that Calls(p,_)]]></querystr>
+<stuans>computeCentroid,main</stuans>
+<correct>main,computeCentroid</correct>
+<time_taken>14.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Calls="1" UnnamedVar="1" SuchThat="1" CondNum="4" RelNum="1" comment="such that Calls(_,p)">53</id><querystr><![CDATA[procedure p; Select p such that Calls(_,p)]]></querystr>
+<stuans>readPoint,printResults,computeCentroid</stuans>
+<correct>computeCentroid,printResults,readPoint</correct>
+<time_taken>11.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Callsstar="1" SuchThat="1" CondNum="3" RelNum="1" comment="such that Calls*(p,readPoint)">54</id><querystr><![CDATA[procedure p, q; Select p such that Calls*(p,"readPoint")]]></querystr>
+<stuans></stuans>
+<correct>main,computeCentroid</correct>
+<time_taken>14.000000</time_taken>
+<failed>
+<missing>computeCentroid,main</missing>
+<additional></additional>
+<summary>
+<expected>2</expected>
+<matched>0</matched>
+<missing>2</missing>
+<additional>0</additional>
+</summary>
+</failed>
+</query>
+<query>
+<id ReturnTuple="1" Callsstar="1" UnnamedVar="1" SuchThat="1" CondNum="4" RelNum="1" comment="such that Calls*(_,printResults)">55</id><querystr><![CDATA[procedure p; Select p such that Calls*(_,"printResults")]]></querystr>
+<stuans>readPoint,printResults,computeCentroid,main</stuans>
+<correct>main</correct>
+<time_taken>11.000000</time_taken>
+<failed>
+<missing></missing>
+<additional>computeCentroid,printResults,readPoint</additional>
+<summary>
+<expected>1</expected>
+<matched>1</matched>
+<missing>0</missing>
+<additional>3</additional>
+</summary>
+</failed>
+</query>
+<query>
+<id ReturnTuple="1" Callsstar="1" UnnamedVar="1" SuchThat="1" CondNum="4" RelNum="1" comment="such that Calls*(main,_)">56</id><querystr><![CDATA[procedure p, q; Select p such that Calls*("main",_)]]></querystr>
+<stuans>readPoint,printResults,computeCentroid,main</stuans>
+<correct>computeCentroid,printResults,readPoint</correct>
+<time_taken>13.000000</time_taken>
+<failed>
+<missing></missing>
+<additional>main</additional>
+<summary>
+<expected>3</expected>
+<matched>3</matched>
+<missing>0</missing>
+<additional>1</additional>
+</summary>
+</failed>
+</query>
+<query>
+<id ReturnTuple="1" Callsstar="1" SuchThat="1" CondNum="3" RelNum="1" comment="such that Calls*(main,p)">57</id><querystr><![CDATA[procedure p, q; Select p such that Calls*("main",p)]]></querystr>
+<stuans>readPoint,printResults,computeCentroid</stuans>
+<correct>computeCentroid,printResults,readPoint</correct>
+<time_taken>11.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Calls="1" SuchThat="1" CondNum="3" RelNum="1" comment="tuple such that Calls(p,q)">75</id><querystr><![CDATA[procedure p, q; Select <p,q> such that Calls(p,q)]]></querystr>
+<stuans>computeCentroid readPoint,computeCentroid printResults,main printResults,main computeCentroid</stuans>
+<correct>main computeCentroid,computeCentroid readPoint,main printResults,computeCentroid printResults</correct>
+<time_taken>16.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Callsstar="1" SuchThat="1" CondNum="3" RelNum="1" comment="tuple such that Calls*(p,q)">76</id><querystr><![CDATA[procedure p, q; Select <p,q> such that Calls*(p,q)]]></querystr>
+<stuans>computeCentroid readPoint,computeCentroid printResults,main readPoint,main printResults,main computeCentroid</stuans>
+<correct>main computeCentroid,computeCentroid readPoint,main readPoint,main printResults,computeCentroid printResults</correct>
+<time_taken>16.000000</time_taken>
 <passed/>
 </query>
 </queries>
