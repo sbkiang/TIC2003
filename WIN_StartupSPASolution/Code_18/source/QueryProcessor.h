@@ -5,7 +5,6 @@
 #include <iostream>
 #include <algorithm>
 #include <stack>
-#include <map>
 #include <set>
 #include <ranges>
 
@@ -20,11 +19,21 @@
 #include "../SPA/ClauseNext.h"
 #include "../SPA/RelEnt.h"
 #include "../SPA/Pattern.h"
-#include "../SPA/ColumnBuilderSqlCall.h"
+#include "../SPA/ColumnBuilderSqlCalls.h"
 #include "../SPA/ColumnBuilderSqlModifies.h"
 #include "../SPA/ColumnBuilderSqlUses.h"
 #include "../SPA/ColumnBuilderSqlNext.h"
 #include "../SPA/ColumnBuilderSqlParent.h"
+
+#include "../SPA/QueryBuilderSqlUses.h"
+#include "../SPA/QueryBuilderSqlModifies.h"
+#include "../SPA/QueryBuilderSqlParent.h"
+#include "../SPA/QueryBuilderSqlParentT.h"
+#include "../SPA/QueryBuilderSqlCalls.h"
+#include "../SPA/QueryBuilderSqlCallsT.h"
+#include "../SPA/QueryBuilderSqlNext.h"
+#include "../SPA/QueryBuilderSqlNextT.h"
+
 #include "Tokenizer.h"
 #include "Database.h"
 

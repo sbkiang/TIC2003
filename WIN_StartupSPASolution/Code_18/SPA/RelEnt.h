@@ -6,10 +6,11 @@ using namespace std;
 
 class RelEnt {
 private:
-	string _relationship = "";
-	string _input1 = "";
-	string _input2 = "";
+	string _relationship;
+	string _input1;
+	string _input2;
 public:
+	RelEnt();
 	RelEnt(string relationship, string input1, string input2);
 	string GetRelationship();
 	string GetInput1(); // get input with quotes

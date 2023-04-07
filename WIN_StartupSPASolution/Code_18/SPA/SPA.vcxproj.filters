@@ -87,7 +87,34 @@
     <ClCompile Include="ColumnBuilderSqlNext.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ColumnBuilderSqlCall.cpp">
+    <ClCompile Include="ColumnBuilderSqlCalls.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="QueryBuilderSqlUses.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="QueryBuilderSqlCalls.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="QueryBuilderSqlParent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="QueryBuilderSqlNext.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="QueryBuilderSqlModifies.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="QueryBuilderSqlParentT.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="QueryBuilderSqlNextT.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="QueryBuilderSqlCallsT.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RelEntDescriber.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -149,12 +176,6 @@
     <ClInclude Include="ClauseNext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IColumnBuilderSqlRelRefStmtStmt.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="IRelRefSqlQueryBuilder.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ColumnBuilderSqlParent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -167,13 +188,7 @@
     <ClInclude Include="ColumnBuilderSqlUses.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IColumnBuilderSqlRelRefNameName.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="IColumnBuilderSqlRelRefNameStmt.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="IColumnBuilderSqlRelRefStmtName.h">
+    <ClInclude Include="IColumnBuilderSqlRelRef.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ColumnBuilderSqlModifies.h">
@@ -182,7 +197,37 @@
     <ClInclude Include="ColumnBuilderSqlNext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ColumnBuilderSqlCall.h">
+    <ClInclude Include="ColumnBuilderSqlCalls.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IQueryBuilderSqlRelRef.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="QueryBuilderSqlUses.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="QueryBuilderSqlModifies.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="QueryBuilderSqlNext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="QueryBuilderSqlParent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="QueryBuilderSqlCalls.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="QueryBuilderSqlParentT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="QueryBuilderSqlNextT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="QueryBuilderSqlCallsT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RelEntDescriber.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

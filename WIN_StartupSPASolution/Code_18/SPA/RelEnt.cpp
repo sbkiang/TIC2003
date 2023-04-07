@@ -1,5 +1,9 @@
 #include "RelEnt.h"
 
+RelEnt::RelEnt()
+{
+}
+
 RelEnt::RelEnt(string relationship, string input1, string input2)
 {
 	_relationship = relationship;

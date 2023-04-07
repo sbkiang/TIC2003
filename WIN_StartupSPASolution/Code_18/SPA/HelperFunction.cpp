@@ -180,7 +180,9 @@ void HelperFunction::PrintRowSet(set<RowSet> setrs)
 	}
 }
 
-bool HelperFunction::inputIsSynonym(map<string, string> SynEntMap, string input)
+string HelperFunction::RelRefSqlBuilder(string colSql, string querySql)
 {
-	return false;
+	char sqlBuf[700];
+	sprintf_s(sqlBuf, "%s from (%s)", colSql.c_str(), querySql.c_str());
+	return string(sqlBuf);
 }

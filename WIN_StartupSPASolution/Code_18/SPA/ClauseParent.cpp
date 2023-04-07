@@ -40,6 +40,8 @@ string Parent::GetParentConstruct_NotSynonym_NotSynonym()
 	return string(sql);
 }
 
+
+
 string Parent::GetParent_Any_Any(string frontSql) {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "%s from parent p join statement s on s.line_num between p.child_start and p.child_end where p.line_num = (select p.line_num from parent p where s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1)", frontSql.c_str());
@@ -49,14 +51,14 @@ string Parent::GetParent_Any_Any(string frontSql) {
 // Parent(stmt/_, read/print/assign/while/if/call)
 string Parent::GetParent_Any_Synonym(string frontSql, string input2) {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, "%s from statement s join parent p on s.line_num between p.child_start and p.child_end and s.entity = '%s' and p.line_num = (select p.line_num from parent p where s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1)", frontSql.c_str(), input2.c_str());
+	sprintf_s(sqlBuf, "%s from parent p join statement s on s.line_num between p.child_start and p.child_end and s.entity = '%s' and p.line_num = (select p.line_num from parent p where s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1)", frontSql.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
 
 // Parent(stmt/_, 10)
 string Parent::GetParent_Any_Specific(string frontSql, string input2) {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, "%s from statement s join parent p on s.line_num between p.child_start and p.child_end and s.line_num = %s order by p.line_num desc limit 1", frontSql.c_str(), input2.c_str());
+	sprintf_s(sqlBuf, "%s from parent p join statement s on s.line_num between p.child_start and p.child_end and s.line_num = %s order by p.line_num desc limit 1", frontSql.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
 
@@ -112,14 +114,14 @@ string Parent::GetParentT_Any_Any(string frontSql)
 string Parent::GetParentT_Any_Synonym(string frontSql, string input2)
 {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, "%s from statement s join parent p on s.line_num between p.child_start and p.child_end and s.entity = '%s'", frontSql.c_str(), input2.c_str());
+	sprintf_s(sqlBuf, "%s from parent p join statement s on s.line_num between p.child_start and p.child_end and s.entity = '%s'", frontSql.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
 
 string Parent::GetParentT_Any_Specific(string frontSql, string input2)
 {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, "%s from statement s join parent p on s.line_num between p.child_start and p.child_end and s.line_num = %s", frontSql.c_str(), input2.c_str());
+	sprintf_s(sqlBuf, "%s from parent p join statement s on s.line_num between p.child_start and p.child_end and s.line_num = %s", frontSql.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
 

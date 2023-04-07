@@ -3,7 +3,7 @@
 string ColumnBuilderSqlParent::Build_StmtSynonym_StmtSynonym(string input1, string input2)
 {
 	char sql[100] = {};
-	sprintf_s(sql, "select distinct p.line_num as %s, s.line_num as %s", input1.c_str(), input2.c_str());
+	sprintf_s(sql, "select distinct parent as %s, child as %s", input1.c_str(), input2.c_str());
 	return string(sql);
 }
 
@@ -11,7 +11,7 @@ string ColumnBuilderSqlParent::Build_StmtSynonym_StmtSynonym(string input1, stri
 string ColumnBuilderSqlParent::Build_StmtSynonym_StmtNotSynonym(string input1)
 {
 	char sql[100] = {};
-	sprintf_s(sql, "select distinct p.line_num as %s", input1.c_str());
+	sprintf_s(sql, "select distinct parent as %s", input1.c_str());
 	return string(sql);
 }
 
@@ -19,7 +19,7 @@ string ColumnBuilderSqlParent::Build_StmtSynonym_StmtNotSynonym(string input1)
 string ColumnBuilderSqlParent::Build_StmtNotSynonym_StmtSynonym(string input2)
 {
 	char sql[100] = {};
-	sprintf_s(sql, "select distinct s.line_num as %s", input2.c_str());
+	sprintf_s(sql, "select distinct child as %s", input2.c_str());
 	return string(sql);
 }
 
@@ -27,18 +27,23 @@ string ColumnBuilderSqlParent::Build_StmtNotSynonym_StmtSynonym(string input2)
 string ColumnBuilderSqlParent::Build_StmtNotSynonym_StmtNotSynonym()
 {
 	char sql[100] = {};
-	sprintf_s(sql, "select distinct p.line_num, s.line_num");
+	sprintf_s(sql, "select distinct parent, child");
 	return string(sql);
 }
 
-string ColumnBuilderSqlParent::GetSqlColumnQuery(RelEnt re, map<string,string> synEntMap)
+ColumnBuilderSqlParent::ColumnBuilderSqlParent(RelEnt re)
 {
-	string input1 = re.GetInput1();
-	string input2 = re.GetInput2();
-	bool input1IsSyn = (synEntMap.find(input1) != synEntMap.end());
-	bool input2IsSyn = (synEntMap.find(input2) != synEntMap.end());
-	input1 = re.GetInput1Unquoted();
-	input2 = re.GetInput2Unquoted();
+	_re = re;
+}
+
+string ColumnBuilderSqlParent::GetSqlQuery(RelEntDescriber red)
+{
+	string input1 = _re.GetInput1();
+	string input2 = _re.GetInput2();
+	bool input1IsSyn = red.Input1IsSyn();
+	bool input2IsSyn = red.Input2IsSyn();
+	input1 = _re.GetInput1Unquoted();
+	input2 = _re.GetInput2Unquoted();
 	if (input1IsSyn && input2IsSyn) { // (entity, entity)
 		return Build_StmtSynonym_StmtSynonym(input1, input2);
 	}
@@ -51,4 +56,5 @@ string ColumnBuilderSqlParent::GetSqlColumnQuery(RelEnt re, map<string,string> s
 	else if (!input1IsSyn && !input2IsSyn) { // (10, 11)
 		return Build_StmtNotSynonym_StmtNotSynonym();
 	}
+	return string();
 }

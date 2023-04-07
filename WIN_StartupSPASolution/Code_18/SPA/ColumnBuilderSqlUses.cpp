@@ -64,16 +64,21 @@ string ColumnBuilderSqlUses::Build_NameNotSynonym_NameNotSynonym()
 	return string(sql);
 }
 
-string ColumnBuilderSqlUses::GetSqlColumnQuery(RelEnt re, map<string, string> synEntMap)
+ColumnBuilderSqlUses::ColumnBuilderSqlUses(RelEnt re)
 {
-	string input1 = re.GetInput1();
-	string input2 = re.GetInput2();
-	bool input1IsSyn = (synEntMap.find(input1) != synEntMap.end());
-	bool input2IsSyn = (synEntMap.find(input2) != synEntMap.end());
-	input1 = re.GetInput1Unquoted();
-	input2 = re.GetInput2Unquoted();
+	_re = re;
+}
+
+string ColumnBuilderSqlUses::GetSqlQuery(RelEntDescriber red)
+{
+	string input1 = _re.GetInput1();
+	string input2 = _re.GetInput2();
+	bool input1IsSyn = red.Input1IsSyn();
+	bool input2IsSyn = red.Input2IsSyn();
+	input1 = _re.GetInput1Unquoted();
+	input2 = _re.GetInput2Unquoted();
+	string entityInput1 = red.EntityInput1();
 	if (input1IsSyn && input2IsSyn) {
-		string entityInput1 = synEntMap.at(input1);
 		if (regex_match(entityInput1, regex(regexStmtNumEntity))) {
 			return ColumnBuilderSqlUses::Build_StmtSynonym_NameSynonym(input1, input2);
 		}
@@ -90,7 +95,6 @@ string ColumnBuilderSqlUses::GetSqlColumnQuery(RelEnt re, map<string, string> sy
 		}
 	}
 	else if (input1IsSyn && !input2IsSyn) {
-		string entityInput1 = synEntMap.at(input1);
 		if (regex_match(entityInput1, regex(regexStmtNumEntity))) {
 			return ColumnBuilderSqlUses::Build_StmtSynonym_NameNotSynonym(input1);
 		}
@@ -106,5 +110,7 @@ string ColumnBuilderSqlUses::GetSqlColumnQuery(RelEnt re, map<string, string> sy
 			return ColumnBuilderSqlUses::Build_NameNotSynonym_NameNotSynonym();
 		}
 	}
+
+	return string();
 }
 

@@ -28,14 +28,19 @@ string ColumnBuilderSqlNext::Build_StmtNotSynonym_StmtNotSynonym()
 	return string(sqlBuf);
 }
 
-string ColumnBuilderSqlNext::GetSqlColumnQuery(RelEnt re, map<string,string> synEntMap)
+ColumnBuilderSqlNext::ColumnBuilderSqlNext(RelEnt re)
 {
-	string input1 = re.GetInput1();
-	string input2 = re.GetInput2();
-	bool input1IsSyn = (synEntMap.find(input1) != synEntMap.end());
-	bool input2IsSyn = (synEntMap.find(input2) != synEntMap.end());
-	input1 = re.GetInput1Unquoted();
-	input2 = re.GetInput2Unquoted();
+	_re = re;
+}
+
+string ColumnBuilderSqlNext::GetSqlQuery(RelEntDescriber red)
+{
+	string input1 = _re.GetInput1();
+	string input2 = _re.GetInput2();
+	bool input1IsSyn = red.Input1IsSyn();
+	bool input2IsSyn = red.Input2IsSyn();
+	input1 = _re.GetInput1Unquoted();
+	input2 = _re.GetInput2Unquoted();
 	if (input1IsSyn && input2IsSyn) { // (entity, entity)
 		return Build_StmtSynonym_StmtSynonym(input1, input2);
 	}
@@ -48,4 +53,5 @@ string ColumnBuilderSqlNext::GetSqlColumnQuery(RelEnt re, map<string,string> syn
 	else if (!input1IsSyn && !input2IsSyn) { // (10, 11)
 		return Build_StmtNotSynonym_StmtNotSynonym();
 	}
+	return string();
 }
