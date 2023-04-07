@@ -173,7 +173,7 @@ string Call::GetCallT_Synonym_Synonym(string frontSql) {
 string Call::GetCallT_Synonym_Specific(string frontSql, string input2) {
 	char sqlBuf[512] = {};
 	//sprintf_s(sqlBuf, " %s from call c where c.procedure_name in (select name from procedure) and c.variable_name = '%s'", frontSql.c_str(), input2.c_str());
-	sprintf_s(sqlBuf, " %s from (select caller, callee from call where caller = '%s'", frontSql.c_str(), input2.c_str());
+	sprintf_s(sqlBuf, " %s from (select caller, callee from call where callee = '%s')", frontSql.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
 

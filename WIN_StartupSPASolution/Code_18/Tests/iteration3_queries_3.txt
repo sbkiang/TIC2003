@@ -16,7 +16,7 @@ Select p such that Calls("readPoint",_)
 51 - such that Calls(computeCentroid,p)
 procedure p;
 Select p such that Calls("computeCentroid",p)
-readPoint
+readPoint, printResults
 5000
 52 - such that Calls(p,_)
 procedure p;
