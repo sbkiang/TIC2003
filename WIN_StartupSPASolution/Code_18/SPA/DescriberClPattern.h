@@ -1,8 +1,7 @@
 #pragma once
 #include "ClPattern.h"
-#include "IDescriberClPattern.h"
 
-class DescriberClPattern : public IDescriberClPattern {
+class DescriberClPattern {
 private:
 	bool _input1IsSyn = false;
 	bool _input1IsWildcard = false;

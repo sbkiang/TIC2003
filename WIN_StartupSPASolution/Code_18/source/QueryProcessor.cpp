@@ -68,7 +68,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	vector<string> tokens;
 	tk.tokenize(query, tokens);
 	map<string, string> synonymEntityMap; // map the synonym to entity
-	stack<ClRelation> relEntStack;
+	stack<ClRelRef> relEntStack;
 	stack<ClPattern> patternStack;
 	Select select;	
 	for (int i = 0; i < tokens.size(); i++) {
@@ -108,7 +108,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			int comma = word.find(",");
 			string input1 = word.substr(0, comma);
 			string input2 = word.substr(comma + 1, word.length());
-			ClRelation re = ClRelation(relationship, input1, input2);
+			ClRelRef re = ClRelRef(relationship, input1, input2);
 			relEntStack.push(re);
 		}
 		else if (tokens[i] == "pattern") {
@@ -162,7 +162,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	Database::SelectPql(select, selectResultStore);
 	set<string> currentResultSetSynonym(select.synonym.begin(), select.synonym.end());
 	while (!relEntStack.empty()) {
-		ClRelation relEntTemp = relEntStack.top();
+		ClRelRef relEntTemp = relEntStack.top();
 		set<string> stSynonym;
 		string entityInput1 = "", entityInput2 = "", input1 = relEntTemp.GetInput1Unquoted(), input2 = relEntTemp.GetInput2Unquoted();
 		bool input1Quoted = (relEntTemp.GetInput1()[0] == '"');
@@ -186,7 +186,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 
 		string relationship = relEntTemp.GetRelationship();
 		string colSql, querySql, sql;
-		DescriberClRelation relEntDescriber = DescriberClRelation(relEntTemp, synonymEntityMap);
+		DescriberClRelRef relEntDescriber = DescriberClRelRef(relEntTemp, synonymEntityMap);
 		if (relationship == "Uses") { // input1 is Stmt Num or Name, input2 is Name
 			ColumnBuilderSqlUses colBuilder = ColumnBuilderSqlUses(relEntTemp);
 			colSql = colBuilder.GetSqlQuery(relEntDescriber);
@@ -489,7 +489,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		}
 		else if (relationship == "Next*"){
 			ColumnBuilderSqlNext colBuilderNext = ColumnBuilderSqlNext(relEntTemp);
-			sql = colBuilderNext.GetSqlQuery(relEntDescriber);
+			colSql = colBuilderNext.GetSqlQuery(relEntDescriber);
 			
 			QueryBuilderSqlNextT queryBuilder = QueryBuilderSqlNextT(relEntTemp);
 			querySql = queryBuilder.GetSqlQuery(relEntDescriber);
@@ -534,7 +534,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		}
 		else if (relationship == "Calls") {
 			ColumnBuilderSqlCalls colBuilderNext = ColumnBuilderSqlCalls(relEntTemp);
-			sql = colBuilderNext.GetSqlQuery(relEntDescriber);
+			colSql = colBuilderNext.GetSqlQuery(relEntDescriber);
 			
 			QueryBuilderSqlCalls queryBuilder = QueryBuilderSqlCalls(relEntTemp);
 			querySql = queryBuilder.GetSqlQuery(relEntDescriber);
@@ -580,7 +580,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		}
 		else if (relationship == "Calls*") {
 			ColumnBuilderSqlCalls colBuilderNext = ColumnBuilderSqlCalls(relEntTemp);
-			sql = colBuilderNext.GetSqlQuery(relEntDescriber);
+			colSql = colBuilderNext.GetSqlQuery(relEntDescriber);
 			
 			QueryBuilderSqlCallsT queryBuilder = QueryBuilderSqlCallsT(relEntTemp);
 			querySql = queryBuilder.GetSqlQuery(relEntDescriber);
@@ -658,29 +658,38 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 
 	while (!patternStack.empty()) {
 		ClPattern patternTemp = patternStack.top();
+		DescriberClPattern patternDescriber = DescriberClPattern(patternTemp, synonymEntityMap);
+		ColumnBuilderSqlPattern colBuilderPattern = ColumnBuilderSqlPattern(patternTemp);
+		string colSql = colBuilderPattern.GetSqlQuery(patternDescriber);
+
+		QueryBuilderSqlPattern queryBuilder = QueryBuilderSqlPattern(patternTemp);
+		string querySql = queryBuilder.GetSqlQuery(patternDescriber);
+
+		string sql = HelperFunction::RelRefSqlBuilder(colSql, querySql);
+
 		string synonym = patternTemp.GetSynonym(), input1 = patternTemp.GetInput1Unquoted(), input2 = patternTemp.GetInput2Unquoted();
 		bool input1Quoted = (patternTemp.GetInput1()[0] == '"');
 		bool input1IsSynonym = (synonymEntityMap.find(input1) != synonymEntityMap.end() && !input1Quoted);
 		bool patternSynonymInSelect = (find(select.synonym.begin(), select.synonym.end(), patternTemp.GetSynonym()) != select.synonym.end());
-		string sql;
 		set<string> ptSynonym;
 		ptSynonym.insert(synonym);
-		if (input1IsSynonym) {
-			sql = ClausePattern::PatternConstruct_Synonym(synonym, input1);
+		string sqlOld;
+		if (patternDescriber.Input1IsSyn()) {
+			sqlOld = ClausePattern::PatternConstruct_Synonym(synonym, input1);
 			ptSynonym.insert(input1);
 		}
 		else {
-			sql = ClausePattern::PatternConstruct_NotSynonym(synonym);
+			sqlOld = ClausePattern::PatternConstruct_NotSynonym(synonym);
 		}
 		bool input1IsAny = (input1IsSynonym || input1 == "_");
 		input1 = HelperFunction::ConvertPqlPatternOprtToSqlPatternOprt(input1);
 		input2 = HelperFunction::PatternExprToPostFix(input2);
 		input2 = HelperFunction::ConvertPqlPatternOprtToSqlPatternOprt(input2);
 		if (input1IsAny) {
-			sql = ClausePattern::GetPattern_Any_Expr(sql, input2);
+			sqlOld = ClausePattern::GetPattern_Any_Expr(sqlOld, input2);
 		}
 		else {
-			sql = ClausePattern::GetPattern_NotAny_Expr(sql, input1, input2);
+			sqlOld = ClausePattern::GetPattern_NotAny_Expr(sqlOld, input1, input2);
 		}
 		SqlResultStore patternResultStore;
 		Database::ExecuteSql(sql, patternResultStore);

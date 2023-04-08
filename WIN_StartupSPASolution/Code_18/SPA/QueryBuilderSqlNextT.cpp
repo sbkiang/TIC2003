@@ -131,12 +131,12 @@ string QueryBuilderSqlNextT::Build_Specific_Synonym(string line_num, string enti
 	return string(sqlBuf);
 }
 
-QueryBuilderSqlNextT::QueryBuilderSqlNextT(ClRelation re)
+QueryBuilderSqlNextT::QueryBuilderSqlNextT(ClRelRef re)
 {
     _re = re;
 }
 
-string QueryBuilderSqlNextT::GetSqlQuery(DescriberClRelation describer)
+string QueryBuilderSqlNextT::GetSqlQuery(DescriberClRelRef describer)
 {
 	bool input1IsAny = describer.Input1IsAny();
 	bool input2IsAny = describer.Input2IsAny();

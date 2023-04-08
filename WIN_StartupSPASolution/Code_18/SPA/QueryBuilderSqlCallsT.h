@@ -1,14 +1,12 @@
 #pragma once
-#include <string>
-#include <map>
-#include "IQueryBuilderSqlRelRef.h"
+#include "IBuilderSqlRelRef.h"
 
 using namespace std;
 
 //Interface class for all the relationship's QueryBuilders (the part where we select the columns from table)
-class QueryBuilderSqlCallsT : IQueryBuilderSqlRelRef {
+class QueryBuilderSqlCallsT : IBuilderSqlRelRef {
 private:
-	ClRelation _re;
+	ClRelRef _re;
 
 	// Call*(procedure, procedure)
 	string Build_Synonym_Synonym();
@@ -38,6 +36,6 @@ private:
 	string Build_Specific_Specific(string input1, string input2);
 
 public:
-	QueryBuilderSqlCallsT(ClRelation re);
-	string GetSqlQuery(DescriberClRelation describer);
+	QueryBuilderSqlCallsT(ClRelRef re);
+	string GetSqlQuery(DescriberClRelRef describer);
 };

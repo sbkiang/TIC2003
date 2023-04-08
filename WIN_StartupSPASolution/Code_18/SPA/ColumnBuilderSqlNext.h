@@ -1,9 +1,9 @@
 #pragma once
-#include "IColumnBuilderSqlRelRef.h"
+#include "IBuilderSqlRelRef.h"
 
-class ColumnBuilderSqlNext : public IColumnBuilderSqlRelRef{
+class ColumnBuilderSqlNext : public IBuilderSqlRelRef {
 private:
-	ClRelation _re;
+	ClRelRef _re;
 	
 	string Build_StmtSynonym_StmtSynonym(string syn1, string syn2);
 	string Build_StmtSynonym_StmtNotSynonym(string syn1);
@@ -11,6 +11,6 @@ private:
 	string Build_StmtNotSynonym_StmtNotSynonym();
 
 public:
-	ColumnBuilderSqlNext(ClRelation re);
-	string GetSqlQuery(DescriberClRelation describer);
+	ColumnBuilderSqlNext(ClRelRef re);
+	string GetSqlQuery(DescriberClRelRef describer);
 };

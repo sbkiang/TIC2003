@@ -64,12 +64,12 @@ string ColumnBuilderSqlModifies::Build_NameNotSynonym_NameNotSynonym()
 	return string(sql);
 }
 
-ColumnBuilderSqlModifies::ColumnBuilderSqlModifies(ClRelation re)
+ColumnBuilderSqlModifies::ColumnBuilderSqlModifies(ClRelRef re)
 {
 	_re = re;
 }
 
-string ColumnBuilderSqlModifies::GetSqlQuery(DescriberClRelation describer)
+string ColumnBuilderSqlModifies::GetSqlQuery(DescriberClRelRef describer)
 {
 	string input1 = _re.GetInput1();
 	string input2 = _re.GetInput2();

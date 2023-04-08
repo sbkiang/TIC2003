@@ -127,12 +127,12 @@ string QueryBuilderSqlUses::Build_SpecificWhileIf_Specific(string input1, string
 	return string(sqlBuf);
 }
 
-QueryBuilderSqlUses::QueryBuilderSqlUses(ClRelation re)
+QueryBuilderSqlUses::QueryBuilderSqlUses(ClRelRef re)
 {
 	_re = re;
 }
 
-string QueryBuilderSqlUses::GetSqlQuery(DescriberClRelation describer) {
+string QueryBuilderSqlUses::GetSqlQuery(DescriberClRelRef describer) {
 	bool input1IsAny = describer.Input1IsAny();
 	bool input2IsAny = describer.Input2IsAny();
 	string input1 = _re.GetInput1Unquoted();

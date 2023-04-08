@@ -1,5 +1,9 @@
 #include "ClPattern.h"
 
+ClPattern::ClPattern() {
+
+}
+
 ClPattern::ClPattern(string syn, string input1, string input2)
 {
 	_synonym = syn;

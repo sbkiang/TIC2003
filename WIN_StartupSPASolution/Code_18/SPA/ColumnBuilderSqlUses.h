@@ -1,10 +1,10 @@
 #pragma once
-#include "IColumnBuilderSqlRelRef.h"
+#include "IBuilderSqlRelRef.h"
 #include <regex>
 
-class ColumnBuilderSqlUses : public IColumnBuilderSqlRelRef{
+class ColumnBuilderSqlUses : public IBuilderSqlRelRef {
 private:
-	ClRelation _re;
+	ClRelRef _re;
 
 	// Stmt - Name
 	string Build_StmtSynonym_NameSynonym(string syn1, string syn2);
@@ -19,6 +19,6 @@ private:
 	string Build_NameNotSynonym_NameNotSynonym();
 
 public:
-	ColumnBuilderSqlUses(ClRelation re);
-	string GetSqlQuery(DescriberClRelation describer);
+	ColumnBuilderSqlUses(ClRelRef re);
+	string GetSqlQuery(DescriberClRelRef describer);
 };

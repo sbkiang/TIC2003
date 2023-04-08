@@ -28,12 +28,12 @@ string ColumnBuilderSqlNext::Build_StmtNotSynonym_StmtNotSynonym()
 	return string(sqlBuf);
 }
 
-ColumnBuilderSqlNext::ColumnBuilderSqlNext(ClRelation re)
+ColumnBuilderSqlNext::ColumnBuilderSqlNext(ClRelRef re)
 {
 	_re = re;
 }
 
-string ColumnBuilderSqlNext::GetSqlQuery(DescriberClRelation describer)
+string ColumnBuilderSqlNext::GetSqlQuery(DescriberClRelRef describer)
 {
 	string input1 = _re.GetInput1();
 	string input2 = _re.GetInput2();

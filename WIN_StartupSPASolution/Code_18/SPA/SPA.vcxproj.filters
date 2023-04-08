@@ -108,22 +108,22 @@
     <ClCompile Include="QueryBuilderSqlCallsT.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DescriberClRelation.cpp">
+    <ClCompile Include="DescriberClRelRef.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ClPattern.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ClRelation.cpp">
+    <ClCompile Include="ClRelRef.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="IDescriberCl.h">
-      <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="DescriberClPattern.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ColumnBuilderSqlPattern.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="QueryBuilderSqlPattern.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -203,9 +203,6 @@
     <ClInclude Include="ColumnBuilderSqlCalls.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IQueryBuilderSqlRelRef.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="QueryBuilderSqlUses.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -233,25 +230,25 @@
     <ClInclude Include="ClPattern.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IBuilderSql.h">
+    <ClInclude Include="IBuilderSqlRelRef.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ClRelation.h">
+    <ClInclude Include="ClRelRef.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DescriberClPattern.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DescriberClRelation.h">
+    <ClInclude Include="DescriberClRelRef.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ColumnBuilderSqlPattern.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IDescriberClPattern.h">
+    <ClInclude Include="QueryBuilderSqlPattern.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IDescriberClRelation.h">
+    <ClInclude Include="IBuilderSqlPattern.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

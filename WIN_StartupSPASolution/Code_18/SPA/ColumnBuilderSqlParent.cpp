@@ -31,12 +31,12 @@ string ColumnBuilderSqlParent::Build_StmtNotSynonym_StmtNotSynonym()
 	return string(sql);
 }
 
-ColumnBuilderSqlParent::ColumnBuilderSqlParent(ClRelation re)
+ColumnBuilderSqlParent::ColumnBuilderSqlParent(ClRelRef re)
 {
 	_re = re;
 }
 
-string ColumnBuilderSqlParent::GetSqlQuery(DescriberClRelation describer)
+string ColumnBuilderSqlParent::GetSqlQuery(DescriberClRelRef describer)
 {
 	string input1 = _re.GetInput1();
 	string input2 = _re.GetInput2();

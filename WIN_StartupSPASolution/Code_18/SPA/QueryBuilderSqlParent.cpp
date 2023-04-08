@@ -62,12 +62,12 @@ string QueryBuilderSqlParent::Build_Specific_Specific(string input1, string inpu
 	return string(sqlBuf);
 }
 
-QueryBuilderSqlParent::QueryBuilderSqlParent(ClRelation re)
+QueryBuilderSqlParent::QueryBuilderSqlParent(ClRelRef re)
 {
     _re = re;
 }
 
-string QueryBuilderSqlParent::GetSqlQuery(DescriberClRelation describer)
+string QueryBuilderSqlParent::GetSqlQuery(DescriberClRelRef describer)
 {
 	bool input1IsAny = describer.Input1IsAny();
 	bool input2IsAny = describer.Input2IsAny();
