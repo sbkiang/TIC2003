@@ -1,0 +1,6 @@
+..\Tests\iteration2a_source.txt ..\Tests\iteration2a_queries.txt ..\Tests\iteration2a_out.xml
+..\Tests\iteration2b_source.txt ..\Tests\iteration2b_queries.txt ..\Tests\iteration2b_out.xml
+..\Tests\iteration2c_source.txt ..\Tests\iteration2c_queries.txt ..\Tests\iteration2c_out.xml
+..\Tests\next_source.txt ..\Tests\next_queries.txt ..\Tests\next_out.xml
+..\Tests\next_source_2.txt ..\Tests\next_queries_2.txt ..\Tests\next_out_2.xml
+..\Tests\iteration1_own_source.txt ..\Tests\iteration1_own_queries.txt ..\Tests\iteration1_own_queries.xml
