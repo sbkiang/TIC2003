@@ -1,17 +1,15 @@
 #pragma once
-#include <string>
-#include "HelperFunction.h"
 
 using namespace std;
 
-class Pattern {
+class ClPattern {
 private:
 	string _synonym = "";
 	string _input1 = "";
 	string _input2 = "";
 
 public:
-	Pattern(string syn, string input1, string input2);
+	ClPattern(string syn, string input1, string input2);
 	string GetSynonym();
 	string GetInput1();
 	string GetInput2();
