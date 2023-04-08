@@ -4,65 +4,65 @@
 using namespace std;
 
 //Interface class for all the relationship's QueryBuilders (the part where we select the columns from table)
-class QueryBuilderSqlUses : IBuilderSqlRelRef {
+class BuilderQuerySqlModifies : IBuilderSqlRelRef {
 private:
 	ClRelRef _re;
 
-	// Uses(print/assign, var/_)
-	string Build_AnyPrintAssign_Any(string input1);
+	// Modifies(read/assign, var/_)
+	string Build_AnyReadAssign_Any(string input1);
 
-	// Uses(call, var/_)
+	// Modifies(call, var/_)
 	string Build_AnyCall_Any();
 
-	// Uses(procedure, var/_)
+	// Modifies(procedure, var/_)
 	string Build_AnyProcedure_Any();
 
-	// Uses(while/if, var/_)
+	// Modifies(while/if, var/_)
 	string Build_AnyWhileIf_Any(string input1);
 
-	// Uses(stmt/_, var/_)
+	// Modifies(stmt/_, var/_)
 	string Build_Any_Any();
 
-	// Uses(print/assign, "x")
-	string Build_AnyPrintAssign_Specific(string input1, string input2);
+	// Modifies(read/assign, "x")
+	string Build_AnyReadAssign_Specific(string input1, string input2);
 
-	// Uses(call, "x")
+	// Modifies(call, "x")
 	string Build_AnyCall_Specific(string input2);
 
-	// Uses(procedure, "x")
+	// Modifies(procedure, "x")
 	string Build_AnyProcedure_Specific(string input2);
 
-	// Uses(while/if, "x")
+	// Modifies(while/if, "x")
 	string Build_AnyWhileIf_Specific(string input1, string input2);
 
-	// Uses(stmt/_, "x")
+	// Modifies(stmt/_, "x)
 	string Build_Any_Specific(string input2);
 
-	// Uses(10, var/_) where 10 = print/assign
-	string Build_SpecificPrintAssign_Any(string input1);
+	// Modifies(10, var/_) where 10 = read/assign
+	string Build_SpecificReadAssign_Any(string input1);
 
-	// Uses(10, var/_) where 10 = call
+	// Modifies(10, var/_) where 10 = call
 	string Build_SpecificCall_Any(string input1);
 
-	// Uses("main", var/_)
+	// Modifies("main", var/_)
 	string Build_SpecificProcedure_Any(string input1);
 
-	// Uses("10", var/_) where 10 = while/if
+	// Modifies("10", var/_) where 10 = while/if
 	string Build_SpecificWhileIf_Any(string input1);
 
-	// Uses(10, "x") where 10 = print/assign
-	string Build_SpecificPrintAssign_Specific(string input1, string input2);
+	// Modifies(10, "x") where 10 = read/assign
+	string Build_SpecificReadAssign_Specific(string input1, string input2);
 
-	// Uses(10, "x") where 10 = call
+	// Modifies(10, var/_) where 10 = call
 	string Build_SpecificCall_Specific(string input1, string input2);
 
-	// Uses("main", "x")
+	// Modifies("main", var/_)
 	string Build_SpecificProcedure_Specific(string input1, string input2);
 
-	// Uses("10", "x") where 10 = while/if
+	// Modifies("10", var/_) where 10 = while/if
 	string Build_SpecificWhileIf_Specific(string input1, string input2);
 
 public:
-	QueryBuilderSqlUses(ClRelRef re);
+	BuilderQuerySqlModifies(ClRelRef re);
 	string GetSqlQuery(DescriberClRelRef describer);
 };

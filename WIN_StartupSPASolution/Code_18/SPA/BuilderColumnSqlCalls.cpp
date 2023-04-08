@@ -1,7 +1,7 @@
-#include "ColumnBuilderSqlCalls.h"
+#include "BuilderColumnSqlCalls.h"
 
 // Call(procedure, procedure)
-string ColumnBuilderSqlCalls::Build_NameSynonym_NameSynonym(string input1, string input2)
+string BuilderColumnSqlCalls::Build_NameSynonym_NameSynonym(string input1, string input2)
 {
 	char sql[100] = {};
 	sprintf_s(sql, "select distinct caller as %s, callee as %s", input1.c_str(), input2.c_str());
@@ -9,7 +9,7 @@ string ColumnBuilderSqlCalls::Build_NameSynonym_NameSynonym(string input1, strin
 }
 
 // Call(procedure, "Second"/_)
-string ColumnBuilderSqlCalls::Build_NameSynonym_NameNotSynonym(string input1)
+string BuilderColumnSqlCalls::Build_NameSynonym_NameNotSynonym(string input1)
 {
 	char sql[100] = {};
 	sprintf_s(sql, "select distinct caller as %s", input1.c_str());
@@ -17,7 +17,7 @@ string ColumnBuilderSqlCalls::Build_NameSynonym_NameNotSynonym(string input1)
 }
 
 // Call("First"/_, procedure)
-string ColumnBuilderSqlCalls::Build_NameNotSynonym_NameSynonym(string input2)
+string BuilderColumnSqlCalls::Build_NameNotSynonym_NameSynonym(string input2)
 {
 	char sql[100] = {};
 	sprintf_s(sql, "select distinct callee as %s", input2.c_str());
@@ -25,19 +25,19 @@ string ColumnBuilderSqlCalls::Build_NameNotSynonym_NameSynonym(string input2)
 }
 
 // Call("First"/_, "Second"/_)
-string ColumnBuilderSqlCalls::Build_NameNotSynonym_NameNotSynonym()
+string BuilderColumnSqlCalls::Build_NameNotSynonym_NameNotSynonym()
 {
 	char sql[100] = {};
 	sprintf_s(sql, "select distinct caller, callee");
 	return string(sql);
 }
 
-ColumnBuilderSqlCalls::ColumnBuilderSqlCalls(ClRelRef re)
+BuilderColumnSqlCalls::BuilderColumnSqlCalls(ClRelRef re)
 {
 	_re = re;
 }
 
-string ColumnBuilderSqlCalls::GetSqlQuery(DescriberClRelRef describer)
+string BuilderColumnSqlCalls::GetSqlQuery(DescriberClRelRef describer)
 {
 	string input1 = _re.GetInput1();
 	string input2 = _re.GetInput2();

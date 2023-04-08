@@ -1,74 +1,74 @@
-#include "QueryBuilderSqlNext.h"
+#include "BuilderQuerySqlNext.h"
 
-string QueryBuilderSqlNext::Build_Any_Any()
+string BuilderQuerySqlNext::Build_Any_Any()
 {
 	char sqlBuf[512];
 	sprintf_s(sqlBuf, "select * from next");
 	return string(sqlBuf);
 }
 
-string QueryBuilderSqlNext::Build_Any_Specific(string input2)
+string BuilderQuerySqlNext::Build_Any_Specific(string input2)
 {
 	char sqlBuf[512];
 	sprintf_s(sqlBuf, "select * from next where to_line = %s", input2.c_str());
 	return string(sqlBuf);
 }
 
-string QueryBuilderSqlNext::Build_Any_Synonym(string input2)
+string BuilderQuerySqlNext::Build_Any_Synonym(string input2)
 {
 	char sqlBuf[512];
 	sprintf_s(sqlBuf, "select * from next where to_line in (select line_num from statement where entity = '%s')", input2.c_str());
 	return string(sqlBuf);
 }
 
-string QueryBuilderSqlNext::Build_Synonym_Any(string input1)
+string BuilderQuerySqlNext::Build_Synonym_Any(string input1)
 {
 	char sqlBuf[512];
 	sprintf_s(sqlBuf, "select * from next where from_line in (select line_num from statement where entity = '%s')", input1.c_str());
 	return string(sqlBuf);
 }
 
-string QueryBuilderSqlNext::Build_Synonym_Synonym(string input1, string input2)
+string BuilderQuerySqlNext::Build_Synonym_Synonym(string input1, string input2)
 {
 	char sqlBuf[512];
 	sprintf_s(sqlBuf, "select * from next where from_line in (select line_num from statement s where s.entity = '%s') and to_line in (select line_num from statement where entity = '%s')", input1.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
 
-string QueryBuilderSqlNext::Build_Synonym_Specific(string input1, string input2)
+string BuilderQuerySqlNext::Build_Synonym_Specific(string input1, string input2)
 {
 	char sqlBuf[512];
 	sprintf_s(sqlBuf, "select * from next where from_line in (select line_num from statement where entity = '%s') and to_line = %s", input1.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
 
-string QueryBuilderSqlNext::Build_Specific_Any(string input1)
+string BuilderQuerySqlNext::Build_Specific_Any(string input1)
 {
 	char sqlBuf[512];
 	sprintf_s(sqlBuf, "select * from next where from_line = %s)", input1.c_str());
 	return string(sqlBuf);
 }
 
-string QueryBuilderSqlNext::Build_Specific_Specific(string input1, string input2)
+string BuilderQuerySqlNext::Build_Specific_Specific(string input1, string input2)
 {
 	char sqlBuf[512];
 	sprintf_s(sqlBuf, "select * from next where from_line = %s and to_line = %s)", input1.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
 
-string QueryBuilderSqlNext::Build_Specific_Synonym(string input1, string input2)
+string BuilderQuerySqlNext::Build_Specific_Synonym(string input1, string input2)
 {
 	char sqlBuf[512];
 	sprintf_s(sqlBuf, "select * from next where from_line = %s and to_line in (select line_num from statement where entity = '%s')", input1.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
 
-QueryBuilderSqlNext::QueryBuilderSqlNext(ClRelRef re)
+BuilderQuerySqlNext::BuilderQuerySqlNext(ClRelRef re)
 {
     _re = re;
 }
 
-string QueryBuilderSqlNext::GetSqlQuery(DescriberClRelRef describer)
+string BuilderQuerySqlNext::GetSqlQuery(DescriberClRelRef describer)
 {
 	bool input1IsAny = describer.Input1IsAny();
 	bool input2IsAny = describer.Input2IsAny();

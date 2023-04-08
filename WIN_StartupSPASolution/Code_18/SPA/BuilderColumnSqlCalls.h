@@ -1,7 +1,7 @@
 #pragma once
 #include "IBuilderSqlRelRef.h"
 
-class ColumnBuilderSqlCalls : public IBuilderSqlRelRef {
+class BuilderColumnSqlCalls : public IBuilderSqlRelRef {
 private:
 	ClRelRef _re;
 
@@ -11,6 +11,6 @@ private:
 	string Build_NameNotSynonym_NameNotSynonym();
 
 public:
-	ColumnBuilderSqlCalls(ClRelRef re);
+	BuilderColumnSqlCalls(ClRelRef re);
 	string GetSqlQuery(DescriberClRelRef describer);
 };

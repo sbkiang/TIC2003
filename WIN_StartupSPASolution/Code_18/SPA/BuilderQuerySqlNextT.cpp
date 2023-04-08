@@ -1,6 +1,6 @@
-#include "QueryBuilderSqlNextT.h"
+#include "BuilderQuerySqlNextT.h"
 
-string QueryBuilderSqlNextT::Build_Any_Any()
+string BuilderQuerySqlNextT::Build_Any_Any()
 {
 	char sqlBuf[512];
 	sprintf_s(sqlBuf, "with recursive nextT as ("
@@ -11,7 +11,7 @@ string QueryBuilderSqlNextT::Build_Any_Any()
 	return string(sqlBuf);
 }
 
-string QueryBuilderSqlNextT::Build_Any_Specific(string input2)
+string BuilderQuerySqlNextT::Build_Any_Specific(string input2)
 {
 	char sqlBuf[512];
 	sprintf_s(sqlBuf, "with recursive nextT as ("
@@ -22,7 +22,7 @@ string QueryBuilderSqlNextT::Build_Any_Specific(string input2)
 	return string(sqlBuf);
 }
 
-string QueryBuilderSqlNextT::Build_Any_Synonym(string input2)
+string BuilderQuerySqlNextT::Build_Any_Synonym(string input2)
 {
 	char sqlBuf[512];
 	sprintf_s(sqlBuf, "with recursive nextT as ("
@@ -33,7 +33,7 @@ string QueryBuilderSqlNextT::Build_Any_Synonym(string input2)
 	return string(sqlBuf);
 }
 
-string QueryBuilderSqlNextT::Build_Synonym_Any(string input1)
+string BuilderQuerySqlNextT::Build_Synonym_Any(string input1)
 {
 	char sqlBuf[512];
 	sprintf_s(sqlBuf, "with recursive nextT as ("
@@ -44,7 +44,7 @@ string QueryBuilderSqlNextT::Build_Synonym_Any(string input1)
 	return string(sqlBuf);
 }
 
-string QueryBuilderSqlNextT::Build_Synonym_Synonym(string input1, string input2)
+string BuilderQuerySqlNextT::Build_Synonym_Synonym(string input1, string input2)
 {
 	char sqlBuf[600];
 	sprintf_s(sqlBuf, "select * from ("
@@ -63,7 +63,7 @@ string QueryBuilderSqlNextT::Build_Synonym_Synonym(string input1, string input2)
 	return string(sqlBuf);
 }
 
-string QueryBuilderSqlNextT::Build_Synonym_Specific(string input1, string input2)
+string BuilderQuerySqlNextT::Build_Synonym_Specific(string input1, string input2)
 {
 	char sqlBuf[512];
 	sprintf_s(sqlBuf, "select * from ("
@@ -82,7 +82,7 @@ string QueryBuilderSqlNextT::Build_Synonym_Specific(string input1, string input2
 	return(sqlBuf);
 }
 
-string QueryBuilderSqlNextT::Build_Specific_Any(string input1)
+string BuilderQuerySqlNextT::Build_Specific_Any(string input1)
 {
 	char sqlBuf[512];
 	sprintf_s(sqlBuf, "with recursive nextT as ( "
@@ -93,7 +93,7 @@ string QueryBuilderSqlNextT::Build_Specific_Any(string input1)
 	return string(sqlBuf);
 }
 
-string QueryBuilderSqlNextT::Build_Specific_Specific(string input1, string input2)
+string BuilderQuerySqlNextT::Build_Specific_Specific(string input1, string input2)
 {
 	char sqlBuf[512];
 	sprintf_s(sqlBuf, "select * from ("
@@ -112,7 +112,7 @@ string QueryBuilderSqlNextT::Build_Specific_Specific(string input1, string input
 	return string(sqlBuf);
 }
 
-string QueryBuilderSqlNextT::Build_Specific_Synonym(string line_num, string entity)
+string BuilderQuerySqlNextT::Build_Specific_Synonym(string line_num, string entity)
 {
 	char sqlBuf[600];
 	sprintf_s(sqlBuf, "select * from ("
@@ -131,12 +131,12 @@ string QueryBuilderSqlNextT::Build_Specific_Synonym(string line_num, string enti
 	return string(sqlBuf);
 }
 
-QueryBuilderSqlNextT::QueryBuilderSqlNextT(ClRelRef re)
+BuilderQuerySqlNextT::BuilderQuerySqlNextT(ClRelRef re)
 {
     _re = re;
 }
 
-string QueryBuilderSqlNextT::GetSqlQuery(DescriberClRelRef describer)
+string BuilderQuerySqlNextT::GetSqlQuery(DescriberClRelRef describer)
 {
 	bool input1IsAny = describer.Input1IsAny();
 	bool input2IsAny = describer.Input2IsAny();

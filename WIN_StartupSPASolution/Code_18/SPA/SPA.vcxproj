@@ -16,6 +16,12 @@
     <ClCompile Include="..\source\SourceProcessor.cpp" />
     <ClCompile Include="..\source\sqlite3.c" />
     <ClCompile Include="..\source\Tokenizer.cpp" />
+    <ClCompile Include="BuilderColumnSqlCalls.cpp" />
+    <ClCompile Include="BuilderColumnSqlModifies.cpp" />
+    <ClCompile Include="BuilderColumnSqlNext.cpp" />
+    <ClCompile Include="BuilderColumnSqlParent.cpp" />
+    <ClCompile Include="BuilderColumnSqlPattern.cpp" />
+    <ClCompile Include="BuilderColumnSqlUses.cpp" />
     <ClCompile Include="CFG.cpp" />
     <ClCompile Include="CFGBuilder.cpp" />
     <ClCompile Include="ClauseCall.cpp" />
@@ -23,15 +29,9 @@
     <ClCompile Include="ClausePattern.cpp" />
     <ClCompile Include="ClPattern.cpp" />
     <ClCompile Include="ClRelRef.cpp" />
-    <ClCompile Include="ColumnBuilderSqlCalls.cpp" />
-    <ClCompile Include="ColumnBuilderSqlModifies.cpp" />
-    <ClCompile Include="ColumnBuilderSqlNext.cpp" />
-    <ClCompile Include="ColumnBuilderSqlPattern.cpp" />
-    <ClCompile Include="ColumnBuilderSqlUses.cpp" />
     <ClCompile Include="Container.cpp" />
     <ClCompile Include="DescriberClPattern.cpp" />
     <ClCompile Include="HelperFunction.cpp" />
-    <ClCompile Include="ColumnBuilderSqlParent.cpp" />
     <ClCompile Include="Procedure.cpp" />
     <ClCompile Include="ClauseModifies.cpp" />
     <ClCompile Include="ClauseParent.cpp" />
@@ -55,6 +55,9 @@
     <ClInclude Include="..\source\SourceProcessor.h" />
     <ClInclude Include="..\source\sqlite3.h" />
     <ClInclude Include="..\source\Tokenizer.h" />
+    <ClInclude Include="BuilderColumnSqlParent.h" />
+    <ClInclude Include="BuilderColumnSqlPattern.h" />
+    <ClInclude Include="BuilderColumnSqlUses.h" />
     <ClInclude Include="CFG.h" />
     <ClInclude Include="CFGBuilder.h" />
     <ClInclude Include="ClauseCall.h" />
@@ -62,10 +65,9 @@
     <ClInclude Include="ClausePattern.h" />
     <ClInclude Include="ClPattern.h" />
     <ClInclude Include="ClRelRef.h" />
-    <ClInclude Include="ColumnBuilderSqlCalls.h" />
-    <ClInclude Include="ColumnBuilderSqlModifies.h" />
-    <ClInclude Include="ColumnBuilderSqlNext.h" />
-    <ClInclude Include="ColumnBuilderSqlPattern.h" />
+    <ClInclude Include="BuilderColumnSqlCalls.h" />
+    <ClInclude Include="BuilderColumnSqlModifies.h" />
+    <ClInclude Include="BuilderColumnSqlNext.h" />
     <ClInclude Include="Container.h" />
     <ClInclude Include="DescriberClPattern.h" />
     <ClInclude Include="DescriberClRelRef.h" />
@@ -73,7 +75,6 @@
     <ClInclude Include="define.h" />
     <ClInclude Include="ClauseModifies.h" />
     <ClInclude Include="ClauseParent.h" />
-    <ClInclude Include="ColumnBuilderSqlParent.h" />
     <ClInclude Include="IBuilderSqlPattern.h" />
     <ClInclude Include="IBuilderSqlRelRef.h" />
     <ClInclude Include="IColumnBuilderSqlRelRef.h" />
@@ -90,7 +91,6 @@
     <ClInclude Include="Statement.h" />
     <ClInclude Include="Struct.h" />
     <ClInclude Include="ClauseUses.h" />
-    <ClInclude Include="ColumnBuilderSqlUses.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{DC21A1EA-D2C6-4D14-A2B4-E025B64BDE81}</ProjectGuid>

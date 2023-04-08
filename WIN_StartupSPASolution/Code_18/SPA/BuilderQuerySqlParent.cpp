@@ -1,73 +1,73 @@
-#include "QueryBuilderSqlParent.h"
+#include "BuilderQuerySqlParent.h"
 
-string QueryBuilderSqlParent::Build_Any_Any() {
+string BuilderQuerySqlParent::Build_Any_Any() {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select p.line_num as parent, s.line_num as child from parent p join statement s on s.line_num between p.child_start and p.child_end where p.line_num = (select p.line_num from parent p where s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1)");
 	return string(sqlBuf);
 }
 
 // Parent(stmt/_, read/print/assign/while/if/call)
-string QueryBuilderSqlParent::Build_Any_Synonym(string input2) {
+string BuilderQuerySqlParent::Build_Any_Synonym(string input2) {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select p.line_num as parent, s.line_num as child from parent p join statement s on s.line_num between p.child_start and p.child_end and s.entity = '%s' and p.line_num = (select p.line_num from parent p where s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1)", input2.c_str());
 	return string(sqlBuf);
 }
 
 // Parent(stmt/_, 10)
-string QueryBuilderSqlParent::Build_Any_Specific(string input2) {
+string BuilderQuerySqlParent::Build_Any_Specific(string input2) {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select p.line_num as parent, s.line_num as child from parent p join statement s on s.line_num between p.child_start and p.child_end and s.line_num = %s order by p.line_num desc limit 1", input2.c_str());
 	return string(sqlBuf);
 }
 
 // Parent(while/if, stmt/_)
-string QueryBuilderSqlParent::Build_Synonym_Any(string input1) {
+string BuilderQuerySqlParent::Build_Synonym_Any(string input1) {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select p.line_num as parent, s.line_num as child from parent p join statement s on s.line_num between p.child_start and p.child_end where p.line_num in (select line_num from statement where entity = '%s') and p.line_num = (select p.line_num from parent p where s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1)", input1.c_str());
 	return string(sqlBuf);
 }
 
 // Parent(while/if, read/print/assign/while/if/call)
-string QueryBuilderSqlParent::Build_Synonym_Synonym(string input1, string input2) {
+string BuilderQuerySqlParent::Build_Synonym_Synonym(string input1, string input2) {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select p.line_num as parent, s.line_num as child from parent p join statement s on s.line_num between p.child_start and p.child_end where s.entity = '%s' and p.line_num in (select line_num from statement where entity = '%s') and p.line_num = (select p.line_num from parent p where s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1)", input2.c_str(), input1.c_str());
 	return string(sqlBuf);
 }
 
 // Parent(while/if, 10)
-string QueryBuilderSqlParent::Build_Synonym_Specific(string input1, string input2) {
+string BuilderQuerySqlParent::Build_Synonym_Specific(string input1, string input2) {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select p.line_num as parent, s.line_num as child from parent p join statement s on s.line_num between p.child_start and p.child_end where s.line_num = %s and p.line_num in (select line_num from statement where entity = '%s') and p.line_num = (select p.line_num from parent p where s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1)", input2.c_str(), input1.c_str());
 	return string(sqlBuf);
 }
 
 // Parent(10, stmt/_)
-string QueryBuilderSqlParent::Build_Specific_Any(string input1) {
+string BuilderQuerySqlParent::Build_Specific_Any(string input1) {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select p.line_num as parent, s.line_num as child from parent p join statement s on s.line_num between p.child_start and p.child_end where p.line_num = %s and p.line_num = (select p.line_num from parent p where s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1)", input1.c_str());
 	return string(sqlBuf);
 }
 
 // Parent(10, read/print/assign/while/if/call)
-string QueryBuilderSqlParent::Build_Specific_Synonym(string input1, string input2) {
+string BuilderQuerySqlParent::Build_Specific_Synonym(string input1, string input2) {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select p.line_num as parent, s.line_num as child from parent p join statement s on s.line_num between p.child_start and p.child_end where p.line_num = %s and s.entity = '%s' and p.line_num = (select p.line_num from parent p where s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1)", input1.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
 
 // Parent(10, 10)
-string QueryBuilderSqlParent::Build_Specific_Specific(string input1, string input2) {
+string BuilderQuerySqlParent::Build_Specific_Specific(string input1, string input2) {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select p.line_num as parent, s.line_num as child from parent p join statement s on s.line_num between p.child_start and p.child_end and p.line_num = %s and s.line_num = %s", input1.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
 
-QueryBuilderSqlParent::QueryBuilderSqlParent(ClRelRef re)
+BuilderQuerySqlParent::BuilderQuerySqlParent(ClRelRef re)
 {
     _re = re;
 }
 
-string QueryBuilderSqlParent::GetSqlQuery(DescriberClRelRef describer)
+string BuilderQuerySqlParent::GetSqlQuery(DescriberClRelRef describer)
 {
 	bool input1IsAny = describer.Input1IsAny();
 	bool input2IsAny = describer.Input2IsAny();

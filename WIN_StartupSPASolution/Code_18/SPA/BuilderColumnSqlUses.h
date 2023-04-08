@@ -2,7 +2,7 @@
 #include "IBuilderSqlRelRef.h"
 #include <regex>
 
-class ColumnBuilderSqlUses : public IBuilderSqlRelRef {
+class BuilderColumnSqlUses : public IBuilderSqlRelRef {
 private:
 	ClRelRef _re;
 
@@ -19,6 +19,6 @@ private:
 	string Build_NameNotSynonym_NameNotSynonym();
 
 public:
-	ColumnBuilderSqlUses(ClRelRef re);
+	BuilderColumnSqlUses(ClRelRef re);
 	string GetSqlQuery(DescriberClRelRef describer);
 };

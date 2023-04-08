@@ -1,118 +1,118 @@
-#include "QueryBuilderSqlUses.h"
+#include "BuilderQuerySqlUses.h"
 
-string QueryBuilderSqlUses::Build_AnyPrintAssign_Any(string input1)
+string BuilderQuerySqlUses::Build_AnyPrintAssign_Any(string input1)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select u.line_num, u.variable_name from use u join statement s on s.line_num = u.line_num where s.entity = '%s'", input1.c_str());
 	return string(sqlBuf);
 }
 
-string QueryBuilderSqlUses::Build_AnyCall_Any()
+string BuilderQuerySqlUses::Build_AnyCall_Any()
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select s.line_num, u.variable_name from statement s join use u on u.line_num between (select start from procedure where name = s.text) and (select end from procedure where name = s.text) where s.entity = 'call'");
 	return string(sqlBuf);
 }
 
-string QueryBuilderSqlUses::Build_AnyProcedure_Any()
+string BuilderQuerySqlUses::Build_AnyProcedure_Any()
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select p.name, u.variable_name from procedure p join use u on u.line_num between p.start and p.end");
 	return string(sqlBuf);
 }
 
-string QueryBuilderSqlUses::Build_AnyWhileIf_Any(string input1)
+string BuilderQuerySqlUses::Build_AnyWhileIf_Any(string input1)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select p.line_num, u.variable_name from parent p join statement s on s.line_num = p.line_num join use u on u.line_num between p.line_num and p.child_end where s.entity = '%s'", input1.c_str());
 	return string(sqlBuf);
 }
 
-string QueryBuilderSqlUses::Build_Any_Any()
+string BuilderQuerySqlUses::Build_Any_Any()
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select p.line_num, u.variable_name from parent p join use u on u.line_num between p.line_num and p.child_end union select line_num, variable_name from use");
 	return string(sqlBuf);
 }
 
-string QueryBuilderSqlUses::Build_AnyPrintAssign_Specific(string input1, string input2)
+string BuilderQuerySqlUses::Build_AnyPrintAssign_Specific(string input1, string input2)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select u.line_num, u.variable_name from use u join statement s on s.line_num = u.line_num where s.entity = '%s' and u.variable_name = '%s'", input1.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
 
-string QueryBuilderSqlUses::Build_AnyCall_Specific(string input2)
+string BuilderQuerySqlUses::Build_AnyCall_Specific(string input2)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select s.line_num, u.variable_name from statement s join use u on u.line_num between (select start from procedure where name = s.text) and (select end from procedure where name = s.text) where s.entity = 'call' and u.variable_name = '%s'", input2.c_str());
 	return string(sqlBuf);
 }
 
-string QueryBuilderSqlUses::Build_AnyProcedure_Specific(string input2)
+string BuilderQuerySqlUses::Build_AnyProcedure_Specific(string input2)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select p.name, u.variable_name from procedure p join use u on u.line_num between p.start and p.end where u.variable_name = '%s'", input2.c_str());
 	return string(sqlBuf);
 }
 
-string QueryBuilderSqlUses::Build_AnyWhileIf_Specific(string input1, string input2)
+string BuilderQuerySqlUses::Build_AnyWhileIf_Specific(string input1, string input2)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select p.line_num, u.variable_name from parent p join statement s on s.line_num = p.line_num join use u on u.line_num between p.line_num and p.child_end where s.entity = '%s' and u.variable_name = '%s'", input1.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
 
-string QueryBuilderSqlUses::Build_Any_Specific(string input2)
+string BuilderQuerySqlUses::Build_Any_Specific(string input2)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select p.line_num, u.variable_name from parent p join use u on u.line_num between p.line_num and p.child_end and u.variable_name = '%s' union select line_num, variable_name from use where variable_name = '%s'", input2.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
 
-string QueryBuilderSqlUses::Build_SpecificPrintAssign_Any(string input1)
+string BuilderQuerySqlUses::Build_SpecificPrintAssign_Any(string input1)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select u.line_num, u.variable_name from use u join statement s on s.line_num = u.line_num where s.line_num = %s", input1.c_str());
 	return string(sqlBuf);
 }
 
-string QueryBuilderSqlUses::Build_SpecificCall_Any(string input1)
+string BuilderQuerySqlUses::Build_SpecificCall_Any(string input1)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select s.line_num, u.variable_name from statement s join use u on u.line_num between (select start from procedure where name = s.text) and (select end from procedure where name = s.text) where s.line_num = %s", input1.c_str());
 	return string(sqlBuf);
 }
 
-string QueryBuilderSqlUses::Build_SpecificProcedure_Any(string input1)
+string BuilderQuerySqlUses::Build_SpecificProcedure_Any(string input1)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select p.name, u.variable_name from procedure p join use u on u.line_num between p.start and p.end where p.name = '%s'", input1.c_str());
 	return string(sqlBuf);
 }
 
-string QueryBuilderSqlUses::Build_SpecificWhileIf_Any(string input1)
+string BuilderQuerySqlUses::Build_SpecificWhileIf_Any(string input1)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select p.line_num, u.variable_name from parent p join use u on u.line_num between p.line_num and p.child_end where p.line_num = %s", input1.c_str());
 	return string(sqlBuf);
 }
 
-string QueryBuilderSqlUses::Build_SpecificPrintAssign_Specific(string input1, string input2)
+string BuilderQuerySqlUses::Build_SpecificPrintAssign_Specific(string input1, string input2)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select u.line_num, u.variable_name from use u join statement s on s.line_num = u.line_num where s.line_num = %s and u.variable_name = '%s'", input1.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
 
-string QueryBuilderSqlUses::Build_SpecificCall_Specific(string input1, string input2)
+string BuilderQuerySqlUses::Build_SpecificCall_Specific(string input1, string input2)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select s.line_num, u.variable_name from statement s join use u on u.line_num between (select start from procedure where name = s.text) and (select end from procedure where name = s.text) where s.line_num = %s where u.variable_name = '%s'", input1.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
 
-string QueryBuilderSqlUses::Build_SpecificProcedure_Specific(string input1, string input2)
+string BuilderQuerySqlUses::Build_SpecificProcedure_Specific(string input1, string input2)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select p.name, u.variable_name from procedure p join use u on u.line_num between p.start and p.end where p.name = '%s' and u.variable_name = '%s'", input1.c_str(), input2.c_str());
@@ -120,19 +120,19 @@ string QueryBuilderSqlUses::Build_SpecificProcedure_Specific(string input1, stri
 }
 
 
-string QueryBuilderSqlUses::Build_SpecificWhileIf_Specific(string input1, string input2)
+string BuilderQuerySqlUses::Build_SpecificWhileIf_Specific(string input1, string input2)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select p.line_num, u.variable_name from parent p join use u on u.line_num between p.line_num and p.child_end where p.line_num = %s and u.variable_name = '%s'", input1.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
 
-QueryBuilderSqlUses::QueryBuilderSqlUses(ClRelRef re)
+BuilderQuerySqlUses::BuilderQuerySqlUses(ClRelRef re)
 {
 	_re = re;
 }
 
-string QueryBuilderSqlUses::GetSqlQuery(DescriberClRelRef describer) {
+string BuilderQuerySqlUses::GetSqlQuery(DescriberClRelRef describer) {
 	bool input1IsAny = describer.Input1IsAny();
 	bool input2IsAny = describer.Input2IsAny();
 	string input1 = _re.GetInput1Unquoted();

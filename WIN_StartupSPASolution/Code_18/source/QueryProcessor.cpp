@@ -176,7 +176,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		}
 
 		if (relationship == "Uses") { // input1 is Stmt Num or Name, input2 is Name
-			ColumnBuilderSqlUses colBuilder = ColumnBuilderSqlUses(relRefTemp);
+			BuilderColumnSqlUses colBuilder = BuilderColumnSqlUses(relRefTemp);
 			colSql = colBuilder.GetSqlQuery(relEntDescriber);
 			
 			QueryBuilderSqlUses queryBuilder = QueryBuilderSqlUses(relRefTemp);
@@ -186,7 +186,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		}
 
  		else if (relationship == "Modifies") { // input1 is Stmt Num or Name, input2 is Name or Wildcard
-			ColumnBuilderSqlModifies colBuilder = ColumnBuilderSqlModifies(relRefTemp);
+			BuilderColumnSqlModifies colBuilder = BuilderColumnSqlModifies(relRefTemp);
 			colSql = colBuilder.GetSqlQuery(relEntDescriber);
 
 			QueryBuilderSqlModifies queryBuilder = QueryBuilderSqlModifies(relRefTemp);
@@ -196,7 +196,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		}
 
 		else if (relationship == "Parent") {
-			ColumnBuilderSqlParent colBuilder = ColumnBuilderSqlParent(relRefTemp);
+			BuilderColumnSqlParent colBuilder = BuilderColumnSqlParent(relRefTemp);
 			colSql = colBuilder.GetSqlQuery(relEntDescriber);
 
 			QueryBuilderSqlParent queryBuilder = QueryBuilderSqlParent(relRefTemp);
@@ -206,7 +206,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		}
 
 		else if (relationship == "Parent*") { // input1 is Stmt Num, input2 is Stmt Num
-			ColumnBuilderSqlParent colBuilder = ColumnBuilderSqlParent(relRefTemp);
+			BuilderColumnSqlParent colBuilder = BuilderColumnSqlParent(relRefTemp);
 			colSql = colBuilder.GetSqlQuery(relEntDescriber);
 			
 			QueryBuilderSqlParentT queryBuilder = QueryBuilderSqlParentT(relRefTemp);
@@ -216,7 +216,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		}
 			
 		else if (relationship == "Next") {
-			ColumnBuilderSqlNext colBuilderNext = ColumnBuilderSqlNext(relRefTemp);
+			BuilderColumnSqlNext colBuilderNext = BuilderColumnSqlNext(relRefTemp);
 			colSql = colBuilderNext.GetSqlQuery(relEntDescriber);
 			
 			QueryBuilderSqlNext queryBuilder = QueryBuilderSqlNext(relRefTemp);
@@ -225,7 +225,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			sql = HelperFunction::RelRefSqlBuilder(colSql, querySql);
 		}
 		else if (relationship == "Next*"){
-			ColumnBuilderSqlNext colBuilderNext = ColumnBuilderSqlNext(relRefTemp);
+			BuilderColumnSqlNext colBuilderNext = BuilderColumnSqlNext(relRefTemp);
 			colSql = colBuilderNext.GetSqlQuery(relEntDescriber);
 			
 			QueryBuilderSqlNextT queryBuilder = QueryBuilderSqlNextT(relRefTemp);
@@ -234,7 +234,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			sql = HelperFunction::RelRefSqlBuilder(colSql, querySql);
 		}
 		else if (relationship == "Calls") {
-			ColumnBuilderSqlCalls colBuilderNext = ColumnBuilderSqlCalls(relRefTemp);
+			BuilderColumnSqlCalls colBuilderNext = BuilderColumnSqlCalls(relRefTemp);
 			colSql = colBuilderNext.GetSqlQuery(relEntDescriber);
 			
 			QueryBuilderSqlCalls queryBuilder = QueryBuilderSqlCalls(relRefTemp);
@@ -243,7 +243,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			sql = HelperFunction::RelRefSqlBuilder(colSql, querySql);
 		}
 		else if (relationship == "Calls*") {
-			ColumnBuilderSqlCalls colBuilderNext = ColumnBuilderSqlCalls(relRefTemp);
+			BuilderColumnSqlCalls colBuilderNext = BuilderColumnSqlCalls(relRefTemp);
 			colSql = colBuilderNext.GetSqlQuery(relEntDescriber);
 			
 			QueryBuilderSqlCallsT queryBuilder = QueryBuilderSqlCallsT(relRefTemp);
@@ -284,7 +284,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	while (!patternStack.empty()) {
 		ClPattern patternTemp = patternStack.top();
 		DescriberClPattern patternDescriber = DescriberClPattern(patternTemp, synonymEntityMap);
-		ColumnBuilderSqlPattern colBuilderPattern = ColumnBuilderSqlPattern(patternTemp);
+		BuilderColumnSqlPattern colBuilderPattern = BuilderColumnSqlPattern(patternTemp);
 		string colSql = colBuilderPattern.GetSqlQuery(patternDescriber);
 
 		QueryBuilderSqlPattern queryBuilder = QueryBuilderSqlPattern(patternTemp);

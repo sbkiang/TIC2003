@@ -1,7 +1,7 @@
 #pragma once
 #include "IBuilderSqlPattern.h"
 
-class ColumnBuilderSqlPattern : IBuilderSqlPattern {
+class BuilderColumnSqlPattern : IBuilderSqlPattern {
 private:
 	ClPattern _cp;
 
@@ -12,6 +12,6 @@ private:
 	string Build_NotSynonym(string selectSynonym);
 
 public:
-	ColumnBuilderSqlPattern(ClPattern cp);
+	BuilderColumnSqlPattern(ClPattern cp);
 	string GetSqlQuery(DescriberClPattern dcp);
 };

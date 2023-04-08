@@ -1,74 +1,74 @@
-#include "QueryBuilderSqlParentT.h"
+#include "BuilderQuerySqlParentT.h"
 
-string QueryBuilderSqlParentT::Build_Any_Any()
+string BuilderQuerySqlParentT::Build_Any_Any()
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select p.line_num as parent, s.line_num as child from parent p join statement s on s.line_num between p.child_start and p.child_end");
 	return string(sqlBuf);
 }
 
-string QueryBuilderSqlParentT::Build_Any_Synonym(string input2)
+string BuilderQuerySqlParentT::Build_Any_Synonym(string input2)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select p.line_num as parent, s.line_num as child from parent p join statement s on s.line_num between p.child_start and p.child_end and s.entity = '%s'", input2.c_str());
 	return string(sqlBuf);
 }
 
-string QueryBuilderSqlParentT::Build_Any_Specific(string input2)
+string BuilderQuerySqlParentT::Build_Any_Specific(string input2)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select p.line_num as parent, s.line_num as child from parent p join statement s on s.line_num between p.child_start and p.child_end and s.line_num = %s", input2.c_str());
 	return string(sqlBuf);
 }
 
-string QueryBuilderSqlParentT::Build_Synonym_Any(string input1)
+string BuilderQuerySqlParentT::Build_Synonym_Any(string input1)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select p.line_num as parent, s.line_num as child from parent p join statement s on s.line_num between p.child_start and p.child_end where p.line_num in (select line_num from statement where entity = '%s')", input1.c_str());
 	return string(sqlBuf);
 }
 
-string QueryBuilderSqlParentT::Build_Synonym_Synonym(string input1, string input2)
+string BuilderQuerySqlParentT::Build_Synonym_Synonym(string input1, string input2)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select p.line_num as parent, s.line_num as child from parent p join statement s on s.line_num between p.child_start and p.child_end where s.entity = '%s' and p.line_num in (select line_num from statement where entity = '%s')", input2.c_str(), input1.c_str());
 	return string(sqlBuf);
 }
 
-string QueryBuilderSqlParentT::Build_Synonym_Specific(string input1, string input2)
+string BuilderQuerySqlParentT::Build_Synonym_Specific(string input1, string input2)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select p.line_num as parent, s.line_num as child from parent p join statement s on s.line_num between p.child_start and p.child_end where s.line_num = %s and p.line_num in (select line_num from statement where entity = '%s')", input2.c_str(), input1.c_str());
 	return string(sqlBuf);
 }
 
-string QueryBuilderSqlParentT::Build_Specific_Any(string input1)
+string BuilderQuerySqlParentT::Build_Specific_Any(string input1)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select p.line_num as parent, s.line_num as child from parent p join statement s on s.line_num between p.child_start and p.child_end where p.line_num = %s", input1.c_str());
 	return string(sqlBuf);
 }
 
-string QueryBuilderSqlParentT::Build_Specific_Synonym(string input1, string input2)
+string BuilderQuerySqlParentT::Build_Specific_Synonym(string input1, string input2)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select p.line_num as parent, s.line_num as child from parent p join statement s on s.line_num between p.child_start and p.child_end where p.line_num = %s and s.entity = '%s'", input1.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
 
-string QueryBuilderSqlParentT::Build_Specific_Specific(string input1, string input2)
+string BuilderQuerySqlParentT::Build_Specific_Specific(string input1, string input2)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select p.line_num as parent, s.line_num as child from parent p join statement s on s.line_num between p.child_start and p.child_end and p.line_num = %s and s.line_num = %s", input1.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
 
-QueryBuilderSqlParentT::QueryBuilderSqlParentT(ClRelRef re)
+BuilderQuerySqlParentT::BuilderQuerySqlParentT(ClRelRef re)
 {
 	_re = re;
 }
 
-string QueryBuilderSqlParentT::GetSqlQuery(DescriberClRelRef describer)
+string BuilderQuerySqlParentT::GetSqlQuery(DescriberClRelRef describer)
 {
 	bool input1IsAny = describer.Input1IsAny();
 	bool input2IsAny = describer.Input2IsAny();
