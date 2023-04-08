@@ -1,4 +1,6 @@
 #pragma once
+#include <string>
+#include "HelperFunction.h"
 
 using namespace std;
 
@@ -7,7 +9,6 @@ private:
 	string _relationship;
 	string _input1;
 	string _input2;
-
 public:
 	ClRelation();
 	ClRelation(string relationship, string input1, string input2);

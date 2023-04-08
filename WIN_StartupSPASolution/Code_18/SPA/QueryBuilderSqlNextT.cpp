@@ -131,51 +131,51 @@ string QueryBuilderSqlNextT::Build_Specific_Synonym(string line_num, string enti
 	return string(sqlBuf);
 }
 
-QueryBuilderSqlNextT::QueryBuilderSqlNextT(RelEnt re)
+QueryBuilderSqlNextT::QueryBuilderSqlNextT(ClRelation re)
 {
     _re = re;
 }
 
-string QueryBuilderSqlNextT::GetSqlQuery(RelEntDescriber red)
+string QueryBuilderSqlNextT::GetSqlQuery(DescriberClRelation describer)
 {
-	bool input1IsAny = red.Input1IsAny();
-	bool input2IsAny = red.Input2IsAny();
+	bool input1IsAny = describer.Input1IsAny();
+	bool input2IsAny = describer.Input2IsAny();
 	string input1 = _re.GetInput1Unquoted();
 	string input2 = _re.GetInput2Unquoted();
-	string entityInput1 = red.EntityInput1();
-	string entityInput2 = red.EntityInput2();
+	string entityInput1 = describer.EntityInput1();
+	string entityInput2 = describer.EntityInput2();
 
-	if (red.Input1IsAny() && red.Input2IsAny()) { // Next*(entity/_, entity/_)
-		if (red.Input1IsStmtOrWildcard() && red.Input2IsStmtOrWildcard()) { // Next*(stmt/_, stmt/_)
+	if (describer.Input1IsAny() && describer.Input2IsAny()) { // Next*(entity/_, entity/_)
+		if (describer.Input1IsStmtOrWildcard() && describer.Input2IsStmtOrWildcard()) { // Next*(stmt/_, stmt/_)
 			return Build_Any_Any();
 		}
-		else if (red.Input1IsStmtOrWildcard() && !red.Input2IsStmtOrWildcard()) { // Next*(stmt/_, stmtRef_excld_stmt)
+		else if (describer.Input1IsStmtOrWildcard() && !describer.Input2IsStmtOrWildcard()) { // Next*(stmt/_, stmtRef_excld_stmt)
 			return Build_Any_Synonym(entityInput2);
 		}
-		else if (!red.Input1IsStmtOrWildcard() && red.Input2IsStmtOrWildcard()) { // Next*(stmtRef_excld_stmt, stmt/_)
+		else if (!describer.Input1IsStmtOrWildcard() && describer.Input2IsStmtOrWildcard()) { // Next*(stmtRef_excld_stmt, stmt/_)
 			return Build_Synonym_Any(entityInput1);
 		}
-		else if (!red.Input1IsStmtOrWildcard() && !red.Input2IsStmtOrWildcard()) { // Next*(stmtRef_excld_stmt, stmtRef_excld_stmt)
+		else if (!describer.Input1IsStmtOrWildcard() && !describer.Input2IsStmtOrWildcard()) { // Next*(stmtRef_excld_stmt, stmtRef_excld_stmt)
 			return Build_Synonym_Synonym(entityInput1, entityInput2);
 		}
 	}
-	else if (red.Input1IsAny() && !red.Input2IsAny()) { // Next*(entity/_, 10)
-		if (red.Input1IsStmtOrWildcard()) { // Next*(stmt/_, 10)
+	else if (describer.Input1IsAny() && !describer.Input2IsAny()) { // Next*(entity/_, 10)
+		if (describer.Input1IsStmtOrWildcard()) { // Next*(stmt/_, 10)
 			return Build_Any_Specific(input2);
 		}
 		else { // Next*(stmtRef_excld_stmt, 10)
 			return Build_Synonym_Specific(entityInput1, input2);
 		}
 	}
-	else if (!red.Input1IsAny() && red.Input2IsAny()) { // Next*(10, entity/_)
-		if (red.Input2IsStmtOrWildcard()) { // Next*(10, stmt/_)
+	else if (!describer.Input1IsAny() && describer.Input2IsAny()) { // Next*(10, entity/_)
+		if (describer.Input2IsStmtOrWildcard()) { // Next*(10, stmt/_)
 			return Build_Specific_Any(input1);
 		}
 		else { // Next*(10, stmtRef_excld_stmt)
 			return Build_Specific_Synonym(input1, entityInput2);
 		}
 	}
-	else if (!red.Input1IsAny() && !red.Input2IsAny()) { // Next*(10, 11)
+	else if (!describer.Input1IsAny() && !describer.Input2IsAny()) { // Next*(10, 11)
 		return Build_Specific_Specific(input1, input2);
 	}
 

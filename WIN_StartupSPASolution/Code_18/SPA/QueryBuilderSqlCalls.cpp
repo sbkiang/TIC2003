@@ -63,50 +63,50 @@ string QueryBuilderSqlCalls::Build_Specific_Specific(string input1, string input
 	return string(sqlBuf);
 }
 
-QueryBuilderSqlCalls::QueryBuilderSqlCalls(RelEnt re) {
+QueryBuilderSqlCalls::QueryBuilderSqlCalls(ClRelation re) {
 	_re = re;
 }
 
-string QueryBuilderSqlCalls::GetSqlQuery(RelEntDescriber red)
+string QueryBuilderSqlCalls::GetSqlQuery(DescriberClRelation describer)
 {
-	bool input1IsAny = red.Input1IsAny();
-	bool input2IsAny = red.Input2IsAny();
+	bool input1IsAny = describer.Input1IsAny();
+	bool input2IsAny = describer.Input2IsAny();
 	string input1 = _re.GetInput1Unquoted();
 	string input2 = _re.GetInput2Unquoted();
-	string entityInput1 = red.EntityInput1();
-	string entityInput2 = red.EntityInput2();
+	string entityInput1 = describer.EntityInput1();
+	string entityInput2 = describer.EntityInput2();
 
-	if (red.Input1IsAny() && red.Input2IsAny()) { // Call(procedure/_, procedure/_)
-		if (red.Input1IsStmtOrWildcard() && red.Input2IsStmtOrWildcard()) { // Call(_,_)
+	if (describer.Input1IsAny() && describer.Input2IsAny()) { // Call(procedure/_, procedure/_)
+		if (describer.Input1IsStmtOrWildcard() && describer.Input2IsStmtOrWildcard()) { // Call(_,_)
 			return Build_Any_Any();
 		}
-		else if (red.Input1IsStmtOrWildcard() && !red.Input2IsStmtOrWildcard()) { // Call(_, procedure)
+		else if (describer.Input1IsStmtOrWildcard() && !describer.Input2IsStmtOrWildcard()) { // Call(_, procedure)
 			return Build_Any_Synonym();
 		}
-		else if (!red.Input1IsStmtOrWildcard() && red.Input2IsStmtOrWildcard()) { // Call(procedure, _)
+		else if (!describer.Input1IsStmtOrWildcard() && describer.Input2IsStmtOrWildcard()) { // Call(procedure, _)
 			return Build_Synonym_Any();
 		}
-		else if (!red.Input1IsStmtOrWildcard() && !red.Input2IsStmtOrWildcard()) { // Call(procedure, procedure)
+		else if (!describer.Input1IsStmtOrWildcard() && !describer.Input2IsStmtOrWildcard()) { // Call(procedure, procedure)
 			return Build_Synonym_Synonym();
 		}
 	}
-	else if (red.Input1IsAny() && !red.Input2IsAny()) { // Call(procedure/_, "Second")
-		if (red.Input1IsStmtOrWildcard()) { // Call(_, "Second")
+	else if (describer.Input1IsAny() && !describer.Input2IsAny()) { // Call(procedure/_, "Second")
+		if (describer.Input1IsStmtOrWildcard()) { // Call(_, "Second")
 			return Build_Any_Specific(input2);
 		}
 		else { // Call(procedure, "Second")
 			return Build_Synonym_Specific(input2);
 		}
 	}
-	else if (!red.Input1IsAny() && red.Input2IsAny()) { // Call("First", procedure/_)
-		if (red.Input2IsStmtOrWildcard()) { // Call("First", _)
+	else if (!describer.Input1IsAny() && describer.Input2IsAny()) { // Call("First", procedure/_)
+		if (describer.Input2IsStmtOrWildcard()) { // Call("First", _)
 			return Build_Specific_Any(input1);
 		}
 		else { // Call("First", procedure)
 			return Build_Specific_Synonym(input1);
 		}
 	}
-	else if (!red.Input1IsAny() && !red.Input2IsAny()) { // Call("First", "Second")
+	else if (!describer.Input1IsAny() && !describer.Input2IsAny()) { // Call("First", "Second")
 		return Build_Specific_Specific(input1, input2);
 	}
     return string();

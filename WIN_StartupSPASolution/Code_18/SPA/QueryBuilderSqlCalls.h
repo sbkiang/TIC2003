@@ -2,14 +2,13 @@
 #include <string>
 #include <map>
 #include "IQueryBuilderSqlRelRef.h"
-#include "../SPA/RelEnt.h"
 
 using namespace std;
 
 //Interface class for all the relationship's QueryBuilders (the part where we select the columns from table)
 class QueryBuilderSqlCalls : IQueryBuilderSqlRelRef {
 private:
-	RelEnt _re;
+	ClRelation _re;
 
 	// Call(procedure, procedure)
 	string Build_Synonym_Synonym();
@@ -39,6 +38,6 @@ private:
 	string Build_Specific_Specific(string input1, string input2);
 
 public:
-	QueryBuilderSqlCalls(RelEnt re);
-	string GetSqlQuery(RelEntDescriber red);
+	QueryBuilderSqlCalls(ClRelation re);
+	string GetSqlQuery(DescriberClRelation describer);
 };

@@ -127,18 +127,18 @@ string QueryBuilderSqlUses::Build_SpecificWhileIf_Specific(string input1, string
 	return string(sqlBuf);
 }
 
-QueryBuilderSqlUses::QueryBuilderSqlUses(RelEnt re)
+QueryBuilderSqlUses::QueryBuilderSqlUses(ClRelation re)
 {
 	_re = re;
 }
 
-string QueryBuilderSqlUses::GetSqlQuery(RelEntDescriber red) {
-	bool input1IsAny = red.Input1IsAny();
-	bool input2IsAny = red.Input2IsAny();
+string QueryBuilderSqlUses::GetSqlQuery(DescriberClRelation describer) {
+	bool input1IsAny = describer.Input1IsAny();
+	bool input2IsAny = describer.Input2IsAny();
 	string input1 = _re.GetInput1Unquoted();
 	string input2 = _re.GetInput2Unquoted();
-	string entityInput1 = red.EntityInput1();
-	string entityInput2 = red.EntityInput2();
+	string entityInput1 = describer.EntityInput1();
+	string entityInput2 = describer.EntityInput2();
 
 	if (entityInput1.empty()) {
 		if (isdigit(input1[0])) { // for stmt num, we need to get the input1's entity first
@@ -162,7 +162,7 @@ string QueryBuilderSqlUses::GetSqlQuery(RelEntDescriber red) {
 		else if (entityInput1 == "call") { // Uses(call, variable/_)
 			return Build_AnyCall_Any();
 		}
-		else if (red.Input1IsStmtOrWildcard()) { // Uses(stmt/_, variable/_)
+		else if (describer.Input1IsStmtOrWildcard()) { // Uses(stmt/_, variable/_)
 			return Build_Any_Any();
 		}
 	}
@@ -193,7 +193,7 @@ string QueryBuilderSqlUses::GetSqlQuery(RelEntDescriber red) {
 		else if (entityInput1 == "call") {
 			return Build_AnyCall_Specific(input2);
 		}
-		else if (red.Input1IsStmtOrWildcard()) {
+		else if (describer.Input1IsStmtOrWildcard()) {
 			return Build_Any_Specific(input2);
 		}
 	}

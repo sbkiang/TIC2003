@@ -1,7 +1,6 @@
 #pragma once
 #include <string>
 #include <map>
-#include "../SPA/RelEnt.h"
 #include "IQueryBuilderSqlRelRef.h"
 
 using namespace std;
@@ -9,7 +8,7 @@ using namespace std;
 //Interface class for all the relationship's QueryBuilders (the part where we select the columns from table)
 class QueryBuilderSqlNext : IQueryBuilderSqlRelRef {
 private:
-	RelEnt _re;
+	ClRelation _re;
 
 	// next(stmt/_, stmt/_)
 	string Build_Any_Any();
@@ -39,6 +38,6 @@ private:
 	string Build_Specific_Synonym(string input1, string input2);
 
 public:
-	QueryBuilderSqlNext(RelEnt re);
-	string GetSqlQuery(RelEntDescriber red);
+	QueryBuilderSqlNext(ClRelation re);
+	string GetSqlQuery(DescriberClRelation describer);
 };

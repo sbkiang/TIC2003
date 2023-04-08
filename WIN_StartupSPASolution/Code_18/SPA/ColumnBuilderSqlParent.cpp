@@ -31,17 +31,17 @@ string ColumnBuilderSqlParent::Build_StmtNotSynonym_StmtNotSynonym()
 	return string(sql);
 }
 
-ColumnBuilderSqlParent::ColumnBuilderSqlParent(RelEnt re)
+ColumnBuilderSqlParent::ColumnBuilderSqlParent(ClRelation re)
 {
 	_re = re;
 }
 
-string ColumnBuilderSqlParent::GetSqlQuery(RelEntDescriber red)
+string ColumnBuilderSqlParent::GetSqlQuery(DescriberClRelation describer)
 {
 	string input1 = _re.GetInput1();
 	string input2 = _re.GetInput2();
-	bool input1IsSyn = red.Input1IsSyn();
-	bool input2IsSyn = red.Input2IsSyn();
+	bool input1IsSyn = describer.Input1IsSyn();
+	bool input2IsSyn = describer.Input2IsSyn();
 	input1 = _re.GetInput1Unquoted();
 	input2 = _re.GetInput2Unquoted();
 	if (input1IsSyn && input2IsSyn) { // (entity, entity)

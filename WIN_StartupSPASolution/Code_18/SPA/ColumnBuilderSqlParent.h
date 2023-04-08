@@ -3,7 +3,7 @@
 
 class ColumnBuilderSqlParent{
 private:
-	RelEnt _re;
+	ClRelation _re;
 
 	string Build_StmtSynonym_StmtSynonym(string syn1, string syn2);
 	string Build_StmtSynonym_StmtNotSynonym(string syn1);
@@ -11,6 +11,6 @@ private:
 	string Build_StmtNotSynonym_StmtNotSynonym();
 
 public:
-	ColumnBuilderSqlParent(RelEnt re);
-	string GetSqlQuery(RelEntDescriber red);
+	ColumnBuilderSqlParent(ClRelation re);
+	string GetSqlQuery(DescriberClRelation describer);
 };

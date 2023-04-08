@@ -3,7 +3,7 @@
 
 class ColumnBuilderSqlCalls : public IColumnBuilderSqlRelRef{
 private:
-	RelEnt _re;
+	ClRelation _re;
 
 	string Build_NameSynonym_NameSynonym(string syn1, string syn2);
 	string Build_NameSynonym_NameNotSynonym(string syn1);
@@ -11,6 +11,6 @@ private:
 	string Build_NameNotSynonym_NameNotSynonym();
 
 public:
-	ColumnBuilderSqlCalls(RelEnt re);
-	string GetSqlQuery(RelEntDescriber red);
+	ColumnBuilderSqlCalls(ClRelation re);
+	string GetSqlQuery(DescriberClRelation describer);
 };

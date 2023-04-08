@@ -21,14 +21,18 @@
     <ClCompile Include="ClauseCall.cpp" />
     <ClCompile Include="ClauseNext.cpp" />
     <ClCompile Include="ClausePattern.cpp" />
+    <ClCompile Include="ClPattern.cpp" />
+    <ClCompile Include="ClRelation.cpp" />
     <ClCompile Include="ColumnBuilderSqlCalls.cpp" />
     <ClCompile Include="ColumnBuilderSqlModifies.cpp" />
     <ClCompile Include="ColumnBuilderSqlNext.cpp" />
+    <ClCompile Include="ColumnBuilderSqlPattern.cpp" />
     <ClCompile Include="ColumnBuilderSqlUses.cpp" />
     <ClCompile Include="Container.cpp" />
+    <ClCompile Include="DescriberClPattern.cpp" />
     <ClCompile Include="HelperFunction.cpp" />
     <ClCompile Include="ColumnBuilderSqlParent.cpp" />
-    <ClCompile Include="Pattern.cpp" />
+    <ClCompile Include="IDescriberCl.h" />
     <ClCompile Include="Procedure.cpp" />
     <ClCompile Include="ClauseModifies.cpp" />
     <ClCompile Include="ClauseParent.cpp" />
@@ -40,11 +44,10 @@
     <ClCompile Include="QueryBuilderSqlParent.cpp" />
     <ClCompile Include="QueryBuilderSqlParentT.cpp" />
     <ClCompile Include="QueryBuilderSqlUses.cpp" />
-    <ClCompile Include="RelEntDescriber.cpp" />
+    <ClCompile Include="DescriberClRelation.cpp" />
     <ClCompile Include="Statement.cpp" />
     <ClCompile Include="Struct.cpp" />
     <ClCompile Include="ClauseUses.cpp" />
-    <ClCompile Include="RelEnt.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\Database.h" />
@@ -57,18 +60,25 @@
     <ClInclude Include="ClauseCall.h" />
     <ClInclude Include="ClauseNext.h" />
     <ClInclude Include="ClausePattern.h" />
+    <ClInclude Include="ClPattern.h" />
+    <ClInclude Include="ClRelation.h" />
     <ClInclude Include="ColumnBuilderSqlCalls.h" />
     <ClInclude Include="ColumnBuilderSqlModifies.h" />
     <ClInclude Include="ColumnBuilderSqlNext.h" />
+    <ClInclude Include="ColumnBuilderSqlPattern.h" />
     <ClInclude Include="Container.h" />
+    <ClInclude Include="DescriberClPattern.h" />
+    <ClInclude Include="DescriberClRelation.h" />
     <ClInclude Include="HelperFunction.h" />
     <ClInclude Include="define.h" />
     <ClInclude Include="ClauseModifies.h" />
     <ClInclude Include="ClauseParent.h" />
     <ClInclude Include="ColumnBuilderSqlParent.h" />
+    <ClInclude Include="IBuilderSql.h" />
     <ClInclude Include="IColumnBuilderSqlRelRef.h" />
+    <ClInclude Include="IDescriberClPattern.h" />
+    <ClInclude Include="IDescriberClRelation.h" />
     <ClInclude Include="IQueryBuilderSqlRelRef.h" />
-    <ClInclude Include="Pattern.h" />
     <ClInclude Include="Procedure.h" />
     <ClInclude Include="QueryBuilderSqlCalls.h" />
     <ClInclude Include="QueryBuilderSqlCallsT.h" />
@@ -78,11 +88,9 @@
     <ClInclude Include="QueryBuilderSqlParent.h" />
     <ClInclude Include="QueryBuilderSqlParentT.h" />
     <ClInclude Include="QueryBuilderSqlUses.h" />
-    <ClInclude Include="RelEntDescriber.h" />
     <ClInclude Include="Statement.h" />
     <ClInclude Include="Struct.h" />
     <ClInclude Include="ClauseUses.h" />
-    <ClInclude Include="RelEnt.h" />
     <ClInclude Include="ColumnBuilderSqlUses.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

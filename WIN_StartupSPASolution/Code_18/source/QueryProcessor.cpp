@@ -68,8 +68,8 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	vector<string> tokens;
 	tk.tokenize(query, tokens);
 	map<string, string> synonymEntityMap; // map the synonym to entity
-	stack<RelEnt> relEntStack;
-	stack<Pattern> patternStack;
+	stack<ClRelation> relEntStack;
+	stack<ClPattern> patternStack;
 	Select select;	
 	for (int i = 0; i < tokens.size(); i++) {
 		if (regex_match(tokens.at(i), regex(regexEntity))){
@@ -108,7 +108,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			int comma = word.find(",");
 			string input1 = word.substr(0, comma);
 			string input2 = word.substr(comma + 1, word.length());
-			RelEnt re = RelEnt(relationship, input1, input2);
+			ClRelation re = ClRelation(relationship, input1, input2);
 			relEntStack.push(re);
 		}
 		else if (tokens[i] == "pattern") {
@@ -137,7 +137,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			int comma = word.find(",");
 			string input1 = word.substr(0, comma);
 			string input2 = word.substr(comma + 1, word.length());
-			Pattern pt = Pattern(synonym, input1, input2);
+			ClPattern pt = ClPattern(synonym, input1, input2);
 			patternStack.push(pt);
 		}
 		else if (tokens[i] == "Select") {
@@ -162,7 +162,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	Database::SelectPql(select, selectResultStore);
 	set<string> currentResultSetSynonym(select.synonym.begin(), select.synonym.end());
 	while (!relEntStack.empty()) {
-		RelEnt relEntTemp = relEntStack.top();
+		ClRelation relEntTemp = relEntStack.top();
 		set<string> stSynonym;
 		string entityInput1 = "", entityInput2 = "", input1 = relEntTemp.GetInput1Unquoted(), input2 = relEntTemp.GetInput2Unquoted();
 		bool input1Quoted = (relEntTemp.GetInput1()[0] == '"');
@@ -186,7 +186,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 
 		string relationship = relEntTemp.GetRelationship();
 		string colSql, querySql, sql;
-		RelEntDescriber relEntDescriber = RelEntDescriber(relEntTemp, synonymEntityMap);
+		DescriberClRelation relEntDescriber = DescriberClRelation(relEntTemp, synonymEntityMap);
 		if (relationship == "Uses") { // input1 is Stmt Num or Name, input2 is Name
 			ColumnBuilderSqlUses colBuilder = ColumnBuilderSqlUses(relEntTemp);
 			colSql = colBuilder.GetSqlQuery(relEntDescriber);
@@ -657,7 +657,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	}
 
 	while (!patternStack.empty()) {
-		Pattern patternTemp = patternStack.top();
+		ClPattern patternTemp = patternStack.top();
 		string synonym = patternTemp.GetSynonym(), input1 = patternTemp.GetInput1Unquoted(), input2 = patternTemp.GetInput2Unquoted();
 		bool input1Quoted = (patternTemp.GetInput1()[0] == '"');
 		bool input1IsSynonym = (synonymEntityMap.find(input1) != synonymEntityMap.end() && !input1Quoted);

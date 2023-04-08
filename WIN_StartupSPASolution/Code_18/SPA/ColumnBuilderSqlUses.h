@@ -4,7 +4,7 @@
 
 class ColumnBuilderSqlUses : public IColumnBuilderSqlRelRef{
 private:
-	RelEnt _re;
+	ClRelation _re;
 
 	// Stmt - Name
 	string Build_StmtSynonym_NameSynonym(string syn1, string syn2);
@@ -19,6 +19,6 @@ private:
 	string Build_NameNotSynonym_NameNotSynonym();
 
 public:
-	ColumnBuilderSqlUses(RelEnt re);
-	string GetSqlQuery(RelEntDescriber red);
+	ColumnBuilderSqlUses(ClRelation re);
+	string GetSqlQuery(DescriberClRelation describer);
 };

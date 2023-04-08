@@ -25,10 +25,8 @@ string ColumnBuilderSqlPattern::GetSqlQuery(DescriberClPattern describer)
 	string input2 = _cp.GetInput2();
 	string syn = _cp.GetSynonym();
 	bool input1IsSyn = describer.Input1IsSyn();
-	bool input2IsSyn = describer.Input2IsSyn();
 	input1 = _cp.GetInput1Unquoted();
-	input2 = _cp.GetInput2Unquoted();
-	if(describer.input1IsSynonym()){
+	if(describer.Input1IsSyn()){
 		return Build_Synonym(syn, input1);
 	}
 	else {

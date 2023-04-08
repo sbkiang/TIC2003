@@ -64,20 +64,20 @@ string ColumnBuilderSqlModifies::Build_NameNotSynonym_NameNotSynonym()
 	return string(sql);
 }
 
-ColumnBuilderSqlModifies::ColumnBuilderSqlModifies(RelEnt re)
+ColumnBuilderSqlModifies::ColumnBuilderSqlModifies(ClRelation re)
 {
 	_re = re;
 }
 
-string ColumnBuilderSqlModifies::GetSqlQuery(RelEntDescriber red)
+string ColumnBuilderSqlModifies::GetSqlQuery(DescriberClRelation describer)
 {
 	string input1 = _re.GetInput1();
 	string input2 = _re.GetInput2();
-	bool input1IsSyn = red.Input1IsSyn();
-	bool input2IsSyn = red.Input2IsSyn();
+	bool input1IsSyn = describer.Input1IsSyn();
+	bool input2IsSyn = describer.Input2IsSyn();
 	input1 = _re.GetInput1Unquoted();
 	input2 = _re.GetInput2Unquoted();
-	string entityInput1 = red.EntityInput1();
+	string entityInput1 = describer.EntityInput1();
 	if (input1IsSyn && input2IsSyn) {
 		if (regex_match(entityInput1, regex(regexStmtNumEntity))) {
 			return ColumnBuilderSqlModifies::Build_StmtSynonym_NameSynonym(input1, input2);

@@ -1,5 +1,6 @@
 #pragma once
 #include "IBuilderSql.h"
+#include "DescriberClPattern.h"
 
 class ColumnBuilderSqlPattern : public IBuilderSql {
 private:

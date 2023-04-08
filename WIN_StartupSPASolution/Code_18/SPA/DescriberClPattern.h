@@ -1,13 +1,15 @@
 #pragma once
-#include "IDescriberClObject.h"
+#include "ClPattern.h"
+#include "IDescriberClPattern.h"
 
-class DescriberClPattern : IDescriberClObject {
+class DescriberClPattern : public IDescriberClPattern {
 private:
 	bool _input1IsSyn = false;
 	bool _input1IsWildcard = false;
 
 public:
 	DescriberClPattern(ClPattern clPattern, map<string,string> synEntMap);
-	bool Input1IsSynonym();
+	bool Input1IsSyn();
 	bool Input1IsAny();
+
 };
