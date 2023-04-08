@@ -68,7 +68,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	vector<string> tokens;
 	tk.tokenize(query, tokens);
 	map<string, string> synonymEntityMap; // map the synonym to entity
-	stack<ClRelRef> relEntStack;
+	stack<ClRelRef> relRefStack;
 	stack<ClPattern> patternStack;
 	Select select;	
 	for (int i = 0; i < tokens.size(); i++) {
@@ -109,7 +109,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			string input1 = word.substr(0, comma);
 			string input2 = word.substr(comma + 1, word.length());
 			ClRelRef re = ClRelRef(relationship, input1, input2);
-			relEntStack.push(re);
+			relRefStack.push(re);
 		}
 		else if (tokens[i] == "pattern") {
 			i++;
@@ -161,475 +161,100 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	EvaluateSelect(select, synonymEntityMap);
 	Database::SelectPql(select, selectResultStore);
 	set<string> currentResultSetSynonym(select.synonym.begin(), select.synonym.end());
-	while (!relEntStack.empty()) {
-		ClRelRef relEntTemp = relEntStack.top();
+	while (!relRefStack.empty()) {
+		ClRelRef relRefTemp = relRefStack.top();
 		set<string> stSynonym;
-		string entityInput1 = "", entityInput2 = "", input1 = relEntTemp.GetInput1Unquoted(), input2 = relEntTemp.GetInput2Unquoted();
-		bool input1Quoted = (relEntTemp.GetInput1()[0] == '"');
-		bool input2Quoted = (relEntTemp.GetInput2()[0] == '"');
-		bool input1IsSynonym = (synonymEntityMap.find(input1) != synonymEntityMap.end() && !input1Quoted);
-		bool input2IsSynonym = (synonymEntityMap.find(input2) != synonymEntityMap.end() && !input2Quoted);		
-		bool input1IsWildcard = (input1 == "_") ? true : false;
-		bool input2IsWildcard = (input2 == "_") ? true : false;
-		
-		if (input1IsSynonym) { // if input1 is part of declared synonym, we get the entity that it belongs
-			entityInput1 = synonymEntityMap.at(input1);
-			stSynonym.insert(input1);
-		}
-		if (input2IsSynonym) { // if input1 is part of declared synonym, we get the entity that it belongs
-			entityInput2 = synonymEntityMap.at(input2);
-			stSynonym.insert(input2);
-		}
-		string sqlOld;
- 		bool input1IsStmtOrWildCard = (entityInput1 == "stmt" || input1IsWildcard);
-		bool input2IsStmtOrWildCard = (entityInput2 == "stmt" || input2IsWildcard);
-
-		string relationship = relEntTemp.GetRelationship();
+		string relationship = relRefTemp.GetRelationship();
 		string colSql, querySql, sql;
-		DescriberClRelRef relEntDescriber = DescriberClRelRef(relEntTemp, synonymEntityMap);
+		DescriberClRelRef relEntDescriber = DescriberClRelRef(relRefTemp, synonymEntityMap);
+		
+		if (relEntDescriber.Input1IsSyn()) { // if input1 is part of declared synonym, we get the entity that it belongs
+			stSynonym.insert(relRefTemp.GetInput1());
+		}
+		if (relEntDescriber.Input2IsSyn()) { // if input1 is part of declared synonym, we get the entity that it belongs
+			stSynonym.insert(relRefTemp.GetInput2());
+		}
+
 		if (relationship == "Uses") { // input1 is Stmt Num or Name, input2 is Name
-			ColumnBuilderSqlUses colBuilder = ColumnBuilderSqlUses(relEntTemp);
+			ColumnBuilderSqlUses colBuilder = ColumnBuilderSqlUses(relRefTemp);
 			colSql = colBuilder.GetSqlQuery(relEntDescriber);
 			
-			QueryBuilderSqlUses queryBuilder = QueryBuilderSqlUses(relEntTemp);
+			QueryBuilderSqlUses queryBuilder = QueryBuilderSqlUses(relRefTemp);
 			querySql = queryBuilder.GetSqlQuery(relEntDescriber);
 
 			sql = HelperFunction::RelRefSqlBuilder(colSql, querySql);
-
-			bool input1IsAny = (input1IsSynonym || input1IsWildcard);
-			bool input2IsAny = (input2IsSynonym || input2IsWildcard);
-
-			if (!input1IsAny) { // Uses("main"/5, variable/_)
-				if (isdigit(input1[0])) { // for stmt num, we need to get the entity input1
-					entityInput1 = HelperFunction::GetEntityByStatement(input1);
-				}
-			}
-			if (input1IsAny && input2IsAny) { // Uses(entity, variable/_)
-				if (entityInput1 == "procedure") { // Uses(procedure, variable/_)
-					sqlOld = Uses::GetUses_AnyProcedure_Any(colSql);
-				}
-				else if (regex_match(entityInput1, regex(regexAssignPrint))) { // Uses(print/assign, variable/_)
-					sqlOld = Uses::GetUses_AnyPrintAssign_Any(colSql, entityInput1);
-				}
-				else if (regex_match(entityInput1, regex(regexWhileIf))) {
-					sqlOld = Uses::GetUses_AnyWhileIf_Any(colSql, entityInput1);
-				}
-				else if (entityInput1 == "call") {
-					sqlOld = Uses::GetUses_AnyCall_Any(colSql);
-				}
-				else if (input1IsStmtOrWildCard) {
-					sqlOld = Uses::GetUses_Any_Any(colSql);
-				}
-			}
-			else if (!input1IsAny && input2IsAny) { // entityInput1 here is already determine at the top
-				if (entityInput1 == "procedure") { // Uses(procedure, variable/_)
-					sqlOld = Uses::GetUses_SpecificProcedure_Any(colSql, input1);
-				}
-				else if (regex_match(entityInput1, regex(regexAssignPrint))) { // Uses(print/assign, variable/_)
-					sqlOld = Uses::GetUses_SpecificPrintAssign_Any(colSql, input1);
-				}
-				else if (regex_match(entityInput1, regex(regexWhileIf))) {
-					sqlOld = Uses::GetUses_SpecificWhileIf_Any(colSql, input1);
-				}
-				else if (entityInput1 == "call") {
-					sqlOld = Uses::GetUses_SpecificCall_Any(colSql, input1);
-				}
-			}
-			else if (input1IsAny && !input2IsAny) {
-				if (entityInput1 == "procedure") { // Uses(procedure, variable/_)
-					sqlOld = Uses::GetUses_AnyProcedure_Specific(colSql, input2);
-				}
-				else if (regex_match(entityInput1, regex(regexAssignPrint))) { // Uses(print/assign, variable/_)
-					sqlOld = Uses::GetUses_AnyPrintAssign_Specific(colSql, entityInput1, input2);
-				}
-				else if (regex_match(entityInput1, regex(regexWhileIf))) {
-					sqlOld = Uses::GetUses_AnyWhileIf_Specific(colSql, entityInput1, input2);
-				}
-				else if (entityInput1 == "call") {
-					sqlOld = Uses::GetUses_AnyCall_Specific(colSql, input2);
-				}
-				else if (input1IsStmtOrWildCard) {
-					sqlOld = Uses::GetUses_Any_Specific(colSql, input2);
-				}
-			}
-			else if (!input1IsAny && !input2IsAny) { // entityInput1 here is already determine at the top
-				if (isalpha(input1[0])) { // Uses("main", "x")
-					sqlOld = Uses::GetUses_SpecificProcedure_Specific(colSql, input1, input2);
-				}
-				else if (regex_match(entityInput1, regex(regexAssignPrint))) { // Uses(print/assign stmt, "x")
-					sqlOld = Uses::GetUses_SpecificPrintAssign_Specific(colSql, input1, input2);
-				}
-				else if (regex_match(entityInput1, regex(regexWhileIf))) { // Uses(while/if stmt, "x")
-					sqlOld = Uses::GetUses_SpecificWhileIf_Specific(colSql, input1, input2);
-				} 
-				else if (entityInput1 == "call") { // Uses(call stmt, "x")
-					sqlOld = Uses::GetUses_SpecificCall_Specific(colSql, input1, input2);
-				}
-			}
 		}
 
  		else if (relationship == "Modifies") { // input1 is Stmt Num or Name, input2 is Name or Wildcard
-			ColumnBuilderSqlModifies colBuilder = ColumnBuilderSqlModifies(relEntTemp);
+			ColumnBuilderSqlModifies colBuilder = ColumnBuilderSqlModifies(relRefTemp);
 			colSql = colBuilder.GetSqlQuery(relEntDescriber);
 
-			QueryBuilderSqlModifies queryBuilder = QueryBuilderSqlModifies(relEntTemp);
+			QueryBuilderSqlModifies queryBuilder = QueryBuilderSqlModifies(relRefTemp);
 			querySql = queryBuilder.GetSqlQuery(relEntDescriber);
 
 			sql = HelperFunction::RelRefSqlBuilder(colSql, querySql);
-
-			bool input1IsAny = (input1IsSynonym || input1IsWildcard);
-			bool input2IsAny = (input2IsSynonym || input2IsWildcard);
-			
-			if (!input1IsAny) { // Modifies("main"/5, variable/_)
-				if (isdigit(input1[0])) { // for stmt num, we need to get the entity input1
-					entityInput1 = HelperFunction::GetEntityByStatement(input1);
-				}
-			}
-			if (input1IsAny && input2IsAny) { // Modifies(entity, variable/_)
-				if (entityInput1 == "procedure") { // Modifies(procedure, variable/_)
-					sqlOld = Modifies::GetModifies_AnyProcedure_Any(colSql);
-				}
-				else if (regex_match(entityInput1, regex(regexAssignRead))) { // Modifies(print/assign, variable/_)
-					sqlOld = Modifies::GetModifies_AnyReadAssign_Any(colSql, entityInput1);
-				}
-				else if (regex_match(entityInput1, regex(regexWhileIf))) {
-					sqlOld = Modifies::GetModifies_AnyWhileIf_Any(colSql, entityInput1);
-				}
-				else if (entityInput1 == "call") {
-					sqlOld = Modifies::GetModifies_AnyCall_Any(colSql);
-				}
-				else if (input1IsStmtOrWildCard){
-					sqlOld = Modifies::GetModifies_Any_Any(colSql);
-				}
-			}
-			else if (!input1IsAny && input2IsAny) { // entityInput1 here is already determine at the top
-				if (entityInput1 == "procedure") { // Modifies(procedure, variable/_)
-					sqlOld = Modifies::GetModifies_SpecificProcedure_Any(colSql, input1);
-				}
-				else if (regex_match(entityInput1, regex(regexAssignPrint))) { // Modifies(print/assign, variable/_)
-					sqlOld = Modifies::GetModifies_SpecificReadAssign_Any(colSql, input1);
-				}
-				else if (regex_match(entityInput1, regex(regexWhileIf))) {
-					sqlOld = Modifies::GetModifies_SpecificWhileIf_Any(colSql, input1);
-				}
-				else if (entityInput1 == "call") {
-					sqlOld = Modifies::GetModifies_SpecificCall_Any(colSql, input1);
-				}
-			}
-			else if (input1IsAny && !input2IsAny) {
-				if (entityInput1 == "procedure") { // Modifies(procedure, variable/_)
-					sqlOld = Modifies::GetModifies_AnyProcedure_Specific(colSql, input2);
-				}
-				else if (regex_match(entityInput1, regex(regexAssignRead))) { // Modifies(print/assign, variable/_)
-					sqlOld = Modifies::GetModifies_AnyReadAssign_Specific(colSql, entityInput1, input2);
-				}
-				else if (regex_match(entityInput1, regex(regexWhileIf))) {
-					sqlOld = Modifies::GetModifies_AnyWhileIf_Specific(colSql, entityInput1, input2);
-				}
-				else if (entityInput1 == "call") {
-					sqlOld = Modifies::GetModifies_AnyCall_Specific(colSql, input2);
-				}
-				else if (input1IsStmtOrWildCard){
-					sqlOld = Modifies::GetModifies_Any_Specific(colSql, input2);
-				}
-			}
-			else if (!input1IsAny && !input2IsAny) { // entityInput1 here is already determine at the top
-				if (isalpha(input1[0])) { // Modifies("main", "x")
-					sqlOld = Modifies::GetModifies_SpecificProcedure_Specific(colSql, input1, input2);
-				}
-				else if (regex_match(entityInput1, regex(regexAssignPrint))) { // Modifies(print/assign stmt, "x")
-					sqlOld = Modifies::GetModifies_SpecificReadAssign_Specific(colSql, input1, input2);
-				}
-				else if (regex_match(entityInput1, regex(regexWhileIf))) { // Modifies(while/if stmt, "x")
-					sqlOld = Modifies::GetModifies_SpecificWhileIf_Specific(colSql, input1, input2);
-				}
-				else if (entityInput1 == "call") { // Modifies(call stmt, "x")
-					sqlOld = Modifies::GetModifies_SpecificCall_Specific(colSql, input1, input2);
-				}
-			}
 		}
 
 		else if (relationship == "Parent") {
-			ColumnBuilderSqlParent colBuilder = ColumnBuilderSqlParent(relEntTemp);
+			ColumnBuilderSqlParent colBuilder = ColumnBuilderSqlParent(relRefTemp);
 			colSql = colBuilder.GetSqlQuery(relEntDescriber);
 
-			QueryBuilderSqlParent queryBuilder = QueryBuilderSqlParent(relEntTemp);
+			QueryBuilderSqlParent queryBuilder = QueryBuilderSqlParent(relRefTemp);
 			querySql = queryBuilder.GetSqlQuery(relEntDescriber);
 
 			sql = HelperFunction::RelRefSqlBuilder(colSql, querySql);
-
-			bool input1IsGeneric = (input1IsStmtOrWildCard || input1IsSynonym);
-			bool input2IsGeneric = (input2IsStmtOrWildCard || input2IsSynonym);
-			
-			if (input1IsGeneric && input2IsGeneric) { // Parent(entity/_, entity/_)
-				if (input1IsStmtOrWildCard && input2IsStmtOrWildCard) { // Parent(stmt/_, stmt/_)
-					sqlOld = Parent::GetParent_Any_Any(colSql);
-				}
-				else if (input1IsStmtOrWildCard && !input2IsStmtOrWildCard) { // Parent(stmt/_, entity_excld_stmt)
-					sqlOld = Parent::GetParent_Any_Synonym(colSql, entityInput2);
-				}
-				else if (!input1IsStmtOrWildCard && input2IsStmtOrWildCard) { // Parent(entity_excld_stmt, stmt/_)
-					sqlOld = Parent::GetParent_Synonym_Any(colSql, entityInput1);
-				}
-				else if (!input1IsStmtOrWildCard && !input2IsStmtOrWildCard) { // Parent(entity_excld_stmt, entity_excld_stmt)
-					sqlOld = Parent::GetParent_Synonym_Synonym(colSql, entityInput1, entityInput2);
-				}
-			}
-			else if (input1IsGeneric && !input2IsGeneric) { // Parent(entity/_, 10)
-				if (input1IsStmtOrWildCard) { // Parent(stmt/_, 10)
-					sqlOld = Parent::GetParent_Any_Specific(colSql, input2);
-				}
-				else if (!input1IsStmtOrWildCard) { // Parent(entity_excld_stmt, 10)
-					sqlOld = Parent::GetParent_Synonym_Specific(colSql, entityInput1, input2);
-				}
-			}
-			else if (!input1IsGeneric && input2IsGeneric) { // Parent(10, entity/_)
-				if (input2IsStmtOrWildCard) { // Parent(10, stmt/_)
-					sqlOld = Parent::GetParent_Specific_Any(colSql, input1);
-				}
-				else if (!input2IsStmtOrWildCard) { // Parent(10, entity_excld_stmt)
-					sqlOld = Parent::GetParent_Specific_Synonym(colSql, input1, entityInput2);
-				}
-			}
-			else if (!input1IsGeneric && !input2IsGeneric) {// Parent(10,11)
-				sqlOld = Parent::GetParent_Specific_Specific(colSql, input1, input2);
-			}
 		}
 
 		else if (relationship == "Parent*") { // input1 is Stmt Num, input2 is Stmt Num
-			ColumnBuilderSqlParent colBuilder = ColumnBuilderSqlParent(relEntTemp);
+			ColumnBuilderSqlParent colBuilder = ColumnBuilderSqlParent(relRefTemp);
 			colSql = colBuilder.GetSqlQuery(relEntDescriber);
 			
-			QueryBuilderSqlParentT queryBuilder = QueryBuilderSqlParentT(relEntTemp);
+			QueryBuilderSqlParentT queryBuilder = QueryBuilderSqlParentT(relRefTemp);
 			querySql = queryBuilder.GetSqlQuery(relEntDescriber);
 
 			sql = HelperFunction::RelRefSqlBuilder(colSql, querySql);
-
-			bool input1IsGeneric = (input1IsStmtOrWildCard || input1IsSynonym);
-			bool input2IsGeneric = (input2IsStmtOrWildCard || input2IsSynonym);
-			if (input1IsGeneric && input2IsGeneric) { // Parent(entity/_, entity/_)
-				if (input1IsStmtOrWildCard && input2IsStmtOrWildCard) { // Parent(stmt/_, stmt/_)
-					sqlOld = Parent::GetParentT_Any_Any(colSql);
-				}
-				else if (input1IsStmtOrWildCard && !input2IsStmtOrWildCard) { // Parent(stmt/_, entity_excld_stmt)
-					sqlOld = Parent::GetParentT_Any_Synonym(colSql, entityInput2);
-				}
-				else if (!input1IsStmtOrWildCard && input2IsStmtOrWildCard) { // Parent(entity_excld_stmt, stmt/_)
-					sqlOld = Parent::GetParentT_Synonym_Any(colSql, entityInput1);
-				}
-				else if (!input1IsStmtOrWildCard && !input2IsStmtOrWildCard) { // Parent(entity_excld_stmt, entity_excld_stmt)
-					sqlOld = Parent::GetParentT_Synonym_Synonym(colSql, entityInput1, entityInput2);
-				}
-			}
-			else if (input1IsGeneric && !input2IsGeneric) { // Parent(entity/_, 10)
-				if (input1IsStmtOrWildCard) { // Parent(stmt/_, 10)
-					sqlOld = Parent::GetParentT_Any_Specific(colSql, input2);
-				}
-				else if (!input1IsStmtOrWildCard) { // Parent(entity_excld_stmt, 10)
-					sqlOld = Parent::GetParentT_Synonym_Specific(colSql, entityInput1, input2);
-				}
-			}
-			else if (!input1IsGeneric && input2IsGeneric) { // Parent(10, entity/_)
-				if (input2IsStmtOrWildCard) { // Parent(10, stmt/_)
-					sqlOld = Parent::GetParentT_Specific_Any(colSql, input1);
-				}
-				else if (!input2IsStmtOrWildCard) { // Parent(10, entity_excld_stmt)
-					sqlOld = Parent::GetParentT_Specific_Synonym(colSql, input1, entityInput2);
-				}
-			}
-			else if (!input1IsGeneric && !input2IsGeneric) {// Parent(10,11)
-				sqlOld = Parent::GetParentT_Specific_Specific(colSql, input1, input2);
-			}
 		}
 			
 		else if (relationship == "Next") {
-			ColumnBuilderSqlNext colBuilderNext = ColumnBuilderSqlNext(relEntTemp);
+			ColumnBuilderSqlNext colBuilderNext = ColumnBuilderSqlNext(relRefTemp);
 			colSql = colBuilderNext.GetSqlQuery(relEntDescriber);
 			
-			QueryBuilderSqlNext queryBuilder = QueryBuilderSqlNext(relEntTemp);
+			QueryBuilderSqlNext queryBuilder = QueryBuilderSqlNext(relRefTemp);
 			querySql = queryBuilder.GetSqlQuery(relEntDescriber);
 
 			sql = HelperFunction::RelRefSqlBuilder(colSql, querySql);
-
-			bool input1IsGeneric = (input1IsStmtOrWildCard || input1IsSynonym);
-			bool input2IsGeneric = (input2IsStmtOrWildCard || input2IsSynonym);
-			if (input1IsGeneric && input2IsGeneric) { // Next(entity/_, entity/_)
-				if (input1IsStmtOrWildCard && input2IsStmtOrWildCard) { // Next(stmt/_, stmt/_)
-					sqlOld = Next::NextConstructQuery_Any_Any(colSql);
-				}
-				else if (input1IsStmtOrWildCard && !input2IsStmtOrWildCard) { // Next(stmt/_, stmtRef_excld_stmt)
-					sqlOld = Next::NextConstructQuery_Any_Synonym(colSql, entityInput2);
-				}
-				else if (!input1IsStmtOrWildCard && input2IsStmtOrWildCard) { // Next(stmtRef_excld_stmt, stmt/_)
-					sqlOld = Next::NextConstructQuery_Synonym_Any(colSql, entityInput1);
-				}
-				else if (!input1IsStmtOrWildCard && !input2IsStmtOrWildCard) { // Next(stmtRef_excld_stmt, stmtRef_excld_stmt)
-					sqlOld = Next::NextConstructQuery_Synonym_Synonym(colSql, entityInput1, entityInput2);
-				}
-			}
-			else if (input1IsGeneric && !input2IsGeneric) { // Next(entity/_, 10)
-				if (input1IsStmtOrWildCard) { // Next(stmt/_, 10)
-					sqlOld = Next::NextConstructQuery_Any_Specific(colSql, input2);
-				}
-				else { // Next(stmtRef_excld_stmt, 10)
-					sqlOld = Next::NextConstructQuery_Synonym_Specific(colSql, entityInput1, input2);
-				}
-			}
-			else if (!input1IsGeneric && input2IsGeneric) { // Next(10, entity/_)
-				if (input2IsStmtOrWildCard) { // Next(10, stmt/_)
-					sqlOld = Next::NextConstructQuery_Specific_Any(colSql, input1);
-				}
-				else { // Next(10, stmtRef_excld_stmt)
-					sqlOld = Next::NextConstructQuery_Specific_Synonym(colSql, input1, entityInput2);
-				}
-			}
-			else if (!input1IsGeneric && !input2IsGeneric) { // Next(10, 11)
-				sqlOld = Next::NextConstructQuery_Specific_Specific(colSql, input1, input2);
-			}
 		}
 		else if (relationship == "Next*"){
-			ColumnBuilderSqlNext colBuilderNext = ColumnBuilderSqlNext(relEntTemp);
+			ColumnBuilderSqlNext colBuilderNext = ColumnBuilderSqlNext(relRefTemp);
 			colSql = colBuilderNext.GetSqlQuery(relEntDescriber);
 			
-			QueryBuilderSqlNextT queryBuilder = QueryBuilderSqlNextT(relEntTemp);
+			QueryBuilderSqlNextT queryBuilder = QueryBuilderSqlNextT(relRefTemp);
 			querySql = queryBuilder.GetSqlQuery(relEntDescriber);
 
 			sql = HelperFunction::RelRefSqlBuilder(colSql, querySql);
-
-			bool input1IsGeneric = (input1IsStmtOrWildCard || input1IsSynonym);
-			bool input2IsGeneric = (input2IsStmtOrWildCard || input2IsSynonym);
-			if (input1IsGeneric && input2IsGeneric) { // Next(entity/_, entity/_)
-				if (input1IsStmtOrWildCard && input2IsStmtOrWildCard) { // Next(stmt/_, stmt/_)
-					sqlOld = Next::NextTConstructQuery_Any_Any(colSql);
-				}
-				else if (input1IsStmtOrWildCard && !input2IsStmtOrWildCard) { // Next(stmt/_, stmtRef_excld_stmt)
-					sqlOld = Next::NextTConstructQuery_Any_Synonym(colSql, entityInput2);
-				}
-				else if (!input1IsStmtOrWildCard && input2IsStmtOrWildCard) { // Next(stmtRef_excld_stmt, stmt/_)
-					sqlOld = Next::NextTConstructQuery_Synonym_Any(colSql, entityInput1);
-				}
-				else if (!input1IsStmtOrWildCard && !input2IsStmtOrWildCard) { // Next(stmtRef_excld_stmt, stmtRef_excld_stmt)
-					sqlOld = Next::NextTConstructQuery_Synonym_Synonym(colSql, entityInput1, entityInput2);
-				}
-			}
-			else if (input1IsGeneric && !input2IsGeneric) { // Next(entity/_, 10)
-				if (input1IsStmtOrWildCard) { // Next(stmt/_, 10)
-					sqlOld = Next::NextTConstructQuery_Any_Specific(colSql, input2);
-				}
-				else { // Next(stmtRef_excld_stmt, 10)
-					sqlOld = Next::NextTConstructQuery_Synonym_Specific(colSql, entityInput1, input2);
-				}
-			}
-			else if (!input1IsGeneric && input2IsGeneric) { // Next(10, entity/_)
-				if (input2IsStmtOrWildCard) { // Next(10, stmt/_)
-					sqlOld = Next::NextTConstructQuery_Specific_Any(colSql, input1);
-				}
-				else { // Next(10, stmtRef_excld_stmt)
-					sqlOld = Next::NextTConstructQuery_Specific_Synonym(colSql, input1, entityInput2);
-				}
-			}
-			else if (!input1IsGeneric && !input2IsGeneric) { // Next(10, 11)
-				sqlOld = Next::NextTConstructQuery_Specific_Specific(colSql, input1, input2);
-			}
 		}
 		else if (relationship == "Calls") {
-			ColumnBuilderSqlCalls colBuilderNext = ColumnBuilderSqlCalls(relEntTemp);
+			ColumnBuilderSqlCalls colBuilderNext = ColumnBuilderSqlCalls(relRefTemp);
 			colSql = colBuilderNext.GetSqlQuery(relEntDescriber);
 			
-			QueryBuilderSqlCalls queryBuilder = QueryBuilderSqlCalls(relEntTemp);
+			QueryBuilderSqlCalls queryBuilder = QueryBuilderSqlCalls(relRefTemp);
 			querySql = queryBuilder.GetSqlQuery(relEntDescriber);
 
 			sql = HelperFunction::RelRefSqlBuilder(colSql, querySql);
-			
-			bool input1IsGeneric = (input1IsStmtOrWildCard || input1IsSynonym);
-			bool input2IsGeneric = (input2IsStmtOrWildCard || input2IsSynonym);
-
-			if (input1IsGeneric && input2IsGeneric) { // Call(procedure/_, procedure/_)
-				if (input1IsStmtOrWildCard && input2IsStmtOrWildCard) { // Call(_,_)
-					sqlOld = Call::GetCall_Any_Any(colSql);
-				}
-				else if (input1IsStmtOrWildCard && !input2IsStmtOrWildCard) { // Call(_, procedure)
-					sqlOld = Call::GetCall_Any_Synonym(colSql);
-				}
-				else if (!input1IsStmtOrWildCard && input2IsStmtOrWildCard) { // Call(procedure, _)
-					sqlOld = Call::GetCall_Synonym_Any(colSql);
-				}
-				else if (!input1IsStmtOrWildCard && !input2IsStmtOrWildCard) { // Call(procedure, procedure)
-					sqlOld = Call::GetCall_Synonym_Synonym(colSql);
-				}
-			}
-			else if (input1IsGeneric && !input2IsGeneric) { // Call(procedure/_, "Second")
-				if (input1IsStmtOrWildCard) { // Call(_, "Second")
-					sqlOld = Call::GetCall_Any_Specific(colSql, input2);
-				}
-				else { // Call(procedure, "Second")
-					sqlOld = Call::GetCall_Synonym_Specific(colSql, input2);
-				}
-			}
-			else if (!input1IsGeneric && input2IsGeneric) { // Call("First", procedure/_)
-				if (input2IsStmtOrWildCard) { // Call("First", _)
-					sqlOld = Call::GetCall_Specific_Any(colSql, input1);
-				}
-				else { // Call("First", procedure)
-					sqlOld = Call::GetCall_Specific_Synonym(colSql, input1);
-				}
-			}
-			else if (!input1IsGeneric && !input2IsGeneric) { // Call("First", "Second")
-				sqlOld = Call::GetCall_Specific_Specific(colSql, input1, input2);
-			}
 		}
 		else if (relationship == "Calls*") {
-			ColumnBuilderSqlCalls colBuilderNext = ColumnBuilderSqlCalls(relEntTemp);
+			ColumnBuilderSqlCalls colBuilderNext = ColumnBuilderSqlCalls(relRefTemp);
 			colSql = colBuilderNext.GetSqlQuery(relEntDescriber);
 			
-			QueryBuilderSqlCallsT queryBuilder = QueryBuilderSqlCallsT(relEntTemp);
+			QueryBuilderSqlCallsT queryBuilder = QueryBuilderSqlCallsT(relRefTemp);
 			querySql = queryBuilder.GetSqlQuery(relEntDescriber);
 
 			sql = HelperFunction::RelRefSqlBuilder(colSql, querySql);
-
-			bool input1IsGeneric = (input1IsStmtOrWildCard || input1IsSynonym);
-			bool input2IsGeneric = (input2IsStmtOrWildCard || input2IsSynonym);
-
-			if (input1IsGeneric && input2IsGeneric) { // Call(procedure/_, procedure/_)
-				if (input1IsStmtOrWildCard && input2IsStmtOrWildCard) { // Call(_,_)
-					sqlOld = Call::GetCallT_Any_Any(colSql);
-				}
-				else if (input1IsStmtOrWildCard && !input2IsStmtOrWildCard) { // Call(_, procedure)
-					sqlOld = Call::GetCallT_Any_Synonym(colSql);
-				}
-				else if (!input1IsStmtOrWildCard && input2IsStmtOrWildCard) { // Call(procedure, _)
-					sqlOld = Call::GetCallT_Synonym_Any(colSql);
-				}
-				else if (!input1IsStmtOrWildCard && !input2IsStmtOrWildCard) { // Call(procedure, procedure)
-					sqlOld = Call::GetCallT_Synonym_Synonym(colSql);
-				}
-			}
-			else if (input1IsGeneric && !input2IsGeneric) { // Call(procedure/_, "Second")
-				if (input1IsStmtOrWildCard) { // Call(_, "Second")
-					sqlOld = Call::GetCallT_Any_Specific(colSql, input2);
-				}
-				else { // Call(procedure, "Second")
-					sqlOld = Call::GetCallT_Synonym_Specific(colSql, input2);
-				}
-			}
-			else if (!input1IsGeneric && input2IsGeneric) { // Call("First", procedure/_)
-				if (input2IsStmtOrWildCard) { // Call("First", _)
-					sqlOld = Call::GetCallT_Specific_Any(colSql, input1);
-				}
-				else { // Call("First", procedure)
-					sqlOld = Call::GetCallT_Specific_Synonym(colSql, input1);
-				}
-			}
-			else if (!input1IsGeneric && !input2IsGeneric) { // Call("First", "Second")
-				sqlOld = Call::GetCallT_Specific_Specific(colSql, input1, input2);
-			}
 		}
 
 		SqlResultStore suchThatResultStore;
 		Database::ExecuteSql(sql, suchThatResultStore);
 
-		SqlResultStore suchThatResultStoreOld;
-		Database::ExecuteSql(sqlOld, suchThatResultStoreOld);
 		//HelperFunction::PrintRowSet(suchThatResultStore.sqlResultSet);
 
 		//if there's common synonym between the table, perform intersect
@@ -653,7 +278,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			}
 		}
 		//HelperFunction::PrintRowSet(selectResultStore.sqlResultSet);
-		relEntStack.pop();
+		relRefStack.pop();
 	}
 
 	while (!patternStack.empty()) {
@@ -667,41 +292,22 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 
 		string sql = HelperFunction::RelRefSqlBuilder(colSql, querySql);
 
-		string synonym = patternTemp.GetSynonym(), input1 = patternTemp.GetInput1Unquoted(), input2 = patternTemp.GetInput2Unquoted();
-		bool input1Quoted = (patternTemp.GetInput1()[0] == '"');
-		bool input1IsSynonym = (synonymEntityMap.find(input1) != synonymEntityMap.end() && !input1Quoted);
-		bool patternSynonymInSelect = (find(select.synonym.begin(), select.synonym.end(), patternTemp.GetSynonym()) != select.synonym.end());
 		set<string> ptSynonym;
-		ptSynonym.insert(synonym);
-		string sqlOld;
+		ptSynonym.insert(patternTemp.GetSynonym());
 		if (patternDescriber.Input1IsSyn()) {
-			sqlOld = ClausePattern::PatternConstruct_Synonym(synonym, input1);
-			ptSynonym.insert(input1);
+			ptSynonym.insert(patternTemp.GetInput1());
 		}
-		else {
-			sqlOld = ClausePattern::PatternConstruct_NotSynonym(synonym);
-		}
-		bool input1IsAny = (input1IsSynonym || input1 == "_");
-		input1 = HelperFunction::ConvertPqlPatternOprtToSqlPatternOprt(input1);
-		input2 = HelperFunction::PatternExprToPostFix(input2);
-		input2 = HelperFunction::ConvertPqlPatternOprtToSqlPatternOprt(input2);
-		if (input1IsAny) {
-			sqlOld = ClausePattern::GetPattern_Any_Expr(sqlOld, input2);
-		}
-		else {
-			sqlOld = ClausePattern::GetPattern_NotAny_Expr(sqlOld, input1, input2);
-		}
+
 		SqlResultStore patternResultStore;
 		Database::ExecuteSql(sql, patternResultStore);
 		set<RowSet> selectResultSet = selectResultStore.sqlResultSet;
 		set<RowSet> patternResultSet = patternResultStore.sqlResultSet;
 		set<string> intersectSynonym;
-		bool patternInput1InSelect = (find(select.synonym.begin(), select.synonym.end(), input1) != select.synonym.end());
 		set_intersection(currentResultSetSynonym.begin(), currentResultSetSynonym.end(), ptSynonym.begin(), ptSynonym.end(), inserter(intersectSynonym, intersectSynonym.begin()));
 		if(!intersectSynonym.empty()){
 			set<RowSet> intersection;
 			selectResultStore.sqlResultSet = HelperFunction::CommonColumnIntersect(selectResultSet, patternResultSet);
-			//currentResultSetSynonym = intersectSynonym;
+			currentResultSetSynonym.insert(ptSynonym.begin(), ptSynonym.end());
 		}
 		else {
 			if (patternResultStore.sqlResultSet.empty()) {
