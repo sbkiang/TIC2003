@@ -45,7 +45,6 @@ string BuilderQuerySqlCallsT::Build_Synonym_Synonym() {
 // Call*(procedure, "Second")
 string BuilderQuerySqlCallsT::Build_Synonym_Specific(string input2) {
 	char Buf[512] = {};
-	cout << input2 << "@";
 	sprintf_s(Buf, "select caller, callee from call where callee = %s", input2.c_str());
 	return string(Buf);
 }
@@ -65,7 +64,7 @@ string BuilderQuerySqlCallsT::Build_Specific_Specific(string input1, string inpu
 }
 
 BuilderQuerySqlCallsT::BuilderQuerySqlCallsT(ClRelRef re) {
-	re = _re;
+	_re = re;
 }
 
 string BuilderQuerySqlCallsT::GetSql(DescriberClRelRef describer)
