@@ -206,12 +206,12 @@ Select a such that Parent(19,a) pattern a("count",_)
 42 - such that (UsesS(s,'flag'))
 stmt s;
 Select s such that Uses(s,"flag")
-6,3
+6
 5000
 43 - such that (ModifiesS(s,'x'))
 stmt s;
 Select s such that Modifies(s,"x")
-2,4,13,18
+2,4,13,14,18
 5000
 44 - such that Parent(i,a) pattern a(_,'1')
 assign a; if i;
@@ -226,91 +226,91 @@ Select t such that Parent(14,t)
 46 - while
 while w;
 Select w;
-15,16,17,18
+14
 5000
 47 - if
 if i;
 Select i;
-20
+19
 5000
 48 - such that calls(p,'readPoint')
 procedure p;
-Select p such that calls(p,'readPoint')
+Select p such that Calls(p,"readPoint")
 computeCentroid
 5000
 49 - such that calls(_,'readPoint')
 procedure p;
-Select p such that calls(_,'readPoint')
-computeCentroid
+Select p such that Calls(_,"readPoint")
+readPoint, printResults, computeCentroid, main
 5000
 50 - such that calls('readPoint',_)
 procedure p;
-Select p such that calls('readPoint',_)
+Select p such that Calls("readPoint",_)
 
 5000
 51 - such that calls('computeCentroid',p)
 procedure p;
-Select p such that calls('computeCentroid',p)
+Select p such that Calls("computeCentroid",p)
 readPoint
 5000
 52 - such that calls(p,_)
 procedure p;
-Select p such that calls(p,_)
+Select p such that Calls(p,_)
 main, computeCentroid
 5000
 53 - such that calls(_,p)
 procedure p;
-Select p such that calls(_,p)
+Select p such that Calls(_,p)
 computeCentroid, printResults, readPoint
 5000
 54 - such that calls*(p,'readPoint')
 procedure p, q;
-Select p such that calls*(p,'readPoint')
+Select p such that Calls*(p,"readPoint")
 main, computeCentroid
 5000
 55 - such that calls*(_,'printResults')
 procedure p, q;
-Select p such that calls*(_,'printResults')
-main
+Select p such that Calls*(_,"printResults")
+main, computeCentroid, printResults, readPoint
 5000
 56 - such that calls*('main',_)
 procedure p, q;
-Select p such that calls*('main',_)
-computeCentroid, printResults, readPoint 
+Select p such that Calls*("main",_)
+main, computeCentroid, printResults, readPoint
 5000
 57 - such that calls*('main',p)
 procedure p, q;
-Select p such that calls*('main',p)
+Select p such that Calls*("main",p)
 computeCentroid, printResults, readPoint 
 5000
 58 - Such that (next #2)
 stmt s;
-Select n such that Next(2, s)
+Select s such that Next(2,s)
 3
 5000
 59 - Such that (next #14)
 stmt s;
-Select n such that Next(14, s)
-15,16,17,18
+Select s such that Next(14, s)
+15,19
 5000
 60 - such that (nextT #2)
 stmt s;
-Select n such that Next*(2, s)
+Select s such that Next*(2, s)
 3
 5000
 61 - such that next(s,8)
 stmt s;
-Select n such that Next(s,8)
+Select s such that Next(s,8)
 7
 5000
 62 - such that next(s,3)
 stmt s;
-Select n such that Next(s,3)
+Select s such that Next(s,3)
 2
 5000
 63 - such that nextT(s,2)
 stmt s;
-Select n such that Next*(s,2)
+Select s such that Next*(s,2)
 1
 5000
 64 - such that next(w,s)
@@ -370,12 +370,12 @@ Select a such that Next(a,pn)
 5000
 75 - tuple such that calls(p,q)
 procedure p, q;
-Select <p,q> such that calls(p,q)
+Select <p,q> such that Calls(p,q)
 main computeCentroid, computeCentroid readPoint, main printResults
 5000
 76 - tuple such that calls*(p,q)
 procedure p, q;
-Select <p,q> such that calls*(p,q)
+Select <p,q> such that Calls*(p,q)
 main computeCentroid, computeCentroid readPoint, main readPoint, main printResults
 5000
 77 - such that (Modifies(c,'cenX'))
@@ -403,9 +403,9 @@ call c;
 Select c such that Uses(c,"normSq")
 3
 5000
-82 - such that (Usess(c,'y'))
+82 - such that (Uses(c,'y'))
 call c;
-Select c such that Usess(c,"y")
+Select c such that Uses(c,"y")
 2
 5000
 83 - such that Uses(a, 'count') such that Parent(w,a) pattern('count',_)
