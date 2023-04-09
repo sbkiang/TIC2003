@@ -17,7 +17,7 @@ string BuilderQuerySqlCalls::Build_Any_Synonym() {
 // Call(_, "Second")
 string BuilderQuerySqlCalls::Build_Any_Specific(string input2) {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, "select caller, callee from call where callee = %s and direct_call = 1", input2.c_str());
+	sprintf_s(sqlBuf, "select caller, callee from call where callee = '%s' and direct_call = 1", input2.c_str());
 	return string(sqlBuf);
 }
 
@@ -31,7 +31,7 @@ string BuilderQuerySqlCalls::Build_Synonym_Any() {
 // Call("First", _)
 string BuilderQuerySqlCalls::Build_Specific_Any(string input1) {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, "select caller, callee from call where caller = %s and direct_call = 1", input1.c_str());
+	sprintf_s(sqlBuf, "select caller, callee from call where caller = '%s' and direct_call = 1", input1.c_str());
 	return string(sqlBuf);
 }
 
@@ -45,21 +45,21 @@ string BuilderQuerySqlCalls::Build_Synonym_Synonym() {
 // Call(procedure, "Second")
 string BuilderQuerySqlCalls::Build_Synonym_Specific(string input2) {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, "select caller, callee from call where callee = %s and direct_call = 1", input2.c_str());
+	sprintf_s(sqlBuf, "select caller, callee from call where callee = '%s' and direct_call = 1", input2.c_str());
 	return string(sqlBuf);
 }
 
 // Call("First", procedure)
 string BuilderQuerySqlCalls::Build_Specific_Synonym(string input1) {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, "select caller, callee from call where caller = %s and direct_call = 1", input1.c_str());
+	sprintf_s(sqlBuf, "select caller, callee from call where caller = '%s' and direct_call = 1", input1.c_str());
 	return string(sqlBuf);
 }
 
 // Call("First", "Second")
 string BuilderQuerySqlCalls::Build_Specific_Specific(string input1, string input2) {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, "select caller, callee from call where caller = %s and callee = %s and direct_call = 1", input1.c_str(), input2.c_str());
+	sprintf_s(sqlBuf, "select caller, callee from call where caller = '%s' and callee = '%s' and direct_call = 1", input1.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
 
