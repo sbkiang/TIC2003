@@ -71,8 +71,7 @@ struct RowSet {
 		cout << coutprint << (compare ? "\ttrue" : "\tfalse") << endl;
 		*/
 		return thisHashResult < otherHashResult;
-	}
-	
+	}	
 };
 
 /*

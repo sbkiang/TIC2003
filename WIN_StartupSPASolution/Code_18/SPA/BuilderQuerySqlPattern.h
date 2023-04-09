@@ -9,5 +9,5 @@ private:
 
 public:
 	BuilderQuerySqlPattern(ClPattern clause);
-	string GetSqlQuery(DescriberClPattern describer);
+	string GetSql(DescriberClPattern describer);
 };

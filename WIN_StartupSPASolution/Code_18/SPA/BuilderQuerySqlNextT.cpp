@@ -136,7 +136,7 @@ BuilderQuerySqlNextT::BuilderQuerySqlNextT(ClRelRef re)
     _re = re;
 }
 
-string BuilderQuerySqlNextT::GetSqlQuery(DescriberClRelRef describer)
+string BuilderQuerySqlNextT::GetSql(DescriberClRelRef describer)
 {
 	bool input1IsAny = describer.Input1IsAny();
 	bool input2IsAny = describer.Input2IsAny();

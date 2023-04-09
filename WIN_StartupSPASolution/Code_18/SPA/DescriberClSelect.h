@@ -2,7 +2,9 @@
 #include <vector>
 #include <string>
 #include "ClSelect.h"
+#include "define.h"
 #include <map>
+#include <regex>
 
 using namespace std;
 

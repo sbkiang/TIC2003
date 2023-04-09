@@ -69,7 +69,7 @@ BuilderColumnSqlUses::BuilderColumnSqlUses(ClRelRef re)
 	_re = re;
 }
 
-string BuilderColumnSqlUses::GetSqlQuery(DescriberClRelRef describer)
+string BuilderColumnSqlUses::GetSql(DescriberClRelRef describer)
 {
 	string input1 = _re.GetInput1();
 	string input2 = _re.GetInput2();

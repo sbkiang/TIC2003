@@ -13,5 +13,5 @@ private:
 
 public:
 	BuilderColumnSqlPattern(ClPattern cp);
-	string GetSqlQuery(DescriberClPattern dcp);
+	string GetSql(DescriberClPattern dcp);
 };

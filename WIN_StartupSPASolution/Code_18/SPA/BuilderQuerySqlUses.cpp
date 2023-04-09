@@ -132,7 +132,7 @@ BuilderQuerySqlUses::BuilderQuerySqlUses(ClRelRef re)
 	_re = re;
 }
 
-string BuilderQuerySqlUses::GetSqlQuery(DescriberClRelRef describer) {
+string BuilderQuerySqlUses::GetSql(DescriberClRelRef describer) {
 	bool input1IsAny = describer.Input1IsAny();
 	bool input2IsAny = describer.Input2IsAny();
 	string input1 = _re.GetInput1Unquoted();

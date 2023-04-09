@@ -19,7 +19,7 @@ BuilderColumnSqlPattern::BuilderColumnSqlPattern(ClPattern cp)
     _cp = cp;
 }
 
-string BuilderColumnSqlPattern::GetSqlQuery(DescriberClPattern describer)
+string BuilderColumnSqlPattern::GetSql(DescriberClPattern describer)
 {
 	string input1 = _cp.GetInput1();
 	string input2 = _cp.GetInput2();

@@ -36,7 +36,7 @@ BuilderColumnSqlParent::BuilderColumnSqlParent(ClRelRef re)
 	_re = re;
 }
 
-string BuilderColumnSqlParent::GetSqlQuery(DescriberClRelRef describer)
+string BuilderColumnSqlParent::GetSql(DescriberClRelRef describer)
 {
 	string input1 = _re.GetInput1();
 	string input2 = _re.GetInput2();

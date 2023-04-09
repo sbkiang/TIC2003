@@ -37,5 +37,5 @@ private:
 
 public:
 	BuilderQuerySqlParentT(ClRelRef re);
-	string GetSqlQuery(DescriberClRelRef describer);
+	string GetSql(DescriberClRelRef describer);
 };

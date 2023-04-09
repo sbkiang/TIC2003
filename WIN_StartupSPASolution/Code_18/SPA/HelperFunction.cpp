@@ -109,12 +109,10 @@ vector<RowSet> HelperFunction::CartesianProduct(vector<RowSet> set1, vector<RowS
 }
 
 
-set<string> HelperFunction::GetColName(set<RowSet> set1) {
+set<string> HelperFunction::GetColNameInRowSet(RowSet rs) {
 	set<string> colName;
-	for (RowSet rs1 : set1) {
-		for (pair<string, string> row : rs1.row) {
-			colName.insert(row.first);
-		}
+	for (pair<string, string> row : rs.row) {
+		colName.insert(row.first);
 	}
 	return colName;
 }
@@ -178,11 +176,4 @@ void HelperFunction::PrintRowSet(set<RowSet> setrs)
 		}
 		cout << body << endl;
 	}
-}
-
-string HelperFunction::RelRefSqlBuilder(string colSql, string querySql)
-{
-	char sqlBuf[700];
-	sprintf_s(sqlBuf, "%s from (%s)", colSql.c_str(), querySql.c_str());
-	return string(sqlBuf);
 }

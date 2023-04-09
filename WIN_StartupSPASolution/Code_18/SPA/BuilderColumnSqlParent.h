@@ -12,5 +12,5 @@ private:
 
 public:
 	BuilderColumnSqlParent(ClRelRef re);
-	string GetSqlQuery(DescriberClRelRef describer);
+	string GetSql(DescriberClRelRef describer);
 };

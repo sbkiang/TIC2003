@@ -68,7 +68,7 @@ BuilderQuerySqlCallsT::BuilderQuerySqlCallsT(ClRelRef re)
 	re = _re;
 }
 
-string BuilderQuerySqlCallsT::GetSqlQuery(DescriberClRelRef describer)
+string BuilderQuerySqlCallsT::GetSql(DescriberClRelRef describer)
 {
 	bool input1IsAny = describer.Input1IsAny();
 	bool input2IsAny = describer.Input2IsAny();

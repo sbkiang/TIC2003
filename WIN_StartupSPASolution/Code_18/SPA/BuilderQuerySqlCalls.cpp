@@ -1,73 +1,73 @@
-#include "QueryBuilderSqlCalls.h"
+#include "BuilderQuerySqlCalls.h"
 
 // Call(_,_)
-string QueryBuilderSqlCalls::Build_Any_Any() {
+string BuilderQuerySqlCalls::Build_Any_Any() {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select caller, callee from call where direct_call = 1");
 	return string(sqlBuf);
 }
 
 // Call(_, procedure)  ** procedure is also a wildcard. so, can be treated as Call(_,_)
-string QueryBuilderSqlCalls::Build_Any_Synonym() {
+string BuilderQuerySqlCalls::Build_Any_Synonym() {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select caller, callee from call where direct_call = 1");
 	return string(sqlBuf);
 }
 
 // Call(_, "Second")
-string QueryBuilderSqlCalls::Build_Any_Specific(string input2) {
+string BuilderQuerySqlCalls::Build_Any_Specific(string input2) {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select caller, callee from call where callee = '%s' and direct_call = 1", input2.c_str());
 	return string(sqlBuf);
 }
 
 // Call(procedure, _)  ** procedure is also a wildcard. so, can be treated as Call(_,_)
-string QueryBuilderSqlCalls::Build_Synonym_Any() {
+string BuilderQuerySqlCalls::Build_Synonym_Any() {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select caller, callee from call where direct_call = 1");
 	return string(sqlBuf);
 }
 
 // Call("First", _)
-string QueryBuilderSqlCalls::Build_Specific_Any(string input1) {
+string BuilderQuerySqlCalls::Build_Specific_Any(string input1) {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select caller, callee from call where caller = '%s' and direct_call = 1", input1.c_str());
 	return string(sqlBuf);
 }
 
 // Call(procedure, procedure)  ** procedure = any. So, same as Call(_,_)
-string QueryBuilderSqlCalls::Build_Synonym_Synonym() {
+string BuilderQuerySqlCalls::Build_Synonym_Synonym() {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select caller, callee from call where direct_call = 1");
 	return string(sqlBuf);
 }
 
 // Call(procedure, "Second")
-string QueryBuilderSqlCalls::Build_Synonym_Specific(string input2) {
+string BuilderQuerySqlCalls::Build_Synonym_Specific(string input2) {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select caller, callee from call where callee = '%s' and direct_call = 1", input2.c_str());
 	return string(sqlBuf);
 }
 
 // Call("First", procedure)
-string QueryBuilderSqlCalls::Build_Specific_Synonym(string input1) {
+string BuilderQuerySqlCalls::Build_Specific_Synonym(string input1) {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select caller, callee from call where caller = '%s' and direct_call = 1", input1.c_str());
 	return string(sqlBuf);
 }
 
 // Call("First", "Second")
-string QueryBuilderSqlCalls::Build_Specific_Specific(string input1, string input2) {
+string BuilderQuerySqlCalls::Build_Specific_Specific(string input1, string input2) {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select caller, callee from call where caller = '%s' and callee = '%s' and direct_call = 1", input1.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
 
-QueryBuilderSqlCalls::QueryBuilderSqlCalls(ClRelRef re) {
+BuilderQuerySqlCalls::BuilderQuerySqlCalls(ClRelRef re) {
 	_re = re;
 }
 
-string QueryBuilderSqlCalls::GetSqlQuery(DescriberClRelRef describer)
+string BuilderQuerySqlCalls::GetSql(DescriberClRelRef describer)
 {
 	bool input1IsAny = describer.Input1IsAny();
 	bool input2IsAny = describer.Input2IsAny();

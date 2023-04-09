@@ -19,7 +19,7 @@ BuilderQuerySqlPattern::BuilderQuerySqlPattern(ClPattern clause)
 	_clause = clause;
 }
 
-string BuilderQuerySqlPattern::GetSqlQuery(DescriberClPattern describer)
+string BuilderQuerySqlPattern::GetSql(DescriberClPattern describer)
 {
 	string input1 = HelperFunction::ConvertPqlPatternOprtToSqlPatternOprt(_clause.GetInput1Unquoted());
 	string input2 = HelperFunction::PatternExprToPostFix(_clause.GetInput2Unquoted());

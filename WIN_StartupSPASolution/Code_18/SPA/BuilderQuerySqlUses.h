@@ -64,5 +64,5 @@ private:
 
 public:
 	BuilderQuerySqlUses(ClRelRef re);
-	string GetSqlQuery(DescriberClRelRef describer);
+	string GetSql(DescriberClRelRef describer);
 };

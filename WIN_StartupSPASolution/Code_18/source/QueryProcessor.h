@@ -17,10 +17,15 @@
 #include "../SPA/ClausePattern.h"
 #include "../SPA/HelperFunction.h"
 #include "../SPA/ClauseNext.h"
+
 #include "../SPA/ClRelRef.h"
 #include "../SPA/ClPattern.h"
+#include "../SPA/ClSelect.h"
+
 #include "../SPA/DescriberClPattern.h"
 #include "../SPA/DescriberClRelref.h"
+#include "../SPA/DescriberClSelect.h"
+
 #include "../SPA/BuilderColumnSqlCalls.h"
 #include "../SPA/BuilderColumnSqlModifies.h"
 #include "../SPA/BuilderColumnSqlUses.h"
@@ -37,6 +42,9 @@
 #include "../SPA/BuilderQuerySqlNext.h"
 #include "../SPA/BuilderQuerySqlNextT.h"
 #include "../SPA/BuilderQuerySqlPattern.h"
+
+#include "../SPA/BuilderFullSqlSelect.h"
+#include "../SPA/BuilderFullSqlRelRefAndPattern.h"
 
 #include "Tokenizer.h"
 #include "Database.h"

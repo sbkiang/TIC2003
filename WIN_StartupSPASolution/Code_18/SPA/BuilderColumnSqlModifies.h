@@ -19,5 +19,5 @@ private:
 	string Build_NameNotSynonym_NameNotSynonym();
 public:
 	BuilderColumnSqlModifies(ClRelRef re);
-	string GetSqlQuery(DescriberClRelRef describer);
+	string GetSql(DescriberClRelRef describer);
 };
