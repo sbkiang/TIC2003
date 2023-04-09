@@ -5,3 +5,4 @@
 ..\Tests\next_source_2.txt ..\Tests\next_queries_2.txt ..\Tests\next_out_2.xml
 ..\Tests\iteration1_own_source.txt ..\Tests\iteration1_own_queries.txt ..\Tests\iteration1_own_queries.xml
 ..\Tests\iteration3_source_3.txt ..\Tests\iteration3_queries_calls.txt ..\Tests\iteration3_calls.xml
+..\Tests\iteration3_source_3.txt ..\Tests\iteration3_queries_error.txt ..\Tests\iteration3_error.xml
