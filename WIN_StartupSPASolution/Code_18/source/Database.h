@@ -54,7 +54,6 @@ public:
 
 	//method to insert pattern into the database
 	static void insertPattern(int stmtNum, string LHS, string RHS, string expression);
-	static void SelectPql(Select& st, SqlResultStore& sqlResultStore);
 
 private:
 	// the connection pointer to the database

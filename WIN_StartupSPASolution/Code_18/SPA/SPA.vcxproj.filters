@@ -36,9 +36,6 @@
     <ClCompile Include="..\source\SourceProcessor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Struct.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="CFG.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

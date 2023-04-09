@@ -109,10 +109,16 @@ vector<RowSet> HelperFunction::CartesianProduct(vector<RowSet> set1, vector<RowS
 }
 
 
-set<string> HelperFunction::GetColNameInRowSet(RowSet rs) {
+set<string> HelperFunction::GetSynonymColInResultSet(set<RowSet> rsSet, map<string,string> synEntMap) {
 	set<string> colName;
-	for (pair<string, string> row : rs.row) {
-		colName.insert(row.first);
+	for(RowSet rs : rsSet){
+		for (pair<string, string> row : rs.row) {
+			if (synEntMap.find(row.first) == synEntMap.end()) {
+				continue;
+			}
+			colName.insert(row.first);
+		}
+		break;
 	}
 	return colName;
 }
