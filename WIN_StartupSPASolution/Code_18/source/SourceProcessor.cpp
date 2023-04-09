@@ -241,7 +241,7 @@ void SourceProcessor::process(string program) {
 				vector<Statement> modifiesStore;
 				caller.push_back(procedure.back()->_name);
 				callee.push_back(tokens.at(i));
-
+				callStatements.push_back(stmt);
 				modifiesStore.push_back(Statement(stmtNum, tokens.at(i), stmtNumSubtract));
 
 				for (int i = 0; i < modifiesStore.size(); i++) { // direct Call
