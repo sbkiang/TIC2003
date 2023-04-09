@@ -1,5 +1,26 @@
-51 - such that Calls('computeCentroid',p)
-procedure p;
-Select p such that Calls('computeCentroid',p)
-readPoint
+59 - Such that (next #14)
+stmt s;
+Select s such that Next(14, s)
+15,16,17,18
+5000
+
+60 - such that (nextT #2)
+stmt s;
+Select s such that Next*(2, s)
+3
+5000
+61 - such that next(s,8)
+stmt s;
+Select s such that Next(s,8)
+7
+5000
+62 - such that next(s,3)
+stmt s;
+Select s such that Next(s,3)
+2
+5000
+63 - such that nextT(s,2)
+stmt s;
+Select s such that Next*(s,2)
+1
 5000
