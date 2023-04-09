@@ -52,7 +52,6 @@ string BuilderColumnSqlCalls::GetSql(DescriberClRelRef describer)
 		return Build_NameNotSynonym_NameSynonym(input2);
 	}
 	else if (input1IsSyn && !input2IsSyn) { // (entity, 10)
-		cout << "@";
 		return Build_NameSynonym_NameNotSynonym(input1);
 	}
 	else if (!input1IsSyn && !input2IsSyn) { // (10, 11)

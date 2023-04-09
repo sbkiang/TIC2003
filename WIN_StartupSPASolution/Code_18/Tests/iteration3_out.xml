@@ -1,14 +1,14 @@
 <?xml-stylesheet type="text/xsl" href="analysis.xsl"?>
 <test_results>
 <info>
-<name>AutoTester</name><parsing_time_taken>1105.000000</parsing_time_taken>
+<name>AutoTester</name><parsing_time_taken>958.000000</parsing_time_taken>
 </info>
 <queries>
 <query>
-<id ReturnTuple="1" Calls="1" SuchThat="1" CondNum="3" RelNum="1" comment="such that calls(p,'readPoint')">48</id><querystr><![CDATA[procedure p; Select p such that Calls (p,'readPoint')]]></querystr>
-<stuans>computeCentroid</stuans>
-<correct>computeCentroid</correct>
-<time_taken>11.000000</time_taken>
+<id ReturnTuple="1" Calls="1" SuchThat="1" CondNum="3" RelNum="1" comment="such that Calls('computeCentroid',p)">51</id><querystr><![CDATA[procedure p; Select p such that Calls('computeCentroid',p)]]></querystr>
+<stuans>readPoint</stuans>
+<correct>readPoint</correct>
+<time_taken>10.000000</time_taken>
 <passed/>
 </query>
 </queries>
