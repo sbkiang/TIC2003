@@ -45,14 +45,14 @@ string BuilderQuerySqlNext::Build_Synonym_Specific(string input1, string input2)
 string BuilderQuerySqlNext::Build_Specific_Any(string input1)
 {
 	char sqlBuf[512];
-	sprintf_s(sqlBuf, "select * from next where from_line = %s)", input1.c_str());
+	sprintf_s(sqlBuf, "select * from next where from_line = %s", input1.c_str());
 	return string(sqlBuf);
 }
 
 string BuilderQuerySqlNext::Build_Specific_Specific(string input1, string input2)
 {
 	char sqlBuf[512];
-	sprintf_s(sqlBuf, "select * from next where from_line = %s and to_line = %s)", input1.c_str(), input2.c_str());
+	sprintf_s(sqlBuf, "select * from next where from_line = %s and to_line = %s", input1.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
 

@@ -238,15 +238,14 @@ void SourceProcessor::process(string program) {
 				procedure.back()->_uses.push_back(stmt->getStmt());
 			}
 			else if (word == "call") {
-				callStatements.push_back(stmt);
 				vector<Statement> modifiesStore;
-
 				caller.push_back(procedure.back()->_name);
 				callee.push_back(tokens.at(i));
 
 				modifiesStore.push_back(Statement(stmtNum, tokens.at(i), stmtNumSubtract));
-				for (int i = 0; i < callStatements.size(); i++) { // direct Call
-					Database::insertCall(procedure.back()->_name, callStatements.at(i)->getStmt(), 1);
+
+				for (int i = 0; i < modifiesStore.size(); i++) { // direct Call
+					Database::insertCall(procedure.back()->_name, modifiesStore.at(i).getStmt(), 1);
 				}
 				for (int j = 0; j < callee.size(); j++) {
 					if (callee[j] == procedure.back()->_name) { // indirect Call
