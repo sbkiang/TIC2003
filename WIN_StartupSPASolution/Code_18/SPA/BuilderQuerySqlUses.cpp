@@ -45,7 +45,7 @@ string BuilderQuerySqlUses::Build_AnyPrintAssign_Specific(string input1, string 
 string BuilderQuerySqlUses::Build_AnyCall_Specific(string input2)
 {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, "select s.line_num, u.variable_name from statement s join use u on u.line_num between (select start from procedure where name = s.text) and (select end from procedure where name = s.text) where s.entity = 'call' and u.variable_name = '%s'", input2.c_str());
+	sprintf_s(sqlBuf, "select s.line_num, m.variable_name from statement s join modify m on m.line_num between (select start from procedure where name = s.text) and (select end from procedure where name = s.text) where s.entity = 'call' and m.variable_name = '%s'", input2.c_str());
 	return string(sqlBuf);
 }
 
