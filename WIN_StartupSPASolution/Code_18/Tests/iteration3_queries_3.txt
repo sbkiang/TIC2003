@@ -206,12 +206,12 @@ Select a such that Parent(19,a) pattern a("count",_)
 42 - such that (UsesS(s,'flag'))
 stmt s;
 Select s such that Uses(s,"flag")
-6
+6,3
 5000
 43 - such that (ModifiesS(s,'x'))
 stmt s;
 Select s such that Modifies(s,"x")
-4
+2,4,13,18
 5000
 44 - such that Parent(i,a) pattern a(_,'1')
 assign a; if i;

@@ -65,7 +65,7 @@ string BuilderQuerySqlCallsT::Build_Specific_Specific(string input1, string inpu
 
 BuilderQuerySqlCallsT::BuilderQuerySqlCallsT(ClRelRef re)
 {
-	re = _re;
+	_re = re;
 }
 
 string BuilderQuerySqlCallsT::GetSql(DescriberClRelRef describer)

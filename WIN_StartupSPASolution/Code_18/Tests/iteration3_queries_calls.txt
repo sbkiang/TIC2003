@@ -1,0 +1,20 @@
+54 - such that Calls*(p,"readPoint")
+procedure p, q;
+Select p such that Calls*(p,"readPoint")
+main, computeCentroid
+5000
+55 - such that Calls*(_,"printResults")
+procedure p, q;
+Select p such that Calls*(_,"printResults")
+main
+5000
+56 - such that Calls*("main",_)
+procedure p, q;
+Select p such that Calls*("main",_)
+computeCentroid, printResults, readPoint 
+5000
+57 - such that Calls*("main",p)
+procedure p, q;
+Select p such that Calls*("main",p)
+computeCentroid, printResults, readPoint 
+5000
