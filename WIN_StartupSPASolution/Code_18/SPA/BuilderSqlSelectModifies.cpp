@@ -1,118 +1,118 @@
-#include "BuilderQuerySqlModifies.h"
+#include "BuilderSqlSelectModifies.h"
 
-string BuilderQuerySqlModifies::Build_AnyReadAssign_Any(string input1)
+string BuilderSqlSelectModifies::Build_AnyReadAssign_Any(string input1)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select m.line_num, m.variable_name from modify m join statement s on s.line_num = m.line_num where s.entity = '%s'", input1.c_str());
 	return string(sqlBuf);
 }
 
-string BuilderQuerySqlModifies::Build_AnyCall_Any()
+string BuilderSqlSelectModifies::Build_AnyCall_Any()
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select s.line_num, m.variable_name from statement s join modify m on m.line_num between (select start from procedure where name = s.text) and (select end from procedure where name = s.text) where s.entity = 'call'");
 	return string(sqlBuf);
 }
 
-string BuilderQuerySqlModifies::Build_AnyProcedure_Any()
+string BuilderSqlSelectModifies::Build_AnyProcedure_Any()
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select p.name, m.variable_name from procedure p join modify m on m.line_num between p.start and p.end");
 	return string(sqlBuf);
 }
 
-string BuilderQuerySqlModifies::Build_AnyWhileIf_Any(string input1)
+string BuilderSqlSelectModifies::Build_AnyWhileIf_Any(string input1)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select p.line_num, m.variable_name from parent p join statement s on s.line_num = p.line_num join modify m on m.line_num between p.line_num and p.child_end where s.entity = '%s'", input1.c_str());
 	return string(sqlBuf);
 }
 
-string BuilderQuerySqlModifies::Build_Any_Any()
+string BuilderSqlSelectModifies::Build_Any_Any()
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select p.line_num, m.variable_name from parent p join modify m on m.line_num between p.line_num and p.child_end union select line_num, variable_name from modify");
 	return string(sqlBuf);
 }
 
-string BuilderQuerySqlModifies::Build_AnyReadAssign_Specific(string input1, string input2)
+string BuilderSqlSelectModifies::Build_AnyReadAssign_Specific(string input1, string input2)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select m.line_num, m.variable_name from modify m join statement s on s.line_num = m.line_num where s.entity = '%s' and m.variable_name = '%s'", input1.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
 
-string BuilderQuerySqlModifies::Build_AnyCall_Specific(string input2)
+string BuilderSqlSelectModifies::Build_AnyCall_Specific(string input2)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select s.line_num, m.variable_name from statement s join modify m on m.line_num between (select start from procedure where name = s.text) and (select end from procedure where name = s.text) where s.entity = 'call' and m.variable_name = '%s'", input2.c_str());
 	return string(sqlBuf);
 }
 
-string BuilderQuerySqlModifies::Build_AnyProcedure_Specific(string input2)
+string BuilderSqlSelectModifies::Build_AnyProcedure_Specific(string input2)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select p.name, m.variable_name from procedure p join modify m on m.line_num between p.start and p.end where m.variable_name = '%s'", input2.c_str());
 	return string(sqlBuf);
 }
 
-string BuilderQuerySqlModifies::Build_AnyWhileIf_Specific(string input1, string input2)
+string BuilderSqlSelectModifies::Build_AnyWhileIf_Specific(string input1, string input2)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select p.line_num, m.variable_name parent p join statement s on s.line_num = p.line_num join modify m on m.line_num between p.line_num and p.child_end where s.entity = '%s' and m.variable_name = '%s'", input1.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
 
-string BuilderQuerySqlModifies::Build_Any_Specific(string input2)
+string BuilderSqlSelectModifies::Build_Any_Specific(string input2)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select p.line_num, m.variable_name from parent p join modify m on m.line_num between p.line_num and p.child_end where m.variable_name = '%s' union select line_num, variable_name from modify where variable_name = '%s'", input2.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
 
-string BuilderQuerySqlModifies::Build_SpecificReadAssign_Any(string input1)
+string BuilderSqlSelectModifies::Build_SpecificReadAssign_Any(string input1)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select m.line_num, m.variable_name from modify m join statement s on s.line_num = m.line_num where s.line_num = %s", input1.c_str());
 	return string(sqlBuf);
 }
 
-string BuilderQuerySqlModifies::Build_SpecificCall_Any(string input1)
+string BuilderSqlSelectModifies::Build_SpecificCall_Any(string input1)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select s.line_num, m.variable from statement s join modify m on m.line_num between (select start from procedure where name = s.text) and (select end from procedure where name = s.text) where s.line_num = %s", input1.c_str());
 	return string(sqlBuf);
 }
 
-string BuilderQuerySqlModifies::Build_SpecificProcedure_Any(string input1)
+string BuilderSqlSelectModifies::Build_SpecificProcedure_Any(string input1)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select p.name, m.variable_name from procedure p join modify m on m.line_num between p.start and p.end where p.name = '%s'", input1.c_str());
 	return string(sqlBuf);
 }
 
-string BuilderQuerySqlModifies::Build_SpecificWhileIf_Any(string input1)
+string BuilderSqlSelectModifies::Build_SpecificWhileIf_Any(string input1)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select p.line_num, m.variable_name from parent p join modify m on m.line_num between p.line_num and p.child_end where p.line_num = %s", input1.c_str());
 	return string(sqlBuf);
 }
 
-string BuilderQuerySqlModifies::Build_SpecificReadAssign_Specific(string input1, string input2)
+string BuilderSqlSelectModifies::Build_SpecificReadAssign_Specific(string input1, string input2)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select m.line_num, m.variable_name from modify m join statement s on s.line_num = m.line_num where s.line_num = %s and m.variable_name = '%s'", input1.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
 
-string BuilderQuerySqlModifies::Build_SpecificCall_Specific(string input1, string input2)
+string BuilderSqlSelectModifies::Build_SpecificCall_Specific(string input1, string input2)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select s.line_num, m.variable_name from statement s join modify m on m.line_num between (select start from procedure where name = s.text) and (select end from procedure where name = s.text) where s.line_num = %s where m.variable_name = '%s'", input1.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
 
-string BuilderQuerySqlModifies::Build_SpecificProcedure_Specific(string input1, string input2)
+string BuilderSqlSelectModifies::Build_SpecificProcedure_Specific(string input1, string input2)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select p.line_num, m.variable_name from procedure p join modify m on m.line_num between p.start and p.end where p.name = '%s' and m.variable_name = '%s'", input1.c_str(), input2.c_str());
@@ -120,19 +120,19 @@ string BuilderQuerySqlModifies::Build_SpecificProcedure_Specific(string input1, 
 }
 
 
-string BuilderQuerySqlModifies::Build_SpecificWhileIf_Specific(string input1, string input2)
+string BuilderSqlSelectModifies::Build_SpecificWhileIf_Specific(string input1, string input2)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select p.line_num, m.variable_name from parent p join modify m on m.line_num between p.line_num and p.child_end where p.line_num = %s and m.variable_name = '%s'", input1.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
 
-BuilderQuerySqlModifies::BuilderQuerySqlModifies(ClRelRef re)
+BuilderSqlSelectModifies::BuilderSqlSelectModifies(ClRelRef re)
 {
 	_re = re;
 }
 
-string BuilderQuerySqlModifies::GetSql(DescriberClRelRef describer)
+string BuilderSqlSelectModifies::GetSql(DescriberClRelRef describer)
 {
 	bool input1IsAny = describer.Input1IsAny();
 	bool input2IsAny = describer.Input2IsAny();

@@ -4,38 +4,38 @@
 using namespace std;
 
 //Interface class for all the relationship's QueryBuilders (the part where we select the columns from table)
-class BuilderQuerySqlNext : IBuilderSqlRelRef {
+class BuilderSqlSelectParent : IBuilderSqlRelRef {
 private:
 	ClRelRef _re;
 
-	// next(stmt/_, stmt/_)
+	// Parent(stmt/_ , stmt/_) 
 	string Build_Any_Any();
 
-	// next(stmt/_, 10)
-	string Build_Any_Specific(string input2);
-
-	// next(stmt/_, stmtRef_excld_stmt)
+	// Parent(stmt/_, read/print/assign/while/if/call)
 	string Build_Any_Synonym(string input2);
 
-	// next(stmtRef_excld_stmt, stmt/_)
+	// Parent(stmt/_, 10)
+	string Build_Any_Specific(string input2);
+
+	// Parent(while/if, stmt/_)
 	string Build_Synonym_Any(string input1);
 
-	// next(stmtRef_excld_stmt, stmtRef_excld_stmt)
+	// Parent(while/if, read/print/assign/while/if/call)
 	string Build_Synonym_Synonym(string input1, string input2);
 
-	// next(stmtRef_excld_stmt, 10)
+	// Parent(while/if, 10)
 	string Build_Synonym_Specific(string input1, string input2);
 
-	// next(10, stmt/_)
+	// Parent(10, stmt/_)
 	string Build_Specific_Any(string input1);
 
-	// next(10, 11)
-	string Build_Specific_Specific(string input1, string input2);
-
-	// next(10, stmtRef_excld_stmt)
+	// Parent(10, read/print/assign/while/if/call)
 	string Build_Specific_Synonym(string input1, string input2);
 
+	// Parent(10, 10)
+	string Build_Specific_Specific(string input1, string input2);
+
 public:
-	BuilderQuerySqlNext(ClRelRef re);
+	BuilderSqlSelectParent(ClRelRef re);
 	string GetSql(DescriberClRelRef describer);
 };

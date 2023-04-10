@@ -1,39 +1,39 @@
-#include "BuilderColumnSqlNext.h"
+#include "BuilderSqlColumnNext.h"
 
-string BuilderColumnSqlNext::Build_StmtSynonym_StmtSynonym(string synonym1, string synonym2)
+string BuilderSqlColumnNext::Build_StmtSynonym_StmtSynonym(string synonym1, string synonym2)
 {
 	char sqlBuf[512];
 	sprintf_s(sqlBuf, "select distinct from_line as %s, to_line as %s", synonym1.c_str(), synonym2.c_str());
 	return string(sqlBuf);
 }
 
-string BuilderColumnSqlNext::Build_StmtSynonym_StmtNotSynonym(string synonym1)
+string BuilderSqlColumnNext::Build_StmtSynonym_StmtNotSynonym(string synonym1)
 {
 	char sqlBuf[512];
 	sprintf_s(sqlBuf, "select distinct from_line as %s", synonym1.c_str());
 	return string(sqlBuf);
 }
 
-string BuilderColumnSqlNext::Build_StmtNotSynonym_StmtSynonym(string synonym2)
+string BuilderSqlColumnNext::Build_StmtNotSynonym_StmtSynonym(string synonym2)
 {
 	char sqlBuf[512];
 	sprintf_s(sqlBuf, "select distinct to_line as %s", synonym2.c_str());
 	return string(sqlBuf);
 }
 
-string BuilderColumnSqlNext::Build_StmtNotSynonym_StmtNotSynonym()
+string BuilderSqlColumnNext::Build_StmtNotSynonym_StmtNotSynonym()
 {
 	char sqlBuf[512];
 	sprintf_s(sqlBuf, "select distinct from_line, to_line");
 	return string(sqlBuf);
 }
 
-BuilderColumnSqlNext::BuilderColumnSqlNext(ClRelRef re)
+BuilderSqlColumnNext::BuilderSqlColumnNext(ClRelRef re)
 {
 	_re = re;
 }
 
-string BuilderColumnSqlNext::GetSql(DescriberClRelRef describer)
+string BuilderSqlColumnNext::GetSql(DescriberClRelRef describer)
 {
 	string input1 = _re.GetInput1();
 	string input2 = _re.GetInput2();

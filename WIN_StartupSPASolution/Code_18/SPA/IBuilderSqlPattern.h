@@ -2,7 +2,7 @@
 #include <string>
 #include <map>
 #include "DescriberClPattern.h"
-#include "ClPattern.h";
+#include "ClPattern.h"
 
 using namespace std;
 

@@ -1,6 +1,6 @@
-#include "BuilderColumnSqlParent.h"
+#include "BuilderSqlColumnParent.h"
 
-string BuilderColumnSqlParent::Build_StmtSynonym_StmtSynonym(string input1, string input2)
+string BuilderSqlColumnParent::Build_StmtSynonym_StmtSynonym(string input1, string input2)
 {
 	char sql[100] = {};
 	sprintf_s(sql, "select distinct parent as %s, child as %s", input1.c_str(), input2.c_str());
@@ -8,7 +8,7 @@ string BuilderColumnSqlParent::Build_StmtSynonym_StmtSynonym(string input1, stri
 }
 
 // Parent((while|if), 10)
-string BuilderColumnSqlParent::Build_StmtSynonym_StmtNotSynonym(string input1)
+string BuilderSqlColumnParent::Build_StmtSynonym_StmtNotSynonym(string input1)
 {
 	char sql[100] = {};
 	sprintf_s(sql, "select distinct parent as %s", input1.c_str());
@@ -16,7 +16,7 @@ string BuilderColumnSqlParent::Build_StmtSynonym_StmtNotSynonym(string input1)
 }
 
 // Parent(10, (stmt|read|print|assign|while|if|call))
-string BuilderColumnSqlParent::Build_StmtNotSynonym_StmtSynonym(string input2)
+string BuilderSqlColumnParent::Build_StmtNotSynonym_StmtSynonym(string input2)
 {
 	char sql[100] = {};
 	sprintf_s(sql, "select distinct child as %s", input2.c_str());
@@ -24,19 +24,19 @@ string BuilderColumnSqlParent::Build_StmtNotSynonym_StmtSynonym(string input2)
 }
 
 // Parent(10, 12)
-string BuilderColumnSqlParent::Build_StmtNotSynonym_StmtNotSynonym()
+string BuilderSqlColumnParent::Build_StmtNotSynonym_StmtNotSynonym()
 {
 	char sql[100] = {};
 	sprintf_s(sql, "select distinct parent, child");
 	return string(sql);
 }
 
-BuilderColumnSqlParent::BuilderColumnSqlParent(ClRelRef re)
+BuilderSqlColumnParent::BuilderSqlColumnParent(ClRelRef re)
 {
 	_re = re;
 }
 
-string BuilderColumnSqlParent::GetSql(DescriberClRelRef describer)
+string BuilderSqlColumnParent::GetSql(DescriberClRelRef describer)
 {
 	string input1 = _re.GetInput1();
 	string input2 = _re.GetInput2();

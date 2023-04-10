@@ -1,25 +1,25 @@
-#include "BuilderColumnSqlPattern.h"
+#include "BuilderSqlColumnPattern.h"
 
-string BuilderColumnSqlPattern::Build_Synonym(string selectSynonym, string input1Synonym)
+string BuilderSqlColumnPattern::Build_Synonym(string selectSynonym, string input1Synonym)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select line_num as %s, lhs as %s", selectSynonym.c_str(), input1Synonym.c_str());
 	return string(sqlBuf);
 }
 
-string BuilderColumnSqlPattern::Build_NotSynonym(string selectSynonym)
+string BuilderSqlColumnPattern::Build_NotSynonym(string selectSynonym)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select line_num as %s", selectSynonym.c_str());
 	return string(sqlBuf);
 }
 
-BuilderColumnSqlPattern::BuilderColumnSqlPattern(ClPattern cp)
+BuilderSqlColumnPattern::BuilderSqlColumnPattern(ClPattern cp)
 {
     _cp = cp;
 }
 
-string BuilderColumnSqlPattern::GetSql(DescriberClPattern describer)
+string BuilderSqlColumnPattern::GetSql(DescriberClPattern describer)
 {
 	string input1 = _cp.GetInput1();
 	string input2 = _cp.GetInput2();

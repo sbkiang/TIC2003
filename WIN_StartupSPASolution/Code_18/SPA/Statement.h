@@ -6,6 +6,13 @@ using namespace std;
 class Container;
 
 class Statement{
+private:
+	string _stmt;
+	string _entity;
+	int _stmtNum = 0;
+	int _level = 0;
+	int _stmtNumSubtract = 0;
+
 public:
 	// Default Constructor
 	Statement(int stmtNum, string stmt, int stmtNumSubtract);
@@ -13,25 +20,15 @@ public:
 	Statement(int stmtNum, int level, Container* container, int stmtNumSubtract);
 	Statement(int stmtNum, string stmt, int level, Container* container, int stmtNumSubtract);
 
-	// Default Destructor
-	~Statement();
-
-	string _entity = "";
 	bool _containerHead = false;
 	bool _containerTail = false;
 	Container* _container = nullptr;
 
-	void setEntity(string entity);
-	string getEntity();
-	int getAdjustedStmtNum();
-	int getStmtNum();
-	void appendStmt(string s);
-	string getStmt();
-	int getLevel();
-
-private:
-	string _stmt = "";
-	int _stmtNum = 0;
-	int _level = 0;
-	int _stmtNumSubtract = 0;
+	void SetEntity(string entity);
+	string GetEntity();
+	int GetAdjustedStmtNum();
+	int GetStmtNum();
+	void AddStmt(string s);
+	string GetStmt();
+	int GetLevel();
 };

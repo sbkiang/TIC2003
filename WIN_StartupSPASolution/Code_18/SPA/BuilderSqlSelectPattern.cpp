@@ -1,25 +1,25 @@
-#include "BuilderQuerySqlPattern.h"
+#include "BuilderSqlSelectPattern.h"
 
-string BuilderQuerySqlPattern::Build_NotAny_Expr(string input1, string input2)
+string BuilderSqlSelectPattern::Build_NotAny_Expr(string input1, string input2)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select * from pattern where lhs = '%s' and expression like '%s'", input1.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
 
-string BuilderQuerySqlPattern::Build_Any_Expr(string input2)
+string BuilderSqlSelectPattern::Build_Any_Expr(string input2)
 {
 	char sqlBuf[512] = {};
 	sprintf_s(sqlBuf, "select * from pattern where expression like '%s' ", input2.c_str());
 	return string(sqlBuf);
 }
 
-BuilderQuerySqlPattern::BuilderQuerySqlPattern(ClPattern clause)
+BuilderSqlSelectPattern::BuilderSqlSelectPattern(ClPattern clause)
 {
 	_clause = clause;
 }
 
-string BuilderQuerySqlPattern::GetSql(DescriberClPattern describer)
+string BuilderSqlSelectPattern::GetSql(DescriberClPattern describer)
 {
 	string input1 = HelperFunction::ConvertPqlPatternOprtToSqlPatternOprt(_clause.GetInput1Unquoted());
 	string input2 = HelperFunction::PatternExprToPostFix(_clause.GetInput2Unquoted());

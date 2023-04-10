@@ -28,32 +28,30 @@ Statement::Statement(int stmtNum, string stmt, int level, Container* container, 
 	_container = container;
 }
 
-Statement::~Statement() {}
-
-int Statement::getAdjustedStmtNum() {
+int Statement::GetAdjustedStmtNum() {
 	return _stmtNum - _stmtNumSubtract;
 }
 
-int Statement::getStmtNum() {
+int Statement::GetStmtNum() {
 	return _stmtNum;
 }
 
-void Statement::appendStmt(string s) {
+void Statement::AddStmt(string s) {
 	_stmt += s;
 }
 
-string Statement::getStmt() {
+string Statement::GetStmt() {
 	return _stmt;
 }
 
-int Statement::getLevel() {
+int Statement::GetLevel() {
 	return _level;
 }
 
-void Statement::setEntity(string entity) {
+void Statement::SetEntity(string entity) {
 	_entity = entity;
 }
 
-string Statement::getEntity() {
+string Statement::GetEntity() {
 	return _entity;
 }

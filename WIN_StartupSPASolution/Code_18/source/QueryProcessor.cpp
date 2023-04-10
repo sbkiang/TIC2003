@@ -137,10 +137,10 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		}
 
 		if (relationship == "Uses") { // input1 is Stmt Num or Name, input2 is Name
-			BuilderColumnSqlUses colBuilder = BuilderColumnSqlUses(relRefTemp);
+			BuilderSqlColumnUses colBuilder = BuilderSqlColumnUses(relRefTemp);
 			colSql = colBuilder.GetSql(relEntDescriber);
 			
-			BuilderQuerySqlUses queryBuilder = BuilderQuerySqlUses(relRefTemp);
+			BuilderSqlSelectUses queryBuilder = BuilderSqlSelectUses(relRefTemp);
 			querySql = queryBuilder.GetSql(relEntDescriber);
 
 			sql = BuilderFullSqlRelRefAndPattern::BuildSql(colSql, querySql);
@@ -148,67 +148,67 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		}
 
  		else if (relationship == "Modifies") { // input1 is Stmt Num or Name, input2 is Name or Wildcard
-			BuilderColumnSqlModifies colBuilder = BuilderColumnSqlModifies(relRefTemp);
+			BuilderSqlColumnModifies colBuilder = BuilderSqlColumnModifies(relRefTemp);
 			colSql = colBuilder.GetSql(relEntDescriber);
 
-			BuilderQuerySqlModifies queryBuilder = BuilderQuerySqlModifies(relRefTemp);
+			BuilderSqlSelectModifies queryBuilder = BuilderSqlSelectModifies(relRefTemp);
 			querySql = queryBuilder.GetSql(relEntDescriber);
 
 			sql = BuilderFullSqlRelRefAndPattern::BuildSql(colSql, querySql);
 		}
 
 		else if (relationship == "Parent") {
-			BuilderColumnSqlParent colBuilder = BuilderColumnSqlParent(relRefTemp);
+			BuilderSqlColumnParent colBuilder = BuilderSqlColumnParent(relRefTemp);
 			colSql = colBuilder.GetSql(relEntDescriber);
 
-			BuilderQuerySqlParent queryBuilder = BuilderQuerySqlParent(relRefTemp);
+			BuilderSqlSelectParent queryBuilder = BuilderSqlSelectParent(relRefTemp);
 			querySql = queryBuilder.GetSql(relEntDescriber);
 
 			sql = BuilderFullSqlRelRefAndPattern::BuildSql(colSql, querySql);
 		}
 
 		else if (relationship == "Parent*") { // input1 is Stmt Num, input2 is Stmt Num
-			BuilderColumnSqlParent colBuilder = BuilderColumnSqlParent(relRefTemp);
+			BuilderSqlColumnParent colBuilder = BuilderSqlColumnParent(relRefTemp);
 			colSql = colBuilder.GetSql(relEntDescriber);
 			
-			BuilderQuerySqlParentT queryBuilder = BuilderQuerySqlParentT(relRefTemp);
+			BuilderSqlSelectParentT queryBuilder = BuilderSqlSelectParentT(relRefTemp);
 			querySql = queryBuilder.GetSql(relEntDescriber);
 
 			sql = BuilderFullSqlRelRefAndPattern::BuildSql(colSql, querySql);
 		}
 			
 		else if (relationship == "Next") {
-			BuilderColumnSqlNext colBuilderNext = BuilderColumnSqlNext(relRefTemp);
+			BuilderSqlColumnNext colBuilderNext = BuilderSqlColumnNext(relRefTemp);
 			colSql = colBuilderNext.GetSql(relEntDescriber);
 			
-			BuilderQuerySqlNext queryBuilder = BuilderQuerySqlNext(relRefTemp);
+			BuilderSqlSelectNext queryBuilder = BuilderSqlSelectNext(relRefTemp);
 			querySql = queryBuilder.GetSql(relEntDescriber);
 
 			sql = BuilderFullSqlRelRefAndPattern::BuildSql(colSql, querySql);
 		}
 		else if (relationship == "Next*"){
-			BuilderColumnSqlNext colBuilderNext = BuilderColumnSqlNext(relRefTemp);
+			BuilderSqlColumnNext colBuilderNext = BuilderSqlColumnNext(relRefTemp);
 			colSql = colBuilderNext.GetSql(relEntDescriber);
 			
-			BuilderQuerySqlNextT queryBuilder = BuilderQuerySqlNextT(relRefTemp);
+			BuilderSqlSelectNextT queryBuilder = BuilderSqlSelectNextT(relRefTemp);
 			querySql = queryBuilder.GetSql(relEntDescriber);
 
 			sql = BuilderFullSqlRelRefAndPattern::BuildSql(colSql, querySql);
 		}
 		else if (relationship == "Calls") {
-			BuilderColumnSqlCalls colBuilderNext = BuilderColumnSqlCalls(relRefTemp);
+			BuilderSqlColumnCalls colBuilderNext = BuilderSqlColumnCalls(relRefTemp);
 			colSql = colBuilderNext.GetSql(relEntDescriber);
 			
-			BuilderQuerySqlCalls queryBuilder = BuilderQuerySqlCalls(relRefTemp);
+			BuilderSqlSelectCalls queryBuilder = BuilderSqlSelectCalls(relRefTemp);
 			querySql = queryBuilder.GetSql(relEntDescriber);
 
 			sql = BuilderFullSqlRelRefAndPattern::BuildSql(colSql, querySql);
 		}
 		else if (relationship == "Calls*") {
-			BuilderColumnSqlCalls colBuilderNext = BuilderColumnSqlCalls(relRefTemp);
+			BuilderSqlColumnCalls colBuilderNext = BuilderSqlColumnCalls(relRefTemp);
 			colSql = colBuilderNext.GetSql(relEntDescriber);
 			
-			BuilderQuerySqlCallsT queryBuilder = BuilderQuerySqlCallsT(relRefTemp);
+			BuilderSqlSelectCallsT queryBuilder = BuilderSqlSelectCallsT(relRefTemp);
 			querySql = queryBuilder.GetSql(relEntDescriber);
 
 			sql = BuilderFullSqlRelRefAndPattern::BuildSql(colSql, querySql);
@@ -252,10 +252,10 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 	while (!patternStack.empty()) {
 		ClPattern patternTemp = patternStack.top();
 		DescriberClPattern patternDescriber = DescriberClPattern(patternTemp, synonymEntityMap);
-		BuilderColumnSqlPattern colBuilderPattern = BuilderColumnSqlPattern(patternTemp);
+		BuilderSqlColumnPattern colBuilderPattern = BuilderSqlColumnPattern(patternTemp);
 		string colSql = colBuilderPattern.GetSql(patternDescriber);
 
-		BuilderQuerySqlPattern queryBuilder = BuilderQuerySqlPattern(patternTemp);
+		BuilderSqlSelectPattern queryBuilder = BuilderSqlSelectPattern(patternTemp);
 		string querySql = queryBuilder.GetSql(patternDescriber);
 
 		string sql = BuilderFullSqlRelRefAndPattern::BuildSql(colSql, querySql);

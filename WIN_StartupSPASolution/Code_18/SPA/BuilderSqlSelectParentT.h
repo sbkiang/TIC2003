@@ -4,7 +4,7 @@
 using namespace std;
 
 //Interface class for all the relationship's QueryBuilders (the part where we select the columns from table)
-class BuilderQuerySqlParentT : IBuilderSqlRelRef {
+class BuilderSqlSelectParentT : IBuilderSqlRelRef {
 private:
 	ClRelRef _re;
 
@@ -36,6 +36,6 @@ private:
 	string Build_Specific_Specific(string input1, string input2);
 
 public:
-	BuilderQuerySqlParentT(ClRelRef re);
+	BuilderSqlSelectParentT(ClRelRef re);
 	string GetSql(DescriberClRelRef describer);
 };
