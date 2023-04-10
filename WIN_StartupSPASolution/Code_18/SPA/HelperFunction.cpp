@@ -76,6 +76,18 @@ string HelperFunction::ConvertPqlPatternOprtToSqlPatternOprt(string input)
 		pos = input.find("_");
 		if (pos > -1) { input.replace(pos, 1, "%"); }
 	} while (pos > -1);
+	pos = 0;
+	return input;
+}
+
+string HelperFunction::EscapePercentSymbol(string input)
+{
+	int pos = 0;
+	do {
+		pos = input.find("%");
+		if (pos > -1) { input.replace(pos, 1, "\%"); }
+	} while (pos > -1);
+	pos = 0;
 	return input;
 }
 

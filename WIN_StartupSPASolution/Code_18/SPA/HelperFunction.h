@@ -14,6 +14,7 @@ public:
 	static string PatternExprToPostFix(string input);
 	static string InfixToPostfix(string s);
 	static string ConvertPqlPatternOprtToSqlPatternOprt(string input);
+	static string EscapePercentSymbol(string input);
 	static string RemoveQuote(string input);
 	static set<string> GetSynonymColInResultSet(set<RowSet> rsSet, map<string, string> synEntMap);
 	static set<RowSet> CartesianProduct(set<RowSet> set1, set<RowSet> set2);
