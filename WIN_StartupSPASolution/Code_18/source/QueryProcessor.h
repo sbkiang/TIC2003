@@ -10,13 +10,6 @@
 
 #include "../SPA/Struct.h"
 #include "../SPA/define.h"
-#include "../SPA/ClauseModifies.h"
-#include "../SPA/ClauseUses.h"
-#include "../SPA/ClauseParent.h"
-#include "../SPA/ClauseCall.h"
-#include "../SPA/ClausePattern.h"
-#include "../SPA/HelperFunction.h"
-#include "../SPA/ClauseNext.h"
 
 #include "../SPA/ClRelRef.h"
 #include "../SPA/ClPattern.h"

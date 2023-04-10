@@ -1,0 +1,5 @@
+25 - Pattern
+assign a;
+Select a pattern a(_,_"number % 12"_)
+8
+5000

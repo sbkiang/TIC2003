@@ -3,14 +3,14 @@
 string BuilderSqlSelectPattern::Build_NotAny_Expr(string input1, string input2)
 {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, "select * from pattern where lhs = '%s' and expression like '%s'", input1.c_str(), input2.c_str());
+	sprintf_s(sqlBuf, "select * from pattern where lhs = '%s' and expression like '%s' escape '!'", input1.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
 
 string BuilderSqlSelectPattern::Build_Any_Expr(string input2)
 {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, "select * from pattern where expression like '%s' ", input2.c_str());
+	sprintf_s(sqlBuf, "select * from pattern where expression like '%s' escape '!'", input2.c_str());
 	return string(sqlBuf);
 }
 

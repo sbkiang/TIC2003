@@ -161,9 +161,6 @@
     <ClInclude Include="HelperFunction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IColumnBuilderSqlRelRef.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="BuilderSqlColumnModifies.h">
       <Filter>Header Files</Filter>
     </ClInclude>

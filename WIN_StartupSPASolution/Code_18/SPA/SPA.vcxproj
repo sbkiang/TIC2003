@@ -85,7 +85,6 @@
     <ClInclude Include="define.h" />
     <ClInclude Include="IBuilderSqlPattern.h" />
     <ClInclude Include="IBuilderSqlRelRef.h" />
-    <ClInclude Include="IColumnBuilderSqlRelRef.h" />
     <ClInclude Include="Procedure.h" />
     <ClInclude Include="Statement.h" />
     <ClInclude Include="Struct.h" />
