@@ -23,6 +23,7 @@ string BuilderSqlSelectPattern::GetSql(DescriberClPattern describer)
 {
 	string input1 = HelperFunction::ConvertPqlPatternOprtToSqlPatternOprt(_clause.GetInput1Unquoted());
 	string input2 = HelperFunction::PatternExprToPostFix(_clause.GetInput2Unquoted());
+	input2 = HelperFunction::EscapePercentSymbol(input2);
 	input2 = HelperFunction::ConvertPqlPatternOprtToSqlPatternOprt(input2);
 	if (describer.Input1IsAny()) {
 		return Build_Any_Expr(input2);
