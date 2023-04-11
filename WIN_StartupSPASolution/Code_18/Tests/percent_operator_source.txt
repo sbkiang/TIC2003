@@ -1,13 +1,14 @@
-
 procedure sumDigits {
     read number;
     sum = 0;
     call hello;
 
     if (a < 5) then {
-        ans = 1; }
+        ans = 1; 
+	}
     else {
-        ans = 100; }
+        ans = 100;
+	}
    
     while (number > 100) {
         digit = number % 12;

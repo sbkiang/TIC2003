@@ -8,3 +8,5 @@ constexpr auto regexAssignPrint = "(assign|print)";
 constexpr auto regexAssignRead = "(assign|read)";
 constexpr auto regexWord = "\\w+";
 constexpr auto regexQuote = "\\\"";
+constexpr auto regexVariables = "^((?!(procedure|while|if|then|else|call|read|print)$)[A-Za-z][A-Za-z0-9]*)";
+constexpr auto regexConstants = "^[0-9]+$";

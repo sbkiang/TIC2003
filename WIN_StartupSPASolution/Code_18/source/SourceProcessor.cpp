@@ -22,8 +22,6 @@ void SourceProcessor::process(string program) {
 	vector<string> tokens;
 	tk.tokenize(program, tokens);
 
-	string regexVariables = "^((?!(procedure|while|if|then|else|call|read|print)$)[A-Za-z][A-Za-z0-9]*)";
-	string regexConstants = "^[0-9]+$";
 	// This logic is highly simplified based on iteration 1 requirements and 
 	// the assumption that the programs are valid.
 
