@@ -164,26 +164,6 @@ set<RowSet> HelperFunction::CommonColumnIntersect(set<RowSet> set1, set<RowSet> 
 	return newSet;
 }
 
-vector<RowSet> HelperFunction::CommonColumnIntersect(vector<RowSet> set1, vector<RowSet> set2)
-{
-	vector<RowSet> newRowSet;
-	for (RowSet rs1 : set1) {
-		for (RowSet rs2 : set2) {
-			if (!(rs1 < rs2) && !(rs2 < rs1)) {
-				RowSet tempRs;
-				for (pair<string, string> p : rs2.row) {
-					tempRs.row.insert(p);
-				}
-				for (pair<string, string> p : rs1.row) {
-					tempRs.row.insert(p);
-				}
-				newRowSet.push_back(tempRs);
-			}
-		}
-	}
-	return newRowSet;
-}
-
 void HelperFunction::PrintRowSet(set<RowSet> setrs)
 {
 	bool colPrinted = false;

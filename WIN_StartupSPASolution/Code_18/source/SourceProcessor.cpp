@@ -69,6 +69,7 @@ void SourceProcessor::process(string program) {
 			while (tokens.at(i) != "{") {
 				container->_condition += tokens.at(i);
 				stmt->AddStmt(tokens.at(i));
+				stmt->AddToken(tokens.at(i));
 				if (regex_match(tokens.at(i), regex(regexConstants))) {
 					Database::insertConstant(tokens.at(i));
 				}
@@ -114,6 +115,7 @@ void SourceProcessor::process(string program) {
 			while (tokens.at(i) != "then") { // from current index till "then", it's the condition. "if(...) then{"
 				container->_condition += tokens.at(i);
 				stmt->AddStmt(tokens.at(i));
+				stmt->AddToken(tokens.at(i));
 				if (regex_match(tokens.at(i), regex(regexConstants))) {
 					Database::insertConstant(tokens.at(i));
 				}
@@ -148,6 +150,7 @@ void SourceProcessor::process(string program) {
 			Statement* stmt = new Statement(stmtNum, nestedLevel, container, stmtNumSubtract - 1);
 			stmt->SetEntity(word);
 			stmt->AddStmt(word);
+			stmt->AddToken(word);
 			container->_statements.push_back(stmt);
 			container->_startStmtNum = stmtNum;
 			container->_adjustedStartStmtNum = stmtNum - stmtNumSubtract;
@@ -162,6 +165,7 @@ void SourceProcessor::process(string program) {
 			stmtNum++;
 			Statement* stmt = new Statement(stmtNum, nestedLevel, parentStack.top(), stmtNumSubtract);
 			stmt->AddStmt(tokens.at(i - 1));
+			stmt->AddToken(tokens.at(i - 1));
 			vector<Statement> variableStore; // we need to insert statement first before inserting variable due to FK. So, we store the variables here
 			vector<Statement> useStore;
 			vector<Statement> modifiesStore;
@@ -169,6 +173,7 @@ void SourceProcessor::process(string program) {
 			string LHS = tokens.at(i - 1);
 			while (tokens.at(i) != ";") {
 				stmt->AddStmt(tokens.at(i));
+				stmt->AddToken(tokens.at(i));
 				if (regex_match(tokens.at(i), regex(regexConstants))) {
 					Database::insertConstant(tokens.at(i));
 				}
@@ -211,6 +216,7 @@ void SourceProcessor::process(string program) {
 			//stmt->_stmt += tokens.at(i); // skip the (read, print, call) keywords
 			i++; // skip the keywords
 			stmt->AddStmt(tokens.at(i));
+			stmt->AddToken(tokens.at(i));
 			parentStack.top()->_statements.push_back(stmt);
 			Database::insertStatement(stmt->GetAdjustedStmtNum(), word, stmt->GetStmt());
 			stmt->SetEntity(word);

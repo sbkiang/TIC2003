@@ -23,8 +23,6 @@ public:
 
 	// this function is to compare each set1 with set2 and return set same column values instead of relying on set_intersection
 	static set<RowSet> CommonColumnIntersect(set<RowSet> set1, set<RowSet> set2);
-	static vector<RowSet> CommonColumnIntersect(vector<RowSet> set1, vector<RowSet> set2);
-
 	static void PrintRowSet(set<RowSet> rs);
 
 private:

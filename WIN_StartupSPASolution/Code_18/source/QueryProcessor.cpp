@@ -229,12 +229,13 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			selectResultStore.sqlResultSet = HelperFunction::CommonColumnIntersect(selectResultSet, suchThatResultSet);
 		}
 		else {
-			if (suchThatResultSet.empty()) {
-				selectResultStore.sqlResultSet.clear();
-			}
-			else {
-				selectResultStore.sqlResultSet = HelperFunction::CartesianProduct(selectResultSet, suchThatResultSet);
-			}
+			//if (suchThatResultSet.empty()) {
+			//	selectResultStore.sqlResultSet.clear();
+			//}
+			//else {
+			//	selectResultStore.sqlResultSet = HelperFunction::CartesianProduct(selectResultSet, suchThatResultSet);
+			//}
+			selectResultStore.sqlResultSet = HelperFunction::CartesianProduct(selectResultSet, suchThatResultSet);
 		}
 		//HelperFunction::PrintRowSet(selectResultStore.sqlResultSet);
 		relRefStack.pop();
@@ -269,12 +270,13 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 			selectResultStore.sqlResultSet = HelperFunction::CommonColumnIntersect(selectResultSet, patternResultSet);
 		}
 		else {
-			if (patternResultStore.sqlResultSet.empty()) {
+			/*if (patternResultStore.sqlResultSet.empty()) {
 				selectResultStore.sqlResultSet.clear();
 			}
 			else {
 				selectResultStore.sqlResultSet = HelperFunction::CartesianProduct(selectResultSet, patternResultSet);
-			}
+			}*/
+			selectResultStore.sqlResultSet = HelperFunction::CartesianProduct(selectResultSet, patternResultSet);
 		}
 		//HelperFunction::PrintRowSet(patternResultSet);
 		//HelperFunction::PrintRowSet(selectResultStore.sqlResultSet);

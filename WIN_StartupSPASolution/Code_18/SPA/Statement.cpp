@@ -28,6 +28,16 @@ Statement::Statement(int stmtNum, string stmt, int level, Container* container, 
 	_container = container;
 }
 
+void Statement::AddToken(string tk)
+{
+	_tokens.push_back(tk);
+}
+
+vector<string> Statement::GetToken()
+{
+	return _tokens;
+}
+
 int Statement::GetAdjustedStmtNum() {
 	return _stmtNum - _stmtNumSubtract;
 }
