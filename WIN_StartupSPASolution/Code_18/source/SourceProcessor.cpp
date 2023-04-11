@@ -65,6 +65,7 @@ void SourceProcessor::process(string program) {
 			Statement* stmt = new Statement(stmtNum, nestedLevel, container, stmtNumSubtract);
 			stmt->SetEntity(word);
 			if (!parentStack.empty()) {
+				container->_parent = parentStack.top();
 				parentStack.top()->_childContainers.push_back(container);
 			}
 			parentStack.push(container);
@@ -105,9 +106,11 @@ void SourceProcessor::process(string program) {
 			container->_startStmtNum = stmtNum;
 			container->_adjustedStartStmtNum = stmtNum - stmtNumSubtract;
 			container->_level = nestedLevel;
+			container->_parent = parentStack.top();
 			Statement* stmt = new Statement(stmtNum, nestedLevel, container, stmtNumSubtract);
 			stmt->SetEntity(word);
 			if (!parentStack.empty()) { // if there's parent container, add current container to parent's child
+				container->_parent = parentStack.top();
 				parentStack.top()->_childContainers.push_back(container);
 			}
 			parentStack.push(container); //set itself as the latest parent container
@@ -158,9 +161,9 @@ void SourceProcessor::process(string program) {
 			container->_adjustedStartStmtNum = stmtNum - stmtNumSubtract;
 			container->_level = nestedLevel;
 			if (!parentStack.empty()) { // if there's parent container, add current container to parent's child
+				container->_parent = parentStack.top();
 				parentStack.top()->_childContainers.push_back(container);
 			}
-
 			parentStack.push(container); // we push the current "else" container to the parentStack for future statements
 		}
 		else if (word == "=") { // for assign

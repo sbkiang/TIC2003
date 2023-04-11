@@ -19,6 +19,7 @@ public:
 
 	vector<Statement*> _statements;
 	vector<Container*> _childContainers;
+	Container* _parent;
 	string _condition = "";
 	string _type = "";
 	int _level = 0;

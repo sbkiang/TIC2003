@@ -119,7 +119,6 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 
 	SqlResultStore selectResultStore;
 	Database::ExecuteSql(sqlSelect, selectResultStore);
-	//set<string> currentResultSetSynonym = HelperFunction::GetColNameInRowSet(selectResultStore.sqlResultSet);
 	set<string> currentResultSetSynonymOld(selectSynonym.begin(), selectSynonym.end());
 
 	while (!relRefStack.empty()) {
@@ -225,24 +224,16 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		set<string> selectResultSetSyn = HelperFunction::GetSynonymColInResultSet(selectResultSet, synonymEntityMap);
 		set<string> suchThatResultSetSyn = HelperFunction::GetSynonymColInResultSet(selectResultSet, synonymEntityMap);
 		set<string> intersectSynonym;
-		//set_intersection(currentResultSetSynonym.begin(), currentResultSetSynonym.end(), stSynonym.begin(), stSynonym.end(), inserter(intersectSynonym, intersectSynonym.begin()));
 		set_intersection(selectResultSetSyn.begin(), selectResultSetSyn.end(), suchThatResultSetSyn.begin(), suchThatResultSetSyn.end(), inserter(intersectSynonym, intersectSynonym.begin()));
 		if(!intersectSynonym.empty()){
 			selectResultStore.sqlResultSet = HelperFunction::CommonColumnIntersect(selectResultSet, suchThatResultSet);
-			//currentResultSetSynonym = HelperFunction::GetColNameInRowSet(selectResultStore.sqlResultSet);
-			//currentResultSetSynonymOld.insert(stSynonym.begin(), stSynonym.end());
 		}
 		else {
 			if (suchThatResultSet.empty()) {
-				//set<RowSet> empty;
-				//selectResultStore.sqlResultSet = empty;
-				//currentResultSetSynonym.clear();
 				selectResultStore.sqlResultSet.clear();
 			}
 			else {
 				selectResultStore.sqlResultSet = HelperFunction::CartesianProduct(selectResultSet, suchThatResultSet);
-				//currentResultSetSynonym.insert(stSynonym.begin(), stSynonym.end());
-				//currentResultSetSynonym = HelperFunction::GetColNameInRowSet(selectResultStore.sqlResultSet);
 			}
 		}
 		//HelperFunction::PrintRowSet(selectResultStore.sqlResultSet);
@@ -273,23 +264,16 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		set<string> selectResultSetSyn = HelperFunction::GetSynonymColInResultSet(selectResultSet, synonymEntityMap);
 		set<string> patternResultSetSyn = HelperFunction::GetSynonymColInResultSet(selectResultSet, synonymEntityMap);
 		set<string> intersectSynonym;
-		//set_intersection(currentResultSetSynonym.begin(), currentResultSetSynonym.end(), ptSynonym.begin(), ptSynonym.end(), inserter(intersectSynonym, intersectSynonym.begin()));
 		set_intersection(selectResultSetSyn.begin(), selectResultSetSyn.end(), patternResultSetSyn.begin(), patternResultSetSyn.end(), inserter(intersectSynonym, intersectSynonym.begin()));
 		if(!intersectSynonym.empty()){
-			//set<RowSet> intersection;
 			selectResultStore.sqlResultSet = HelperFunction::CommonColumnIntersect(selectResultSet, patternResultSet);
-			//currentResultSetSynonym.insert(ptSynonym.begin(), ptSynonym.end());
 		}
 		else {
 			if (patternResultStore.sqlResultSet.empty()) {
-				//set<RowSet> empty;
-				//selectResultStore.sqlResultSet = empty;
-				//currentResultSetSynonym.clear();
 				selectResultStore.sqlResultSet.clear();
 			}
 			else {
 				selectResultStore.sqlResultSet = HelperFunction::CartesianProduct(selectResultSet, patternResultSet);
-				//currentResultSetSynonym.insert(ptSynonym.begin(), ptSynonym.end());
 			}
 		}
 		//HelperFunction::PrintRowSet(patternResultSet);
@@ -306,13 +290,6 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		}
 		final.insert(ins);
 	}
-	/*
-	for (RowSet rs : final) {
-		for (string synonym : select.synonym) {
-			output.push_back(rs.row.at(synonym));
-		}
-	}
-	*/
 	for (RowSet rs : final) {
 		string result = "";
 		for (string synonym : select.synonym) {

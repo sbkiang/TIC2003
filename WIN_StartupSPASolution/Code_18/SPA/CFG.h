@@ -18,7 +18,7 @@ public:
 
 	CFGNode* GetNode(int stmtNum);
 	vector<CFGNode*> GetAllCFGNodes();
-	CFGNode* _GetNode(int stmtNum, CFGNode* CFGNode, set<int> visitsed);
+	CFGNode* _GetNode(int stmtNum, CFGNode* CFGNode, set<int> visited);
 	void _GetAllCFGNodes(CFGNode* node, set<int> visited, int spaces, vector<CFGNode*> &nodes);
 	
 };
