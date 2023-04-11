@@ -7,12 +7,6 @@
 // using some highly simplified logic.
 // You should modify this method to complete the logic for handling all the required syntax.
 
-/*
-bool SourceProcessor::is_operator(char c) {
-	return (c == '+' || c == '-' || c == '*' || c == '/');
-}
-*/
-
 void SourceProcessor::process(string program) {
 	// initialize the database
 	Database::initialize();
@@ -127,7 +121,6 @@ void SourceProcessor::process(string program) {
 					variableStore.push_back(Statement(stmtNum, tokens.at(i), container, stmtNumSubtract));
 				}
 
-				// changed from "!regex_match(tokens.at(i), regex(regexVariables)" to current one. Makes more sense to match variables instead of not matching operators
 				if (regex_match(tokens.at(i), regex(regexVariables))) {
 					useStore.push_back(Statement(stmtNum, tokens.at(i), stmtNumSubtract));
 				}
@@ -144,7 +137,6 @@ void SourceProcessor::process(string program) {
 				// database PK constraint will trigger for duplicate variables with same line_num to prevent duplicate insertion
 				Database::insertUses(useStore.at(i).GetAdjustedStmtNum(), useStore.at(i).GetStmt());
 				procedure.back()->_uses.push_back((useStore.at(i).GetStmt()));
-				//container->_uses.push_back((useStore.at(i)._stmt));
 			}
 		}
 		else if (word == "else") { // for else container
@@ -184,7 +176,6 @@ void SourceProcessor::process(string program) {
 					variableStore.push_back(Statement(stmtNum, tokens.at(i), nestedLevel, parentStack.top(), stmtNumSubtract));
 				}
 
-				// changed from "!regex_match(tokens.at(i), regex(regexUse)" to current one. Makes more sense to match variables instead of not matching operators
 				if (regex_match(tokens.at(i), regex(regexVariables))) {
 					useStore.push_back(Statement(stmtNum, tokens.at(i), stmtNumSubtract));
 				}
@@ -192,8 +183,6 @@ void SourceProcessor::process(string program) {
 			}
 			parentStack.top()->_statements.push_back(stmt);
 			modifiesStore.push_back(Statement(stmtNum, LHS, stmtNumSubtract)); //Store LHS variable
-
-
 			Database::insertStatement(stmt->GetAdjustedStmtNum(), "assign", stmt->GetStmt());
 			
 			for (int i = 0; i < variableStore.size(); i++) {
@@ -210,14 +199,11 @@ void SourceProcessor::process(string program) {
 			for (int i = 0; i < modifiesStore.size(); i++) {
 				Database::insertModifies(modifiesStore.at(i).GetAdjustedStmtNum(), modifiesStore.at(i).GetStmt());
 				procedure.back()->_modifies.push_back(modifiesStore.at(i).GetStmt());
-				//parentStack.top()->_modifies.push_back((modifiesStore.at(i)._stmt));
 			}
 
 			size_t equal_pos = (stmt->GetStmt()).find("="); // Find position of the equal sign
 			string RHS = (stmt->GetStmt()).substr(equal_pos + 1); //RHS expression
 			Database::insertPattern(stmt->GetAdjustedStmtNum(), LHS, RHS, HelperFunction::InfixToPostfix(RHS));
-			
-		
 		}
 		else if (word == "read" || word == "print" || word == "call") {
 			stmtNum++;
@@ -302,7 +288,6 @@ void SourceProcessor::process(string program) {
 
 	vector<CFG*> CFGs;
 	for (int i = 0; i < procedure.size(); i++) {
-		//CFG* cfg = CFGBuilder::BuildCFG(procedure.at(i));
 		CFG cfg = CFGBuilder::BuildCFG(procedure.at(i));
 		vector<CFGNode*> nodes = cfg.GetAllCFGNodes();
 		for (int j = 0; j < nodes.size(); j++) {
@@ -324,53 +309,3 @@ void SourceProcessor::process(string program) {
 	}
 	
 }
-
-/*
-int SourceProcessor::prec(char c) {
-	if (c == '^')
-		return 3;
-	else if (c == '/' || c == '*' || c == '%')
-		return 2;
-	else if (c == '+' || c == '-')
-		return 1;
-	else
-		return -1;
-}
-
-string SourceProcessor::infixToPostfix(string s) {
-
-	stack<char> st;
-	string result;
-
-	for (int i = 0; i < s.length(); i++) {
-		char c = s[i];
-
-		if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9'))
-			result += c;
-		else if (c == '(')
-			st.push('(');
-		else if (c == ')') {
-			while (st.top() != '(')
-			{
-				result += st.top();
-				st.pop();
-			}
-			st.pop();
-		}
-		else {
-			while (!st.empty() && prec(s[i]) <= prec(st.top())) {
-				result += st.top();
-				st.pop();
-			}
-			st.push(c);
-		}
-	}
-
-	while (!st.empty()) {
-		result += st.top();
-		st.pop();
-	}
-
-	return result;
-}
-*/
