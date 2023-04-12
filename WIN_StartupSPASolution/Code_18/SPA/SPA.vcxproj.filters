@@ -117,7 +117,7 @@
     <ClCompile Include="BuilderFullSqlRelRefAndPattern.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DescriberSIMPLE.cpp">
+    <ClCompile Include="DescriberEntStmt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="StatementProcessor.cpp">
@@ -177,9 +177,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ClPattern.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="IBuilderSqlRelRef.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ClRelRef.h">
@@ -245,7 +242,7 @@
     <ClInclude Include="BuilderSqlInsertSIMPLE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DescriberEntSIMPLE.h">
+    <ClInclude Include="DescriberEntStmt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="StatementProcessor.h">

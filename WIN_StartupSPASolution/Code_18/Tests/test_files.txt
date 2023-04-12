@@ -6,5 +6,6 @@
 ..\Tests\iteration1_own_source.txt ..\Tests\iteration1_own_queries.txt ..\Tests\iteration1_own_queries.xml
 ..\Tests\iteration3_source_3.txt ..\Tests\iteration3_queries_calls.txt ..\Tests\iteration3_calls.xml
 ..\Tests\iteration3_source_3.txt ..\Tests\iteration3_queries_error.txt ..\Tests\iteration3_error.xml
+..\Tests\iteration3_source_3.txt ..\Tests\iteration3_queries_3.txt ..\Tests\iteration3_out.xml
 ..\Tests\percent_operator_source.txt ..\Tests\percent_operator_queries.txt ..\Tests\percent_operator_out.xml
 

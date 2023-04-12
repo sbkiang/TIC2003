@@ -41,7 +41,7 @@
     <ClCompile Include="Container.cpp" />
     <ClCompile Include="DescriberClPattern.cpp" />
     <ClCompile Include="DescriberClSelect.cpp" />
-    <ClCompile Include="DescriberSIMPLE.cpp" />
+    <ClCompile Include="DescriberEntStmt.cpp" />
     <ClCompile Include="HelperFunction.cpp" />
     <ClCompile Include="IDescriberClConstrain.h" />
     <ClCompile Include="Procedure.cpp" />
@@ -82,11 +82,10 @@
     <ClInclude Include="DescriberClPattern.h" />
     <ClInclude Include="DescriberClRelRef.h" />
     <ClInclude Include="DescriberClSelect.h" />
-    <ClInclude Include="DescriberEntSIMPLE.h" />
+    <ClInclude Include="DescriberEntStmt.h" />
     <ClInclude Include="HelperFunction.h" />
     <ClInclude Include="define.h" />
     <ClInclude Include="IBuilderSqlConstrain.h" />
-    <ClInclude Include="IBuilderSqlRelRef.h" />
     <ClInclude Include="Procedure.h" />
     <ClInclude Include="Statement.h" />
     <ClInclude Include="StatementProcessor.h" />

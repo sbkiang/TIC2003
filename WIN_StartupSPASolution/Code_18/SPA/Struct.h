@@ -74,68 +74,10 @@ struct RowSet {
 	}	
 };
 
-/*
-struct CommonColumnComparator {
-	bool operator()(const RowSet& left, const RowSet& right) const{
-		vector<string> commonColName;
-		set<string> leftColName = 
-		set<string> rightColName;
-		for (auto it = left.row.begin(); it != left.row.end(); it++) {
-			leftColName.insert(it->first);
-		}
-		for (auto it = right.row.begin(); it != right.row.end(); it++) {
-			rightColName.insert(it->first);
-		}
-		set_intersection(leftColName.begin(), leftColName.end(), rightColName.begin(), rightColName.end(), inserter(commonColName, commonColName.begin()));
-		size_t leftHash = 0;
-		size_t rightHash = 0;
-		char buf[512] = {};
-		string rowLeft, rowRight;
-		for (int i = 0; i < commonColName.size(); i++) {
-			string col = commonColName.at(i);
-			leftHash = leftHash ^ hash<string>{}(left.row.at(col));
-			rightHash = rightHash ^ hash<string>{}(right.row.at(col));
-			rowLeft += left.row.at(col) + ",";
-			rowRight += right.row.at(col) + ",";
-		}
-		string equal = (leftHash == rightHash) ? "yes" : "no";
-		sprintf_s(buf, "rowLeft(%i): %s, rowRight(%i): %s, hashLeft: %zu, hashRight: %zu, equal: %s", leftColName.size(), rowLeft.c_str(), rightColName.size(), rowRight.c_str(), leftHash, rightHash, equal.c_str());
-		cout << buf << endl;
-		return leftHash < rightHash;
-	}
-};
-*/
-
 struct SqlResultStore{
 	//vector<Row> sqlResult;
 	set<RowSet> sqlResultSet;
 };
-
-/*
-struct SuchThat {
-	string _relationship = "";
-	string _input1 = "";
-	string _input2 = "";
-	string GetInput1() {
-		return _input1;
-	}
-	string GetInput1Unquoted() {
-		return HelperFunction::RemoveQuote(_input1);
-	}
-	bool input1Quoted = false;
-	bool input2Quoted = false;
-};
-*/
-
-/*
-struct Pattern {
-	string synonym = "";
-	string input1 = "";
-	string input2 = "";
-	bool input1Quoted = false;
-};
-*/
-
 
 struct Select {
 	vector<string> synonym;

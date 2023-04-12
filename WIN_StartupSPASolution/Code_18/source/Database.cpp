@@ -38,7 +38,8 @@ void Database::initialize() {
 	sqlite3_exec(dbConnection, dropVariableTableSQL.c_str(), NULL, 0, &errorMessage);
 
 	// create a variable table
-	string createVariableTableSQL = "CREATE TABLE variable ( name VARCHAR(20) PRIMARY KEY, line_num INT REFERENCES statement(line_num) );";
+	//string createVariableTableSQL = "CREATE TABLE variable ( name VARCHAR(20) PRIMARY KEY, line_num INT REFERENCES statement(line_num) );";
+	string createVariableTableSQL = "CREATE TABLE variable ( name VARCHAR(20) PRIMARY KEY);";
 	sqlite3_exec(dbConnection, createVariableTableSQL.c_str(), NULL, 0, &errorMessage);
 
 	// drop the existing constant table (if any)
@@ -134,7 +135,6 @@ void Database::insertProcedure(string procedureName, int start, int end) {
 // method to insert a statement into the database
 void Database::insertStatement(int stmtNum, string entity, string text) {
 	char sqlBuf[256];
-	//sprintf_s(sqlBuf, "INSERT INTO statement ('line_num','procedure_name','entity','text') VALUES ('%i','%s','%s','%s');", stmtNum, stmtName.c_str(), entity.c_str(), text.c_str());
 	sprintf_s(sqlBuf, "INSERT INTO statement ('line_num','entity','text') VALUES (%i,'%s','%s');", stmtNum, entity.c_str(), text.c_str());
 	sqlite3_exec(dbConnection, sqlBuf, NULL, 0, &errorMessage);
 	if (errorMessage) { cout << "insertStatement SQL Error: " << errorMessage << endl; }
@@ -143,8 +143,8 @@ void Database::insertStatement(int stmtNum, string entity, string text) {
 // method to insert a statement into the database
 void Database::insertVariable(string stmtName, int stmtNum) {
 	char sqlBuf[256];
-	sprintf_s(sqlBuf, "INSERT INTO variable('name','line_num') VALUES('%s','%i');", stmtName.c_str(), stmtNum);
-	//string sql = "INSERT INTO variable ('name', 'line_num') VALUES ('" + statementName + "', '" + to_string(statementNumber) + "');";
+	//sprintf_s(sqlBuf, "INSERT INTO variable('name','line_num') VALUES('%s','%i');", stmtName.c_str(), stmtNum);
+	sprintf_s(sqlBuf, "INSERT INTO variable('name') VALUES('%s');", stmtName.c_str());
 	sqlite3_exec(dbConnection, sqlBuf, NULL, 0, &errorMessage);
 	char sqlError[256];
 	sprintf_s(sqlError, "insertVariable SQL Error for %s at stmtNum %i: ", stmtName.c_str(), stmtNum);
