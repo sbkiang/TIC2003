@@ -69,7 +69,7 @@ BuilderSqlColumnModifies::BuilderSqlColumnModifies(ClRelRef re)
 	_re = re;
 }
 
-string BuilderSqlColumnModifies::GetSql(DescriberClRelRef describer)
+string BuilderSqlColumnModifies::GetSql(IDescriberClConstrain& describer)
 {
 	string input1 = _re.GetInput1();
 	string input2 = _re.GetInput2();

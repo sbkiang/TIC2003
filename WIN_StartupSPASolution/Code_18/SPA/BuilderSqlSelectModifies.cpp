@@ -132,7 +132,7 @@ BuilderSqlSelectModifies::BuilderSqlSelectModifies(ClRelRef re)
 	_re = re;
 }
 
-string BuilderSqlSelectModifies::GetSql(DescriberClRelRef describer)
+string BuilderSqlSelectModifies::GetSql(IDescriberClConstrain& describer)
 {
 	bool input1IsAny = describer.Input1IsAny();
 	bool input2IsAny = describer.Input2IsAny();

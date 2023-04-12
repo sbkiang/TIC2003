@@ -1,7 +1,7 @@
 #pragma once
-#include "IBuilderSqlRelRef.h"
+#include "IBuilderSqlConstrain.h"
 
-class BuilderSqlColumnCalls : public IBuilderSqlRelRef {
+class BuilderSqlColumnCalls : public IBuilderSqlConstrain {
 private:
 	ClRelRef _re;
 
@@ -12,5 +12,5 @@ private:
 
 public:
 	BuilderSqlColumnCalls(ClRelRef re);
-	string GetSql(DescriberClRelRef describer);
+	string GetSql(IDescriberClConstrain& describer);
 };

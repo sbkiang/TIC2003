@@ -2,11 +2,12 @@
 #include <string>
 #include "define.h"
 #include "ClRelRef.h"
+#include "IDescriberClConstrain.h"
 
 using namespace std;
 
 // describes whether the inputs in ClRelRef is synonym, is wildcard
-class DescriberClRelRef {
+class DescriberClRelRef : public IDescriberClConstrain {
 private:
 	bool _input1IsSyn = false;
 	bool _input2IsSyn = false;

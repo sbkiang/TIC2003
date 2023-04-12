@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "DescriberSIMPLE.h"
+#include "DescriberEntSIMPLE.h"
 
 using namespace std;
 

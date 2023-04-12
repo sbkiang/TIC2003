@@ -1,18 +1,17 @@
 #pragma once
 #include <string>
 #include <vector>
+#include "Statement.h"
 
 using namespace std;
 
-class DescriberSIMPLE {
+class DescriberEntSIMPLE {
 private:
 	string _type;
 	vector<string> _data;
 
 public:
-	DescriberSIMPLE();
-	DescriberSIMPLE(string type);
-	DescriberSIMPLE(string type, vector<string> data);
+	DescriberEntSIMPLE(Statement stmt);
 	void AddData(string addData);
 	void SetData(vector<string> data);
 	vector<string> GetData();

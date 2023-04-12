@@ -1,7 +1,7 @@
 #pragma once
-#include "IBuilderSqlPattern.h"
+#include "IBuilderSqlConstrain.h"
 
-class BuilderSqlSelectPattern : public IBuilderSqlPattern{
+class BuilderSqlSelectPattern : public IBuilderSqlConstrain {
 private:
 	ClPattern _clause;
 	string Build_NotAny_Expr(string input1, string input2);
@@ -9,5 +9,5 @@ private:
 
 public:
 	BuilderSqlSelectPattern(ClPattern clause);
-	string GetSql(DescriberClPattern describer);
+	string GetSql(IDescriberClConstrain& describer);
 };

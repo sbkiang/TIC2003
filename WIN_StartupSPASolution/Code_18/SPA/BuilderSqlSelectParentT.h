@@ -1,10 +1,10 @@
 #pragma once
-#include "IBuilderSqlRelRef.h"
+#include "IBuilderSqlConstrain.h"
 
 using namespace std;
 
 //Interface class for all the relationship's QueryBuilders (the part where we select the columns from table)
-class BuilderSqlSelectParentT : IBuilderSqlRelRef {
+class BuilderSqlSelectParentT : IBuilderSqlConstrain {
 private:
 	ClRelRef _re;
 
@@ -37,5 +37,5 @@ private:
 
 public:
 	BuilderSqlSelectParentT(ClRelRef re);
-	string GetSql(DescriberClRelRef describer);
+	string GetSql(IDescriberClConstrain& describer);
 };

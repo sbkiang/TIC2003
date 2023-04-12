@@ -67,7 +67,7 @@ BuilderSqlSelectCalls::BuilderSqlSelectCalls(ClRelRef re) {
 	_re = re;
 }
 
-string BuilderSqlSelectCalls::GetSql(DescriberClRelRef describer)
+string BuilderSqlSelectCalls::GetSql(IDescriberClConstrain& describer)
 {
 	bool input1IsAny = describer.Input1IsAny();
 	bool input2IsAny = describer.Input2IsAny();

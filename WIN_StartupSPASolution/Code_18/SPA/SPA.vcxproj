@@ -43,9 +43,11 @@
     <ClCompile Include="DescriberClSelect.cpp" />
     <ClCompile Include="DescriberSIMPLE.cpp" />
     <ClCompile Include="HelperFunction.cpp" />
+    <ClCompile Include="IDescriberClConstrain.h" />
     <ClCompile Include="Procedure.cpp" />
     <ClCompile Include="DescriberClRelRef.cpp" />
     <ClCompile Include="Statement.cpp" />
+    <ClCompile Include="StatementProcessor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\Database.h" />
@@ -80,13 +82,14 @@
     <ClInclude Include="DescriberClPattern.h" />
     <ClInclude Include="DescriberClRelRef.h" />
     <ClInclude Include="DescriberClSelect.h" />
-    <ClInclude Include="DescriberSIMPLE.h" />
+    <ClInclude Include="DescriberEntSIMPLE.h" />
     <ClInclude Include="HelperFunction.h" />
     <ClInclude Include="define.h" />
-    <ClInclude Include="IBuilderSqlPattern.h" />
+    <ClInclude Include="IBuilderSqlConstrain.h" />
     <ClInclude Include="IBuilderSqlRelRef.h" />
     <ClInclude Include="Procedure.h" />
     <ClInclude Include="Statement.h" />
+    <ClInclude Include="StatementProcessor.h" />
     <ClInclude Include="Struct.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

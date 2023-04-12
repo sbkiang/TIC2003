@@ -1,8 +1,8 @@
 #pragma once
-#include "IBuilderSqlRelRef.h"
+#include "IBuilderSqlConstrain.h"
 #include <regex>
 
-class BuilderSqlColumnModifies : public IBuilderSqlRelRef {
+class BuilderSqlColumnModifies : public IBuilderSqlConstrain {
 private:
 	ClRelRef _re;
 
@@ -19,5 +19,5 @@ private:
 	string Build_NameNotSynonym_NameNotSynonym();
 public:
 	BuilderSqlColumnModifies(ClRelRef re);
-	string GetSql(DescriberClRelRef describer);
+	string GetSql(IDescriberClConstrain& describer);
 };

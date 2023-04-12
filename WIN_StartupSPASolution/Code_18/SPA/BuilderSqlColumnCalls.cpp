@@ -37,7 +37,7 @@ BuilderSqlColumnCalls::BuilderSqlColumnCalls(ClRelRef re)
 	_re = re;
 }
 
-string BuilderSqlColumnCalls::GetSql(DescriberClRelRef describer)
+string BuilderSqlColumnCalls::GetSql(IDescriberClConstrain& describer)
 {
 	string input1 = _re.GetInput1();
 	string input2 = _re.GetInput2();

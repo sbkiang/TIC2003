@@ -1,8 +1,8 @@
 #pragma once
-#include "IBuilderSqlRelRef.h"
+#include "IBuilderSqlConstrain.h"
 #include <regex>
 
-class BuilderSqlColumnUses : public IBuilderSqlRelRef {
+class BuilderSqlColumnUses : public IBuilderSqlConstrain {
 private:
 	ClRelRef _re;
 
@@ -20,5 +20,5 @@ private:
 
 public:
 	BuilderSqlColumnUses(ClRelRef re);
-	string GetSql(DescriberClRelRef describer);
+	string GetSql(IDescriberClConstrain& describer);
 };
