@@ -28,19 +28,18 @@ string BuilderSqlColumnNext::Build_StmtNotSynonym_StmtNotSynonym()
 	return string(sqlBuf);
 }
 
-BuilderSqlColumnNext::BuilderSqlColumnNext(ClRelRef re)
+BuilderSqlColumnNext::BuilderSqlColumnNext()
 {
-	_re = re;
 }
 
-string BuilderSqlColumnNext::GetSql(IDescriberClConstrain& describer)
+string BuilderSqlColumnNext::GetSql(IClConstrain& re, IDescriberClConstrain& describer)
 {
-	string input1 = _re.GetInput1();
-	string input2 = _re.GetInput2();
+	string input1 = re.GetInput1();
+	string input2 = re.GetInput2();
 	bool input1IsSyn = describer.Input1IsSyn();
 	bool input2IsSyn = describer.Input2IsSyn();
-	input1 = _re.GetInput1Unquoted();
-	input2 = _re.GetInput2Unquoted();
+	input1 = re.GetInput1Unquoted();
+	input2 = re.GetInput2Unquoted();
 	if (input1IsSyn && input2IsSyn) { // (entity, entity)
 		return Build_StmtSynonym_StmtSynonym(input1, input2);
 	}

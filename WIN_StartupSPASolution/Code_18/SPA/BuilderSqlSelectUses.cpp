@@ -127,16 +127,15 @@ string BuilderSqlSelectUses::Build_SpecificWhileIf_Specific(string input1, strin
 	return string(sqlBuf);
 }
 
-BuilderSqlSelectUses::BuilderSqlSelectUses(ClRelRef re)
+BuilderSqlSelectUses::BuilderSqlSelectUses()
 {
-	_re = re;
 }
 
-string BuilderSqlSelectUses::GetSql(IDescriberClConstrain& describer) {
+string BuilderSqlSelectUses::GetSql(IClConstrain& re, IDescriberClConstrain& describer) {
 	bool input1IsAny = describer.Input1IsAny();
 	bool input2IsAny = describer.Input2IsAny();
-	string input1 = _re.GetInput1Unquoted();
-	string input2 = _re.GetInput2Unquoted();
+	string input1 = re.GetInput1Unquoted();
+	string input2 = re.GetInput2Unquoted();
 	string entityInput1 = describer.EntityInput1();
 	string entityInput2 = describer.EntityInput2();
 

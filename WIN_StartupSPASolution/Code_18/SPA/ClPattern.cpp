@@ -11,9 +11,14 @@ ClPattern::ClPattern(string syn, string input1, string input2)
 	_input2 = input2;
 }
 
-string ClPattern::GetSynonym()
+string ClPattern::GetPatternSynonym()
 {
 	return _synonym;
+}
+
+string ClPattern::GetRelRefRelation()
+{
+	return "";
 }
 
 string ClPattern::GetInput1()

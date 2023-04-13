@@ -4,8 +4,6 @@
 
 class BuilderSqlColumnUses : public IBuilderSqlConstrain {
 private:
-	ClRelRef _re;
-
 	// Stmt - Name
 	string Build_StmtSynonym_NameSynonym(string syn1, string syn2);
 	string Build_StmtSynonym_NameNotSynonym(string syn1);
@@ -19,6 +17,6 @@ private:
 	string Build_NameNotSynonym_NameNotSynonym();
 
 public:
-	BuilderSqlColumnUses(ClRelRef re);
-	string GetSql(IDescriberClConstrain& describer);
+	BuilderSqlColumnUses();
+	string GetSql(IClConstrain& re, IDescriberClConstrain& describer);
 };

@@ -11,9 +11,14 @@ ClRelRef::ClRelRef(string relationship, string input1, string input2)
 	_input2 = input2;
 }
 
-string ClRelRef::GetRelationship()
+string ClRelRef::GetRelRefRelation()
 {
 	return _relationship;
+}
+
+string ClRelRef::GetPatternSynonym()
+{
+	return "";
 }
 
 string ClRelRef::GetInput1()

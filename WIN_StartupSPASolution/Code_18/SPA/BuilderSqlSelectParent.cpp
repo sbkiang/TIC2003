@@ -62,17 +62,16 @@ string BuilderSqlSelectParent::Build_Specific_Specific(string input1, string inp
 	return string(sqlBuf);
 }
 
-BuilderSqlSelectParent::BuilderSqlSelectParent(ClRelRef re)
+BuilderSqlSelectParent::BuilderSqlSelectParent()
 {
-    _re = re;
 }
 
-string BuilderSqlSelectParent::GetSql(IDescriberClConstrain& describer)
+string BuilderSqlSelectParent::GetSql(IClConstrain& re, IDescriberClConstrain& describer)
 {
 	bool input1IsAny = describer.Input1IsAny();
 	bool input2IsAny = describer.Input2IsAny();
-	string input1 = _re.GetInput1Unquoted();
-	string input2 = _re.GetInput2Unquoted();
+	string input1 = re.GetInput1Unquoted();
+	string input2 = re.GetInput2Unquoted();
 	string entityInput1 = describer.EntityInput1();
 	string entityInput2 = describer.EntityInput2();
 

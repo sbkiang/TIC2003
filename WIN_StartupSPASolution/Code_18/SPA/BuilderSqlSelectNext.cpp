@@ -63,17 +63,16 @@ string BuilderSqlSelectNext::Build_Specific_Synonym(string input1, string input2
 	return string(sqlBuf);
 }
 
-BuilderSqlSelectNext::BuilderSqlSelectNext(ClRelRef re)
+BuilderSqlSelectNext::BuilderSqlSelectNext()
 {
-    _re = re;
 }
 
-string BuilderSqlSelectNext::GetSql(IDescriberClConstrain& describer)
+string BuilderSqlSelectNext::GetSql(IClConstrain& re, IDescriberClConstrain& describer)
 {
 	bool input1IsAny = describer.Input1IsAny();
 	bool input2IsAny = describer.Input2IsAny();
-	string input1 = _re.GetInput1Unquoted();
-	string input2 = _re.GetInput2Unquoted();
+	string input1 = re.GetInput1Unquoted();
+	string input2 = re.GetInput2Unquoted();
 	string entityInput1 = describer.EntityInput1();
 	string entityInput2 = describer.EntityInput2();
 

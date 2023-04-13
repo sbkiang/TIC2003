@@ -1,12 +1,12 @@
 1 - Call
 procedure p, q;
 Select p such that Calls (p, _) 
-First, Second
+First, Second, Third
 5000
 2 - Call
 procedure p, q;
 Select <p, q> such that Calls (p, q)
-First Second, Second Third
+First Second, First Fourth, Second Third, Second Fifth, Third Fourth
 5000
 3 - Call
 procedure p;

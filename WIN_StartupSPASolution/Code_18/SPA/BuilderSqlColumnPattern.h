@@ -3,8 +3,6 @@
 
 class BuilderSqlColumnPattern : IBuilderSqlConstrain {
 private:
-	ClPattern _cp;
-
 	// Pattern a(v, expr)
 	string Build_Synonym(string selectSynonym, string input1Synonym);
 
@@ -12,6 +10,6 @@ private:
 	string Build_NotSynonym(string selectSynonym);
 
 public:
-	BuilderSqlColumnPattern(ClPattern cp);
-	string GetSql(IDescriberClConstrain& dcp);
+	BuilderSqlColumnPattern();
+	string GetSql(IClConstrain& re, IDescriberClConstrain& dcp);
 };

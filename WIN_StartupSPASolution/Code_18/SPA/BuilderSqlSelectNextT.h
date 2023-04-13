@@ -6,8 +6,6 @@ using namespace std;
 //Interface class for all the relationship's QueryBuilders (the part where we select the columns from table)
 class BuilderSqlSelectNextT : IBuilderSqlConstrain {
 private:
-	ClRelRef _re;
-
 	// next*(stmt/_, stmt/_)
 	string Build_Any_Any();
 
@@ -36,6 +34,6 @@ private:
 	string Build_Specific_Synonym(string line_num, string entity);
 
 public:
-	BuilderSqlSelectNextT(ClRelRef re);
-	string GetSql(IDescriberClConstrain& describer);
+	BuilderSqlSelectNextT();
+	string GetSql(IClConstrain& re, IDescriberClConstrain& describer);
 };

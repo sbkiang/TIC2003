@@ -48,6 +48,7 @@
     <ClCompile Include="DescriberClRelRef.cpp" />
     <ClCompile Include="Statement.cpp" />
     <ClCompile Include="StatementProcessor.cpp" />
+    <ClCompile Include="Struct.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\Database.h" />
@@ -60,7 +61,7 @@
     <ClInclude Include="BuilderSqlColumnUses.h" />
     <ClInclude Include="BuilderFullSqlRelRefAndPattern.h" />
     <ClInclude Include="BuilderFullSqlSelect.h" />
-    <ClInclude Include="BuilderSqlInsertSIMPLE.h" />
+    <ClInclude Include="BuilderSqlInsertStmt.h" />
     <ClInclude Include="BuilderSqlSelectCalls.h" />
     <ClInclude Include="BuilderSqlSelectCallsT.h" />
     <ClInclude Include="BuilderSqlSelectModifies.h" />
@@ -86,6 +87,7 @@
     <ClInclude Include="HelperFunction.h" />
     <ClInclude Include="define.h" />
     <ClInclude Include="IBuilderSqlConstrain.h" />
+    <ClInclude Include="IClConstrain.h" />
     <ClInclude Include="Procedure.h" />
     <ClInclude Include="Statement.h" />
     <ClInclude Include="StatementProcessor.h" />

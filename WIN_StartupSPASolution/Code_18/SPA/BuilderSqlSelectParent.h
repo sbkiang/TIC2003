@@ -6,8 +6,6 @@ using namespace std;
 //Interface class for all the relationship's QueryBuilders (the part where we select the columns from table)
 class BuilderSqlSelectParent : IBuilderSqlConstrain {
 private:
-	ClRelRef _re;
-
 	// Parent(stmt/_ , stmt/_) 
 	string Build_Any_Any();
 
@@ -36,6 +34,6 @@ private:
 	string Build_Specific_Specific(string input1, string input2);
 
 public:
-	BuilderSqlSelectParent(ClRelRef re);
-	string GetSql(IDescriberClConstrain& describer);
+	BuilderSqlSelectParent();
+	string GetSql(IClConstrain& re, IDescriberClConstrain& describer);
 };

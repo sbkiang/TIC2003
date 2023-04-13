@@ -64,19 +64,18 @@ string BuilderSqlColumnModifies::Build_NameNotSynonym_NameNotSynonym()
 	return string(sql);
 }
 
-BuilderSqlColumnModifies::BuilderSqlColumnModifies(ClRelRef re)
+BuilderSqlColumnModifies::BuilderSqlColumnModifies()
 {
-	_re = re;
 }
 
-string BuilderSqlColumnModifies::GetSql(IDescriberClConstrain& describer)
+string BuilderSqlColumnModifies::GetSql(IClConstrain& re, IDescriberClConstrain& describer)
 {
-	string input1 = _re.GetInput1();
-	string input2 = _re.GetInput2();
+	string input1 = re.GetInput1();
+	string input2 = re.GetInput2();
 	bool input1IsSyn = describer.Input1IsSyn();
 	bool input2IsSyn = describer.Input2IsSyn();
-	input1 = _re.GetInput1Unquoted();
-	input2 = _re.GetInput2Unquoted();
+	input1 = re.GetInput1Unquoted();
+	input2 = re.GetInput2Unquoted();
 	string entityInput1 = describer.EntityInput1();
 	if (input1IsSyn && input2IsSyn) {
 		if (regex_match(entityInput1, regex(regexStmtNumEntity))) {

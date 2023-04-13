@@ -14,15 +14,14 @@ string BuilderSqlSelectPattern::Build_Any_Expr(string input2)
 	return string(sqlBuf);
 }
 
-BuilderSqlSelectPattern::BuilderSqlSelectPattern(ClPattern clause)
+BuilderSqlSelectPattern::BuilderSqlSelectPattern()
 {
-	_clause = clause;
 }
 
-string BuilderSqlSelectPattern::GetSql(IDescriberClConstrain& describer)
+string BuilderSqlSelectPattern::GetSql(IClConstrain& re, IDescriberClConstrain& describer)
 {
-	string input1 = HelperFunction::ConvertPqlPatternOprtToSqlPatternOprt(_clause.GetInput1Unquoted());
-	string input2 = HelperFunction::PatternExprToPostFix(_clause.GetInput2Unquoted());
+	string input1 = HelperFunction::ConvertPqlPatternOprtToSqlPatternOprt(re.GetInput1Unquoted());
+	string input2 = HelperFunction::PatternExprToPostFix(re.GetInput2Unquoted());
 	input2 = HelperFunction::EscapePercentSymbol(input2);
 	input2 = HelperFunction::ConvertPqlPatternOprtToSqlPatternOprt(input2);
 	if (describer.Input1IsAny()) {

@@ -126,6 +126,9 @@
     <ClCompile Include="IDescriberClConstrain.h">
       <Filter>Header Files</Filter>
     </ClCompile>
+    <ClCompile Include="Struct.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\Database.h">
@@ -239,13 +242,16 @@
     <ClInclude Include="BuilderFullSqlRelRefAndPattern.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="BuilderSqlInsertSIMPLE.h">
+    <ClInclude Include="BuilderSqlInsertStmt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DescriberEntStmt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="StatementProcessor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IClConstrain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

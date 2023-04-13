@@ -166,6 +166,7 @@ void SourceProcessor::process(string program) {
 			Statement* stmt = new Statement(stmtNum, nestedLevel, parentStack.top(), stmtNumSubtract);
 			stmt->AddStmt(tokens.at(i - 1));
 			stmt->AddToken(tokens.at(i - 1));
+			stmt->SetEntity("assign");
 			vector<Statement> variableStore; // we need to insert statement first before inserting variable due to FK. So, we store the variables here
 			vector<Statement> useStore;
 			vector<Statement> modifiesStore;
@@ -188,7 +189,7 @@ void SourceProcessor::process(string program) {
 			}
 			parentStack.top()->_statements.push_back(stmt);
 			modifiesStore.push_back(Statement(stmtNum, LHS, stmtNumSubtract)); //Store LHS variable
-			Database::insertStatement(stmt->GetAdjustedStmtNum(), "assign", stmt->GetStmt());
+			Database::insertStatement(stmt->GetAdjustedStmtNum(), stmt->GetEntity(), stmt->GetStmt());
 			
 			for (int i = 0; i < variableStore.size(); i++) {
 				Database::insertVariable(variableStore.at(i).GetStmt(), variableStore.at(i).GetAdjustedStmtNum());
@@ -231,17 +232,12 @@ void SourceProcessor::process(string program) {
 				procedure.back()->_uses.push_back(stmt->GetStmt());
 			}
 			else if (word == "call") {
-				vector<Statement> modifiesStore;
 				caller.push_back(procedure.back()->_name);
 				callee.push_back(tokens.at(i));
 				callStatements.push_back(stmt);
-				modifiesStore.push_back(Statement(stmtNum, tokens.at(i), stmtNumSubtract));
-
-				for (int i = 0; i < modifiesStore.size(); i++) { // direct Call
-					Database::insertCall(procedure.back()->_name, modifiesStore.at(i).GetStmt(), 1);
-				}
-				for (int j = 0; j < callee.size(); j++) {
-					if (callee[j] == procedure.back()->_name) { // indirect Call
+				Database::insertCall(procedure.back()->_name, tokens.at(i), 1); // Calls
+				for (int j = 0; j < callee.size(); j++) { // Calls*
+					if (callee[j] == procedure.back()->_name) { 
 						Database::insertCall(caller[j], tokens.at(i), 0);
 						break;
 					}

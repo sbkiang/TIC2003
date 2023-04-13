@@ -1,7 +1,9 @@
 procedure First {
 read x;
 read z;
-call Second; }
+call Second; 
+call Fourth;
+}
 
 procedure Second {
     x = 0;
@@ -16,9 +18,21 @@ procedure Second {
         z = 1; }
     z = z + x + i;
     y = z + 2;
-    x = x * y + z; }
+    x = x * y + z;
+	call Fifth;
+}
 
 procedure Third {
     z = 5;
     v = z;
-    print v; }
+    print v;
+	call Fourth
+}
+
+procedure Fourth{
+	z = b;
+}
+
+procedure Fifth{
+	z = c;
+}

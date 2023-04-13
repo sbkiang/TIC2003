@@ -14,18 +14,17 @@ string BuilderSqlColumnPattern::Build_NotSynonym(string selectSynonym)
 	return string(sqlBuf);
 }
 
-BuilderSqlColumnPattern::BuilderSqlColumnPattern(ClPattern cp)
+BuilderSqlColumnPattern::BuilderSqlColumnPattern()
 {
-    _cp = cp;
 }
 
-string BuilderSqlColumnPattern::GetSql(IDescriberClConstrain& describer)
+string BuilderSqlColumnPattern::GetSql(IClConstrain& re, IDescriberClConstrain& describer)
 {
-	string input1 = _cp.GetInput1();
-	string input2 = _cp.GetInput2();
-	string syn = _cp.GetSynonym();
+	string input1 = re.GetInput1();
+	string input2 = re.GetInput2();
+	string syn = re.GetPatternSynonym();
 	bool input1IsSyn = describer.Input1IsSyn();
-	input1 = _cp.GetInput1Unquoted();
+	input1 = re.GetInput1Unquoted();
 	if(describer.Input1IsSyn()){
 		return Build_Synonym(syn, input1);
 	}

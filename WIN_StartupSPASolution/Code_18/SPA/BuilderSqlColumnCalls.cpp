@@ -32,19 +32,18 @@ string BuilderSqlColumnCalls::Build_NameNotSynonym_NameNotSynonym()
 	return string(sql);
 }
 
-BuilderSqlColumnCalls::BuilderSqlColumnCalls(ClRelRef re)
+BuilderSqlColumnCalls::BuilderSqlColumnCalls()
 {
-	_re = re;
 }
 
-string BuilderSqlColumnCalls::GetSql(IDescriberClConstrain& describer)
+string BuilderSqlColumnCalls::GetSql(IClConstrain& re, IDescriberClConstrain& describer)
 {
-	string input1 = _re.GetInput1();
-	string input2 = _re.GetInput2();
+	string input1 = re.GetInput1();
+	string input2 = re.GetInput2();
 	bool input1IsSyn = describer.Input1IsSyn();
 	bool input2IsSyn = describer.Input2IsSyn();
-	input1 = _re.GetInput1Unquoted();
-	input2 = _re.GetInput2Unquoted();
+	input1 = re.GetInput1Unquoted();
+	input2 = re.GetInput2Unquoted();
 	if (input1IsSyn && input2IsSyn) { // (entity, entity)
 		return Build_NameSynonym_NameSynonym(input1, input2);
 	}
