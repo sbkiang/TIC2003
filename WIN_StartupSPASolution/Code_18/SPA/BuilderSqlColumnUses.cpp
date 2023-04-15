@@ -102,7 +102,7 @@ string BuilderSqlColumnUses::GetSql(IClConstrain& re, IDescriberClConstrain& des
 		}
 	}
 	else if (!input1IsSyn && !input2IsSyn) {
-		if (isdigit(input1[0])) {
+		if (isdigit(input1[0]) || describer.Input1IsWildcard()) {
 			return BuilderSqlColumnUses::Build_StmtNotSynonym_NameNotSynonym();
 		}
 		else {

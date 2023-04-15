@@ -119,6 +119,7 @@ bool Database::ExecuteSql(string sql, SqlResultStore& rs)
 	sqlite3_exec(dbConnection, sql.c_str(), callback, 0, &errorMessage);
 	cout << endl << "SQL: " << sql << endl;
 	if (errorMessage) {
+		cout << "** SQL ERROR **" << endl;
 		cout << errorMessage << endl; return false;
 	}
 	return true;

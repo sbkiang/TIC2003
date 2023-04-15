@@ -215,7 +215,6 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 
 		SqlResultStore suchThatResultStore;
 		Database::ExecuteSql(sql, suchThatResultStore);
-
 		//HelperFunction::PrintRowSet(suchThatResultStore.sqlResultSet);
 
 		//if there's common synonym between the table, perform intersect
