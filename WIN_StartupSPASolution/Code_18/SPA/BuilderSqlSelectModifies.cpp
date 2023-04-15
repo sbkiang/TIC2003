@@ -59,7 +59,7 @@ string BuilderSqlSelectModifies::Build_AnyProcedure_Specific(string input2)
 string BuilderSqlSelectModifies::Build_AnyWhileIf_Specific(string input1, string input2)
 {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, "select p.line_num, m.variable_name parent p join statement s on s.line_num = p.line_num join modify m on m.line_num between p.line_num and p.child_end where s.entity = '%s' and m.variable_name = '%s'", input1.c_str(), input2.c_str());
+	sprintf_s(sqlBuf, "select p.line_num, m.variable_name from parent p join statement s on s.line_num = p.line_num join modify m on m.line_num between p.line_num and p.child_end where s.entity = '%s' and m.variable_name = '%s'", input1.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
 

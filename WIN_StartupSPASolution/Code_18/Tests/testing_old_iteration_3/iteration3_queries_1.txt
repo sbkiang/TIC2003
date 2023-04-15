@@ -1,0 +1,450 @@
+1 - Procedure
+procedure p;
+Select p
+sumDigits,hello,testing
+5000
+2 - Variable
+variable v;
+Select v
+number,sum,ans,digit,a,abc
+5000
+3 - Constant
+constant c;
+Select c
+0,5,1,100,12
+5000
+4 - Assignment
+assign a;
+Select a
+2,5,6,8,9,10,13,15,16
+5000
+5 - Print
+print pr;
+Select pr
+11
+5000
+6 - Read
+read rd;
+Select rd
+1,12
+5000
+7 - Statement
+stmt s;
+Select s
+1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16
+5000
+8 - Such That (Parent of #5)
+stmt t;
+Select t such that Parent(t,5)
+4
+5000
+9 - such that (Parent(i,a))
+assign a; if i;
+Select a such that Parent(i,a)
+5
+5000
+10 - such that (Parent(w,a))
+assign a; while w;
+Select a such that Parent(w,a)
+8,9,10
+5000
+11 - Such That (ParentT of #6)
+stmt t;
+Select t such that Parent*(t,6)
+4
+5000
+12 - Such That (ParentT(w,a))
+assign a; while w;
+Select a such that Parent*(w,a)
+8,9,10
+5000
+13 - such that (ParentT(i,a))
+assign a; if i;
+Select a such that Parent*(i,a)
+5,6
+5000
+14 - such that (ModifiesS(a,v))
+assign a; variable v;
+Select v such that Modifies(a,v)
+sum,ans,digit,number,abc
+5000
+15 - such that (ModifiesS(r,v))
+read r; variable v;
+Select v such that Modifies(r,v)
+number,a
+5000
+16 - such that (ModifiesS #8)
+variable v;
+Select v such that Modifies(8,v)
+digit
+5000
+17 - such that (ModifiesS(w,v))
+while w; variable v;
+Select v such that Modifies(w,v)
+digit,sum,number
+5000
+18 - such that (ModifiesS(i,v))
+if i; variable v;
+Select v such that Modifies(i,v)
+ans
+5000
+19 - such that (UsesS(a,v))
+assign a; variable v;
+Select v such that Uses(a,v)
+number,digit,sum
+5000
+20 - such that (UsesS(pn,v))
+print pn; variable v;
+Select pn such that Uses(pn,v)
+11
+5000
+21 - such that (UsesS(w,v))
+while w; variable v;
+Select v such that Uses(w,v)
+number,sum,digit
+5000
+22 - such that (UsesS(i,v))
+if i; variable v;
+Select v such that Uses(i,v)
+
+5000
+23 - such that (UsesS #9)
+variable v;
+Select v such that Uses(9,v)
+sum, digit
+5000
+24 - Pattern (_,'100')
+assign a;
+Select a pattern a(_,"100")
+6
+5000
+25 - Pattern (_,'number % 12')
+assign a;
+Select a pattern a(_,"number % 12")
+8
+5000
+26 - Pattern (_,'number / 12')
+assign a;
+Select a pattern a(_,"number / 12")
+10
+5000
+27 - Pattern ('sum',_)
+assign a;
+Select a pattern a("sum",_)
+2,9
+5000
+28 - Pattern ('number',_)
+assign a;
+Select a pattern a("number",_)
+10
+5000
+29 - Pattern ('ans',_)
+assign a;
+Select a pattern a("ans",_)
+5,6,13
+5000
+30 - Pattern (_,_'/ 12'_)
+assign a;
+Select a pattern a(_,_"/ 12"_)
+10
+5000
+31 - such that UsesS(a,'sum')
+assign a; variable v;
+Select a such that Uses(a,"sum")
+9
+5000
+32 - such that UsesS(a,'sum') pattern a('sum',_)
+assign a; variable v;
+Select a such that Uses(a,"sum") pattern a("sum",_)
+9
+5000
+33 - such that UsesS(a,'digit') pattern a('sum',_)
+assign a; variable v;
+Select a such that Uses(a,"digit") pattern a("sum",_)
+9
+5000
+34 - such that UsesS(a,'number') pattern a('number',_'12'_)
+assign a; variable v;
+Select a such that Uses(a,"number") pattern a("number",_"12"_)
+10
+5000
+35 - such that ModifiesS(a,'sum') pattern a('sum',_)
+assign a; variable v;
+Select a such that Modifies(a,"sum") pattern a("sum",_)
+2,9
+5000
+36 - such that ModifiesS(a,'digit') pattern a('number',_)
+assign a; variable v;
+Select a such that Modifies(a,"digit") pattern a("number",_)
+
+5000
+37 - such that ModifiesS(a,'number') pattern a('number',_'12'_)
+assign a; variable v;
+Select a such that Modifies(a,"number") pattern a("number",_"12"_)
+10
+5000
+38 - such that ParentT(w,a) pattern a('sum',_)
+assign a; while w;
+Select a such that Parent*(w,a) pattern a("sum",_)
+9
+5000
+39 - such that ParentT(i,a) pattern a(_,'100')
+assign a; if i;
+Select a such that Parent*(i,a) pattern a(_,"100")
+6
+5000
+40 - such that ParentT(w,a) pattern a('number',_'12'_)
+assign a; while w;
+Select a such that Parent*(w,a) pattern a("number",_"12"_)
+10
+5000
+41 - such that Parent(4,a) pattern a('ans',_)
+assign a; Parent t;
+Select a such that Parent(4,a) pattern a("ans",_)
+5
+5000
+42 - such that Parent(a,9) pattern a('sum',_)
+assign a; Parent t;
+Select a such that Parent(t,9) pattern a("sum",_)
+
+5000
+43 - such that Parent(w,a) pattern a('sum',_'digit'_)
+assign a; while w;
+Select a such that Parent(w,a) pattern a("sum",_"digit"_)
+9
+5000
+44 - such that Parent(i,a) pattern a(_,'1')
+assign a; if i;
+Select a such that Parent(i,a) pattern a(_,"1")
+5
+5000
+45 - Such That (child of #4)
+stmt t;
+Select t such that Parent(4,t)
+5
+5000
+46 - while
+while w;
+Select w;
+8,9,10
+5000
+47 - if
+if i;
+Select i;
+5
+5000
+48 - such that Calls(p,'hello')
+procedure p;
+Select p such that Calls(p, "hello")
+sumDigits
+5000
+49 - such that Calls(_,'hello')
+procedure p;
+Select p such that Calls(_, "hello")
+sumDigits,hello,testing
+5000
+50 - such that Calls('hello',_)
+procedure p;
+Select p such that Calls("hello",_)
+testing,sumDigits,hello
+5000
+51 - such that Calls('hello',p)
+procedure p;
+Select p such that Calls("hello",p)
+testing
+5000
+52 - such that Calls(p,_)
+procedure p;
+Select p such that Calls(p,_)
+sumDigits, hello
+5000
+53 - such that Calls(_,p)
+procedure p;
+Select p such that Calls(_,p)
+hello, testing
+5000
+54 - such that Calls*(p,'testing')
+procedure p, q;
+Select p such that Calls*(p,"testing")
+sumDigits,hello
+5000
+55 - such that Calls*(_,'testing')
+procedure p, q;
+Select p such that Calls*(_,"testing")
+sumDigits,hello,testing
+5000
+56 - such that Calls*('sumDigits',_)
+procedure p, q;
+Select p such that Calls*("sumDigits",_)
+sumDigits,hello,testing
+5000
+57 - such that Calls*('sumDigits',p)
+procedure p, q;
+Select p such that Calls*("sumDigits",p)
+hello, testing
+5000
+58 - Such that (next #2)
+stmt s;
+Select s such that Next(2, s)
+3
+5000
+59 - Such that (next #4)
+stmt s;
+Select s such that Next(4, s)
+5,6
+5000
+60 - such that (nextT #3)
+stmt s;
+Select s such that Next*(3, s)
+4, 5, 6, 7, 8, 9, 10, 11
+5000
+61 - such that next(s,5)
+stmt s;
+Select s such that Next(s,5)
+4
+5000
+62 - such that next(s,3)
+stmt s;
+Select s such that Next(s,3)
+2
+5000
+63 - such that nextT(s,6)
+stmt s;
+Select s such that Next*(s,6)
+1, 2, 3, 4, 5
+5000
+64 - such that next(w,s)
+while w; assign a;
+Select a such that Next(w,a)
+8,9,10
+5000
+65 - such that Modifies(p,s)
+procedure p; stmt s;
+Select s such that Modifies(p,s)
+1, 2, 5, 6, 8, 9, 10, 12, 13, 15, 16
+5000
+66 - such that Modifies('sumDigits',s)
+stmt s;
+Select s such that Modifies("sumDigits",s)
+1, 2, 5, 6, 8, 9, 10
+5000
+67 - such that Modifies(p,6)
+procedure p;
+Select p such that Modifies(p,6)
+sumDigits
+5000
+68 - such that Modifies('hello',re)
+read re;
+Select re such that Modifies("hello",re)
+12
+5000
+69 - such that Uses(p,s)
+procedure p; stmt s;
+Select s such that Uses(p,s)
+4, 7, 8, 9, 10, 11
+5000
+70 - such that Uses('sumDigits',s)
+stmt s;
+Select s such that Uses("sumDigits",s)
+4, 7, 8, 9, 10, 11
+5000
+71 - such that Uses(p,4)
+procedure p;
+Select p such that Uses(p,4)
+sumDigits
+5000
+72 - such that Uses('sumDigits',pn)
+print pn;
+Select pn such that Uses("sumDigits",pn)
+11
+5000
+73 - such that next(pn,s)
+print pn; assign a;
+Select a such that Next(pn,a)
+
+5000
+74 - such that next(s,pn)
+print pn; assign a;
+Select a such that Next(a,pn)
+7
+5000
+75 - tuple such that Calls(p,q)
+procedure p, q;
+Select <p,q> such that Calls(p,q)
+sumDigits hello, hello testing
+5000
+76 - tuple such that Calls*(p,q)
+procedure p, q;
+Select <p,q> such that Calls*(p,q)
+sumDigits hello, hello testing, sumDigits testing
+5000
+77 - such that (Modifies(c,'abc'))
+call c;
+Select c such that Modifies(c,"abc")
+14
+5000
+78 - such that (Modifies(c,'a'))
+call c;
+Select c such that Modifies(c,"a")
+3
+5000
+79 - such that (Modifies(c,'digit'))
+call c;
+Select c such that Modifies(c,"digit")
+14
+5000
+80 - such that (Uses(c,'abc'))
+call c;
+Select c such that Uses(c,"abc")
+
+5000
+81 - such that (Uses(c,'number'))
+call c;
+Select c such that Uses(c,"number")
+
+5000
+82 - such that (Usess(c,'sum'))
+call c;
+Select c such that Usess(c,"sum")
+
+5000
+83 - such that Uses(a, 'number') such that Parent(w,a) pattern('digit',_)
+while w; assign a;
+Select a such that Uses(a, "number") such that Parent(w,a) pattern a ("digit",_)
+8
+5000
+84 - such that Modifies(a, 'number') such that Uses(a, 'number) such that Parent(w,a) pattern (_,_)
+while w; assign a;
+Select a such that Modifies(a, "number") such that Uses(a, "number") such that Parent(w,a) pattern a (_,_)
+10
+5000
+85 - such that next*(1,a) pattern a (_,_'number'_) pattern a (v, _)
+assign a; variable v;
+Select a such that next*(1,a) pattern a (_,_"number"_) pattern a (v,_)
+8, 10
+5000
+86 - such that next*(1,a) such that next*(a,7) such that Parent(i,a) such that Modifies('sumDigits',v)
+assign a; if i; variable v;
+Select a such that next*(1,a) such that next*(a,7) such that Parent(i,a) such that Modifies("sumDigits",v)
+5
+5000
+87 - such that next*(1,a) such that next*(a,7) such that Parent(i,a) such that Modifies('sumDigits',v)
+assign a; if i; variable v;
+Select a such that next*(1,a) such that next*(a,7) such that Parent*(i,a) such that Modifies("sumDigits",v)
+5, 6
+5000
+88 - such that Modifies(a,'ans') such that Modifies(c, 'ans')
+assign a; call c;
+Select c such that Modifies(a,"ans") such that Modifies(c, "ans")
+3
+5000
+89 - such that Modifies(a,'ans') such that Modifies(c, 'ans')
+assign a; call c;
+Select c such that Modifies(a,"ans") such that Modifies*(c, "ans")
+3, 14
+5000
+90 - pattern a (_,_'number'_) pattern a (v, _)
+assign a; variable v;
+Select a pattern a (_,_"number"_) pattern a (v,_)
+8,10
+5000
