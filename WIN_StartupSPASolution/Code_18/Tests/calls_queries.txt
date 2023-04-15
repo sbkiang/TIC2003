@@ -11,7 +11,7 @@ none
 2 - Direct called procedures from proc3
 procedure p;
 Select p such that Calls("proc3", p)
-callee2Only
+callee1Only,callee2Only
 5000
 201 - Direct called procedures from non-exist procedure
 procedure p;
@@ -21,27 +21,27 @@ none
 3 - Indirect called procedures from any procedure
 procedure p;
 Select p such that Calls*(_,p)
-proc1,proc2,nestCall1,nestCall2,nestCall3,callee1Only
+proc1,proc2,nestCall1,nestCall2,nestCall3,callee1Only,callee2Only,proc3
 5000
-4 - Direct called procedures from any
+4 - Direct called procedures from any procedure
 procedure p;
 Select p such that Calls(_, p)
-proc1,proc2,callee1Only,nestCall1,pro3
+proc1,proc2,nestCall1,nestCall2,nestCall3,callee1Only,proc3,callee2Only
 5000
 5 - All procedures that calls proc2
 procedure p;
 Select p such that Calls(p, "proc2")
-main,caller2Only
+main
 5000
 5a - All procedures that calls caller2Only
 procedure p;
 Select p such that Calls(p, "caller2Only")
 none
 5000
-6 - All procedures that calls proc2
+6 - Check if there's direct call to proc2
 procedure p;
 Select p such that Calls(_, "proc2")
-main
+main,caller2Only,callee1Only,callee2Only,nestCall1,nestCall2,nestCall3,proc1,proc2,proc3
 5000
 6a - All procedure that calls caller2Only
 procedure p;
@@ -51,35 +51,35 @@ none
 7 - Check if main direct calls specific procedure
 constant c;
 Select c such that Calls("main","proc2")
-TOFILL
+1,10,10000000,2,20,5
 5000
 7a - Check if main direct calls specific procedure
 constant c;
 Select c such that Calls("main","proc2")
-TOFILL
+1,10,10000000,2,20,5
 5000
 7b - Check if main indirect calls specific procedure
 constant c;
 Select c such that Calls("main","nestCall3")
-TOFILL
+none
 5000
 8 - Get all the direct callers
 procedure p;
 Select p such that Calls(p,_)
-TOFILL
+caller2Only,main,nestCall1,nestCall2,proc2,proc3
 5000
 801 - Get all the indirect callers
 procedure p;
 Select p such that Calls*(p,_)
-TOFILL
+caller2Only,main,nestCall1,nestCall2,proc2,proc3
 5000
 802 - Get all indirect callers
 procedure p,q;
 Select p such that Calls(p,q)
-TOFILL
+caller2Only,main,nestCall1,nestCall2,proc2,proc3
 5000
 20 - Check if indirect calls exists
 procedure p;
 Select p such that Calls*(_,_)
-TOFILL
+callee1Only,callee2Only,caller2Only,main,nestCall1,nestCall2,nestCall3,proc1,proc2,proc3
 5000

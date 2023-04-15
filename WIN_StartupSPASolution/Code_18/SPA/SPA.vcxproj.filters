@@ -126,6 +126,9 @@
     <ClCompile Include="Struct.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="IndirectCallsBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\Database.h">
@@ -249,6 +252,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="IClConstrain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IndirectCallsBuilder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -44,6 +44,7 @@
     <ClCompile Include="DescriberEntStmt.cpp" />
     <ClCompile Include="HelperFunction.cpp" />
     <ClCompile Include="IDescriberClConstrain.h" />
+    <ClCompile Include="IndirectCallsBuilder.cpp" />
     <ClCompile Include="Procedure.cpp" />
     <ClCompile Include="DescriberClRelRef.cpp" />
     <ClCompile Include="Statement.cpp" />
@@ -70,6 +71,7 @@
     <ClInclude Include="BuilderSqlSelectParentT.h" />
     <ClInclude Include="BuilderSqlSelectPattern.h" />
     <ClInclude Include="BuilderSqlSelectUses.h" />
+    <ClInclude Include="IndirectCallsBuilder.h" />
     <ClInclude Include="CFG.h" />
     <ClInclude Include="CFGBuilder.h" />
     <ClInclude Include="ClPattern.h" />
