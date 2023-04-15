@@ -239,7 +239,6 @@ void SourceProcessor::process(string program) {
 				for (int j = 0; j < callee.size(); j++) { // Calls*
 					if (callee[j] == procedure.back()->_name) { 
 						Database::insertCall(caller[j], tokens.at(i), 0);
-						break;
 					}
 				}
 			}

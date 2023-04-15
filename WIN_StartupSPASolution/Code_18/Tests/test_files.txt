@@ -11,4 +11,6 @@
 
 ..\Tests\uses_source.txt ..\Tests\uses_queries.txt ..\Tests\uses_out.xml
 ..\Tests\modifies_source.txt ..\Tests\modifies_queries.txt ..\Tests\modifies_out.xml
+..\Tests\calls_source.txt ..\Tests\calls_queries.txt ..\Tests\calls_out.xml
+
 

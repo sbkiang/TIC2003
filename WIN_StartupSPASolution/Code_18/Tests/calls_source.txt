@@ -33,6 +33,7 @@ procedure proc2 {
 		print x1;
 		print y1;
 	}
+	call nestCall1;
 }
 procedure proc3 {
     read x2;
@@ -49,7 +50,7 @@ procedure proc3 {
 			call callee1Only;
 		}
 	}
-	call callee2;
+	call callee2Only;
 }
 procedure callee1Only{
 	print x;
@@ -66,4 +67,15 @@ procedure callee2Only{
 procedure caller2Only{
 	call proc2;
 	call proc3;
+}
+procedure nestCall1{
+	a = b;
+	call nestCall2;
+}
+procedure nestCall2{
+	c = d;
+	call nestCall3;
+}
+procedure nestCall3{
+	c = f;
 }
