@@ -10,14 +10,14 @@ string BuilderSqlSelectParentT::Build_Any_Any()
 string BuilderSqlSelectParentT::Build_Any_Synonym(string input2)
 {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, "select p.line_num as parent, s.line_num as child from parent p join statement s on s.line_num between p.child_start and p.child_end and s.entity = '%s'", input2.c_str());
+	sprintf_s(sqlBuf, "select p.line_num as parent, s.line_num as child from parent p join statement s on s.line_num between p.child_start and p.child_end where s.entity = '%s'", input2.c_str());
 	return string(sqlBuf);
 }
 
 string BuilderSqlSelectParentT::Build_Any_Specific(string input2)
 {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, "select p.line_num as parent, s.line_num as child from parent p join statement s on s.line_num between p.child_start and p.child_end and s.line_num = %s", input2.c_str());
+	sprintf_s(sqlBuf, "select p.line_num as parent, s.line_num as child from parent p join statement s on s.line_num between p.child_start and p.child_end where s.line_num = %s", input2.c_str());
 	return string(sqlBuf);
 }
 
@@ -59,7 +59,7 @@ string BuilderSqlSelectParentT::Build_Specific_Synonym(string input1, string inp
 string BuilderSqlSelectParentT::Build_Specific_Specific(string input1, string input2)
 {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, "select p.line_num as parent, s.line_num as child from parent p join statement s on s.line_num between p.child_start and p.child_end and p.line_num = %s and s.line_num = %s", input1.c_str(), input2.c_str());
+	sprintf_s(sqlBuf, "select p.line_num as parent, s.line_num as child from parent p join statement s on s.line_num between p.child_start and p.child_end where p.line_num = %s and s.line_num = %s", input1.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
 

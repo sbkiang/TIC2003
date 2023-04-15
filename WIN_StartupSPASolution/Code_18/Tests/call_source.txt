@@ -12,7 +12,7 @@ procedure proc1 {
 			x = (2 * (x + y)) - 20;
 		}
 		else{
-			x = 2 * (x + y % 5) + (10 - x) * 2;
+			x = 2 * (x + y % 5) + (10 - x) * 2 ;
 		}
 		print x;
 		print y;
@@ -22,13 +22,13 @@ procedure proc2 {
 	read x1;
 	read y1;
 	while(x1 > 10){
-		x1 = x1 / y1 + (x1 % (10 + y1));
-		y1 = y1 + 10;
-		if(y1 < 10000000)then{
-			y1 = y1 + (x1 % 20); 
+		x = x / y + (x % (10 + y));
+		y = y + 10;
+		if(y < 10000000)then{
+			y = y + (x % 20); 
 		}
 		else{
-			y1 = (y1 % 10000000);
+			y = (y % 10000000);
 		}
 		print x1;
 		print y1;
@@ -49,18 +49,18 @@ procedure proc3 {
 			call callee1Only;
 		}
 	}
-	call callee2Only;
+	call callee2;
 }
 procedure callee1Only{
 	print x;
 	print y;
 	print x1;
-	print y1;
+	print y2;
 }
 procedure callee2Only{
 	print x;
 	print y;
-	print x2;
+	print x1;
 	print y2;
 }
 procedure caller2Only{

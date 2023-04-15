@@ -130,6 +130,6 @@ none
 5000
 5f - Uses call stmt specific variable not exists
 stmt s;
-Select s such that Uses(31,"notexists);
+Select s such that Uses(31,"notexists");
 none
 5000

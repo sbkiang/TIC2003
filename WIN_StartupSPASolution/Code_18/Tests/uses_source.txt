@@ -12,7 +12,7 @@ procedure proc1 {
 			x = (2 * (x + y)) - 20;
 		}
 		else{
-			x = 2 * (x + y % 5) + (10 - x) * 2;
+			x = 2 * (x + y % 5) + (10 - x) * 2 ;
 		}
 		print x;
 		print y;

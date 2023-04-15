@@ -108,7 +108,7 @@ string BuilderSqlSelectModifies::Build_SpecificReadAssign_Specific(string input1
 string BuilderSqlSelectModifies::Build_SpecificCall_Specific(string input1, string input2)
 {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, "select s.line_num, m.variable_name from statement s join modify m on m.line_num between (select start from procedure where name = s.text) and (select end from procedure where name = s.text) where s.line_num = %s where m.variable_name = '%s'", input1.c_str(), input2.c_str());
+	sprintf_s(sqlBuf, "select s.line_num, m.variable_name from statement s join modify m on m.line_num between (select start from procedure where name = s.text) and (select end from procedure where name = s.text) where s.line_num = %s and m.variable_name = '%s'", input1.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
 

@@ -33,7 +33,7 @@ CFG CFGBuilder::BuildCFG(Container* procedure) {
 		// if node is body, just set sJump to next statement
 		if (!(node->_stmtPtr->_containerHead || node->_stmtPtr->_containerTail)) {
 			node->_sJump = stmts.at(i + 1);
-			cout << "node " << node->_stmtPtr->GetStmtNum() << " sJump : " << node->_sJump->_stmtPtr->GetStmtNum() << endl;
+			//cout << "node " << node->_stmtPtr->GetStmtNum() << " sJump : " << node->_sJump->_stmtPtr->GetStmtNum() << endl;
 			continue;
 		}
 		if (node->_stmtPtr->_container->_type == "procedure") {
@@ -102,8 +102,8 @@ CFG CFGBuilder::BuildCFG(Container* procedure) {
 				break;
 			}
 		}
-		if(node->_sJump){ cout << "node " << node->_stmtPtr->GetStmtNum() << " sJump : " << node->_sJump->_stmtPtr->GetStmtNum() << endl; }
-		if(node->_fJump) { cout << "node " << node->_stmtPtr->GetStmtNum() << " fJump : " << node->_fJump->_stmtPtr->GetStmtNum() << endl; }
+		//if(node->_sJump){ cout << "node " << node->_stmtPtr->GetStmtNum() << " sJump : " << node->_sJump->_stmtPtr->GetStmtNum() << endl; }
+		//if(node->_fJump) { cout << "node " << node->_stmtPtr->GetStmtNum() << " fJump : " << node->_fJump->_stmtPtr->GetStmtNum() << endl; }
 	}
 	return cfg;
 }

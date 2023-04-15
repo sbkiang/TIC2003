@@ -120,9 +120,6 @@
     <ClCompile Include="DescriberEntStmt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="StatementProcessor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="IDescriberClConstrain.h">
       <Filter>Header Files</Filter>
     </ClCompile>

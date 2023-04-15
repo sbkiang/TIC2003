@@ -47,7 +47,6 @@
     <ClCompile Include="Procedure.cpp" />
     <ClCompile Include="DescriberClRelRef.cpp" />
     <ClCompile Include="Statement.cpp" />
-    <ClCompile Include="StatementProcessor.cpp" />
     <ClCompile Include="Struct.cpp" />
   </ItemGroup>
   <ItemGroup>

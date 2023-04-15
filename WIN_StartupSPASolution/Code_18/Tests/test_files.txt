@@ -9,4 +9,5 @@
 ..\Tests\iteration3_source_3.txt ..\Tests\iteration3_queries_3.txt ..\Tests\iteration3_out.xml
 ..\Tests\percent_operator_source.txt ..\Tests\percent_operator_queries.txt ..\Tests\percent_operator_out.xml
 
-..\Tests\code6_source.txt ..\Tests\code6_calls.txt ..\Tests\code6_calls_out.xml
+..\Tests\uses_source.txt ..\Tests\uses_queries.txt ..\Tests\uses_out.xml
+

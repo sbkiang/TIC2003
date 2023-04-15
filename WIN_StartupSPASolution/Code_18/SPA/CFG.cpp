@@ -48,20 +48,20 @@ void CFG::_GetAllCFGNodes(CFGNode* node, set<int> visited, int spaces, vector<CF
 		return;
 	} // if node is null, return as we're at the end
 	if(visited.find(node->_stmtPtr->GetStmtNum()) != visited.end()){ // if node is already visited, skip. This is to avoid the While CFG cycle
-		cout << setfill('0') << setw(2) << node->_stmtPtr->GetStmtNum() << "(" << node->_stmtPtr->GetAdjustedStmtNum() << ")" << "->";
+		//cout << setfill('0') << setw(2) << node->_stmtPtr->GetStmtNum() << "(" << node->_stmtPtr->GetAdjustedStmtNum() << ")" << "->";
 		return;
 	}
 	visited.insert(node->_stmtPtr->GetStmtNum());
-	cout << setfill('0') << setw(2) << node->_stmtPtr->GetStmtNum() << "(" << node->_stmtPtr->GetAdjustedStmtNum() << ")" << "->";
+	//cout << setfill('0') << setw(2) << node->_stmtPtr->GetStmtNum() << "(" << node->_stmtPtr->GetAdjustedStmtNum() << ")" << "->";
 	spaces += to_string(node->_stmtPtr->GetStmtNum()).length() + 4;
 	if (find(nodes.begin(), nodes.end(), node) == nodes.end()) { // if node not in nodes
 		nodes.push_back(node);
 	}
 	_GetAllCFGNodes(node->_sJump, visited, spaces, nodes);
 	if (node->_fJump) {
-		cout << endl;
-		cout << setfill(' ') << setw(spaces) << " ";
-		cout << setfill('0') << setw(2) << node->_stmtPtr->GetStmtNum() << "(" << node->_stmtPtr->GetAdjustedStmtNum() << ")" << "->";
+		//cout << endl;
+		//cout << setfill(' ') << setw(spaces) << " ";
+		//cout << setfill('0') << setw(2) << node->_stmtPtr->GetStmtNum() << "(" << node->_stmtPtr->GetAdjustedStmtNum() << ")" << "->";
 		_GetAllCFGNodes(node->_fJump, visited, spaces, nodes);
 	}
 }
