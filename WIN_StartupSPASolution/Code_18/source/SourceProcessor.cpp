@@ -235,13 +235,7 @@ void SourceProcessor::process(string program) {
 				caller.push_back(procedure.back()->_name);
 				callee.push_back(tokens.at(i));
 				callStatements.push_back(stmt);
-				Database::insertCall(procedure.back()->_name, tokens.at(i), 1); // Calls
-				for (int j = 0; j < callee.size(); j++) { // Calls*
-					Database::insertCall(caller[j], tokens.at(i), 0); //Multiple Level Nested
-					if (callee[j] == procedure.back()->_name) { 
-						//Database::insertCall(caller[j], tokens.at(i), 0); //First Level Nested
-					}
-				}
+				Database::insertCall(procedure.back()->_name, tokens.at(i));
 			}
 		}
 	}
