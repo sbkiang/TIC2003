@@ -3,63 +3,63 @@
 // Call(_,_)
 string BuilderSqlSelectCalls::Build_Any_Any() {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, "select caller, callee from call where direct_call = 1");
+	sprintf_s(sqlBuf, "select caller, callee from call");
 	return string(sqlBuf);
 }
 
 // Call(_, procedure)  ** procedure is also a wildcard. so, can be treated as Call(_,_)
 string BuilderSqlSelectCalls::Build_Any_Synonym() {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, "select caller, callee from call where direct_call = 1");
+	sprintf_s(sqlBuf, "select caller, callee from call");
 	return string(sqlBuf);
 }
 
 // Call(_, "Second")
 string BuilderSqlSelectCalls::Build_Any_Specific(string input2) {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, "select caller, callee from call where callee = '%s' and direct_call = 1", input2.c_str());
+	sprintf_s(sqlBuf, "select caller, callee from call where callee = '%s'", input2.c_str());
 	return string(sqlBuf);
 }
 
 // Call(procedure, _)  ** procedure is also a wildcard. so, can be treated as Call(_,_)
 string BuilderSqlSelectCalls::Build_Synonym_Any() {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, "select caller, callee from call where direct_call = 1");
+	sprintf_s(sqlBuf, "select caller, callee from call");
 	return string(sqlBuf);
 }
 
 // Call("First", _)
 string BuilderSqlSelectCalls::Build_Specific_Any(string input1) {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, "select caller, callee from call where caller = '%s' and direct_call = 1", input1.c_str());
+	sprintf_s(sqlBuf, "select caller, callee from call where caller = '%s'", input1.c_str());
 	return string(sqlBuf);
 }
 
 // Call(procedure, procedure)  ** procedure = any. So, same as Call(_,_)
 string BuilderSqlSelectCalls::Build_Synonym_Synonym() {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, "select caller, callee from call where direct_call = 1");
+	sprintf_s(sqlBuf, "select caller, callee from call");
 	return string(sqlBuf);
 }
 
 // Call(procedure, "Second")
 string BuilderSqlSelectCalls::Build_Synonym_Specific(string input2) {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, "select caller, callee from call where callee = '%s' and direct_call = 1", input2.c_str());
+	sprintf_s(sqlBuf, "select caller, callee from call where callee = '%s'", input2.c_str());
 	return string(sqlBuf);
 }
 
 // Call("First", procedure)
 string BuilderSqlSelectCalls::Build_Specific_Synonym(string input1) {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, "select caller, callee from call where caller = '%s' and direct_call = 1", input1.c_str());
+	sprintf_s(sqlBuf, "select caller, callee from call where caller = '%s'", input1.c_str());
 	return string(sqlBuf);
 }
 
 // Call("First", "Second")
 string BuilderSqlSelectCalls::Build_Specific_Specific(string input1, string input2) {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, "select caller, callee from call where caller = '%s' and callee = '%s' and direct_call = 1", input1.c_str(), input2.c_str());
+	sprintf_s(sqlBuf, "select caller, callee from call where caller = '%s' and callee = '%s'", input1.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
 
