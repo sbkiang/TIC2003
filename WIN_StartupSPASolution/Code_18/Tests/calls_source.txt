@@ -50,7 +50,7 @@ procedure proc3 {
 			call callee1Only;
 		}
 	}
-	call callee2Only;
+	
 }
 procedure callee1Only{
 	print x;

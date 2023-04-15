@@ -236,53 +236,38 @@ void SourceProcessor::process(string program) {
 				callee.push_back(tokens.at(i));
 				callStatements.push_back(stmt);
 				Database::insertCall(procedure.back()->_name, tokens.at(i), 1); // Calls
-				//for (int j = 0; j < callee.size(); j++) { // Calls*
-				//	if (callee[j] == procedure.back()->_name) { 
-				//		Database::insertCall(caller[j], tokens.at(i), 0);
-				//	}
-				//}
-				//callStatements.push_back(stmt);
-				//vector<Statement> modifiesStore;
-
-				//caller.push_back(procedure.back()->_name); //Which Procedure is caller
-				//callee.push_back(tokens.at(i)); //Call function
-
-				//modifiesStore.push_back(Statement(stmtNum, tokens.at(i), stmtNumSubtract));
-				//for (int i = 0; i < modifiesStore.size(); i++) { //direct Call
-				//	Database::insertCall(procedure.back()->_name, modifiesStore.at(i).GetStmt(), 1);
-				//}
-				//for (int j = 0; j < callee.size(); j++) {
-				//	if (callee[j] == procedure.back()->_name) { //indirect Call
-				//		Database::insertCall(caller[j], tokens.at(i), 0);
-				//		break;
-				//	}
-				//}
+				for (int j = 0; j < callee.size(); j++) { // Calls*
+					Database::insertCall(caller[j], tokens.at(i), 0); //Multiple Level Nested
+					if (callee[j] == procedure.back()->_name) { 
+						//Database::insertCall(caller[j], tokens.at(i), 0); //First Level Nested
+					}
+				}
 			}
 		}
 	}
 
-	unordered_map<Statement*, Procedure*> stmtCalleeMap;
+	unordered_map<Statement*, Procedure*> stmtProcMap;
 	
-	// add each callee procedure to the parent procedure
+	// add each called procedure to the parent procedure
 	for (int i = 0; i < callStatements.size(); i++) {
-		Statement* callStmt = callStatements.at(i);
-		Procedure* caller = nullptr;
-		Procedure* callee = nullptr;
+		Statement* cp = callStatements.at(i);
+		Procedure* parentProc = nullptr;
+		Procedure* childProc = nullptr;
 		for (int j = 0; j < procedure.size(); j++) {
-			if (callStmt->GetAdjustedStmtNum() >= procedure.at(j)->_adjustedStartStmtNum && callStmt->GetAdjustedStmtNum() <= procedure.at(j)->_adjustedEndStmtNum) {
-				caller = procedure.at(j);
+			if (cp->GetAdjustedStmtNum() >= procedure.at(j)->_adjustedStartStmtNum && cp->GetAdjustedStmtNum() <= procedure.at(j)->_adjustedEndStmtNum) {
+				parentProc = procedure.at(j);
 			}
-			if (callStmt->GetStmt() == procedure.at(j)->_name) {
-				callee = procedure.at(j);
+			if (cp->GetStmt() == procedure.at(j)->_name) {
+				childProc = procedure.at(j);
 			}
-			if (callee && caller) { break; }
+			if (childProc && parentProc) { break; }
 		}
-		caller->_calls.push_back(callee);
-		stmtCalleeMap.insert(pair<Statement*, Procedure*>(callStmt, callee));
+		parentProc->_calls.push_back(childProc);
+		stmtProcMap.insert(pair<Statement*, Procedure*>(cp, childProc)); // save each call stmt to the called procedure
 	}
 
-	// for each callee procedure, find all the direct and indirect variables that satisfy uses(s,v) and modifies(s,v), and add them to the database 
-	for (auto it = stmtCalleeMap.begin(); it != stmtCalleeMap.end(); it++) {
+	// for each called procedure, find all the direct and indirect variables that satisfy uses(s,v) and modifies(s,v), and add them to the database 
+	for (auto it = stmtProcMap.begin(); it != stmtProcMap.end(); it++) {
 		Statement* stmt = (*it).first;
 		Procedure* proc = (*it).second;
 		if (!proc) { cout << "**ERROR** Procedure not found"; }
