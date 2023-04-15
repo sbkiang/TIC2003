@@ -1,0 +1,141 @@
+1 - Direct Modifies assign any variable
+assign a; variable v;
+Select a such that Modifies(a,v)
+10,16,17,19,20,26,28,29,6,7,9
+5000
+101 - Direct Modifies assign any variable
+assign a;
+Select a such that Modifies(a,_)
+10,16,17,19,20,26,28,29,6,7,9
+5000
+102 - Direct Modifies assign variable not exist
+assign a;
+Select a such that Modifies(a,"notexist")
+none
+5000
+103 - Direct Modifies assign variable exists
+assign a;
+Select a such that Modifies(a,"x")
+10,6,9
+5000
+2 - Direct Modifies while any variable
+while w; variable v;
+Select w such that Modifies(w,v)
+15,27,5
+5000
+201 - Direct Modifies while any variable
+while w;
+Select w such that Modifies(w,_)
+15,27,5
+5000
+202 - Direct Modifies while variable not exist
+while w;
+Select w such that Modifies(w,"notexist")
+none
+5000
+203 - Direct Modifies while variable exist
+while w;
+Select w such that Modifies(w,"x1")
+15
+5000
+3 - Direct Modifies of any variable
+if i; variable v;
+Select v such that Modifies(i,v)
+x,y1,x2,y2
+5000
+301 - Direct Modifies while any variable
+if i;
+Select i such that Modifies(i,_)
+18,25,8
+5000
+302 - Direct Modifies while variable not exist
+if i;
+Select i such that Modifies(i,"notexist")
+none
+5000
+303 - Direct Modifies while variable exist
+if i;
+Select i such that Modifies(i,"x")
+8
+5000
+4 - procedure any variable
+procedure p; variable v;
+Select p such that Modifies(p,v)
+main,proc1,proc2,proc3,caller2Only
+5000
+401 - procedure any varaible
+procedure p; variable v;
+Select p such that Modifies(p,_)
+main,proc1,proc2,proc3,caller2Only
+5000
+402 - procedure variable not exist
+procedure p;
+Select p such that Modifies(p,"notexist")
+none
+5000
+403 - procedure variable exist
+procedure p;
+Select p such that Modifies(p,"x2")
+caller2Only,proc3
+5000
+404 - Direct Modifies any procedure variable
+variable v; procedure p;
+Select v such that Modifies(p,v)
+x,y,x1,y1,x2,y2
+5000
+405 - Direct Modifies specific procedure specific variable
+variable v;
+Select v such that Modifies("callee1Only",v)
+none
+5000
+40501 - Indirect Modifies specific procedure specific variable
+variable v;
+Select v such that Modifies("proc3",v)
+x2,y2
+5000
+406 - procedure not exists
+variable v;
+Select v such that Modifies("notexist",v)
+none
+5000
+407 - procedure any stmt any variable
+variable v; stmt s;
+Select v such that Modifies(s,_)
+x,y,x1,y1,x2,y2
+5000
+5 - Modifies call any variable
+call c; variable v;
+Select c such that Modifies(c,v)
+1,2,41,42
+5000
+508- Modifies call specific variable exists
+call c;
+Select c such that Modifies(c,"x2");
+42
+5000
+509 - Modifies call specific variable not exist
+call c;
+Select c such that Modifies(c,"notexist")
+none
+5000
+510 - Modifies call nested call stmt any variable
+variable v;
+Select v such that Modifies(42,v);
+x2,y2
+5000
+511 - Modifies call non-nested call stmt any variable
+variable v;
+Select v such that Modifies(1,_);
+x,y,x1,x2,y1,y2
+5000
+512 - Modifies call stmt specific variable exists
+stmt s;
+Select s such that Modifies(1,"x");
+1,10,11,12,13,14,15,16,17,18,19,2,20,21,22,23,24,25,26,27,28,29,3,30,31,32,33,34,35,36,37,38,39,4,40,41,42,5,6,7,8,9
+5000
+513 - Modifies call stmt specific variable not exists
+stmt s;
+Select s such that Modifies(2,"notexists");
+none
+5000
+

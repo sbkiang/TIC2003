@@ -10,4 +10,5 @@
 ..\Tests\percent_operator_source.txt ..\Tests\percent_operator_queries.txt ..\Tests\percent_operator_out.xml
 
 ..\Tests\uses_source.txt ..\Tests\uses_queries.txt ..\Tests\uses_out.xml
+..\Tests\modifies_source.txt ..\Tests\modifies_queries.txt ..\Tests\modifies_out.xml
 

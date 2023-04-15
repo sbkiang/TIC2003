@@ -58,7 +58,7 @@ string BuilderSqlSelectParent::Build_Specific_Synonym(string input1, string inpu
 // Parent(10, 10)
 string BuilderSqlSelectParent::Build_Specific_Specific(string input1, string input2) {
 	char sqlBuf[512] = {};
-	sprintf_s(sqlBuf, "select p.line_num as parent, s.line_num as child from parent p join statement s on s.line_num between p.child_start and p.child_end where p.line_num = %s and s.line_num = %s", input1.c_str(), input2.c_str());
+	sprintf_s(sqlBuf, "select p.line_num as parent, s.line_num as child from parent p join statement s on s.line_num between p.child_start and p.child_end where p.line_num = %s and s.line_num = %s and p.line_num = (select p.line_num from parent p where s.line_num between p.child_start and p.child_end order by p.line_num desc limit 1)", input1.c_str(), input2.c_str());
 	return string(sqlBuf);
 }
 

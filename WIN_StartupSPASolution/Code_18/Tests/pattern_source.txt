@@ -1,5 +1,5 @@
 procedure main {
-  flag = x+1;
+  flag = 0;
   call computeCentroid;
   call printResults;
 }
@@ -14,21 +14,20 @@ procedure printResults {
     print normSq;
 }
 procedure computeCentroid {
-    count = count*count;
+    count = 0;
     cenX = 0;
     cenY = 0;
     call readPoint;
     while ((x * x + y * y) != 0) {
         count = count + 1;
-        cenX = cenX+x+sss*eee+v;
+        cenX = cenX + x;
         cenY = cenY + y;
         call readPoint;
     }
     if (count == 0) then {
-        flag = 1;
-    } else {
+        flag = 1; } 
+    else {
         cenX = cenX / count;
-        cenY = cenY / count;
-    }
+        cenY = cenY / count; }
     normSq = cenX * cenX + cenY * cenY;
 }
