@@ -1,0 +1,80 @@
+procedure main {
+1  call proc1;
+2  call proc2;
+}
+procedure proc1 {
+3    read x;
+4    read y;
+5	while(x < 10){
+6		x = x + 1;
+7		y = y + x;
+8		if(y > x)then{
+9			x = (2 * (x + y)) - 20;
+		}
+		else{
+10			x = 2 * (x + y % 5) + (10 - x) * 2 ;
+		}
+11		print x;
+12		print y;
+	}
+}
+procedure proc2 {
+13	read x1;
+14	read y1;
+15	while(x1 > 10){
+16		x = x / y + (x % (10 + y));
+17		y = y + 10;
+18		if(y < 10000000)then{
+19			y = y + (x % 20); 
+		}
+		else{
+20			y = (y % 10000000);
+		}
+21		print x1;
+22		print y1;
+	}
+23	call nestCall1;
+}
+procedure proc3 {
+    read x2;
+	read y2;
+	if(x2 > y2)then{
+		x2 = x2 + y2;
+		while(x2 > y2){
+			x2 = y2 - 1;
+		}
+	}
+	else{
+		y2 = y2 - x2;
+		while(y2 > x2){
+			call callee1Only;
+		}
+	}
+	call callee2Only;
+}
+procedure callee1Only{
+	print x;
+	print y;
+	print x1;
+	print y2;
+}
+procedure callee2Only{
+	print x;
+	print y;
+	print x1;
+	print y2;
+}
+procedure caller2Only{
+	call proc3;
+}
+procedure nestCall1{
+	a = b;
+	call nestCall2;
+}
+procedure nestCall2{
+	c = d;
+	call nestCall3;
+}
+procedure nestCall3{
+	c = f;
+}

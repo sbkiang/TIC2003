@@ -1,8 +1,0 @@
-<?xml-stylesheet type="text/xsl" href="analysis.xsl"?>
-<test_results>
-<info>
-<name>AutoTester</name><parsing_time_taken>1380.000000</parsing_time_taken>
-</info>
-<queries>
-<query>
-<id ReturnTuple="1" Nextstar="2" SuchThat="2" CondNum="5" RelNum="2" comment="Test synonym to synonym, entity in while jump back, get stmt">40501</id><querystr><![CDATA[print pr; assign a; stmt s; Select pr such that Next*(pr,s) such that Next*(s,a)]]></querystr>

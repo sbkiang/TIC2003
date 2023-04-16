@@ -1,0 +1,76 @@
+procedure main {
+1  call proc1;
+2  call proc2;
+}
+procedure proc1 {
+3    read x;
+4    read y;
+5	while(x < 10){
+6		x = x + 1;
+7		y = y + x;
+8		if(y > x)then{
+9			x = (2 * (x + y)) - 20;
+		}
+		else{
+10			x = 2 * (x + y % 5) + (10 - x) * 2 ;
+		}
+11		print x;
+12		print y;
+	}
+}
+procedure proc2 {
+13	read x1;
+14	read y1;
+15	while(x1 > 10){
+16		x1 = x1 / y1 + (x1 % (10 + y1));
+17		y1 = y1 + 10;
+18		if(y1 < 10000000)then{
+19			y1 = y1 + (x1 % 20); 
+		}
+		else{
+20			y1 = (y1 % 10000000);
+		}
+21		print x1;
+22		print y1;
+	}
+}
+procedure proc3 {
+23  read x2;
+24	read y2;
+25	if(x2 > y2)then{
+26		x2 = x2 + y2;
+27		while(x2 > y2){
+28			x2 = y2 - 1;
+29			x2 = x2 * 2;
+		}
+	}
+	else{
+30		y2 = y2 - x2;
+31		while(y2 > x2){
+32			call callee1Only;
+		}
+	}
+33	call callee2Only;
+}
+procedure callee1Only{
+34	print x;
+35	print y;
+36	print x1;
+37	print y1;
+}
+procedure callee2Only{
+38	print x;
+39	print y;
+40	print x2;
+41	print y2;
+}
+procedure caller2Only{
+42	call proc2;
+43	call proc3;
+}
+procedure noCallerCallee{
+44	x = y + 10;
+45	y = x + 10;
+46 	x = x + x;
+47  y = y + y;
+}

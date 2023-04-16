@@ -251,9 +251,6 @@
     <ClInclude Include="DescriberEntStmt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="StatementProcessor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="IClConstrain.h">
       <Filter>Header Files</Filter>
     </ClInclude>

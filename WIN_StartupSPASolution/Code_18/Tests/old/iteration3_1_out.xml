@@ -1,8 +1,0 @@
-<?xml-stylesheet type="text/xsl" href="analysis.xsl"?>
-<test_results>
-<info>
-<name>AutoTester</name><parsing_time_taken>656.000000</parsing_time_taken>
-</info>
-<queries>
-<query>
-<id ReturnTuple="1" Uses="1" SuchThat="1" CondNum="3" RelNum="1" comment="Uses for assign entity, one synonym for select, uses(specific, specific), input1 is unknown, input2 in select">1</id><querystr><![CDATA[assign a; Select a such that Uses("main",a)]]></querystr>

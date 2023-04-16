@@ -96,7 +96,6 @@
     <ClInclude Include="IClConstrain.h" />
     <ClInclude Include="IContainer.h" />
     <ClInclude Include="Statement.h" />
-    <ClInclude Include="StatementProcessor.h" />
     <ClInclude Include="Struct.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
