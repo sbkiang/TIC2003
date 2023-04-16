@@ -1,0 +1,132 @@
+procedure main {
+1    print return1;
+2    x = return2;
+3    x = return3;
+4    call calleeL1;
+5    if(x > L1Use)then{
+6        a = use1;
+7        b = use2;
+8        if(x < L2Use)then{
+9            c = use3;
+10            d = use4;
+11            while(d > use20){
+12                d = use21;
+            }
+        }
+        else{
+13            while(d < use20){
+14                d = use21;
+            }
+15            e = use5;
+16            f = use6;
+        }
+    }
+    else{
+17        d = use4;
+    }
+18    while(x < y){
+19        while(y < z){
+20            while(z < a){
+21                while(a > b){
+22                    wwww = yyyy;
+                }
+            }
+        }
+    }
+23    if (10 > 10) then{
+24        x = 10;
+    }
+    else{
+25        x = 20;
+    }
+26    while(5 < 10){
+27        x = 20;
+    }
+28   call callNone;
+}
+
+procedure calleeL1{
+29    print return1;
+30    call calleeL2;
+31    x = return5 + return6;
+32   if(a > b)then{
+33        if(b > c)then{
+34            if(c > d)then{
+35                xxx = bbc2;
+            }
+            else{
+36                xxx = x;
+            }
+        }
+        else{
+37            xxx = yyy;
+        }
+    }
+    else{
+38        x1 = x2;
+    }
+}
+
+procedure calleeL2{
+39    x = returnL21;
+40    x = returnL22;
+41    call calleeL3;
+42    if(x = L1Use)then{
+43        a = use1;
+44        b = use2;
+45        if(x = L2Use)then{
+46            print printx;
+47            d = use4;
+48            while(d = use20){
+49                print printUnderWhile;
+            }
+        }
+        else{
+50            while(d = use20){
+51                d = use21;
+            }
+52            e = use5;
+53            f = use6;
+        }
+    }
+    else{
+54        d = use4;
+    }
+}
+
+procedure calleeL3{
+55    x = returnL31;
+56    x = returnL32;
+57    if(b == returnL33)then{
+58        if(c == d)then{
+59            print printx;
+        }
+        else{
+60            d = f;
+        }
+    }
+    else{
+61        x = returnL35;
+    }
+62    while(c < returnL36){
+63        x = returnL37 + returnL38;
+    }
+}
+
+procedure callNone{
+64    x = 10;
+65    y = 10 * 10;
+66    read y;
+67    call x1;
+68    while(10 == 10){
+69        call a2;
+    }
+}
+
+procedure x1{
+70   b = c;
+}
+
+procedure a2{
+71    c = d;
+}

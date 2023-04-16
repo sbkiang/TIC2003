@@ -14,4 +14,4 @@
 ..\Tests\calls_source.txt ..\Tests\calls_queries.txt ..\Tests\calls_out.xml
 ..\Tests\tuple_source.txt ..\Tests\tuple_queries.txt ..\Tests\tuple_out.xml
 
-
+..\Tests\parent_source.txt ..\Tests\parent_queries.txt ..\Tests\parent_out.xml

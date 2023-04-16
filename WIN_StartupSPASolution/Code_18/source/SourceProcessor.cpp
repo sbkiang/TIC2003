@@ -19,16 +19,22 @@ void SourceProcessor::process(string program) {
 	// This logic is highly simplified based on iteration 1 requirements and 
 	// the assumption that the programs are valid.
 
-	vector<ContainerProcedure*> procedure2;
+	//vector<ContainerProcedure*> procedure2;
+	//vector<string> procedure2;
 	stack<IContainer*> parentStack2;
 	vector<Procedure*> procedure;
 	stack<Container*> parentStack;
 	vector<Statement*> callStatements;
-	map<string, ContainerProcedure*> procedureNamePtrMap;
+	vector<Statement*> callee;
+	map<string, vector<string>> procedureToUsesMap;
+	map<string, vector<string>> procedureToModifiesMap;
+	vector<string> usesVariable, modifiesVariable;
+	map<string, ContainerProcedure*> procedureNameToPtrMap;
 	int stmtNumSubtract = 0;
 	int stmtNum = 0;
 	int nestedLevel = 0;
 	string sql;
+	string procedureName;
 	for (int i = 0; i < tokens.size(); i++) {	
 		string word = tokens.at(i);
 		if (word == "}") { // "}" indicates the end of a container
@@ -37,6 +43,12 @@ void SourceProcessor::process(string program) {
 				parentStack.top()->_endStmtNum = stmtNum;
 				parentStack.top()->_adjustedEndStmtNum = stmtNum - stmtNumSubtract;
 				parentStack.pop();
+				if (parentStack2.top()->GetType() == "procedure") {
+					procedureToUsesMap.insert(pair<string, vector<string>>(procedureName, usesVariable));
+					procedureToModifiesMap.insert(pair<string, vector<string>>(procedureName, modifiesVariable));
+					usesVariable.clear();
+					modifiesVariable.clear();
+				}
 				parentStack2.top()->SetEndStmtNum(stmtNum);
 				parentStack2.top()->SetAdjustedEndStmtNum(stmtNum - stmtNumSubtract);
 				parentStack2.pop();
@@ -44,13 +56,12 @@ void SourceProcessor::process(string program) {
 		}
 		else if (word == "procedure") {
 			i++;
-
 			ContainerProcedure* p2 = new ContainerProcedure(nestedLevel);
 			p2->SetStartStmtNum(stmtNum + 1);
 			p2->SetAdjustedStartStmtNum(stmtNum - stmtNumSubtract);
-			procedure2.push_back(p2);
 			parentStack2.push(p2);
-			procedureNamePtrMap.insert(pair<string, ContainerProcedure*>(tokens.at(i), p2));
+			procedureNameToPtrMap.insert(pair<string, ContainerProcedure*>(tokens.at(i), p2));
+			procedureName = tokens.at(i);
 			Procedure* p = new Procedure(tokens.at(i));
 			p->_type = "procedure";
 			p->_startStmtNum = stmtNum + 1;
@@ -114,6 +125,7 @@ void SourceProcessor::process(string program) {
 			for (int i = 0; i < useStore.size(); i++) {
 				// database PK constraint will trigger for duplicate variables with same line_num to prevent duplicate insertion
 				Database::insertUses(useStore.at(i).GetAdjustedStmtNum(), useStore.at(i).GetStmt());
+				usesVariable.push_back(useStore.at(i).GetStmt());
 				procedure.back()->_uses.push_back(useStore.at(i).GetStmt());
 			}
 		}
@@ -159,7 +171,6 @@ void SourceProcessor::process(string program) {
 				if (regex_match(tokens.at(i), regex(regexVariables))) {
 					useStore.push_back(Statement(stmtNum, tokens.at(i), stmtNumSubtract));
 				}
-
 				i++;
 			}
 
@@ -174,6 +185,7 @@ void SourceProcessor::process(string program) {
 			for (int i = 0; i < useStore.size(); i++) {
 				// database PK constraint will trigger for duplicate variables with same line_num to prevent duplicate insertion
 				Database::insertUses(useStore.at(i).GetAdjustedStmtNum(), useStore.at(i).GetStmt());
+				usesVariable.push_back(useStore.at(i).GetStmt());
 				procedure.back()->_uses.push_back((useStore.at(i).GetStmt()));
 			}
 		}
@@ -248,12 +260,14 @@ void SourceProcessor::process(string program) {
 			for (int i = 0; i < useStore.size(); i++) {
 				// database PK constraint will trigger for duplicate variables with same line_num to prevent duplicate insertion
 				Database::insertUses(useStore.at(i).GetAdjustedStmtNum(), useStore.at(i).GetStmt());
+				usesVariable.push_back(useStore.at(i).GetStmt());
 				procedure.back()->_uses.push_back(useStore.at(i).GetStmt());
 				//parentStack.top()->_uses.push_back((useStore.at(i)._stmt));
 			}
 
 			for (int i = 0; i < modifiesStore.size(); i++) {
 				Database::insertModifies(modifiesStore.at(i).GetAdjustedStmtNum(), modifiesStore.at(i).GetStmt());
+				modifiesVariable.push_back(modifiesStore.at(i).GetStmt());
 				procedure.back()->_modifies.push_back(modifiesStore.at(i).GetStmt());
 			}
 
@@ -275,72 +289,65 @@ void SourceProcessor::process(string program) {
 			if (word == "read") {
 				Database::insertVariable(stmt->GetStmt(), stmt->GetAdjustedStmtNum());
 				Database::insertModifies(stmt->GetAdjustedStmtNum(), stmt->GetStmt());
+				modifiesVariable.push_back(stmt->GetStmt());
 				procedure.back()->_modifies.push_back(stmt->GetStmt());
 			} 
 			else if(word == "print") {
 				Database::insertVariable(stmt->GetStmt(), stmt->GetAdjustedStmtNum());
 				Database::insertUses(stmt->GetAdjustedStmtNum(), stmt->GetStmt());
+				usesVariable.push_back(stmt->GetStmt());
 				procedure.back()->_uses.push_back(stmt->GetStmt());
 			}
 			else if (word == "call") {
 				callStatements.push_back(stmt);
+				callee.push_back(stmt);
 				Database::insertCall(procedure.back()->_name, tokens.at(i));
 			}
 		}
 	}
 
-	unordered_map<Statement*, Procedure*> stmtProcMap;
-	
-	// add each called procedure to the parent procedure
-	for (int i = 0; i < callStatements.size(); i++) {
-		Statement* cp = callStatements.at(i);
-		Procedure* parentProc = nullptr;
-		Procedure* childProc = nullptr;
-		for (int j = 0; j < procedure.size(); j++) {
-			if (cp->GetAdjustedStmtNum() >= procedure.at(j)->_adjustedStartStmtNum && cp->GetAdjustedStmtNum() <= procedure.at(j)->_adjustedEndStmtNum) {
-				parentProc = procedure.at(j);
-			}
-			if (cp->GetStmt() == procedure.at(j)->_name) {
-				childProc = procedure.at(j);
-			}
-			if (childProc && parentProc) { break; }
+	//for each call stmt, find get all the child container?
+
+	for (Statement* stmt : callStatements) {
+		string procedureName = stmt->GetStmt();
+		for (string var : procedureToUsesMap.at(procedureName)) {
+			Database::insertUses(stmt->GetAdjustedStmtNum(), var);
 		}
-		parentProc->_calls.push_back(childProc);
-		stmtProcMap.insert(pair<Statement*, Procedure*>(cp, childProc)); // save each call stmt to the called procedure
-	}
+		for (string var : procedureToModifiesMap.at(procedureName)) {
+			Database::insertModifies(stmt->GetAdjustedStmtNum(), var);
+		}
 
-	// for each called procedure, find all the direct and indirect variables that satisfy uses(s,v) and modifies(s,v), and add them to the database 
-	for (auto it = stmtProcMap.begin(); it != stmtProcMap.end(); it++) {
-		Statement* stmt = (*it).first;
-		Procedure* proc = (*it).second;
-		if (!proc) { cout << "**ERROR** Procedure not found"; }
-		vector<string> allUses = proc->GetAllUses();
-		vector<string> allModifies = proc->GetAllModifies();
-		for (int i = 0; i < allUses.size(); i++) { Database::insertUses(stmt->GetAdjustedStmtNum(), allUses.at(i));	}
-		for (int i = 0; i < allModifies.size(); i++) { Database::insertModifies(stmt->GetAdjustedStmtNum(), allModifies.at(i)); }
-	}
-
-	for (int i = 0; i < procedure2.size(); i++) {
-		//Database::insertProcedure(procedure2.at(i)->GetName(), procedure.at(i)->_adjustedStartStmtNum, procedure.at(i)->_adjustedEndStmtNum);
-	}
-
-
-	for (int i = 0; i < procedure.size(); i++) {
-		Database::insertProcedure(procedure.at(i)->_name, procedure.at(i)->_adjustedStartStmtNum, procedure.at(i)->_adjustedEndStmtNum);
-	}
-
-	for (int i = 0; i < procedure2.size(); i++) {
-		HelperFunction::LinkIfElseEndStmtNum(procedure2.at(i));
-		vector<IContainer*> containers = procedure2.at(i)->GetAllChildContainer(); // get all the if and while containers
-		for (int j = 0; j < containers.size(); j++) {
-			//Database::insertParent(containers.at(j)->GetAdjustedStartStmtNum(), containers.at(j)->GetAdjustedStartStmtNum() + 1, containers.at(j)->GetAdjustedEndStmtNum());
+		SqlResultStore callChain;
+		ClRelRef relRef = ClRelRef("Calls*", stmt->GetStmt(), "_");
+		DescriberClRelRef describer = DescriberClRelRef(relRef, map<string, string>());
+		BuilderSqlSelectCallsT builder = BuilderSqlSelectCallsT();
+		string sql = builder.GetSql(relRef, describer);
+		Database::ExecuteSql(sql, callChain);
+		for (RowSet rs : callChain.sqlResultSet) {
+			for (pair<string,string> row : rs.row) {
+				for (string var : procedureToUsesMap.at(row.second)) {
+					Database::insertUses(stmt->GetAdjustedStmtNum(), var);
+				}
+				for (string var : procedureToModifiesMap.at(row.second)) {
+					Database::insertModifies(stmt->GetAdjustedStmtNum(), var);
+				}
+			}
 		}
 	}
 
-	for (int i = 0; i < procedure.size(); i++) {
-		vector<Container> containers = procedure.at(i)->getAllContainers(); // get all the if and while containers
+	for (pair<string, ContainerProcedure*> pair : procedureNameToPtrMap) {
+		Database::insertProcedure(pair.first, pair.second->GetAdjustedStartStmtNum(), pair.second->GetAdjustedEndStmtNum());
+	}
+
+
+	for (pair<string, ContainerProcedure*> pair : procedureNameToPtrMap) {
+		HelperFunction::LinkIfElseEndStmtNum(pair.second);
+		vector<IContainer*> containers = pair.second->GetAllChildContainer(); // get all the if and while containers
 		for (int j = 0; j < containers.size(); j++) {
-			Database::insertParent(containers.at(j)._adjustedStartStmtNum, containers.at(j)._adjustedStartStmtNum + 1, containers.at(j)._adjustedEndStmtNum);
+			if (containers.at(j)->GetType() == "else"){
+				continue;
+			}
+			Database::insertParent(containers.at(j)->GetAdjustedStartStmtNum(), containers.at(j)->GetAdjustedStartStmtNum() + 1, containers.at(j)->GetAdjustedEndStmtNum());
 		}
 	}
 

@@ -1,32 +1,32 @@
 procedure NestedWhileIf {
-    read a;
-    b = 20;
-    print d;
+1    read a;
+2    b = 20;
+3    print d;
 
-    while (a < 30) {
-        a = b + c;
-        while (a < 10) {
-            a = 10;
+4    while (a < 30) {
+5        a = b + c;
+6        while (a < 10) {
+7            a = 10;
         }
-        if (a > 10) then {
-            if (c < 30) then {
-                d = b;
+8        if (a > 10) then {
+9            if (c < 30) then {
+10                d = b;
             } else {
-                c = a + b;
+11                c = a + b;
             }
         } else {
-            while (a < 10) {
-                print c;
+12            while (a < 10) {
+13                print c;
             }
-            c = a + b;
+14            c = a + b;
         }
     }
 
-    add = a * b * c;                
-    print add;
-    if (add < 0) then {
-        print negative;
+15    add = a * b * c;                
+16    print add;
+17    if (add < 0) then {
+18        print negative;
     } else {
-        print positive;
+19        print positive;
     }
 }
