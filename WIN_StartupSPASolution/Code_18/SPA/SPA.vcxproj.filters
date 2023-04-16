@@ -155,12 +155,6 @@
     <ClInclude Include="..\source\sqlite3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Container.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Procedure.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Struct.h">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -82,7 +82,6 @@
     <ClInclude Include="BuilderSqlColumnModifies.h" />
     <ClInclude Include="BuilderSqlColumnNext.h" />
     <ClInclude Include="ClSelect.h" />
-    <ClInclude Include="Container.h" />
     <ClInclude Include="ContainerElse.h" />
     <ClInclude Include="ContainerIf.h" />
     <ClInclude Include="ContainerProcedure.h" />
@@ -96,7 +95,6 @@
     <ClInclude Include="IBuilderSqlConstrain.h" />
     <ClInclude Include="IClConstrain.h" />
     <ClInclude Include="IContainer.h" />
-    <ClInclude Include="Procedure.h" />
     <ClInclude Include="Statement.h" />
     <ClInclude Include="StatementProcessor.h" />
     <ClInclude Include="Struct.h" />

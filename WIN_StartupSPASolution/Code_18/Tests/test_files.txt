@@ -13,5 +13,6 @@
 ..\Tests\modifies_source.txt ..\Tests\modifies_queries.txt ..\Tests\modifies_out.xml
 ..\Tests\calls_source.txt ..\Tests\calls_queries.txt ..\Tests\calls_out.xml
 ..\Tests\tuple_source.txt ..\Tests\tuple_queries.txt ..\Tests\tuple_out.xml
+..\Tests\tuple_source_1.txt ..\Tests\tuple_queries_1.txt ..\Tests\tuple_out_2.xml
 
 ..\Tests\parent_source.txt ..\Tests\parent_queries.txt ..\Tests\parent_out.xml

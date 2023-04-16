@@ -20,7 +20,6 @@ void SourceProcessor::process(string program) {
 	// the assumption that the programs are valid.
 
 	stack<IContainer*> parentStack2;
-	vector<Procedure*> procedure;
 	//vector<ContainerProcedure*> procedure2;
 	vector<Statement*> callStatements;
 	map<string, vector<string>> procedureToUsesMap;
