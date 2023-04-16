@@ -30,7 +30,7 @@ public:
 	static void insertStatement(int stmtNum, string entity, string text);
 
 	// method to insert a variable into the database
-	static void insertVariable(string variablename, int statementNumber);
+	static void insertVariable(string variablename);
 
 	// method to insert a constant into the database
 	static void insertConstant(string value);

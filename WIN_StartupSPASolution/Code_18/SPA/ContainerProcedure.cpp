@@ -40,17 +40,17 @@ vector<IContainer*> ContainerProcedure::GetAllChildContainer()
 	return containers;
 }
 
-vector<Statement> ContainerProcedure::GetStatement()
+vector<Statement*> ContainerProcedure::GetStatement()
 {
 	return _statement;
 }
 
-void ContainerProcedure::SetStatement(vector<Statement> stmt)
+void ContainerProcedure::SetStatement(vector<Statement*> stmt)
 {
 	_statement = stmt;
 }
 
-void ContainerProcedure::PushBackStatement(Statement stmt)
+void ContainerProcedure::PushBackStatement(Statement* stmt)
 {
 	_statement.push_back(stmt);
 }

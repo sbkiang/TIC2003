@@ -6,15 +6,15 @@ Select <w,a> such that Parent*(w,a) such that Modifies(a,"x") pattern a("x",_"2"
 2 - All variables and stmt in while
 while w; variable v; stmt s;
 Select <s,v> such that Uses(s,v) such that Modifies(s,v) such that Parent*(w,s)
-18 y1,19 y1,16 x1,17 y1,10 x,7 y,6 x,9 x,8 x,20 y1
+18 y1,19 y1,16 x1,17 y1,10 x,7 y,6 x,9 x,8 x,20 y1,29 x2
 5000
 2a - All variables and in while
 while w; variable v; stmt s;
 Select <s,v> such that Uses(s,v) such that Modifies(s,v)
-18 y1,19 y1,15 x1,15 y1,16 x1,17 y1,10 x,5 y,5 x,7 y,6 x,1 y,1 x,2 x1,2 y1,9 x,8 x,43 x2,43 y2,42 x1,42 y1,30 y2,25 x2,25 y2,47 y,27 x2,46 x,26 x2,20 y1,29 x2
+18 y1,19 y1,15 x1,15 y1,16 x1,17 y1,10 x,5 y,5 x,7 y,6 x,1 y,1 x,2 x1,2 y1,9 x,8 x,43 x2,43 y2,42 x1,42 y1,30 y2,25 x2,25 y2,47 y,27 x2,46 x,26 x2,20 y1,29 x2,
 5000
 3 - Get all statement in if that is child of while that comes after read statement, and uses a variable
 stmt s; read re; while w; if i; variable v;
 Select <s,w,i,v> such that Next*(re,w) such that Parent(w,i) such that Parent(i,s) such that Uses(s,v)
-18 19 x1 15,18 19 y1 15,18 20 y1 15,8 10 y 5,8 10 x 5,8 9 y 5,8 9 x 5
+19 15 18 x1,19 15 18 y1,20 15 18 y1,10 5 8 y,10 5 8 x,9 5 8 y,9 5 8 x
 5000

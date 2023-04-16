@@ -1,8 +1,8 @@
 #include "CFGBuilder.h"
 
-CFG CFGBuilder::BuildCFG(Container* procedure) {
-	stack<Container*> parentStack;
-	Container* tempContainer = procedure;
+CFG CFGBuilder::BuildCFG(IContainer* procedure) {
+	stack<IContainer*> parentStack;
+	IContainer* tempContainer = procedure;
 	map<int, CFGNode*> stmts;
 	_CreateStmtMap(procedure, stmts);
 	//_printStmt(stmts);
@@ -14,18 +14,18 @@ CFG CFGBuilder::BuildCFG(Container* procedure) {
 		CFGNode* node = stmts.at(i);
 
 		// if current stmt is the container head, save to a tempContainer as it's the start of a new container
-		if (i == node->_stmtPtr->_container->_startStmtNum) {  
+		if (i == node->_stmtPtr->_container->GetStartStmtNum()) {  
 
 			// if tempContainer nestedLevel < current node container level, then tempContainer is a parent container of current container
 			// we push the tempContainer to the stack
-			if (tempContainer->_level < node->_stmtPtr->_container->_level) {
+			if (tempContainer->GetLevel() < node->_stmtPtr->_container->GetLevel()) {
 				parentStack.push(tempContainer);
 				tempContainer = node->_stmtPtr->_container;
 			}
 
 			// if tempContainer level = current node container level, then both containers are siblings
 			// set the tempContainer to the current container
-			else if(tempContainer->_level == node->_stmtPtr->_container->_level){
+			else if(tempContainer->GetLevel() == node->_stmtPtr->_container->GetLevel()) {
 				tempContainer = node->_stmtPtr->_container;
 			}
 		}
@@ -36,25 +36,25 @@ CFG CFGBuilder::BuildCFG(Container* procedure) {
 			//cout << "node " << node->_stmtPtr->GetStmtNum() << " sJump : " << node->_sJump->_stmtPtr->GetStmtNum() << endl;
 			continue;
 		}
-		if (node->_stmtPtr->_container->_type == "procedure") {
+		if (node->_stmtPtr->_container->GetType() == "procedure") {
 			if (stmts.find(i + 1) != stmts.end()) {
 				node->_sJump = stmts.at(i + 1);
 			}
 		}
-		else if (node->_stmtPtr->_container->_type == "while") {
+		else if (node->_stmtPtr->_container->GetType() == "while") {
 
 			// if stmt is while container tail only, sJump back to head
 			if (!node->_stmtPtr->_containerHead && node->_stmtPtr->_containerTail) { 
-				node->_sJump = stmts.at(node->_stmtPtr->_container->_startStmtNum);
+				node->_sJump = stmts.at(node->_stmtPtr->_container->GetStartStmtNum());
 			}
 
 			// if stmt is while container head and tail, or only head, set sJump to next, and fJump to _FindNextStmt
 			else { 
 				node->_sJump = stmts.at(i + 1);
-				node->_fJump = _FindNextStmt(parentStack, node->_stmtPtr->_container->_endStmtNum + 1, stmts);
+				node->_fJump = _FindNextStmt(parentStack, node->_stmtPtr->_container->GetEndStmtNum() + 1, stmts);
 			}
 		}
-		else if (node->_stmtPtr->_container->_type == "if") {
+		else if (node->_stmtPtr->_container->GetType() == "if") {
 
 			// if stmt is "if" container tail only
 			if (!node->_stmtPtr->_containerHead && node->_stmtPtr->_containerTail) { 
@@ -64,15 +64,15 @@ CFG CFGBuilder::BuildCFG(Container* procedure) {
 			// if stmt is both "if" container head and tail, or head only, sJump = next stmt, fJump = else stmt
 			else { 
 				node->_sJump = stmts.at(i + 1);
-				loopStart = node->_stmtPtr->_container->_endStmtNum + 1;
-				loopEnd = parentStack.top()->_endStmtNum;
+				loopStart = node->_stmtPtr->_container->GetEndStmtNum() + 1;
+				loopEnd = parentStack.top()->GetEndStmtNum();
 
 				// fJump is the first stmt in else container of same nestedLevel
 				for (int j = loopStart; j < loopEnd; j++) { 
 					if (stmts.at(j)->_stmtPtr->GetLevel() != node->_stmtPtr->GetLevel()) {
 						continue;
 					}
-					if (stmts.at(j)->_stmtPtr->_container->_type != "else") {
+					if (stmts.at(j)->_stmtPtr->_container->GetType() != "else") {
 						continue;
 					}
 					node->_fJump = stmts.at(j);
@@ -80,7 +80,7 @@ CFG CFGBuilder::BuildCFG(Container* procedure) {
 				}
 			}
 		}
-		else if (node->_stmtPtr->_container->_type == "else") {
+		else if (node->_stmtPtr->_container->GetType() == "else") {
 
 			// if stmt is else container head only, sJump is next stmt
 			if (node->_stmtPtr->_containerHead && !node->_stmtPtr->_containerTail) { 
@@ -95,7 +95,7 @@ CFG CFGBuilder::BuildCFG(Container* procedure) {
 		while (!parentStack.empty()) {
 
 			// if current stmt is a container end, pop from parentStack. Place it at the end so that the pop occurs after everything have been processed
-			if (i == parentStack.top()->_endStmtNum) { 
+			if (i == parentStack.top()->GetEndStmtNum()) { 
 				parentStack.pop();
 			}
 			else {
@@ -108,13 +108,14 @@ CFG CFGBuilder::BuildCFG(Container* procedure) {
 	return cfg;
 }
 
-void CFGBuilder::_CreateStmtMap(Container* container, map<int, CFGNode*> &stmtMap) {
-	for (int i = 0; i < container->_statements.size(); i++) {
-		Statement* stmt = container->_statements.at(i);
-		if (stmt->GetStmtNum() == (container->_startStmtNum)) {
+void CFGBuilder::_CreateStmtMap(IContainer* container, map<int, CFGNode*> &stmtMap) {
+	vector<Statement*> containerStatement = container->GetStatement();
+	for (int i = 0; i < containerStatement.size(); i++) {
+		Statement* stmt = containerStatement.at(i);
+		if (stmt->GetStmtNum() == (container->GetStartStmtNum())) {
 			stmt->_containerHead = true;
 		}
-		if (stmt->GetStmtNum() == (container->_endStmtNum)) {
+		if (stmt->GetStmtNum() == (container->GetEndStmtNum())) {
 			stmt->_containerTail = true;
 		}
 		CFGNode* node = new CFGNode();
@@ -122,8 +123,8 @@ void CFGBuilder::_CreateStmtMap(Container* container, map<int, CFGNode*> &stmtMa
 		pair<int, CFGNode*> *mypair = new pair<int, CFGNode*>(stmt->GetStmtNum(), node);
 		stmtMap.insert(*mypair);
 	}
-	for (int i = 0; i < container->_childContainers.size(); i++) {
-		Container* childContainer = container->_childContainers.at(i);
+	for (int i = 0; i < container->GetChildContainer().size(); i++) {
+		IContainer* childContainer = container->GetChildContainer().at(i);
 		_CreateStmtMap(childContainer, stmtMap);
 	}
 }
@@ -133,19 +134,19 @@ void CFGBuilder::_CreateStmtMap(Container* container, map<int, CFGNode*> &stmtMa
 //	2) if can't find the stmt,
 //		2a) if parent container is while, loop back
 //		2b) if parent container is not while, search from current block endStmtNum + 1 to parentBlock endStmtNum
-CFGNode* CFGBuilder::_FindNextStmt(stack<Container*> parentStack, int startStmtNum, map<int, CFGNode*> stmts) {
-	Container* currContainer = nullptr;
+CFGNode* CFGBuilder::_FindNextStmt(stack<IContainer*> parentStack, int startStmtNum, map<int, CFGNode*> stmts) {
+	IContainer* currContainer = nullptr;
 	CFGNode* nextStmt = nullptr;
 	if (parentStack.empty()) { return nullptr; }
-	int endStmtNum = parentStack.top()->_endStmtNum; // ** run createCFG 5 times to get to the 6th test
+	int endStmtNum = parentStack.top()->GetEndStmtNum(); // ** run createCFG 5 times to get to the 6th test
 
 	// find the next stmt that is a sibling or parent stmt
 	for (int j = startStmtNum; j < endStmtNum + 1; j++) { 
 
 		// if encounter else stmt, it's going to be the else head. Skip the entire block
-		if (stmts.at(j)->_stmtPtr->_container->_type == "else") { 
-			if (j == stmts.at(j)->_stmtPtr->_container->_startStmtNum) {
-				j = stmts.at(j)->_stmtPtr->_container->_endStmtNum;
+		if (stmts.at(j)->_stmtPtr->_container->GetType() == "else") { 
+			if (j == stmts.at(j)->_stmtPtr->_container->GetStartStmtNum()) {
+				j = stmts.at(j)->_stmtPtr->_container->GetEndStmtNum();
 				continue;
 			}
 		}
@@ -161,15 +162,15 @@ CFGNode* CFGBuilder::_FindNextStmt(stack<Container*> parentStack, int startStmtN
 	if (!nextStmt) {
 
 		// if parent container is a while, then next stmt will be the while parent head
-		if (parentStack.top()->_type == "while") { 
-			return stmts.at(parentStack.top()->_startStmtNum);
+		if (parentStack.top()->GetType() == "while") { 
+			return stmts.at(parentStack.top()->GetStartStmtNum());
 		}
 
 		// if parent container is not while, we pop the stack to find the higher parent. Need to push back after that
 		else { 
 			currContainer = parentStack.top();
 			parentStack.pop();
-			nextStmt = _FindNextStmt(parentStack, currContainer->_endStmtNum + 1, stmts);
+			nextStmt = _FindNextStmt(parentStack, currContainer->GetEndStmtNum() + 1, stmts);
 			parentStack.push(currContainer);
 		}
 	}

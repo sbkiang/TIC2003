@@ -1,0 +1,170 @@
+1 - Test linear Next* forward
+procedure p;
+Select p such that Next*(2,5)
+main, p1
+5000
+101 - Test linear Next* backward
+procedure p;
+Select p such that Next*(5,2)
+none
+5000
+102 - Test stmt in while jump out of while
+procedure p;
+Select p such that Next*(15,17)
+main, p1
+5000
+103 - Test stmt in while jump back to earlier stmt in while
+read re;
+Select re such that Next*(15,13)
+1,9,15
+5000
+10301 - Test stmt in while jump back impossible
+read re;
+Select re such that Next*(22,20)
+none
+5000
+104 - Test stmt in if jump to else
+read re;
+Select re such that Next*(20,24)
+none
+5000
+105 - Test stmt in if jump to parent else
+read re;
+Select re such that Next*(20,25)
+none
+5000
+106 - Test stmt if head jump to else
+read re;
+Select re such that Next*(18,24)
+1,9,15
+5000
+107 - Test stmt if head child jump to parent else
+read re;
+Select re such that Next*(19,24)
+none
+5000
+108 - Test stmt if head jump to else
+read re;
+Select re such that Next*(19,23)
+1,9,15
+5000
+109 - Test stmt linear to while
+read re;
+Select re such that Next*(17,22)
+1,9,15
+5000
+2 - Test stmt to entity
+print pr;
+Select pr such that Next*(2,pr);
+4,7,16,23,24
+5000
+201 - Test stmt to entity
+if i;
+Select i such that Next*(7,i)
+14,18,19
+5000
+202 - Test stmt to entity
+while w;
+Select w such that Next*(18,w)
+21
+5000
+203 - Test stmt to entity
+read re;
+Select re such that Next*(18,re)
+none
+5000
+204 - Test stmt in while jump back to entity
+assign a;
+Select a such that Next*(15,a)
+13,20
+5000
+205 - Test stmt in while jump back to entity
+read re;
+Select re such that Next*(16,re)
+15
+5000
+206 - Test stmt in while jump back to entity 
+call c;
+Select c such that Next*(14,c)
+17,22
+5000
+20601 - Test stmt in while jump back to entity impossible
+assign a;
+Select a such that Next*(22,a)
+none
+5000
+207 - Test stmt in if to entity
+call c;
+Select c such that Next*(19,c)
+22
+5000
+208 - Test stmt in if to entity in parent else
+print pr;
+Select pr such that Next*(19,pr)
+23
+5000
+209 - Test stmt if head to entity in own else and child else
+print pr;
+Select pr such that Next*(18,pr)
+23,24
+5000
+2010 - Test stmt in else to entity in parent else
+print pr;
+Select pr such that Next*(23,pr)
+none
+5000
+3 - Test stmt to wildcard
+procedure p;
+Select p such that Next*(16,_)
+main, p1
+5000
+301 - Test synonym to stmt
+print pr; stmt s;
+Select pr such that Next*(pr,s)
+7,16,4
+5000
+302 - Test synonym to wildcard
+while w;
+Select w such that Next*(w,_)
+12,21
+5000
+4 - Test synonym to synonym, while to assign Select while
+while w; assign a;
+Select w such that Next*(w,a)
+12
+5000
+401 - Test synonym to synonym, while to assign Select assign
+while w; assign a;
+Select a such that Next*(w,a)
+13,20
+5000
+402 - Test synonym to synonym, same entity
+if if1,if2;
+Select if1 such that Next*(if2,if1)
+14,18,19
+5000
+403 - Test synonym to synonym, same entity
+print pr1,pr2;
+Select pr2 such that Next*(pr1,pr2)
+16,23,24,7
+5000
+5 - Test wildcard to synonym
+procedure p; if i;
+Select p such that Next*(_,i)
+main,p1
+5000
+6 - Test wildcard to specific
+procedure p;
+Select p such that Next*(_, 9)
+main,p1
+5000
+6_1 - Test wildcard to specific
+procedure p;
+Select p such that Next*(_, 25)
+none
+5000
+7 - Test wildcard to wildcard
+procedure p;
+Select p such that Next*(_, _)
+main,p1
+5000

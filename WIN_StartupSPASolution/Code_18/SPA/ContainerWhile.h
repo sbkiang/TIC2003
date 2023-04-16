@@ -10,7 +10,7 @@ class ContainerWhile : public IContainer {
 private:
 	string _type = "while";
 	vector<IContainer*> _childContainer;
-	vector<Statement> _statement;
+	vector<Statement*> _statement;
 	IContainer* _parent;
 	int _level = 0;
 	int _startStmtNum = 0;
@@ -28,9 +28,9 @@ public:
 	void SetChildContainer(vector<IContainer*> childContainer);
 	void PushBackChildContainer(IContainer* childContainer);
 	vector<IContainer*> GetAllChildContainer();
-	vector<Statement> GetStatement();
-	void SetStatement(vector<Statement> stmt);
-	void PushBackStatement(Statement stmt);
+	vector<Statement*> GetStatement();
+	void SetStatement(vector<Statement*> stmt);
+	void PushBackStatement(Statement* stmt);
 	string GetType();
 	int GetStartStmtNum();
 	void SetStartStmtNum(int num);

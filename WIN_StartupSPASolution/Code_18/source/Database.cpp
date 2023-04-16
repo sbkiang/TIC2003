@@ -142,13 +142,12 @@ void Database::insertStatement(int stmtNum, string entity, string text) {
 }
 
 // method to insert a statement into the database
-void Database::insertVariable(string stmtName, int stmtNum) {
+void Database::insertVariable(string stmtName) {
 	char sqlBuf[256];
-	//sprintf_s(sqlBuf, "INSERT INTO variable('name','line_num') VALUES('%s','%i');", stmtName.c_str(), stmtNum);
 	sprintf_s(sqlBuf, "INSERT INTO variable('name') VALUES('%s');", stmtName.c_str());
 	sqlite3_exec(dbConnection, sqlBuf, NULL, 0, &errorMessage);
 	char sqlError[256];
-	sprintf_s(sqlError, "insertVariable SQL Error for %s at stmtNum %i: ", stmtName.c_str(), stmtNum);
+	sprintf_s(sqlError, "insertVariable SQL Error for %s: ", stmtName.c_str());
 	if (errorMessage) { 
 
 		cout << sqlError << errorMessage << endl; 

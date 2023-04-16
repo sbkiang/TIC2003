@@ -40,17 +40,17 @@ vector<IContainer*> ContainerWhile::GetAllChildContainer()
 	return containers;
 }
 
-vector<Statement> ContainerWhile::GetStatement()
+vector<Statement*> ContainerWhile::GetStatement()
 {
 	return _statement;
 }
 
-void ContainerWhile::SetStatement(vector<Statement> stmt)
+void ContainerWhile::SetStatement(vector<Statement*> stmt)
 {
 	_statement = stmt;
 }
 
-void ContainerWhile::PushBackStatement(Statement stmt)
+void ContainerWhile::PushBackStatement(Statement* stmt)
 {
 	_statement.push_back(stmt);
 }

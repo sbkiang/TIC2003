@@ -24,34 +24,34 @@ procedure main {
     else{
 17        d = use4;
     }
-18    while(x < y){
-19        while(y < z){
-20            while(z < a){
-21                while(a > b){
-22                    wwww = yyyy;
+18  while(x < y){
+19      while(y < z){
+20          while(z < a){
+21              while(a > b){
+22                  wwww = yyyy;
                 }
             }
         }
     }
-23    if (10 > 10) then{
+23  if (10 > 10) then{
 24        x = 10;
     }
     else{
 25        x = 20;
     }
-26    while(5 < 10){
+26  while(5 < 10){
 27        x = 20;
     }
-28   call callNone;
+28  call callNone;
 }
 
 procedure calleeL1{
-29    print return1;
-30    call calleeL2;
-31    x = return5 + return6;
+29   print return1;
+30   call calleeL2;
+31   x = return5 + return6;
 32   if(a > b)then{
-33        if(b > c)then{
-34            if(c > d)then{
+33      if(b > c)then{
+34          if(c > d)then{
 35                xxx = bbc2;
             }
             else{

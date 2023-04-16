@@ -252,11 +252,21 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 
 	for (RowSet rs : finalResultStore.sqlResultSet) {
 		string rowCombined;
-		for (pair<string, string> pair : rs.row) {
-			rowCombined += pair.second + " ";
+		for (string syn : selectSynonym) {
+			for (pair<string, string> pair : rs.row) {
+				if (pair.first == syn) {
+					rowCombined += pair.second + " ";
+				}
+			}
 		}
 		rowCombined.pop_back(); // remove trailing whitespace
 		output.push_back(rowCombined);
 	}
+
+	//cout << "MY OUTPUT: ";
+	//for (int i = 0; i < output.size(); i++) {
+	//	cout << output.at(i) << ",";
+	//}
+	//cout << endl;
 }
 

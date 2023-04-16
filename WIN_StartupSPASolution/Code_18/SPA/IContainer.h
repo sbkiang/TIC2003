@@ -11,9 +11,9 @@ public:
 	virtual void SetChildContainer(vector<IContainer*> childContainer) = 0;
 	virtual void PushBackChildContainer(IContainer* childContainer) = 0;
 	virtual vector<IContainer*> GetAllChildContainer() = 0;
-	virtual vector<Statement> GetStatement() = 0;
-	virtual void PushBackStatement(Statement stmt) = 0;
-	virtual void SetStatement(vector<Statement> stmt) = 0;
+	virtual vector<Statement*> GetStatement() = 0;
+	virtual void PushBackStatement(Statement* stmt) = 0;
+	virtual void SetStatement(vector<Statement*> stmt) = 0;
 	virtual string GetType() = 0;
 	virtual int GetStartStmtNum() = 0;
 	virtual void SetStartStmtNum(int num) = 0;

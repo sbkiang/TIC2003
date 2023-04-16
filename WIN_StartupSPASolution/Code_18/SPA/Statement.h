@@ -4,7 +4,7 @@
 
 using namespace std;
 
-class Container;
+class IContainer;
 
 class Statement{
 private:
@@ -18,13 +18,13 @@ private:
 public:
 	// Default Constructor
 	Statement(int stmtNum, string stmt, int stmtNumSubtract);
-	Statement(int stmtNum, string stmt, Container* container, int stmtNumSubtract);
-	Statement(int stmtNum, int level, Container* container, int stmtNumSubtract);
-	Statement(int stmtNum, string stmt, int level, Container* container, int stmtNumSubtract);
+	Statement(int stmtNum, string stmt, IContainer* container, int stmtNumSubtract);
+	Statement(int stmtNum, int level, IContainer* container, int stmtNumSubtract);
+	Statement(int stmtNum, string stmt, int level, IContainer* container, int stmtNumSubtract);
 
 	bool _containerHead = false;
 	bool _containerTail = false;
-	Container* _container = nullptr;
+	IContainer* _container = nullptr;
 
 	void AddToken(string tk);
 	vector<string> GetToken();

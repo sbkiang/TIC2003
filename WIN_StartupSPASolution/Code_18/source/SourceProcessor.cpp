@@ -19,13 +19,10 @@ void SourceProcessor::process(string program) {
 	// This logic is highly simplified based on iteration 1 requirements and 
 	// the assumption that the programs are valid.
 
-	//vector<ContainerProcedure*> procedure2;
-	//vector<string> procedure2;
 	stack<IContainer*> parentStack2;
 	vector<Procedure*> procedure;
-	stack<Container*> parentStack;
+	//vector<ContainerProcedure*> procedure2;
 	vector<Statement*> callStatements;
-	vector<Statement*> callee;
 	map<string, vector<string>> procedureToUsesMap;
 	map<string, vector<string>> procedureToModifiesMap;
 	vector<string> usesVariable, modifiesVariable;
@@ -38,11 +35,8 @@ void SourceProcessor::process(string program) {
 	for (int i = 0; i < tokens.size(); i++) {	
 		string word = tokens.at(i);
 		if (word == "}") { // "}" indicates the end of a container
-			if (!parentStack.empty()) {
+			if (!parentStack2.empty()) {
 				nestedLevel--;
-				parentStack.top()->_endStmtNum = stmtNum;
-				parentStack.top()->_adjustedEndStmtNum = stmtNum - stmtNumSubtract;
-				parentStack.pop();
 				if (parentStack2.top()->GetType() == "procedure") {
 					procedureToUsesMap.insert(pair<string, vector<string>>(procedureName, usesVariable));
 					procedureToModifiesMap.insert(pair<string, vector<string>>(procedureName, modifiesVariable));
@@ -58,17 +52,11 @@ void SourceProcessor::process(string program) {
 			i++;
 			ContainerProcedure* p2 = new ContainerProcedure(nestedLevel);
 			p2->SetStartStmtNum(stmtNum + 1);
-			p2->SetAdjustedStartStmtNum(stmtNum - stmtNumSubtract);
+			p2->SetAdjustedStartStmtNum(p2->GetStartStmtNum() - stmtNumSubtract);
 			parentStack2.push(p2);
+			//procedure2.push_back(p2);
 			procedureNameToPtrMap.insert(pair<string, ContainerProcedure*>(tokens.at(i), p2));
 			procedureName = tokens.at(i);
-			Procedure* p = new Procedure(tokens.at(i));
-			p->_type = "procedure";
-			p->_startStmtNum = stmtNum + 1;
-			p->_adjustedStartStmtNum = p->_startStmtNum - stmtNumSubtract;
-			p->_level = nestedLevel;
-			procedure.push_back(p);
-			parentStack.push(p);
 			nestedLevel++;
 		}
 		else if (word == "while") { // while(...){...}
@@ -78,55 +66,39 @@ void SourceProcessor::process(string program) {
 			ContainerWhile* container2 = new ContainerWhile(nestedLevel);
 			container2->SetStartStmtNum(stmtNum);
 			container2->SetAdjustedStartStmtNum(stmtNum - stmtNumSubtract);
-
-			Container* container = new Container();
-			container->_type = word;
-			container->_startStmtNum = stmtNum;
-			container->_adjustedStartStmtNum = stmtNum - stmtNumSubtract;
-			container->_level = nestedLevel;
-			Statement* stmt = new Statement(stmtNum, nestedLevel, container, stmtNumSubtract);
+			Statement* stmt = new Statement(stmtNum, nestedLevel, container2, stmtNumSubtract);
 			stmt->SetEntity(word);
-			if (!parentStack.empty()) {
-				container->_parent = parentStack.top();
-
+			if (!parentStack2.empty()) {
 				parentStack2.top()->PushBackChildContainer(container2);
-
-				parentStack.top()->_childContainers.push_back(container);
 			}
 			parentStack2.push(container2);
-			parentStack.push(container);
-			vector<Statement> variableStore;
+			vector<string> variableStore;
 			vector<Statement> useStore;
 			i++; // skip the "while" keyword
 			while (tokens.at(i) != "{") {
-				container->_condition += tokens.at(i);
 				stmt->AddStmt(tokens.at(i));
 				stmt->AddToken(tokens.at(i));
 				if (regex_match(tokens.at(i), regex(regexConstants))) {
 					Database::insertConstant(tokens.at(i));
 				}
 				else if (regex_match(tokens.at(i), regex(regexVariables))) {
-					variableStore.push_back(Statement(stmtNum, tokens.at(i), container, stmtNumSubtract));
+					variableStore.push_back(tokens.at(i));
 				}
 				if (regex_match(tokens.at(i), regex(regexVariables))) {
 					useStore.push_back(Statement(stmtNum, tokens.at(i), stmtNumSubtract));
 				}
 				i++;
 			}
-
-			container2->PushBackStatement(*stmt);
-
-			container->_statements.push_back(stmt);
+			container2->PushBackStatement(stmt);
 			Database::insertStatement(stmt->GetAdjustedStmtNum(), word, stmt->GetStmt());
 			for (int i = 0; i < variableStore.size(); i++) { // insert the variable after inserting the statement due to FK
-				Database::insertVariable(variableStore.at(i).GetStmt(), variableStore.at(i).GetAdjustedStmtNum());
+				Database::insertVariable(variableStore.at(i));
 			}
 
 			for (int i = 0; i < useStore.size(); i++) {
 				// database PK constraint will trigger for duplicate variables with same line_num to prevent duplicate insertion
 				Database::insertUses(useStore.at(i).GetAdjustedStmtNum(), useStore.at(i).GetStmt());
 				usesVariable.push_back(useStore.at(i).GetStmt());
-				procedure.back()->_uses.push_back(useStore.at(i).GetStmt());
 			}
 		}
 		else if (word == "if") { // if(...) then {...} else {...}
@@ -136,36 +108,23 @@ void SourceProcessor::process(string program) {
 			ContainerIf* container2 = new ContainerIf(nestedLevel);
 			container2->SetStartStmtNum(stmtNum);
 			container2->SetAdjustedStartStmtNum(stmtNum - stmtNumSubtract);
-
-			Container* container = new Container();
-			container->_type = word;
-			container->_startStmtNum = stmtNum;
-			container->_adjustedStartStmtNum = stmtNum - stmtNumSubtract;
-			container->_level = nestedLevel;
-			container->_parent = parentStack.top();
-			Statement* stmt = new Statement(stmtNum, nestedLevel, container, stmtNumSubtract);
+			Statement* stmt = new Statement(stmtNum, nestedLevel, container2, stmtNumSubtract);
 			stmt->SetEntity(word);
-			if (!parentStack.empty()) { // if there's parent container, add current container to parent's child
-				container->_parent = parentStack.top();
-
+			if (!parentStack2.empty()) { // if there's parent container, add current container to parent's child
 				parentStack2.top()->PushBackChildContainer(container2);
-
-				parentStack.top()->_childContainers.push_back(container);
 			}
 			parentStack2.push(container2);
-			parentStack.push(container); //set itself as the latest parent container
-			vector<Statement> variableStore; // we need to insert statement first before inserting variable due to FK
+			vector<string> variableStore; // we need to insert statement first before inserting variable due to FK
 			vector<Statement> useStore;
 			i++; // skip the "if" keyword for the while loop below
 			while (tokens.at(i) != "then") { // from current index till "then", it's the condition. "if(...) then{"
-				container->_condition += tokens.at(i);
 				stmt->AddStmt(tokens.at(i));
 				stmt->AddToken(tokens.at(i));
 				if (regex_match(tokens.at(i), regex(regexConstants))) {
 					Database::insertConstant(tokens.at(i));
 				}
 				else if (regex_match(tokens.at(i), regex(regexVariables))) {
-					variableStore.push_back(Statement(stmtNum, tokens.at(i), container, stmtNumSubtract));
+					variableStore.push_back(tokens.at(i));
 				}
 
 				if (regex_match(tokens.at(i), regex(regexVariables))) {
@@ -173,20 +132,15 @@ void SourceProcessor::process(string program) {
 				}
 				i++;
 			}
-
-			container2->PushBackStatement(*stmt);
-
-			container->_statements.push_back(stmt);
+			container2->PushBackStatement(stmt);
 			Database::insertStatement(stmt->GetAdjustedStmtNum(), word, stmt->GetStmt());
 			for (int i = 0; i < variableStore.size(); i++) {
-				Database::insertVariable(variableStore.at(i).GetStmt(), variableStore.at(i).GetAdjustedStmtNum());
+				Database::insertVariable(variableStore.at(i));
 			}
-
 			for (int i = 0; i < useStore.size(); i++) {
 				// database PK constraint will trigger for duplicate variables with same line_num to prevent duplicate insertion
 				Database::insertUses(useStore.at(i).GetAdjustedStmtNum(), useStore.at(i).GetStmt());
 				usesVariable.push_back(useStore.at(i).GetStmt());
-				procedure.back()->_uses.push_back((useStore.at(i).GetStmt()));
 			}
 		}
 		else if (word == "else") { // for else container
@@ -198,39 +152,27 @@ void SourceProcessor::process(string program) {
 			container2->SetStartStmtNum(stmtNum);
 			container2->SetAdjustedStartStmtNum(stmtNum - stmtNumSubtract);
 
-			Container* container = new Container();
-			container->_type = word;
-			Statement* stmt = new Statement(stmtNum, nestedLevel, container, stmtNumSubtract - 1);
+			Statement* stmt = new Statement(stmtNum, nestedLevel, container2, stmtNumSubtract - 1);
 			stmt->SetEntity(word);
 			stmt->AddStmt(word);
 			stmt->AddToken(word);
 
-			container2->PushBackStatement(*stmt);
-
-			container->_statements.push_back(stmt);
-			container->_startStmtNum = stmtNum;
-			container->_adjustedStartStmtNum = stmtNum - stmtNumSubtract;
-			container->_level = nestedLevel;
-			if (!parentStack.empty()) { // if there's parent container, add current container to parent's child
-				container->_parent = parentStack.top();
-
+			container2->PushBackStatement(stmt);
+			if (!parentStack2.empty()) { // if there's parent container, add current container to parent's child
 				parentStack2.top()->PushBackChildContainer(container2);
-
-				parentStack.top()->_childContainers.push_back(container);
 			}
 			parentStack2.push(container2);
-			parentStack.push(container); // we push the current "else" container to the parentStack for future statements
 		}
 		else if (word == "=") { // for assign
 			stmtNum++;
-			Statement* stmt = new Statement(stmtNum, nestedLevel, parentStack.top(), stmtNumSubtract);
+			Statement* stmt = new Statement(stmtNum, nestedLevel, parentStack2.top(), stmtNumSubtract);
 			stmt->AddStmt(tokens.at(i - 1));
 			stmt->AddToken(tokens.at(i - 1));
 			stmt->SetEntity("assign");
-			vector<Statement> variableStore; // we need to insert statement first before inserting variable due to FK. So, we store the variables here
+			vector<string> variableStore; // we need to insert statement first before inserting variable due to FK. So, we store the variables here
 			vector<Statement> useStore;
 			vector<Statement> modifiesStore;
-			variableStore.push_back(Statement(stmtNum, tokens.at(i - 1), stmtNumSubtract));
+			variableStore.push_back(tokens.at(i - 1));
 			string LHS = tokens.at(i - 1);
 			while (tokens.at(i) != ";") {
 				stmt->AddStmt(tokens.at(i));
@@ -239,7 +181,7 @@ void SourceProcessor::process(string program) {
 					Database::insertConstant(tokens.at(i));
 				}
 				else if (regex_match(tokens.at(i), regex(regexVariables))) {
-					variableStore.push_back(Statement(stmtNum, tokens.at(i), nestedLevel, parentStack.top(), stmtNumSubtract));
+					variableStore.push_back(tokens.at(i));
 				}
 
 				if (regex_match(tokens.at(i), regex(regexVariables))) {
@@ -248,27 +190,24 @@ void SourceProcessor::process(string program) {
 				i++;
 			}
 
-			parentStack2.top()->PushBackStatement(*stmt);
-			parentStack.top()->_statements.push_back(stmt);
+			parentStack2.top()->PushBackStatement(stmt);
 			modifiesStore.push_back(Statement(stmtNum, LHS, stmtNumSubtract)); //Store LHS variable
 			Database::insertStatement(stmt->GetAdjustedStmtNum(), stmt->GetEntity(), stmt->GetStmt());
 			
 			for (int i = 0; i < variableStore.size(); i++) {
-				Database::insertVariable(variableStore.at(i).GetStmt(), variableStore.at(i).GetAdjustedStmtNum());
+				Database::insertVariable(variableStore.at(i));
 			}
 
 			for (int i = 0; i < useStore.size(); i++) {
 				// database PK constraint will trigger for duplicate variables with same line_num to prevent duplicate insertion
 				Database::insertUses(useStore.at(i).GetAdjustedStmtNum(), useStore.at(i).GetStmt());
 				usesVariable.push_back(useStore.at(i).GetStmt());
-				procedure.back()->_uses.push_back(useStore.at(i).GetStmt());
 				//parentStack.top()->_uses.push_back((useStore.at(i)._stmt));
 			}
 
 			for (int i = 0; i < modifiesStore.size(); i++) {
 				Database::insertModifies(modifiesStore.at(i).GetAdjustedStmtNum(), modifiesStore.at(i).GetStmt());
 				modifiesVariable.push_back(modifiesStore.at(i).GetStmt());
-				procedure.back()->_modifies.push_back(modifiesStore.at(i).GetStmt());
 			}
 
 			size_t equal_pos = (stmt->GetStmt()).find("="); // Find position of the equal sign
@@ -277,31 +216,26 @@ void SourceProcessor::process(string program) {
 		}
 		else if (word == "read" || word == "print" || word == "call") {
 			stmtNum++;
-			Statement* stmt = new Statement(stmtNum, nestedLevel, parentStack.top(), stmtNumSubtract);
-			//stmt->_stmt += tokens.at(i); // skip the (read, print, call) keywords
+			Statement* stmt = new Statement(stmtNum, nestedLevel, parentStack2.top(), stmtNumSubtract);
 			i++; // skip the keywords
 			stmt->AddStmt(tokens.at(i));
 			stmt->AddToken(tokens.at(i));
-			parentStack2.top()->PushBackStatement(*stmt);
-			parentStack.top()->_statements.push_back(stmt);
+			parentStack2.top()->PushBackStatement(stmt);
 			Database::insertStatement(stmt->GetAdjustedStmtNum(), word, stmt->GetStmt());
 			stmt->SetEntity(word);
 			if (word == "read") {
-				Database::insertVariable(stmt->GetStmt(), stmt->GetAdjustedStmtNum());
+				Database::insertVariable(stmt->GetStmt());
 				Database::insertModifies(stmt->GetAdjustedStmtNum(), stmt->GetStmt());
 				modifiesVariable.push_back(stmt->GetStmt());
-				procedure.back()->_modifies.push_back(stmt->GetStmt());
 			} 
 			else if(word == "print") {
-				Database::insertVariable(stmt->GetStmt(), stmt->GetAdjustedStmtNum());
+				Database::insertVariable(stmt->GetStmt());
 				Database::insertUses(stmt->GetAdjustedStmtNum(), stmt->GetStmt());
 				usesVariable.push_back(stmt->GetStmt());
-				procedure.back()->_uses.push_back(stmt->GetStmt());
 			}
 			else if (word == "call") {
 				callStatements.push_back(stmt);
-				callee.push_back(stmt);
-				Database::insertCall(procedure.back()->_name, tokens.at(i));
+				Database::insertCall(procedureName, tokens.at(i));
 			}
 		}
 	}
@@ -335,25 +269,12 @@ void SourceProcessor::process(string program) {
 		}
 	}
 
-	for (pair<string, ContainerProcedure*> pair : procedureNameToPtrMap) {
-		Database::insertProcedure(pair.first, pair.second->GetAdjustedStartStmtNum(), pair.second->GetAdjustedEndStmtNum());
-	}
-
-
-	for (pair<string, ContainerProcedure*> pair : procedureNameToPtrMap) {
-		HelperFunction::LinkIfElseEndStmtNum(pair.second);
-		vector<IContainer*> containers = pair.second->GetAllChildContainer(); // get all the if and while containers
-		for (int j = 0; j < containers.size(); j++) {
-			if (containers.at(j)->GetType() == "else"){
-				continue;
-			}
-			Database::insertParent(containers.at(j)->GetAdjustedStartStmtNum(), containers.at(j)->GetAdjustedStartStmtNum() + 1, containers.at(j)->GetAdjustedEndStmtNum());
-		}
-	}
-
 	vector<CFG*> CFGs;
-	for (int i = 0; i < procedure.size(); i++) {
-		CFG cfg = CFGBuilder::BuildCFG(procedure.at(i));
+	for (auto pair : procedureNameToPtrMap) {
+	//for(ContainerProcedure* procedure : procedure2){
+	//for (int i = 0; i < procedure.size(); i++) {
+		//CFG cfg = CFGBuilder::BuildCFG(procedure);
+		CFG cfg = CFGBuilder::BuildCFG(pair.second);
 		vector<CFGNode*> nodes = cfg.GetAllCFGNodes();
 		for (int j = 0; j < nodes.size(); j++) {
 			CFGNode* node = nodes.at(j);
@@ -371,6 +292,21 @@ void SourceProcessor::process(string program) {
 			}
 		}
 		//procedure.at(i)->printContainerTree(0);
+	}
+
+	for (pair<string, ContainerProcedure*> pair : procedureNameToPtrMap) {
+		Database::insertProcedure(pair.first, pair.second->GetAdjustedStartStmtNum(), pair.second->GetAdjustedEndStmtNum());
+	}
+
+	for (pair<string, ContainerProcedure*> pair : procedureNameToPtrMap) {
+		HelperFunction::LinkIfElseEndStmtNum(pair.second);
+		vector<IContainer*> containers = pair.second->GetAllChildContainer(); // get all the if and while containers
+		for (int j = 0; j < containers.size(); j++) {
+			if (containers.at(j)->GetType() == "else") {
+				continue;
+			}
+			Database::insertParent(containers.at(j)->GetAdjustedStartStmtNum(), containers.at(j)->GetAdjustedStartStmtNum() + 1, containers.at(j)->GetAdjustedEndStmtNum());
+		}
 	}
 	
 }

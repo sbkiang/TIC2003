@@ -117,6 +117,7 @@ set<RowSet> HelperFunction::CartesianProduct(set<RowSet> set1, set<RowSet> set2)
 	return cpSet;
 }
 
+// this function must only run after doing CFG. Else, the logic will be messed up as CFG relies on the separation between if and else container
 void HelperFunction::LinkIfElseEndStmtNum(IContainer* container)
 {
 	if (!container) { return; }

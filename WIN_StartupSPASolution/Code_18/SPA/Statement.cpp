@@ -6,21 +6,21 @@ Statement::Statement(int stmtNum, string stmt, int stmtNumSubtract) {
 	_stmtNumSubtract = stmtNumSubtract;
 }
 
-Statement::Statement(int stmtNum, string stmt, Container* container, int stmtNumSubtract) {
+Statement::Statement(int stmtNum, string stmt, IContainer* container, int stmtNumSubtract) {
 	_stmtNum = stmtNum;
 	_stmt = stmt;
 	_stmtNumSubtract = stmtNumSubtract;
 	_container = container;
 }
 
-Statement::Statement(int stmtNum, int level, Container* container, int stmtNumSubtract) {
+Statement::Statement(int stmtNum, int level, IContainer* container, int stmtNumSubtract) {
 	_stmtNum = stmtNum;
 	_level = level;
 	_container = container;
 	_stmtNumSubtract = stmtNumSubtract;
 }
 
-Statement::Statement(int stmtNum, string stmt, int level, Container* container, int stmtNumSubtract) {
+Statement::Statement(int stmtNum, string stmt, int level, IContainer* container, int stmtNumSubtract) {
 	_stmtNum = stmtNum;
 	_stmt = stmt;
 	_level = level;
