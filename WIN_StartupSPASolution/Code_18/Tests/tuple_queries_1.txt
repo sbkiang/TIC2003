@@ -53,3 +53,8 @@ if f1; while w2, w3;
 Select <f1, w2, w3> such that Parent* (f1, w2) such that Parent* (w2, w3)
 22 24 25
 5000
+11 - Find three while loops nested one in another
+while w1, w2, w3;
+Select <w1, w2, w3> such that Parent* (w1, w2) such that Parent* (w2, w3)
+14 19 20
+5000
