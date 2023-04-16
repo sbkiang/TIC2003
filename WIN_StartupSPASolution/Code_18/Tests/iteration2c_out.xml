@@ -1,21 +1,21 @@
 <?xml-stylesheet type="text/xsl" href="analysis.xsl"?>
 <test_results>
 <info>
-<name>AutoTester</name><parsing_time_taken>1567.000000</parsing_time_taken>
+<name>AutoTester</name><parsing_time_taken>2171.000000</parsing_time_taken>
 </info>
 <queries>
 <query>
 <id ReturnTuple="1" UnnamedVar="2" Uses="1" Pattern="1" SuchThat="1" CondNum="6" RelNum="1" comment="Mix Uses and pattern">1069</id><querystr><![CDATA[assign a; variable v; Select v such that Uses(a, v) pattern a(_, _"a"_)]]></querystr>
 <stuans>a,c,b</stuans>
 <correct>a,b,c</correct>
-<time_taken>243.000000</time_taken>
+<time_taken>85.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Parentstar="1" UnnamedVar="1" Pattern="1" SuchThat="1" CondNum="5" RelNum="1" comment="Mix Parent* and pattern">1071</id><querystr><![CDATA[assign a; while w; Select w such that Parent*(w, a) pattern a("a", _)]]></querystr>
 <stuans>4,6</stuans>
 <correct>4,6</correct>
-<time_taken>83.000000</time_taken>
+<time_taken>116.000000</time_taken>
 <passed/>
 </query>
 </queries>
