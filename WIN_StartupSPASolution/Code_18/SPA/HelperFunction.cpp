@@ -117,18 +117,20 @@ set<RowSet> HelperFunction::CartesianProduct(set<RowSet> set1, set<RowSet> set2)
 	return cpSet;
 }
 
-vector<RowSet> HelperFunction::CartesianProduct(vector<RowSet> set1, vector<RowSet> set2) {
-	vector<RowSet> cpSet;
-	for (RowSet rs1 : set1) {
-		for (RowSet rs2 : set2) {
-			RowSet nrs = rs1;
-			nrs.row.insert(rs2.row.begin(), rs2.row.end());
-			cpSet.push_back(nrs);
+void HelperFunction::LinkIfElseEndStmtNum(IContainer* container)
+{
+	if (!container) { return; }
+	vector<IContainer*> cc = container->GetChildContainer();
+	for (int i = 0; i < cc.size(); i++) {
+		IContainer* child = cc.at(i);
+		if (child->GetType() == "if") { // if childContainer is "if" container
+			IContainer* nextChild = cc.at(i + 1);
+			child->SetAdjustedEndStmtNum(nextChild->GetAdjustedEndStmtNum());
+			child->SetEndStmtNum(nextChild->GetEndStmtNum());
 		}
+		LinkIfElseEndStmtNum(child);
 	}
-	return cpSet;
 }
-
 
 set<string> HelperFunction::GetSynonymColInResultSet(set<RowSet> rsSet, map<string,string> synEntMap) {
 	set<string> colName;
@@ -149,8 +151,9 @@ set<RowSet> HelperFunction::CommonColumnIntersect(set<RowSet> set1, set<RowSet> 
 	set<RowSet> newSet;
 	for (RowSet rs1 : set1) {
 		for (RowSet rs2 : set2) {
+			//if (!(rs1 < rs2)) { break; }
 			if (!(rs1 < rs2) && !(rs2 < rs1)) {
-					RowSet tempRs;
+				RowSet tempRs;
 				for (pair<string, string> p : rs2.row) {
 					tempRs.row.insert(p);
 				}

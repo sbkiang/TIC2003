@@ -39,12 +39,15 @@
     <ClCompile Include="ClRelRef.cpp" />
     <ClCompile Include="ClSelect.cpp" />
     <ClCompile Include="Container.cpp" />
+    <ClCompile Include="ContainerElse.cpp" />
+    <ClCompile Include="ContainerIf.cpp" />
+    <ClCompile Include="ContainerProcedure.cpp" />
+    <ClCompile Include="ContainerWhile.cpp" />
     <ClCompile Include="DescriberClPattern.cpp" />
     <ClCompile Include="DescriberClSelect.cpp" />
     <ClCompile Include="DescriberEntStmt.cpp" />
     <ClCompile Include="HelperFunction.cpp" />
     <ClCompile Include="IDescriberClConstrain.h" />
-    <ClCompile Include="IndirectCallsBuilder.cpp" />
     <ClCompile Include="Procedure.cpp" />
     <ClCompile Include="DescriberClRelRef.cpp" />
     <ClCompile Include="Statement.cpp" />
@@ -71,7 +74,6 @@
     <ClInclude Include="BuilderSqlSelectParentT.h" />
     <ClInclude Include="BuilderSqlSelectPattern.h" />
     <ClInclude Include="BuilderSqlSelectUses.h" />
-    <ClInclude Include="IndirectCallsBuilder.h" />
     <ClInclude Include="CFG.h" />
     <ClInclude Include="CFGBuilder.h" />
     <ClInclude Include="ClPattern.h" />
@@ -81,6 +83,10 @@
     <ClInclude Include="BuilderSqlColumnNext.h" />
     <ClInclude Include="ClSelect.h" />
     <ClInclude Include="Container.h" />
+    <ClInclude Include="ContainerElse.h" />
+    <ClInclude Include="ContainerIf.h" />
+    <ClInclude Include="ContainerProcedure.h" />
+    <ClInclude Include="ContainerWhile.h" />
     <ClInclude Include="DescriberClPattern.h" />
     <ClInclude Include="DescriberClRelRef.h" />
     <ClInclude Include="DescriberClSelect.h" />
@@ -89,6 +95,7 @@
     <ClInclude Include="define.h" />
     <ClInclude Include="IBuilderSqlConstrain.h" />
     <ClInclude Include="IClConstrain.h" />
+    <ClInclude Include="IContainer.h" />
     <ClInclude Include="Procedure.h" />
     <ClInclude Include="Statement.h" />
     <ClInclude Include="StatementProcessor.h" />

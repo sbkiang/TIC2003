@@ -1,4 +1,5 @@
 #include "QueryProcessor.h"
+#include <chrono>
 
 // constructor
 QueryProcessor::QueryProcessor() {}
@@ -7,6 +8,7 @@ QueryProcessor::QueryProcessor() {}
 QueryProcessor::~QueryProcessor() {}
 
 using namespace std;
+using namespace chrono;
 
 // method to evaluate a query
 // This method currently only handles queries for getting all the procedure names,
@@ -119,7 +121,8 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 
 	SqlResultStore selectResultStore;
 	Database::ExecuteSql(sqlSelect, selectResultStore);
-	set<string> currentResultSetSynonymOld(selectSynonym.begin(), selectSynonym.end());
+
+	vector<string> constrainSql;
 
 	while (!relRefStack.empty()) {
 		ClRelRef relRefTemp = relRefStack.top();
@@ -134,6 +137,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		if (relEntDescriber.Input2IsSyn()) { // if input1 is part of declared synonym, we get the entity that it belongs
 			stSynonym.insert(relRefTemp.GetInput2());
 		}
+
 
 		if (relationship == "Uses") { // input1 is Stmt Num or Name, input2 is Name
 			BuilderSqlColumnUses colBuilder = BuilderSqlColumnUses();
@@ -212,20 +216,47 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 
 			sql = BuilderFullSqlRelRefAndPattern::BuildSql(colSql, querySql);
 		}
+		constrainSql.push_back(sql);
 
 		SqlResultStore suchThatResultStore;
 		Database::ExecuteSql(sql, suchThatResultStore);
+
 		//HelperFunction::PrintRowSet(suchThatResultStore.sqlResultSet);
 
 		//if there's common synonym between the table, perform intersect
 		set<RowSet> selectResultSet = selectResultStore.sqlResultSet;
 		set<RowSet> suchThatResultSet = suchThatResultStore.sqlResultSet;
 		set<string> selectResultSetSyn = HelperFunction::GetSynonymColInResultSet(selectResultSet, synonymEntityMap);
-		set<string> suchThatResultSetSyn = HelperFunction::GetSynonymColInResultSet(selectResultSet, synonymEntityMap);
+		set<string> suchThatResultSetSyn = HelperFunction::GetSynonymColInResultSet(suchThatResultSet, synonymEntityMap);
 		set<string> intersectSynonym;
-		set_intersection(selectResultSetSyn.begin(), selectResultSetSyn.end(), suchThatResultSetSyn.begin(), suchThatResultSetSyn.end(), inserter(intersectSynonym, intersectSynonym.begin()));
+		std::set_intersection(selectResultSetSyn.begin(), selectResultSetSyn.end(), suchThatResultSetSyn.begin(), suchThatResultSetSyn.end(), inserter(intersectSynonym, intersectSynonym.begin()));
 		if(!intersectSynonym.empty()){
+		/*	set<RowSet> intersectRowSet;
+			set<RowSet> combinedRowSet;
+			auto start = high_resolution_clock::now();
+			set_intersection(selectResultSet.begin(), selectResultSet.end(), suchThatResultSet.begin(), suchThatResultSet.end(), inserter(intersectRowSet, intersectRowSet.begin()));
+			for (RowSet rs : intersectRowSet) {
+				set<RowSet>::iterator set1 = selectResultSet.find(rs);
+				set<RowSet>::iterator set2 = suchThatResultSet.find(rs);
+				for (pair<string,string> colRowPair : set1->row) {
+					rs.row.insert(colRowPair);
+				}
+				for (pair<string, string> colRowPair : set2->row) {
+					rs.row.insert(colRowPair);
+				}
+				combinedRowSet.insert(rs);
+			}
+			auto stop = high_resolution_clock::now();
+			auto duration = duration_cast<microseconds>(stop - start);
+			cout << "Set intersect then combine: " << duration.count() << endl;
+			selectResultStore.sqlResultSet = combinedRowSet;*/
+
+			//start = high_resolution_clock::now();
 			selectResultStore.sqlResultSet = HelperFunction::CommonColumnIntersect(selectResultSet, suchThatResultSet);
+			//stop = high_resolution_clock::now();
+			//duration = duration_cast<microseconds>(stop - start);
+			//cout << "CommonColumnIntersect: " << duration.count() << endl;
+			
 		}
 		else {
 			selectResultStore.sqlResultSet = HelperFunction::CartesianProduct(selectResultSet, suchThatResultSet);
@@ -244,6 +275,7 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		string querySql = queryBuilder.GetSql(patternTemp, patternDescriber);
 
 		string sql = BuilderFullSqlRelRefAndPattern::BuildSql(colSql, querySql);
+		constrainSql.push_back(sql);
 
 		set<string> ptSynonym;
 		ptSynonym.insert(patternTemp.GetPatternSynonym());
@@ -256,9 +288,9 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		set<RowSet> selectResultSet = selectResultStore.sqlResultSet;
 		set<RowSet> patternResultSet = patternResultStore.sqlResultSet;
 		set<string> selectResultSetSyn = HelperFunction::GetSynonymColInResultSet(selectResultSet, synonymEntityMap);
-		set<string> patternResultSetSyn = HelperFunction::GetSynonymColInResultSet(selectResultSet, synonymEntityMap);
+		set<string> patternResultSetSyn = HelperFunction::GetSynonymColInResultSet(patternResultSet, synonymEntityMap);
 		set<string> intersectSynonym;
-		set_intersection(selectResultSetSyn.begin(), selectResultSetSyn.end(), patternResultSetSyn.begin(), patternResultSetSyn.end(), inserter(intersectSynonym, intersectSynonym.begin()));
+		std::set_intersection(selectResultSetSyn.begin(), selectResultSetSyn.end(), patternResultSetSyn.begin(), patternResultSetSyn.end(), inserter(intersectSynonym, intersectSynonym.begin()));
 		if(!intersectSynonym.empty()){
 			selectResultStore.sqlResultSet = HelperFunction::CommonColumnIntersect(selectResultSet, patternResultSet);
 		}
@@ -269,26 +301,48 @@ void QueryProcessor::evaluate(string query, vector<string>& output) {
 		//HelperFunction::PrintRowSet(selectResultStore.sqlResultSet);
 		patternStack.pop();
 	}
+	string sqlFinal = " ( " + sqlSelect + " ) "; // (select xxx from xxx)
+	for (string sql : constrainSql) {
+		sqlFinal += " natural join ( " + sql + " ) "; // (select xxx from xxx) natural join (select yyy from yyy)
+	}
+	string selectSynonymSql;
+	for (string synonym : select.synonym) {
+		selectSynonymSql += synonym + ",";
+	}
+	selectSynonymSql.pop_back(); // remove trailing ","
+	selectSynonymSql = " select distinct " + selectSynonymSql + " from "; // select distinct x,y,z from
+	sqlFinal = selectSynonymSql + " ( " + sqlFinal + " ) "; // select distinct x,y,z from ((select xxx from xxx) natural join (select yyy from yyy)) 
+	SqlResultStore finalResultStore;
+	Database::ExecuteSql(sqlFinal, finalResultStore);
+
+	for (RowSet rs : finalResultStore.sqlResultSet) {
+		string rowCombined;
+		for (pair<string, string> pair : rs.row) {
+			rowCombined += pair.second + " ";
+		}
+		rowCombined.pop_back(); // remove trailing whitespace
+		output.push_back(rowCombined);
+	}
 
 	// post process the results to fill in the output vector
-	set<RowSet> final;
-	for (RowSet rs : selectResultStore.sqlResultSet) {
-		RowSet ins;
-		for (string synonym : select.synonym) {
-			ins.row.insert(pair<string, string>(synonym, rs.row.at(synonym)));
-		}
-		final.insert(ins);
-	}
-	for (RowSet rs : final) {
-		string result = "";
-		for (string synonym : select.synonym) {
-			result += (rs.row.at(synonym) + " ");
-		}
-		while (result.back() == ' ') {
-			result.pop_back();
-		}
-		output.push_back(result);
-	}
+	//set<RowSet> final;
+	//for (RowSet rs : selectResultStore.sqlResultSet) {
+	//	RowSet ins;
+	//	for (string synonym : select.synonym) {
+	//		ins.row.insert(pair<string, string>(synonym, rs.row.at(synonym)));
+	//	}
+	//	final.insert(ins);
+	//}
+	//for (RowSet rs : final) {
+	//	string result = "";
+	//	for (string synonym : select.synonym) {
+	//		result += (rs.row.at(synonym) + " ");
+	//	}
+	//	while (result.back() == ' ') {
+	//		result.pop_back();
+	//	}
+	//	output.push_back(result);
+	//}
 
 	cout << "MY OUTPUT: ";
 	for (int i = 0; i < output.size(); i++) {

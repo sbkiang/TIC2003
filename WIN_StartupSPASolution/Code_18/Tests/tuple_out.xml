@@ -1,0 +1,42 @@
+<?xml-stylesheet type="text/xsl" href="analysis.xsl"?>
+<test_results>
+<info>
+<name>AutoTester</name><parsing_time_taken>3651.000000</parsing_time_taken>
+</info>
+<queries>
+<query>
+<id ReturnTuple="1" Modifies="1" Parentstar="1" UnnamedVar="1" Pattern="1" SuchThat="2" CondNum="7" RelNum="2" comment="Get while statement and all assignment in it with pattern">1</id><querystr><![CDATA[while w; assign a; Select <w,a> such that Parent*(w,a) such that Modifies(a,"x") pattern a("x",_"2"_)]]></querystr>
+<stuans></stuans>
+<correct>5 10,5 9</correct>
+<time_taken>157.000000</time_taken>
+<failed>
+<missing>5 10,5 9</missing>
+<additional></additional>
+<summary>
+<expected>2</expected>
+<matched>0</matched>
+<missing>2</missing>
+<additional>0</additional>
+</summary>
+</failed>
+</query>
+<query>
+<id ReturnTuple="1" Modifies="1" Parentstar="1" Uses="1" SuchThat="3" CondNum="7" RelNum="3" comment="All variables and stmt in while">2</id><querystr><![CDATA[while w; variable v; stmt s; Select <s,v> such that Uses(s,v) such that Modifies(s,v) such that Parent*(w,s)]]></querystr>
+<stuans></stuans>
+<correct></correct>
+<time_taken>764.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Modifies="1" Uses="1" SuchThat="2" CondNum="5" RelNum="2" comment="All variables and in while">2</id><querystr><![CDATA[while w; variable v; stmt s; Select <s,v> such that Uses(s,v) such that Modifies(s,v)]]></querystr>
+<stuans>18 y1,19 y1,15 x1,15 y1,16 x1,17 y1,10 x,5 y,5 x,7 y,6 x,1 y,1 x,2 x1,2 y1,9 x,8 x,42 x2,42 y2,41 x1,41 y1,25 x2,25 y2,27 x2,26 x2,20 y1,29 y2</stuans>
+<correct>18 y1,19 y1,15 x1,15 y1,16 x1,17 y1,10 x,5 y,5 x,7 y,6 x,1 y,1 x,2 x1,2 y1,9 x,8 x,42 x2,42 y2,41 x1,41 y1,25 x2,25 y2,27 x2,26 x2,20 y1,29 y2</correct>
+<time_taken>838.000000</time_taken>
+<passed/>
+</query>
+<query>
+<id ReturnTuple="1" Nextstar="1" Parent="2" Uses="1" SuchThat="4" CondNum="9" RelNum="4" comment="Get all statement in if that is child of while that comes after read statement, and uses a variable">3</id><querystr><![CDATA[stmt s; read re; while w; if i; variable v; Select <s,w,i,v> such that Next*(re,w) such that Parent(w,i) such that Parent(i,s) such that Uses(s,v)]]></querystr>
+<timeout/>
+</query>
+</queries>
+</test_results>

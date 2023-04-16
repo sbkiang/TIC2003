@@ -35,4 +35,5 @@ struct Select {
 	vector<string> whereSql;
 	vector<string> columnSql;
 	vector<string> asSql;
+	vector<string> parentSql;
 };

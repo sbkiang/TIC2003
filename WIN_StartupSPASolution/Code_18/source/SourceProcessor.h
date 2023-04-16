@@ -13,6 +13,10 @@
 #include "..\SPA\Container.h"
 #include "..\SPA\CFGBuilder.h"
 #include "..\SPA\Statement.h"
+#include "..\SPA\ContainerElse.h"
+#include "..\SPA\ContainerIf.h"
+#include "..\SPA\ContainerWhile.h"
+#include "..\SPA\ContainerProcedure.h"
 
 using namespace std;
 

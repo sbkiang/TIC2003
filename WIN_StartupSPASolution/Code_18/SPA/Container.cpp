@@ -31,12 +31,6 @@ vector<Container> Container::getAllContainers() {
 }
 
 void Container::_getAllContainers(Container container, vector<Container> &containers) {
-	//if (!container) { return; }
-	/*
-	if ((container._type != "procedure" && container._type != "else")) { // don't add procedure and else container to the result
-		containers.push_back(container);
-	}
-	*/
 	for (int i = 0; i < container._childContainers.size(); i++) {
 		Container child = *(container._childContainers.at(i));
 		if (child._type == "if") { // if childContainer is "if" container

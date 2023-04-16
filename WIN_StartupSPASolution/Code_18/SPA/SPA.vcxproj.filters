@@ -126,7 +126,16 @@
     <ClCompile Include="Struct.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="IndirectCallsBuilder.cpp">
+    <ClCompile Include="ContainerProcedure.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ContainerIf.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ContainerElse.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ContainerWhile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -254,7 +263,19 @@
     <ClInclude Include="IClConstrain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IndirectCallsBuilder.h">
+    <ClInclude Include="IContainer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ContainerProcedure.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ContainerIf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ContainerElse.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ContainerWhile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
