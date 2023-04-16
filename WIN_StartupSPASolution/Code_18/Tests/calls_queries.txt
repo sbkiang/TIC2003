@@ -83,3 +83,13 @@ procedure p;
 Select p such that Calls*(_,_)
 callee1Only,callee2Only,caller2Only,main,nestCall1,nestCall2,nestCall3,proc1,proc2,proc3
 5000
+21- Call
+procedure p;
+Select p such that Calls(p,nestCall3)
+nestCall2
+5000
+22- Call
+procedure p;
+Select p such that Calls*(p,nestCall3)
+TOBEFILL
+5000
