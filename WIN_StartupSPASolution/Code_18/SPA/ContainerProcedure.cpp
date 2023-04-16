@@ -9,9 +9,8 @@ void ContainerProcedure::_GetAllChildContainer(IContainer& container, vector<ICo
 	}
 }
 
-ContainerProcedure::ContainerProcedure(string name, int level)
+ContainerProcedure::ContainerProcedure(int level)
 {
-	_name = name;
 	_level = level;
 }
 

@@ -24,6 +24,7 @@ void SourceProcessor::process(string program) {
 	vector<Procedure*> procedure;
 	stack<Container*> parentStack;
 	vector<Statement*> callStatements;
+	map<string, ContainerProcedure*> procedureNamePtrMap;
 	int stmtNumSubtract = 0;
 	int stmtNum = 0;
 	int nestedLevel = 0;
@@ -44,12 +45,12 @@ void SourceProcessor::process(string program) {
 		else if (word == "procedure") {
 			i++;
 
-			ContainerProcedure* p2 = new ContainerProcedure(tokens.at(i), nestedLevel);
+			ContainerProcedure* p2 = new ContainerProcedure(nestedLevel);
 			p2->SetStartStmtNum(stmtNum + 1);
 			p2->SetAdjustedStartStmtNum(stmtNum - stmtNumSubtract);
 			procedure2.push_back(p2);
 			parentStack2.push(p2);
-
+			procedureNamePtrMap.insert(pair<string, ContainerProcedure*>(tokens.at(i), p2));
 			Procedure* p = new Procedure(tokens.at(i));
 			p->_type = "procedure";
 			p->_startStmtNum = stmtNum + 1;

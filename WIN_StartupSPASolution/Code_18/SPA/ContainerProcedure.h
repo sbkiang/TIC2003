@@ -23,7 +23,7 @@ private:
 
 public:
 	// Default Constructor
-	ContainerProcedure(string name, int level);
+	ContainerProcedure(int level);
 	vector<string> _uses; // stores the variables that satisfy the assign's uses(s,v), print's uses(s,v), and container stmt s's uses(s,v)
 	vector<string> _modifies; // stores the variables that satisfy the assign's uses(s,v), print's uses(s,v), and container stmt s's uses(s,v)
 	vector<ContainerProcedure*> _calls; // stores the called procedures. Used to populate database for _uses, _modifies, _calls
